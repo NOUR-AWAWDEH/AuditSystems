@@ -6,7 +6,7 @@ namespace AuditSystem.Domain.Entities.Jobs
     {
         public int SerialNumber { get; set; }
         public string AuditableUnit { get; set; } = string.Empty;
-        public string BusinessObjectiveID { get; set; } = string.Empty;
+        public Guid BusinessObjectiveID { get; set; }
         public string RiskRating { get; set; } = string.Empty;
         public bool SelectForAudit { get; set; }
         public string Comments { get; set; } = string.Empty;

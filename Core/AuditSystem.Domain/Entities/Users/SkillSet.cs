@@ -3,9 +3,9 @@ using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Domain.Entities.Users 
 {
-    public class SkillSet : Entity<int>
+    public class SkillSet : Entity<Guid>
     {
-        public int UserManagementId  { get; set; }
+        public Guid UserManagementId  { get; set; }
         public int SkillId { get; set; } 
         public string ProficiencyLevel { get; set; } = string.Empty;
 

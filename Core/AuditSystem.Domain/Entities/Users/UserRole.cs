@@ -1,10 +1,10 @@
-using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Domain.Entities.Users
 {
-    public class UserRole : Entity<Guid>
+    public class UserRole
     {
-        public string RoleName { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public const string Admin = "Admin";
+        public const string  Auditor = "Auditor";
+        public const string User = "User";
     }
 }

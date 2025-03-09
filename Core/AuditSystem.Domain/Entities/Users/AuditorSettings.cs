@@ -1,7 +1,7 @@
 using AuditSystem.Domain.Entities.Common;
 namespace AuditSystem.Domain.Entities.Users
 {
-    public class AdminSettings : Entity<Guid>
+    public class AuditorSettings : Entity<Guid>
     {
         public Guid UserId { get; set; }
 

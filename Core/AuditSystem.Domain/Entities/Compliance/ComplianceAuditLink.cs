@@ -4,7 +4,7 @@ using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Domain.Entities.Compliance
 {
-    public class ComplianceAuditLink : Entity<Guid>
+    public class ComplianceAuditLink : Entity<Guid> // many to many 
     {
         public Guid ComplianceId { get; set; }
         public Guid AuditUniverseId { get; set; }

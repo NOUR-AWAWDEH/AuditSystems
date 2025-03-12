@@ -10,6 +10,6 @@ namespace AuditSystem.Domain.Entities.Audit
         public string Description { get; set; } = string.Empty;
         public string ExampleDetails { get; set; } = string.Empty;
 
-        public AuditorSettings AuditorSettings { get; set; } = null!;
+        public virtual AuditorSettings AuditorSettings { get; set; } = null!;
     }
 }

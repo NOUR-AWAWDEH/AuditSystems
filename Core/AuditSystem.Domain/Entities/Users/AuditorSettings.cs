@@ -5,6 +5,6 @@ namespace AuditSystem.Domain.Entities.Users
     {
         public Guid UserId { get; set; }
 
-        public User User { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -11,6 +11,6 @@ namespace AuditSystem.Domain.Entities.Processes
         public Guid ProcessId { get; set; }
         public string Particular { get; set; } = string.Empty;
 
-        public Process Process { get; set; } = null!;
+        public virtual Process Process { get; set; } = null!;
     }
 }

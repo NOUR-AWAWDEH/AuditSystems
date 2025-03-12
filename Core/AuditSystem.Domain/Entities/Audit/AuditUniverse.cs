@@ -7,10 +7,10 @@ namespace AuditSystem.Domain.Entities.Audit
         public string BusinessObjective { get; set; } = string.Empty;
         public string IndustryUpdate { get; set; } = string.Empty; 
         public string CompanyUpdate { get; set; } = string.Empty;
-        public Guid DomainID { get; set; }
+        public Guid DomainId { get; set; }
         public bool IsFinancialQuantifiable { get; set; } 
         public bool IsSpecialProject { get; set; } = false; // make in Special Project
 
-        public Domain Domain { get; set; } = null!;
+        public virtual Domain Domain { get; set; } = null!;
     }
 }

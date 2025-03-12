@@ -1,13 +1,15 @@
+using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Risks;
 
 namespace AuditSystem.Domain.Entities.RiskControls
 {
-    public class RiskControl
+    public class RiskControl : Entity<Guid>
     {
         public Guid RiskId { get; set; }
-        public string Rating { get; set; } = string.Empty;
+        public Guid RatingId { get; set; }
         public string Description { get; set; } = string.Empty;
 
-        public Risk Risk { get; set; } = null!;
+        public Rating Rating { get; set; } = null!;
+        public virtual Risk Risk { get; set; } = null!;
     }
 }

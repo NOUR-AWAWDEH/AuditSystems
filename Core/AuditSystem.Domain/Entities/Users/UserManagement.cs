@@ -8,7 +8,7 @@ namespace AuditSystem.Domain.Entities.Users
         public Guid UserID { get; set; }
         public string Designation { get; set; } = string.Empty;
         
-        public AuditorSettings AuditorSettings { get; set; } = null!;
-        public User User { get; set; } = null!;
+        public virtual AuditorSettings AuditorSettings { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

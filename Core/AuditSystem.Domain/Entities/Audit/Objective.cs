@@ -6,9 +6,10 @@ namespace AuditSystem.Domain.Entities.Audit
     public class Objective : Entity<Guid>
     {
         public Guid RiskControlMatrixId { get; set; }
-        public string Rating { get; set; } = string.Empty;
+        public Guid RatingId { get; set; }
         public string Description { get; set; } = string.Empty;
 
-        public RiskControlMatrix RiskControlMatrix { get; set; } = null!;
+        public virtual Rating Rating { get; set; } = null!;
+        public virtual RiskControlMatrix RiskControlMatrix { get; set; } = null!;
     }
 }

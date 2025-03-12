@@ -8,6 +8,6 @@ namespace AuditSystem.Domain.Entities.RiskControls
         public Guid SubProcessId { get; set; }
         public string Description { get; set; } = string.Empty;
         
-        public SubProcess SubProcess { get; set; } = null!;         
+        public virtual SubProcess SubProcess { get; set; } = null!;         
     }
 }

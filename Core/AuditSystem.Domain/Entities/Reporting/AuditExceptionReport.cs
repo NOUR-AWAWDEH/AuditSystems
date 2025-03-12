@@ -11,6 +11,6 @@ namespace AuditSystem.Domain.Entities.Reporting
         public Guid CreatedById { get; set; }
         public string Status { get; set; } = string.Empty;
 
-        public User Creator { get; set; } = null!;
+        public virtual User Creator { get; set; } = null!;
     }
 }

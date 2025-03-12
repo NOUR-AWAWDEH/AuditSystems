@@ -1,0 +1,98 @@
+﻿using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.CheckLists;
+using AuditSystem.Domain.Entities.Compliance;
+using AuditSystem.Domain.Entities.Jobs;
+using AuditSystem.Domain.Entities.Organisation;
+using AuditSystem.Domain.Entities.Reporting;
+using AuditSystem.Domain.Entities.Risks;
+using AuditSystem.Domain.Entities.Tasks;
+using AuditSystem.Domain.Entities.RiskControls;
+using AuditSystem.Domain.Entities.Processes;
+using AuditSystem.Domain.Entities.SupportingDocs;
+using AuditSystem.Domain.Entities.Users;
+using Microsoft.EntityFrameworkCore;
+using AuditSystem.Domain.Entities;
+
+namespace AuditSystem.DataAccess.Contexts;
+
+internal sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : DbContext(options)
+{
+    // Common
+    public required DbSet<Rating> Ratings { get; set; }
+
+    // Audit
+    public required DbSet<AuditEngagement> AuditEngagements { get; set; }
+    public required DbSet<AuditPlanSummary> AuditPlanSummaries { get; set; }
+    public required DbSet<AuditUniverse> AuditUniverses { get; set; }
+    public required DbSet<AuditUniverseObjective> AuditUniverseObjectives { get; set; }
+    public required DbSet<BusinessObjective> BusinessObjectives { get; set; }
+    public required DbSet<Domain.Entities.Audit.Domain> Domains { get; set; }
+    public required DbSet<Objective> Objectives { get; set; }
+    
+    // Checklists
+    public required DbSet<Checklist> Checklists { get; set; }
+    public required DbSet<ChecklistManagement> ChecklistManagements { get; set; }
+    public required DbSet<Remark> Remarks { get; set; }
+    
+    // Compliance
+    public required DbSet<ComplianceAuditLink> ComplianceAuditLinks { get; set; }
+    public required DbSet<ComplianceChecklist> ComplianceChecklists { get; set; }
+    
+    // Jobs
+    public required DbSet<AuditJob> AuditJobs { get; set; }
+    public required DbSet<JobPrioritization> JobPrioritizations { get; set; }
+    public required DbSet<JobScheduling> JobSchedulings { get; set; }
+    
+    // Organisation
+    public required DbSet<Company> Companies { get; set; }
+    public required DbSet<Department> Departments { get; set; }
+    public required DbSet<Location> Locations { get; set; }
+    public required DbSet<SubDepartment> SubDepartments { get; set; }
+    public required DbSet<SubLocation> SubLocations { get; set; }
+    
+    // Process
+    public required DbSet<Process> Processes { get; set; }
+    public required DbSet<SubProcess> SubProcesses { get; set; }
+    
+    // Reporting
+    public required DbSet<ReportingFollowUp> ReportingFollowUps { get; set; }
+    public required DbSet<PlanningReport> PlanningReports { get; set; }
+    public required DbSet<JobTimeAllocationReport> JobTimeAllocationReports { get; set; }
+    public required DbSet<InternalAuditConsolidationReport> InternalAuditConsolidationReports { get; set; }
+    public required DbSet<AuditPlanSummaryReport> AuditPlanSummaryReports { get; set; }
+    public required DbSet<AuditExceptionReport> AuditExceptionReports { get; set; }
+    
+    // Risk Controls
+    public required DbSet<RiskControl> RiskControls { get; set; }
+    public required DbSet<RiskControlMatrix> RiskControlMatrices { get; set; }
+    public required DbSet<Program> Programsrograms { get; set; }
+
+    // Risks
+    public required DbSet<Risk> Risks { get; set; }
+    public required DbSet<RiskAssessment> RiskAssessments { get; set; }
+    public required DbSet<RiskFactor> RiskFactors { get; set; }
+    public required DbSet<SpecificRiskFactor> SpecificRiskFactors { get; set; }
+
+    // Supporting Docs
+    public required DbSet<SupportingDoc> SupportingDocs { get; set; }
+
+    //Tasks
+    public required DbSet<TaskManagement> TaskManagements { get; set; }
+    
+    // Users
+    public required DbSet<User> Users { get; set; }
+    public required DbSet<UserRole> UserRoles { get; set; }
+    public required DbSet<UserManagement> UserManagements { get; set; }
+    public required DbSet<AuditorSettings> AuditorSettings { get; set; }
+    public required DbSet<Skill> Skills { get; set; }
+    public required DbSet<SkillSet> SkillSets { get; set; }
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
+}
+

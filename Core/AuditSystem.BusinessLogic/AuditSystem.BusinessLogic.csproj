@@ -2,7 +2,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuditSystem.Application\AuditSystem.Application.csproj" />
+    <ProjectReference Include="..\AuditSystem.Contract\AuditSystem.Contract.csproj" />
     <ProjectReference Include="..\AuditSystem.Domain\AuditSystem.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    
   </ItemGroup>
 
   <PropertyGroup>

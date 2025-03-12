@@ -9,9 +9,9 @@ namespace AuditSystem.Domain.Entities.Reporting
         public string JobName { get; set; } = string.Empty;
         public string ReportName { get; set; } = string.Empty;
         public DateOnly ReportDate { get; set; }
-        public Guid PreparedByUserID { get; set; } 
+        public Guid PreparedByUserId { get; set; } 
         public string Status { get; set; } = string.Empty;
 
-        public User PreparedByUser { get; set; } = null!;
+        public virtual User PreparedByUser { get; set; } = null!;
     }
 }

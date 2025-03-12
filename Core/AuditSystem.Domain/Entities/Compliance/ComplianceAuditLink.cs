@@ -11,8 +11,8 @@ namespace AuditSystem.Domain.Entities.Compliance
         public string IdentifiedThrough { get; set; } = string.Empty;
         public Guid InitiatedById { get; set; }
 
-        public ComplianceChecklist ComplianceChecklist { get; set; } = null!;
-        public AuditUniverse AuditUniverse { get; set; } = null!;
-        public User Initiator { get; set; } = null!;
+        public virtual ComplianceChecklist ComplianceChecklist { get; set; } = null!;
+        public virtual AuditUniverse AuditUniverse { get; set; } = null!;
+        public virtual User Initiator { get; set; } = null!;
     }
 }

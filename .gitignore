@@ -31,8 +31,7 @@ _ReSharper*/
 *.code-workspace
 
 # Project specific files
-TakeCare.md
-TODO.md
+
 
 # SQL Server files
 *.mdf

@@ -12,6 +12,6 @@ namespace AuditSystem.Domain.Entities.Tasks
         public string Assignee { get; set; } = string.Empty;
         public Guid AssignedById { get; set;}
 
-        public User AssignedBy { get; set; } = null!;
+        public virtual User AssignedBy { get; set; } = null!;
     }
 }

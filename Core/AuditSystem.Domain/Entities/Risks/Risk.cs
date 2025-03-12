@@ -6,10 +6,11 @@ namespace AuditSystem.Domain.Entities.Risks
     public class Risk : Entity<Guid>
     {
         public Guid ObjectiveId { get; set; }
-        public string Rating { get; set; } = string.Empty;
         public string RiskName { get; set; } = string.Empty;
+        public Guid RatingId{ get; set; }
         public string Description { get; set; } = string.Empty;
 
-        public Objective Objective { get; set; } = null!;
+        public Rating Rating { get; set; } = null!;
+        public virtual Objective Objective { get; set; } = null!;
     }
 }

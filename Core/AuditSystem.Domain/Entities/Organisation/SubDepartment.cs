@@ -7,6 +7,7 @@ namespace AuditSystem.Domain.Entities.Organisation
         public string Name { get; set; } = string.Empty;
         public Guid DepartmentId { get; set; }
         
-        public Department Department { get; set; } = null!;
+        public virtual Department Department { get; set; } = null!;
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
 }

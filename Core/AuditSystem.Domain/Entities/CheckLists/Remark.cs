@@ -7,6 +7,6 @@ namespace AuditSystem.Domain.Entities.CheckLists
         public Guid CheckListManagementId { get; set; }
         public string Remarkcommants { get; set; } = string.Empty;
 
-        public CheckListManagement CheckListManagement { get; set; } = null!;
+        public virtual ChecklistManagement ChecklistManagement { get; set; } = null!;
     }
 }

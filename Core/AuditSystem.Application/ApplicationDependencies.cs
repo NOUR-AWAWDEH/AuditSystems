@@ -31,5 +31,5 @@ public static class ApplicationDependencies
                    .AddBehavior(typeof(IPipelineBehavior<,>), typeof(CommandTransactionBehavior<,>)));
 
     private static IServiceCollection AddMapping(this IServiceCollection services) =>
-        services.AddAutoMapper(typeof(ApplicationDependencies).Assembly);
+        services.AddAutoMapper(cfg => cfg.AddMaps(typeof(ApplicationDependencies).Assembly));
 }

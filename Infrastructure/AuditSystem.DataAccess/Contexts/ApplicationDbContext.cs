@@ -66,7 +66,7 @@ internal sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext
     // Risk Controls
     public required DbSet<RiskControl> RiskControls { get; set; }
     public required DbSet<RiskControlMatrix> RiskControlMatrices { get; set; }
-    public required DbSet<Program> Programsrograms { get; set; }
+    public required DbSet<Program> Programs { get; set; }
 
     // Risks
     public required DbSet<Risk> Risks { get; set; }

@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>2a18ea02-2622-41ac-bedf-50ef963ba030</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MailKit" Version="4.11.0" />
@@ -21,6 +22,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.0.30" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />

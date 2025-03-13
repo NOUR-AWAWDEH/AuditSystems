@@ -9,22 +9,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        // Primary Key (inherited from Entity<Guid>)
-        builder.HasKey(u => u.Id);
+        // Table name (optional, overrides Identity's default AspNetUsers)
+        builder.ToTable("Users");
 
         // Properties with constraints
-        builder.Property(u => u.UserName)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        builder.Property(u => u.Password)
-            .IsRequired()
-            .HasMaxLength(255);
-
-        builder.Property(u => u.Email)
-            .IsRequired()
-            .HasMaxLength(100);
-
         builder.Property(u => u.FirstName)
             .IsRequired()
             .HasMaxLength(50);
@@ -34,7 +22,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(50);
 
         // Foreign Key Relationships (nullable, optional)
-        builder.Property(u => u.UserRoleId)
+        builder.Property(u => u.RoleId)
             .IsRequired(false);
 
         builder.Property(u => u.CompanyId)
@@ -49,7 +37,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         // Other Properties
         builder.Property(u => u.LastLogin)
             .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()"); // Default to current UTC time
+            .HasDefaultValueSql("GETUTCDATE()");
 
         builder.Property(u => u.IsActive)
             .IsRequired()
@@ -62,7 +50,31 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.CurrentSessionStart)
             .IsRequired(false);
 
-        // Prevent cascade paths by using Restrict
+        // Identity-related properties (optional)
+        builder.Property(u => u.RefreshToken)
+            .IsRequired(false);
+
+        builder.Property(u => u.PasswordResetCode)
+            .IsRequired(false);
+
+        builder.Property(u => u.PasswordResetCodeExpiration)
+            .IsRequired(false);
+
+        builder.Property(u => u.PasswordResetToken)
+            .IsRequired(false);
+
+        builder.Property(u => u.PasswordResetTokenExpiration)
+            .IsRequired(false);
+
+        builder.Property(u => u.LastLogoutTime)
+            .IsRequired(false);
+
+        // Relationships
+        builder.HasOne(u => u.Role)
+            .WithMany() // No navigation property on UserRole side
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne(u => u.Company)
             .WithMany(c => c.Users)
             .HasForeignKey(u => u.CompanyId)
@@ -77,21 +89,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithMany(s => s.Users)
             .HasForeignKey(u => u.SubDepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(u => u.UserRole)
-            .WithMany()
-            .HasForeignKey(u => u.UserRoleId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Indexes for performance
-        builder.HasIndex(u => u.UserName)
-            .IsUnique();
-
-        builder.HasIndex(u => u.Email)
-            .IsUnique();
-
-
-        builder.Property(u => u.Password)
-            .HasColumnType("nvarchar(100)");
     }
 }

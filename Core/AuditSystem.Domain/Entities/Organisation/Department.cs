@@ -1,4 +1,5 @@
 using AuditSystem.Domain.Entities.Common;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Domain.Entities.Organisation
 {

@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuditSystem.Host.Controllers.v1
+namespace AuditSystem.Host.Controllers.v1.Risks
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,13 +1,13 @@
-using AuditSystem.Auth.Models;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Services.Password.PasswordToken;
 
 public interface IPasswordTokenService
 {
-    bool ValidateResetTokenAsync(ApplicationUser user, string token);
+    bool ValidateResetTokenAsync(User user, string token);
 
-    Task<string> GenerateAndStorePasswordResetTokenAsync(ApplicationUser user);
+    Task<string> GenerateAndStorePasswordResetTokenAsync(User user);
 
-    Task<string?> GeneratePasswordResetTokenAsync(ApplicationUser user);
+    Task<string?> GeneratePasswordResetTokenAsync(User user);
 
 }

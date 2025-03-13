@@ -5,6 +5,6 @@ namespace AuditSystem.Auth.Services.Registration
 {
     public interface IRegistrationService
     {
-        Task<IdentityResult?> RegisterAsync(RegisterDto request);
+        Task RegisterAsync(RegisterDto request);
     }
 }

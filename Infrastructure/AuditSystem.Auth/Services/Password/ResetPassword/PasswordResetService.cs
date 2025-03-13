@@ -1,14 +1,14 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.Auth.Services.Password.ResetPassword
 {
-    public class PasswordResetService(UserManager<ApplicationUser> userManager, IPasswordTokenService passwordTokenService) : IPasswordResetService
+    public class PasswordResetService(UserManager<User> userManager, IPasswordTokenService passwordTokenService) : IPasswordResetService
     {
 
-        public async Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string newPassword)
+        public async Task<IdentityResult> ResetPasswordAsync(User user, string newPassword)
         {
             if (user == null)
                 return IdentityResult.Failed(new IdentityError { Description = "User not found." });
@@ -55,8 +55,9 @@ namespace AuditSystem.Auth.Services.Password.ResetPassword
             return code;
         }
 
-        public async Task ClearResetCodeAsync(ApplicationUser user)
+        public async Task ClearResetCodeAsync(User user)
         {
+
             user.PasswordResetCode = null;
             user.PasswordResetCodeExpiration = null;
             await userManager.UpdateAsync(user);

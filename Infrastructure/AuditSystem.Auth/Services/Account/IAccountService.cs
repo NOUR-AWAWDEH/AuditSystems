@@ -1,9 +1,9 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Services.Account
 {
     public interface IAccountService
     {
-        Task<ApplicationUser?> FindByEmailAsync(string email);
+        Task<User?> FindByEmailAsync(string email);
     }
 }

@@ -1,5 +1,6 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,20 +12,16 @@ namespace AuditSystem.Auth.Authentication
     public class TokenService : ITokenService
     {
         private readonly JwtSettings _jwtSettings;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly SigningCredentials _signingCredentials;
         private readonly int _expirationMinutes;
 
-        public TokenService(IConfiguration config, UserManager<ApplicationUser> userManager)
+        public TokenService(IConfiguration config, UserManager<User> userManager)
         {
-            _userManager = userManager;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 
-            _jwtSettings = config.GetSection("JwtSettings").Get<JwtSettings>() ?? throw new ArgumentNullException("JwtSettings section is missing in configuration");
-
-            if (_jwtSettings == null)
-            {
-                throw new InvalidOperationException("JwtSettings section is missing or invalid in configuration.");
-            }
+            _jwtSettings = config.GetSection("JwtSettings").Get<JwtSettings>()
+                           ?? throw new InvalidOperationException("JwtSettings section is missing or invalid in configuration.");
 
             var missingFields = new List<string>();
             if (string.IsNullOrEmpty(_jwtSettings.Key))
@@ -39,7 +36,7 @@ namespace AuditSystem.Auth.Authentication
             {
                 missingFields.Add("JwtSettings:Audience");
             }
-            if (string.IsNullOrEmpty(_jwtSettings.ExpirationMinutes))
+            if (_jwtSettings.ExpirationMinutes <= 0)
             {
                 missingFields.Add("JwtSettings:ExpirationMinutes");
             }
@@ -52,14 +49,15 @@ namespace AuditSystem.Auth.Authentication
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            _expirationMinutes = int.Parse(_jwtSettings.ExpirationMinutes);
+            _expirationMinutes = _jwtSettings.ExpirationMinutes;
         }
 
-        public string GenerateJwtToken(ApplicationUser request)
+
+        public string GenerateJwtToken(User request)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, request.Id),
+                new Claim(ClaimTypes.NameIdentifier, request.Id.ToString()),
                 new Claim(ClaimTypes.Name, request.UserName ?? ""),
                 new Claim(ClaimTypes.Email, request.Email ?? "")
             };
@@ -75,7 +73,7 @@ namespace AuditSystem.Auth.Authentication
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateAccessToken(ApplicationUser user)
+        public string GenerateAccessToken(User user)
         {
             return GenerateJwtToken(user);
         }
@@ -90,9 +88,9 @@ namespace AuditSystem.Auth.Authentication
             return Convert.ToBase64String(randomNumber);
         }
 
-        public async Task SaveRefreshTokenAsync(ApplicationUser user, string refreshToken)
+        public async Task SaveRefreshTokenAsync(User user, string refreshToken)
         {
-            if (user is ApplicationUser appUser)
+            if (user is User appUser)
             {
                 appUser.RefreshToken = refreshToken;
                 await _userManager.UpdateAsync(appUser);

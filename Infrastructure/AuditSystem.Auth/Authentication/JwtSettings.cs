@@ -8,6 +8,6 @@
 
         public required string Audience { get; set; }
 
-        public required string ExpirationMinutes { get; set; }
+        public required int ExpirationMinutes { get; set; }
     }
 }

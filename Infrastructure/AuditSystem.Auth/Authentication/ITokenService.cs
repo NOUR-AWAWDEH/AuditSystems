@@ -1,12 +1,12 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Authentication
 {
     public interface ITokenService
     {
-        string GenerateAccessToken(ApplicationUser user);
-        string GenerateJwtToken(ApplicationUser request);
+        string GenerateAccessToken(User user);
+        string GenerateJwtToken(User request);
         string GenerateRefreshToken();
-        Task SaveRefreshTokenAsync(ApplicationUser user, string refreshToken);
+        Task SaveRefreshTokenAsync(User user, string refreshToken);
     }
 }

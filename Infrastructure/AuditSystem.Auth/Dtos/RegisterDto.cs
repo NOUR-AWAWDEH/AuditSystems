@@ -26,6 +26,19 @@ namespace AuditSystem.Auth.Dtos
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required]
-        public UserRole RoleName { get; set; } = UserRole.User;
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "First name must be between 1 and 50 characters.")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Last name must be between 1 and 50 characters.")]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        public string RoleName { get; set; } = string.Empty;
+
+        public Guid? CompanyId { get; set; }
+        public Guid? DepartmentId { get; set; }
+        public Guid? SubDepartmentId { get; set; }
     }
 }
+

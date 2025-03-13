@@ -1,4 +1,5 @@
-﻿namespace AuditSystem.Auth.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+namespace AuditSystem.Auth.Dtos
 {
     public class VerifyResetCodeDto
     {

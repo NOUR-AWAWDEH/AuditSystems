@@ -1,52 +1,44 @@
 using AuditSystem.Auth.Dtos;
-using AuditSystem.Auth.Models;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth.Services.Registration
 {
     public class RegistrationService : IRegistrationService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<Role> _roleManager; // Use custom Role, not IdentityRole
 
-        public RegistrationService(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+        public RegistrationService(UserManager<User> userManager, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult?> RegisterAsync(RegisterDto request)
+        public async Task RegisterAsync(RegisterDto request)
         {
-            string roleName = Enum.GetName(typeof(UserRole), request.RoleName)
-                ?? throw new ArgumentException("Invalid role.");
-
-            if (await _userManager.FindByNameAsync(request.UserName) != null)
-                return IdentityResult.Failed(new IdentityError { Description = "Username is already taken." });
-
-            if (await _userManager.FindByEmailAsync(request.Email) != null)
-                return IdentityResult.Failed(new IdentityError { Description = "Email is already in use." });
-
-            var user = new ApplicationUser
+            var user = new User
             {
                 UserName = request.UserName,
-                Email = request.Email
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
-                return result;
-
-            if (!await _roleManager.RoleExistsAsync(roleName))
+            if (result.Succeeded)
             {
-                var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
-                if (!roleResult.Succeeded)
-                    return roleResult;
+                // Assign a default role (e.g., "User")
+                if (!await _roleManager.RoleExistsAsync(Role.User))
+                {
+                    await _roleManager.CreateAsync(new Role { Name = Role.User });
+                }
+                await _userManager.AddToRoleAsync(user, Role.User);
             }
-
-            var roleAssignmentResult = await _userManager.AddToRoleAsync(user, roleName);
-            return roleAssignmentResult.Succeeded ? result : roleAssignmentResult;
+            else
+            {
+                throw new Exception("User creation failed");
+            }
         }
     }
 }

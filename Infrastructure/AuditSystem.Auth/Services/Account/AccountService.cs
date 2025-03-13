@@ -1,10 +1,10 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Auth.Services.Account;
 using Microsoft.AspNetCore.Identity;
 
-public class AccountService(UserManager<ApplicationUser> userManager) : IAccountService
+public class AccountService(UserManager<User> userManager) : IAccountService
 {
-    public Task<ApplicationUser?> FindByEmailAsync(string email)
+    public Task<User?> FindByEmailAsync(string email)
     {
         return userManager.FindByEmailAsync(email);
     }

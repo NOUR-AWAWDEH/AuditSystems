@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
-namespace AuditSystem.Auth.Controllers.Authentication;
+namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]

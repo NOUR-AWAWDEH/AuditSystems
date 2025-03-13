@@ -4,6 +4,7 @@ using AuditSystem.Auth.Services.Registration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace AuditSystem.Host.v1.Controllers.v1;
 [Route("api/[controller]")]
 [ApiController]
 public class RegistrationController : ControllerBase
@@ -31,14 +32,9 @@ public class RegistrationController : ControllerBase
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse(false, "Invalid model state", ModelState));
 
-            var result = await _registrationService.RegisterAsync(model);
+            await _registrationService.RegisterAsync(model);
 
-            if (result == null)
-                return StatusCode(500, new ApiResponse(false, "An unexpected error occurred during registration."));
-
-            return result.Succeeded
-                ? Ok(new ApiResponse(true, "User registered successfully"))
-                : BadRequest(new ApiResponse(false, "User registration failed", result.Errors.Select(e => e.Description)));
+            return Ok(new ApiResponse(true, "User registered successfully"));
         }
         catch (Exception ex)
         {

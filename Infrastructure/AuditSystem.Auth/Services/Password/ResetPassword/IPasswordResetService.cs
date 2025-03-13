@@ -1,4 +1,4 @@
-using AuditSystem.Auth.Models;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth.Services.Password.ResetPassword;
@@ -9,9 +9,9 @@ public interface IPasswordResetService
 
     Task SaveResetCodeAsync(string email, string resetCode);
 
-    Task ClearResetCodeAsync(ApplicationUser user);
+    Task ClearResetCodeAsync(User user);
 
-    Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string newPassword);
+    Task<IdentityResult> ResetPasswordAsync(User user, string newPassword);
 
     string GenerateResetCode();
 }

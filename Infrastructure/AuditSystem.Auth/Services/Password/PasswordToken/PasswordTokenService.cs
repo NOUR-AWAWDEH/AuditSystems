@@ -1,11 +1,11 @@
-﻿using AuditSystem.Auth.Models;
+﻿using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth.Services.Password.PasswordToken
 {
-    public class PasswordTokenService(UserManager<ApplicationUser> userManager) : IPasswordTokenService
+    public class PasswordTokenService(UserManager<User> userManager) : IPasswordTokenService
     {
-        public bool ValidateResetTokenAsync(ApplicationUser user, string token)
+        public bool ValidateResetTokenAsync(User user, string token)
         {
             if (user == null)
             {
@@ -30,7 +30,7 @@ namespace AuditSystem.Auth.Services.Password.PasswordToken
             return true;
         }
 
-        public async Task<string> GenerateAndStorePasswordResetTokenAsync(ApplicationUser user)
+        public async Task<string> GenerateAndStorePasswordResetTokenAsync(User user)
         {
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -43,7 +43,7 @@ namespace AuditSystem.Auth.Services.Password.PasswordToken
             return token;
         }
 
-        public async Task<string?> GeneratePasswordResetTokenAsync(ApplicationUser request)
+        public async Task<string?> GeneratePasswordResetTokenAsync(User request)
         {
             if (string.IsNullOrWhiteSpace(request.Email))
                 return null;

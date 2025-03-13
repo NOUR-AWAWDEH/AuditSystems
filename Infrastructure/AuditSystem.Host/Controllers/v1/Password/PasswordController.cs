@@ -7,7 +7,8 @@ using AuditSystem.Auth.Services.Password.ResetPassword;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuditSystem.Auth.Controllers.Account;
+namespace AuditSystem.Host.v1.Controllers.Account;
+
 [Route("api/[controller]")]
 [ApiController]
 public class PasswordController : ControllerBase

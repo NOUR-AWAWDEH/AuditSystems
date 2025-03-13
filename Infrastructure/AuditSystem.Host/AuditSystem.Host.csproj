@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.0.29" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.0.30" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
   </ItemGroup>
 
@@ -31,6 +31,7 @@
     <ProjectReference Include="..\..\Core\AuditSystem.Application\AuditSystem.Application.csproj" />
     <ProjectReference Include="..\..\Core\AuditSystem.Domain\AuditSystem.Domain.csproj" />
     <ProjectReference Include="..\AuditSystem.DataAccess\AuditSystem.DataAccess.csproj" />
-  </ItemGroup>
+    <ProjectReference Include="..\AuditSystem.Auth\AuditSystem.Auth.csproj" />
+</ItemGroup>
 
 </Project>

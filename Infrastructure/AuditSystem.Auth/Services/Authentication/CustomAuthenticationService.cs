@@ -1,18 +1,17 @@
 using AuditSystem.Auth.Authentication;
 using AuditSystem.Auth.Dtos;
-using AuditSystem.Auth.Models;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
-using System.Net.NetworkInformation;
 namespace AuditSystem.Auth.Services.Authentication;
 public class CustomAuthenticationService : ICustomAuthenticationService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
     private readonly ITokenService _tokenService;
 
     public CustomAuthenticationService(
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
         ITokenService tokenService)
     {
         _userManager = userManager;

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.CheckLists;
 
-public class CheckListModel : BaseModel<Guid>
+public sealed class CheckListModel : BaseModel<Guid>
 {
     public required string Area { get; set; } = string.Empty;
     public string Particulars { get; set; } = string.Empty;

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Processes;
 
-class ProcessModel : BaseModel<Guid>
+public sealed class ProcessModel : BaseModel<Guid>
 {
     public required string ProcessName { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

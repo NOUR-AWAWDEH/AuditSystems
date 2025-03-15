@@ -1,7 +1,7 @@
 using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.Reporting;
+namespace AuditSystem.Domain.Entities.Reports;
 
 public class AuditExceptionReport : Entity<Guid>
 {
@@ -10,6 +10,6 @@ public class AuditExceptionReport : Entity<Guid>
     public DateOnly ReportDate { get;set; }
     public Guid CreatedById { get; set; }
     public string Status { get; set; } = string.Empty;
-
+    
     public virtual User Creator { get; set; } = null!;
 }

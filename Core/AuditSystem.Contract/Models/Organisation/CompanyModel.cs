@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Organisation;
 
-public class CompanyModel : BaseModel<Guid>
+public sealed class CompanyModel : BaseModel<Guid>
 {
     public required string CompanyName { get; set; } = string.Empty;
 }

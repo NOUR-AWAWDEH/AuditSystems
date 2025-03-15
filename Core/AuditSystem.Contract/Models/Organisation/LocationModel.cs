@@ -1,6 +1,8 @@
-﻿namespace AuditSystem.Contract.Models.Organisation;
+﻿using AuditSystem.Contract.Models.Common;
 
-public class LocationModel
+namespace AuditSystem.Contract.Models.Organisation;
+
+public sealed class LocationModel : BaseModel<Guid>
 {
     public required Guid AuditorSettingsId { get; set; }
     public required  string LocationName { get; set; } = string.Empty;

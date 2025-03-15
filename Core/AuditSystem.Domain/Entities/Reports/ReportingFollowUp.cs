@@ -1,6 +1,6 @@
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.Reporting;
+namespace AuditSystem.Domain.Entities.Reports;
 
 public class ReportingFollowUp : Entity<Guid>
 {

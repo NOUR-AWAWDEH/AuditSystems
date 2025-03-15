@@ -1,12 +1,11 @@
 using FluentValidation;
 
-namespace AuditSystem.Application.Base.Validators
+namespace AuditSystem.Application.Base.Validators;
+
+public abstract class BaseValidator<T> : AbstractValidator<T>
 {
-    public abstract class BaseValidator<T> : AbstractValidator<T>
+    protected BaseValidator()
     {
-        protected BaseValidator()
-        {
-            RuleFor(x => x).NotNull();
-        }
+        RuleFor(x => x).NotNull();
     }
 }

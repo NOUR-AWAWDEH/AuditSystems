@@ -2,7 +2,9 @@ using AuditSystem.Auth.Authentication;
 using AuditSystem.Auth.Dtos;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+
 namespace AuditSystem.Auth.Services.Authentication;
+
 public class CustomAuthenticationService : ICustomAuthenticationService
 {
     private readonly UserManager<User> _userManager;

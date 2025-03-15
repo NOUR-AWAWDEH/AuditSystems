@@ -5,7 +5,7 @@ using AuditSystem.DataAccess.Contexts;
 using AuditSystem.DataAccess.Repositories;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Risks;
-using AuditSystem.Domain.Entities.Users; // Ensure User and Role are imported
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

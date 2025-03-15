@@ -1,12 +1,11 @@
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.CheckLists
-{
-    public class Remark : Entity<Guid>
-    {
-        public Guid CheckListManagementId { get; set; }
-        public string Remarkcommants { get; set; } = string.Empty;
+namespace AuditSystem.Domain.Entities.CheckLists;
 
-        public virtual ChecklistManagement ChecklistManagement { get; set; } = null!;
-    }
+public class Remark : Entity<Guid>
+{
+    public Guid CheckListManagementId { get; set; }
+    public string Remarkcommants { get; set; } = string.Empty;
+
+    public virtual ChecklistManagement ChecklistManagement { get; set; } = null!;
 }

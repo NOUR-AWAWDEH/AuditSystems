@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.Processes
-{
-    public class SubProcess : Entity<Guid>
-    {
-        public Guid ProcessId { get; set; }
-        public string Particular { get; set; } = string.Empty;
+namespace AuditSystem.Domain.Entities.Processes;
 
-        public virtual Process Process { get; set; } = null!;
-    }
+public class SubProcess : Entity<Guid>
+{
+    public Guid ProcessId { get; set; }
+    public string Particular { get; set; } = string.Empty;
+
+    public virtual Process Process { get; set; } = null!;
 }

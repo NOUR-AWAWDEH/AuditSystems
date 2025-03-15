@@ -1,9 +1,8 @@
 ﻿using AuditSystem.Domain.Entities.Users;
 
-namespace AuditSystem.Auth.Services.Account
+namespace AuditSystem.Auth.Services.Account;
+
+public interface IAccountService
 {
-    public interface IAccountService
-    {
-        Task<User?> FindByEmailAsync(string email);
-    }
+    Task<User?> FindByEmailAsync(string email);
 }

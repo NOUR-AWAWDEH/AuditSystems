@@ -54,6 +54,8 @@ services.AddDomain();
 services.AddDataAccess(configuration, healthCheckBuilder);
 services.AddAuthDependencies(configuration);
 
+
+
 var app = builder.Build();
 
 // Database migration

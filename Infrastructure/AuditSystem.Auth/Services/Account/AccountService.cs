@@ -1,6 +1,7 @@
 ﻿using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Auth.Services.Account;
 using Microsoft.AspNetCore.Identity;
+
+namespace AuditSystem.Auth.Services.Account;
 
 public class AccountService(UserManager<User> userManager) : IAccountService
 {

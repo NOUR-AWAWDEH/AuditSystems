@@ -1,7 +1,6 @@
-﻿namespace AuditSystem.Auth.Dtos
+﻿namespace AuditSystem.Auth.Dtos;
+
+public class ForgotPasswordRequest
 {
-    public class ForgotPasswordRequest
-    {
-        public string Email { get; set; } = string.Empty;
-    }
+    public string Email { get; set; } = string.Empty;
 }

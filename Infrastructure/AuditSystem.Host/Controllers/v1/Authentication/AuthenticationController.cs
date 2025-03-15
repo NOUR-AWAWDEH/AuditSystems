@@ -1,14 +1,14 @@
 using AuditSystem.Auth.Common.ApiResponses;
 using AuditSystem.Auth.Dtos;
-using AuditSystem.Auth.Services.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using AuditSystem.Auth.Services.Account;
+using AuditSystem.Auth.Services.Authentication;
 using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
@@ -24,8 +24,9 @@ public class AuthenticationController : ControllerBase
     private readonly IPasswordResetService _passwordResetService;
     private readonly IPasswordTokenService _passwordTokenService;
     private readonly IRegistrationService _registrationService;
-    
+
     public AuthenticationController(
+        ICustomAuthenticationService customAuthenticationService,
        IAccountService accountService,
         IEmailService emailService,
         ILogger<AuthenticationController> logger,
@@ -33,12 +34,14 @@ public class AuthenticationController : ControllerBase
         IPasswordTokenService passwordTokenService,
         IRegistrationService registrationService)
     {
+        _authService = customAuthenticationService;
         _accountService = accountService;
         _emailService = emailService;
         _logger = logger;
         _passwordResetService = passwordResetService;
         _passwordTokenService = passwordTokenService;
         _registrationService = registrationService;
+
     }
 
     [HttpPost("login")]
@@ -92,7 +95,7 @@ public class AuthenticationController : ControllerBase
         }
     }
 
-    [HttpPost("reset")]
+    [HttpPost("reset-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -186,7 +189,7 @@ public class AuthenticationController : ControllerBase
         }
     }
 
-     [HttpPost]
+    [HttpPost]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

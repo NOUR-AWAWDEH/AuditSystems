@@ -1,7 +1,6 @@
-﻿namespace AuditSystem.Auth.Dtos
+﻿namespace AuditSystem.Auth.Dtos;
+
+public class SignOutRequestDto
 {
-    public class SignOutRequestDto
-    {
-        public required Guid UserId {get;set;}
-    }
+    public required Guid UserId { get; set; }
 }

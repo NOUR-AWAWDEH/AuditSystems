@@ -1,9 +1,8 @@
-﻿namespace AuditSystem.DataAccess.Configurations;
-
-using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Domain.Entities.Organisation;
+﻿using AuditSystem.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace AuditSystem.DataAccess.Configurations;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

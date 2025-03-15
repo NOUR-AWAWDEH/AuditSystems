@@ -17,7 +17,7 @@ public class EmailService(IConfiguration configuration) : IEmailService
         var host = configuration.GetValue<string>("EMAIL_CONFIGURATION:HOST")
                    ?? throw new ArgumentNullException("Host configuration is missing.");
 
-        var port = configuration.GetValue<int?>("EMAIL_CONFIGURATION:PORT") 
+        var port = configuration.GetValue<int?>("EMAIL_CONFIGURATION:PORT")
                    ?? throw new ArgumentNullException("Port configuration is missing.");
 
         using var smtpClient = new SmtpClient(host, port)

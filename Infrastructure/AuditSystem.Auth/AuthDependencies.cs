@@ -32,6 +32,7 @@ public static class AuthDependencies
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAccountService, AccountService>();
 
+
         // JWT Settings
         var jwtSettings = new JwtSettings
         {
@@ -66,7 +67,6 @@ public static class AuthDependencies
             };
         });
 
-        // Rate Limiting
         // Rate Limiting
         services.AddRateLimiter(options =>
         {
@@ -114,7 +114,7 @@ public static class AuthDependencies
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseRateLimiter(); // Enables rate limiting
+        app.UseRateLimiter();
         return app;
     }
 }

@@ -1,5 +1,4 @@
 using AuditSystem.Auth.Dtos;
-using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth.Services.Registration
 {

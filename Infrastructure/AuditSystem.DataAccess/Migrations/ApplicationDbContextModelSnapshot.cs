@@ -22,6 +22,27 @@ namespace AuditSystem.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditDomain", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Domains");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditEngagement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -103,46 +124,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("AuditPlanSummaries");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BusinessObjective")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyUpdate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DomainId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("IndustryUpdate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsFinancialQuantifiable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSpecialProject")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DomainId");
-
-                    b.ToTable("AuditUniverses");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverseObjective", b =>
                 {
                     b.Property<Guid>("Id")
@@ -210,27 +191,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("BusinessObjectives");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Domain", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Domains");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
                 {
                     b.Property<Guid>("Id")
@@ -261,6 +221,83 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("RiskControlMatrixId");
 
                     b.ToTable("Objectives");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.SpecialProject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AuditUniverseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProjectName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditUniverseId")
+                        .IsUnique();
+
+                    b.ToTable("SpecialProject");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BusinessObjective")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyUpdate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DomainId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IndustryUpdate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsFinancialQuantifiable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSpecialProject")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DomainId");
+
+                    b.ToTable("AuditUniverses");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.CheckLists.Checklist", b =>
@@ -731,6 +768,10 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -968,41 +1009,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("ReportingFollowUps");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Program", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RatingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RiskControlId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RatingId");
-
-                    b.HasIndex("RiskControlId");
-
-                    b.ToTable("Programs");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControl", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1059,6 +1065,41 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("SubProcessId");
 
                     b.ToTable("RiskControlMatrices");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskProgram", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("RatingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RiskControlId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RatingId");
+
+                    b.HasIndex("RiskControlId");
+
+                    b.ToTable("RiskPrograms");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
@@ -1672,20 +1713,9 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("AuditorSettings");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.Domain", "Domain")
-                        .WithMany()
-                        .HasForeignKey("DomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Domain");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverseObjective", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1724,6 +1754,28 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("RiskControlMatrix");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.SpecialProject", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
+                        .WithOne("SpecialProject")
+                        .HasForeignKey("AuditSystem.Domain.Entities.Audit.SpecialProject", "AuditUniverseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuditUniverse");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditDomain", "Domain")
+                        .WithMany()
+                        .HasForeignKey("DomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Domain");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.CheckLists.ChecklistManagement", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Users.AuditorSettings", "AuditorSettings")
@@ -1756,7 +1808,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Compliance.ComplianceAuditLink", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1783,7 +1835,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Jobs.AuditJob", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1940,25 +1992,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Program", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Rating", "Rating")
-                        .WithMany()
-                        .HasForeignKey("RatingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControl", "RiskControl")
-                        .WithMany()
-                        .HasForeignKey("RiskControlId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rating");
-
-                    b.Navigation("RiskControl");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControl", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Rating", "Rating")
@@ -1987,6 +2020,25 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("SubProcess");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskProgram", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Rating", "Rating")
+                        .WithMany()
+                        .HasForeignKey("RatingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControl", "RiskControl")
+                        .WithMany()
+                        .HasForeignKey("RiskControlId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rating");
+
+                    b.Navigation("RiskControl");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
@@ -2181,6 +2233,11 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
+                {
+                    b.Navigation("SpecialProject");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Company", b =>

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Audit;
 
-public sealed class ObjectiveModle : BaseModel<Guid>
+public sealed class ObjectiveModel : BaseModel<Guid>
 {
     public required Guid RiskControlMatrixId { get; set; }
     public required Guid RatingId { get; set; }

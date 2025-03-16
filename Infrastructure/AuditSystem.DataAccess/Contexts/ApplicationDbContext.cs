@@ -1,5 +1,5 @@
 ﻿using AuditSystem.Domain.Entities.Audit;
-using AuditSystem.Domain.Entities.CheckLists;
+using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities.Compliance;
 using AuditSystem.Domain.Entities.Jobs;
 using AuditSystem.Domain.Entities.Organisation;

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Compliance;
 
-public sealed class ComplianceChecklistModle : BaseModel<Guid>
+public sealed class ComplianceChecklistModel : BaseModel<Guid>
 {
     public int SerialNumber { get; set; }
     public string Area { get; set; } = string.Empty;

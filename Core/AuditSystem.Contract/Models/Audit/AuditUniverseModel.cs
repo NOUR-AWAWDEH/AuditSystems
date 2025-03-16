@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Audit;
 
-public sealed class AuditUniverseModle : BaseModel<Guid>
+public sealed class AuditUniverseModel : BaseModel<Guid>
 {
     public string BusinessObjective { get; set; } = string.Empty;
     public string IndustryUpdate { get; set; } = string.Empty;

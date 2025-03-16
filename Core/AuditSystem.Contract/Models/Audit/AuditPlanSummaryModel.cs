@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Audit;
 
-public sealed class AuditPlanSummaryModle : BaseModel<Guid>
+public sealed class AuditPlanSummaryModel : BaseModel<Guid>
 {
     public required Guid AuditorSettingsId { get; set; }
     public string Component { get; set; } = string.Empty;

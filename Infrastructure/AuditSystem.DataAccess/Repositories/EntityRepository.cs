@@ -1,4 +1,4 @@
-using AuditSystem.Contract.Interfaces.Repositories;  // Update this using statement
+using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Audit;
 
-public sealed class SpecialProjectModle : BaseModel<Guid>
+public sealed class SpecialProjectModel : BaseModel<Guid>
 {
     public required Guid AuditUniverseId { get; set; }
     public string ProjectName { get; set; } = string.Empty;

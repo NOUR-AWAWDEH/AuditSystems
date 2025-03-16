@@ -1,6 +1,7 @@
 using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
+
 public interface IUserSessionManager
 {
     TimeSpan GetCurrentSessionDuration(User user);

@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Jobs;
 
-public sealed class AudiJobModle : BaseModel<Guid>
+public sealed class AuditJobModel : BaseModel<Guid>
 {
     public required Guid AuditUniverseID { get; set; }
     public required int SerialNumber { get; set; }

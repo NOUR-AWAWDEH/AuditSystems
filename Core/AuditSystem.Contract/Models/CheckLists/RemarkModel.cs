@@ -1,6 +1,6 @@
 ﻿using AuditSystem.Contract.Models.Common;
 
-namespace AuditSystem.Contract.Models.CheckLists;
+namespace AuditSystem.Contract.Models.Checklists;
 
 public sealed class RemarkModel : BaseModel<Guid>
 {

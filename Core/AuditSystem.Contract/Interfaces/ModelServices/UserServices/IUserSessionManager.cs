@@ -1,6 +1,6 @@
 using AuditSystem.Domain.Entities.Users;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
+namespace AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 
 public interface IUserSessionManager
 {

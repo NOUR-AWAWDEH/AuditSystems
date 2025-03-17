@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 
-public interface IRiskControlsService
+public interface IRiskControlService
 {
     public Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel);
 }

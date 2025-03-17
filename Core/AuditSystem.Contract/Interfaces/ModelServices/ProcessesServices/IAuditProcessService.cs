@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 
-public interface IProcessService
+public interface IAuditProcessService
 {
-    public Task<Guid> CreateProcessAsync(ProcessModel processModel);
+    public Task<Guid> CreateAuditProcessAsync(AuditProcessModel auditProcessModel);
 }

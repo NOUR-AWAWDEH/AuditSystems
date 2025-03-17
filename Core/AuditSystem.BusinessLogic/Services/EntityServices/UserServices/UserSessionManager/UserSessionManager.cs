@@ -1,5 +1,5 @@
 using AuditSystem.Domain.Entities.Users;
-
+using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
 
 public class UserSessionManager : IUserSessionManager

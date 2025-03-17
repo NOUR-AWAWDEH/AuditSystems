@@ -4,7 +4,7 @@ using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Domain.Entities.Processes;
 
-public class Process : Entity<Guid>
+public class AuditProcess : Entity<Guid>
 {
     public Guid AuditSettingsId { get; set; }
     public string ProcessName { get; set; } = string.Empty;

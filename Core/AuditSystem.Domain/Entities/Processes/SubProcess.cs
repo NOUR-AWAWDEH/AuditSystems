@@ -11,5 +11,5 @@ public class SubProcess : Entity<Guid>
     public Guid ProcessId { get; set; }
     public string Particular { get; set; } = string.Empty;
 
-    public virtual Process Process { get; set; } = null!;
+    public virtual AuditProcess Process { get; set; } = null!;
 }

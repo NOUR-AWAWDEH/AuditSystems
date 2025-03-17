@@ -57,7 +57,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<SubLocation> SubLocations { get; set; }
 
     // Process
-    public required DbSet<Process> Processes { get; set; }
+    public required DbSet<AuditProcess> AuditProcesses { get; set; }
     public required DbSet<SubProcess> SubProcesses { get; set; }
 
     // Reporting

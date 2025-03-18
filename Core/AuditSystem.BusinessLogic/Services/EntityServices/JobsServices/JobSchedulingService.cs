@@ -13,8 +13,19 @@ internal sealed class JobSchedulingService(
     ICacheService cacheService)
     : IJobSchedulingService
 {
-    public Task<Guid> CreateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
+    public async Task<Guid> CreateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
     {
+        ArgumentNullException.ThrowIfNull(jobSchedulingModel, nameof(jobSchedulingModel));
+        
+        try
+        {
+            var entity = mapper.Map<JobScheduling>(jobSchedulingModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

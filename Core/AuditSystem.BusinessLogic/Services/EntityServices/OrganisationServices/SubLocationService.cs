@@ -13,8 +13,19 @@ internal sealed class SubLocationService(
     ICacheService cacheService) 
     : ISubLocationService
 {
-    public Task<Guid> CreateSubLocationAsync(SubProcessModel supProcessModel)
+    public async Task<Guid> CreateSubLocationAsync(SubProcessModel supProcessModel)
     {
+        ArgumentNullException.ThrowIfNull(supProcessModel, nameof(supProcessModel));
+        
+        try
+        {
+            var entity = mapper.Map<SubLocation>(supProcessModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

@@ -13,8 +13,19 @@ internal sealed class RiskProgramService(
     ICacheService cacheService)
     : IRiskProgramService
 {
-    public Task<Guid> CreateRiskProgramAsync(RiskProgramModel riskProgramModel)
+    public async Task<Guid> CreateRiskProgramAsync(RiskProgramModel riskProgramModel)
     {
+        ArgumentNullException.ThrowIfNull(riskProgramModel, nameof(riskProgramModel));
+        
+        try
+        {
+            var entity = mapper.Map<RiskProgram>(riskProgramModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

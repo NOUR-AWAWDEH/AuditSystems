@@ -13,8 +13,19 @@ internal sealed class AuditUniverseObjectiveService(
     ICacheService cacheService)
     : IAuditUniverseObjectiveService
 {
-    public Task<Guid> CreateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)
+    public async Task<Guid> CreateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)
     {
+        ArgumentNullException.ThrowIfNull(auditUniverseObjectiveModel, nameof(auditUniverseObjectiveModel));
+        
+        try
+        {
+            var entity = mapper.Map<AuditUniverseObjective>(auditUniverseObjectiveModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

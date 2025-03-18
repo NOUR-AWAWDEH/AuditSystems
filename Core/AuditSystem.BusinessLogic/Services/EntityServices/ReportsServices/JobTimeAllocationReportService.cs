@@ -13,8 +13,19 @@ internal sealed class JobTimeAllocationReportService(
     ICacheService cacheService)
     : IJobTimeAllocationReportService
 {
-    public Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
+    public async Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
+        ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

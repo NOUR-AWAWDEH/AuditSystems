@@ -13,8 +13,19 @@ internal sealed class RiskFactorService(
     ICacheService cacheService)
     : IRiskFactorService
 {
-    public Task<Guid> CreateRiskFactorAsync(RiskFactorModel riskFactorModel)
+    public async Task<Guid> CreateRiskFactorAsync(RiskFactorModel riskFactorModel)
     {
+        ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));
+        
+        try
+        {
+            var entity = mapper.Map<RiskFactor>(riskFactorModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

@@ -13,8 +13,19 @@ internal sealed class AuditPlanSummaryReportService(
     ICacheService cacheService)
     : IAuditPlanSummaryReportService
 {
-    public Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
+    public async Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
+        ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

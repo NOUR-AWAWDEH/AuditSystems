@@ -13,8 +13,19 @@ internal sealed class AuditExceptionRepotService(
     ICacheService cacheService) 
     : IAuditExceptionRepotService
 {
-    public Task<Guid> CreateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
+    public async Task<Guid> CreateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
+        ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

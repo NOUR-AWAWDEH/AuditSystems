@@ -13,8 +13,19 @@ internal sealed class ComplianceAuditLinkService(
     ICacheService cacheService)
     : IComplianceAuditLinkService
 {
-    public Task<Guid> CreateComplianceAuditLinkAsync(ComplianceAuditLinkModel complianceAuditLinkModel)
+    public async Task<Guid> CreateComplianceAuditLinkAsync(ComplianceAuditLinkModel complianceAuditLinkModel)
     {
+        ArgumentNullException.ThrowIfNull(complianceAuditLinkModel, nameof(complianceAuditLinkModel));
+        
+        try
+        {
+            var entity = mapper.Map<ComplianceAuditLink>(complianceAuditLinkModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

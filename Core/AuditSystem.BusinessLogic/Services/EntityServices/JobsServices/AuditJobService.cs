@@ -13,8 +13,19 @@ internal sealed class AuditJobService(
     ICacheService cacheService)
     : IAuditJobService
 {
-    public Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel)
+    public async Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel)
     {
+        ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));
+        
+        try
+        {
+            var entity = mapper.Map<AuditJob>(auditJobModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

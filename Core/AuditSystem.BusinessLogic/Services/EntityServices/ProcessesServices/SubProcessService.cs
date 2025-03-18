@@ -13,8 +13,19 @@ internal sealed class SubProcessService(
     ICacheService cacheService)
     : ISubProcessService
 {
-    public Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel)
+    public async Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel)
     {
+        ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
+        
+        try
+        {
+            var entity = mapper.Map<SubProcess>(subProcessModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

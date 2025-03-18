@@ -13,8 +13,19 @@ internal sealed class RemarkService(
     ICacheService cacheService)
     : IRemarkService
 {
-    public Task<Guid> CreateRemarkAsync(RemarkModel remarkModel)
+    public async Task<Guid> CreateRemarkAsync(RemarkModel remarkModel)
     {
+        ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));
+        
+        try
+        {
+            var entity = mapper.Map<Remark>(remarkModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

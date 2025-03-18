@@ -13,8 +13,19 @@ internal sealed class SkillSetService(
     ICacheService cacheService)
     : ISkillSetService
 {
-    public Task<Guid> CreateSkillSetAsync(SkillSetModel skillSetModel)
+    public async Task<Guid> CreateSkillSetAsync(SkillSetModel skillSetModel)
     {
+        ArgumentNullException.ThrowIfNull(skillSetModel, nameof(skillSetModel));
+
+        try
+        {
+            var entity = mapper.Map<SkillSet>(skillSetModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

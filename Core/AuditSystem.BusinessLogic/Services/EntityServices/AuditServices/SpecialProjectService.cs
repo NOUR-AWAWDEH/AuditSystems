@@ -13,8 +13,19 @@ internal sealed class SpecialProjectService(
     ICacheService cacheService)
     : ISpecialProjectService
 {
-    public Task<Guid> CreateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
+    public async Task<Guid> CreateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
+        ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));
+        
+        try
+        {
+            var entity = mapper.Map<SpecialProject>(specialProjectModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

@@ -13,8 +13,19 @@ internal sealed class TaskManagementService(
     ICacheService cacheService) 
     : ITaskManagementService
 {
-    public Task<Guid> CreateTaskAsync(TaskManagementModel taskManagementModel)
+    public async Task<Guid> CreateTaskAsync(TaskManagementModel taskManagementModel)
     {
+        ArgumentNullException.ThrowIfNull(taskManagementModel, nameof(taskManagementModel));
+
+        try
+        {
+            var entity = mapper.Map<TaskManagement>(taskManagementModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

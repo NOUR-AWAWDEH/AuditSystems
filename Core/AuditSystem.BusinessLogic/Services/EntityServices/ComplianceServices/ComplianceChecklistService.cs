@@ -14,8 +14,19 @@ internal sealed class ComplianceChecklistService(
     )
     : IComplianceChecklistService
 {
-    public Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
+    public async Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
+        ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));
+        
+        try
+        {
+            var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

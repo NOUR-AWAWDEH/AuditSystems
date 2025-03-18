@@ -13,8 +13,19 @@ internal sealed class RiskControlService(
     ICacheService cacheService) 
     : IRiskControlService
 {
-    public Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel)
+    public async Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel)
     {
+        ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
+        
+        try
+        {
+            var entity = mapper.Map<RiskControl>(riskControlModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

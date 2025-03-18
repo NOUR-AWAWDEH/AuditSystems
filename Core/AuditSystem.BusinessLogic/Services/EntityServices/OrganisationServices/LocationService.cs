@@ -13,8 +13,19 @@ internal sealed class LocationService(
     ICacheService cacheService)
     : ILocationService
 {
-    public Task<Guid> CreateLocationAsync(LocationModel locationModel)
+    public async Task<Guid> CreateLocationAsync(LocationModel locationModel)
     {
+        ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));
+        
+        try
+        {
+            var entity = mapper.Map<Location>(locationModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

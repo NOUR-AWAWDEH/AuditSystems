@@ -13,8 +13,19 @@ internal sealed class UserManagementService(
     ICacheService cacheService) 
     : IUserManagementService
 {
-    public Task<Guid> CreateUserAsync(UserManagementModel userManagementModel)
+    public async Task<Guid> CreateUserAsync(UserManagementModel userManagementModel)
     {
+        ArgumentNullException.ThrowIfNull(userManagementModel, nameof(userManagementModel));
+
+        try
+        {
+            var entity = mapper.Map<UserManagement>(userManagementModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

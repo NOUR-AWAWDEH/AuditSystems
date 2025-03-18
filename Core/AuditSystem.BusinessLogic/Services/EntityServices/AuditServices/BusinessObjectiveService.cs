@@ -13,8 +13,19 @@ internal sealed class BusinessObjectiveService(
     ICacheService cacheService)
     : IBusinessObjectiveService
 {
-    public Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
+    public async Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
+        ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
+        
+        try
+        {
+            var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

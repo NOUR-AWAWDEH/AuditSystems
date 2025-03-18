@@ -13,8 +13,19 @@ internal sealed class PlanningReportService(
     ICacheService cacheService) 
     : IPlanningReportService
 {
-    public Task<Guid> CreatePlanningReportAsync(PlanningReportModel planningReportModel)
+    public async Task<Guid> CreatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
+        ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<PlanningReport>(planningReportModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

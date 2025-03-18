@@ -13,8 +13,19 @@ internal sealed class SupportingDocService(
     ICacheService cacheService)
     : ISupportingDocService
 {
-    public Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel)
+    public async Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
+        ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));
+
+        try
+        {
+            var entity = mapper.Map<SupportingDoc>(supportingDocModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

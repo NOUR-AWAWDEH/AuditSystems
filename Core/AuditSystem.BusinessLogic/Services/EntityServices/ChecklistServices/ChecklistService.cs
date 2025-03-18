@@ -13,8 +13,19 @@ internal sealed class ChecklistService(
     ICacheService cacheService)
     : IChecklistService
 {
-    public Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel)
+    public async Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel)
     {
+        ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));
+        
+        try
+        {
+            var entity = mapper.Map<Checklist>(checklistModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

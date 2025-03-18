@@ -13,8 +13,19 @@ internal sealed class AuditProcessService(
     ICacheService cacheService)
     : IAuditProcessService
 {
-    public Task<Guid> CreateAuditProcessAsync(AuditProcessModel processModel)
+    public async Task<Guid> CreateAuditProcessAsync(AuditProcessModel processModel)
     {
+        ArgumentNullException.ThrowIfNull(processModel, nameof(processModel));
+        
+        try
+        {
+            var entity = mapper.Map<AuditProcess>(processModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

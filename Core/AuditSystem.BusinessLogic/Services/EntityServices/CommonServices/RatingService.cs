@@ -13,8 +13,19 @@ internal sealed class RatingService(
     ICacheService cacheService)
     : IRatingService
 {
-    public Task<Guid> CreateRatingAsync(RatingModel ratingModel)
+    public async Task<Guid> CreateRatingAsync(RatingModel ratingModel)
     {
+        ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
+        
+        try
+        {
+            var entity = mapper.Map<Rating>(ratingModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

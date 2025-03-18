@@ -13,8 +13,19 @@ internal sealed class SubDepartmentService(
     ICacheService cacheService)
     : ISubDepartmentService
 {
-    public Task<Guid> CreateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)
+    public async Task<Guid> CreateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)
     {
+        ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));
+        
+        try
+        {
+            var entity = mapper.Map<SubDepartment>(subDepartmentModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

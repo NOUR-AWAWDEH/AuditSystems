@@ -13,8 +13,19 @@ internal sealed class JobPrioritizationService(
     ICacheService cacheService)
     : IJobPrioritizationService
 {
-    public Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
+    public async Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
+        ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
+        
+        try
+        {
+            var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

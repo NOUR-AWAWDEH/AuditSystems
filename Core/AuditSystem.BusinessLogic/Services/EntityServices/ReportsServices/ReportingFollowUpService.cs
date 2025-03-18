@@ -13,8 +13,19 @@ internal sealed class ReportingFollowUpService(
     ICacheService cacheService) 
     : IReportingFollowUpService
 {
-    public Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
+    public async Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
+        ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
+        
+        try
+        {
+            var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

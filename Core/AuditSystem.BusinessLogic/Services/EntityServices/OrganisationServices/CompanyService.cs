@@ -13,8 +13,19 @@ internal sealed class CompanyService(
     ICacheService cacheService)
     : ICompanyService
 {
-    public Task<Guid> CreateCompanyAsync(CompanyModel companyModel)
+    public async Task<Guid> CreateCompanyAsync(CompanyModel companyModel)
     {
+        ArgumentNullException.ThrowIfNull(companyModel, nameof(companyModel));
+        
+        try
+        {
+            var entity = mapper.Map<Company>(companyModel);
+            var createdEntity = await repository.CreateAsync(entity);
+        }
+        catch (Exception ex)
+        {
+
+        }
         throw new NotImplementedException();
     }
 }

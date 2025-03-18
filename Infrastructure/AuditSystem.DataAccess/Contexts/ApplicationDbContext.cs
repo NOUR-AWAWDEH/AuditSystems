@@ -69,7 +69,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<AuditExceptionReport> AuditExceptionReports { get; set; }
 
     // Risk Controls
-    public required DbSet<RiskControl> RiskControls { get; set; }
+    public required DbSet<RiskControls> RisksControls { get; set; }
     public required DbSet<RiskControlMatrix> RiskControlMatrices { get; set; }
     public required DbSet<RiskProgram> RiskPrograms { get; set; }
 

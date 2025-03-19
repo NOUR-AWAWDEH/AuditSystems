@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
@@ -10,22 +11,36 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 internal sealed class InternalAuditConsolidationReportService(
     IRepository<Guid, InternalAuditConsolidationReport> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : IInternalAuditConsolidationReportService
 {
+    private static readonly string[] InternalAuditConsolidationReportTags = ["internal-audit-consolidation-reports", "internal-audit-consolidation-report-list"];
+    private static readonly string[] ListTags = ["internal-audit-consolidation-report-list"]; // Tags for collections only
+
     public async Task<Guid> CreateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));
-        
+
         try
         {
             var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.InternalAuditConsolidationReport, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: InternalAuditConsolidationReportTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create InternalAuditConsolidationReport.", ex);
         }
-        throw new NotImplementedException();
     }
 }

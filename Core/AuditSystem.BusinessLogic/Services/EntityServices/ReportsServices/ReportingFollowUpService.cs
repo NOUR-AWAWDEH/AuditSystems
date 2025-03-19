@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
@@ -13,6 +14,9 @@ internal sealed class ReportingFollowUpService(
     ICacheService cacheService) 
     : IReportingFollowUpService
 {
+    private static readonly string[] ReportingFollowUpTags = ["reporting-follow-ups", "reporting-follow-up-list"];
+    private static readonly string[] ListTags = ["reporting-follow-up-list"]; // Tags for collections only
+
     public async Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
@@ -21,11 +25,22 @@ internal sealed class ReportingFollowUpService(
         {
             var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.ReportingFollowUp, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: ReportingFollowUpTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create ReportingFollowUp.", ex);
         }
-        throw new NotImplementedException();
     }
 }

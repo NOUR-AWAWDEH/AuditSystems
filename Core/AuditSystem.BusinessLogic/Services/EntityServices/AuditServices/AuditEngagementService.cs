@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
@@ -13,6 +14,9 @@ internal sealed class AuditEngagementService(
     ICacheService cacheService)
     : IAuditEngagementService
 {
+    private static readonly string[] AuditEngagementServiceTags = ["audit-engagements", "audit-engagement-list"];
+    private static readonly string[] ListTags = ["audit-engagement-list"]; // Tags for collections only
+
     public async Task<Guid> CreateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));
@@ -21,10 +25,23 @@ internal sealed class AuditEngagementService(
         {
             var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditEngagement, createdEntity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey, 
+                value: createdEntity,
+                tags: AuditEngagementServiceTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            return createdEntity.Id;
         }
-        catch (Exception ex) {
+        catch (Exception ex) 
+        {
+            throw new Exception("Failed to create AuditEngagement.", ex);
+        }
         
-        }
-        throw new NotImplementedException();
     }
 }

@@ -23,19 +23,17 @@ internal sealed class RiskService(
 
         try
         {
-            // Map and create the entity
             var entity = mapper.Map<Risk>(riskModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            // Cache the individual risk
             var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Risk, createdEntity.Id);
+            
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: createdEntity,
                 tags: RiskTags,
                 expiration: CacheExpirations.MediumTerm);
 
-            // Invalidate only collection-related caches
             await cacheService.RemoveCacheByTagAsync(ListTags);
 
             return createdEntity.Id;

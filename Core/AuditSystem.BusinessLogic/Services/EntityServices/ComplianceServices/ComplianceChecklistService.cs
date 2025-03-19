@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ComplianceServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Compliance;
@@ -14,6 +15,9 @@ internal sealed class ComplianceChecklistService(
     )
     : IComplianceChecklistService
 {
+    private static readonly string[] ComplianceChecklistTags = ["compliance-checklists", "compliance-checklist-list"];
+    private static readonly string[] ListTags = ["compliance-checklist-list"]; // Tags for collections only
+
     public async Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));
@@ -22,11 +26,22 @@ internal sealed class ComplianceChecklistService(
         {
             var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.ComplianceChecklist, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: ComplianceChecklistTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create ComplianceChecklist.", ex);
         }
-        throw new NotImplementedException();
     }
 }

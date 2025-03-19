@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.RiskControls;
@@ -8,24 +9,38 @@ using AutoMapper;
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 
 internal sealed class RiskControlService(
-    IRepository<Guid, RiskControl> repository,
+    IRepository<Guid, RiskControls> repository,
     IMapper mapper,
     ICacheService cacheService) 
     : IRiskControlService
 {
+    private static readonly string[] RiskControlTags = ["risk-controls", "risk-control-list"];
+    private static readonly string[] ListTags = ["risk-control-list"]; // Tags for collections only
+
     public async Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
         
         try
         {
-            var entity = mapper.Map<RiskControl>(riskControlModel);
+            var entity = mapper.Map<RiskControls>(riskControlModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.RiskControl, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: RiskControlTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create RiskControl.", ex);
         }
-        throw new NotImplementedException();
     }
 }

@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
@@ -13,6 +14,9 @@ internal sealed class AuditPlanSummaryReportService(
     ICacheService cacheService)
     : IAuditPlanSummaryReportService
 {
+    private static readonly string[] AuditPlanSummaryReportTags = ["audit-plan-summary-reports", "audit-plan-summary-report-list"];
+    private static readonly string[] ListTags = ["audit-plan-summary-report-list"]; // Tags for collections only
+
     public async Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));
@@ -21,11 +25,22 @@ internal sealed class AuditPlanSummaryReportService(
         {
             var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditPlanSummaryReport, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: AuditPlanSummaryReportTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create AuditPlanSummaryReport.", ex);
         }
-        throw new NotImplementedException();
     }
 }

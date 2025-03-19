@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
@@ -13,6 +14,9 @@ internal sealed class JobTimeAllocationReportService(
     ICacheService cacheService)
     : IJobTimeAllocationReportService
 {
+    private static readonly string[] JobTimeAllocationReportTags = ["job-time-allocation-reports", "job-time-allocation-report-list"];
+    private static readonly string[] ListTags = ["job-time-allocation-report-list"]; // Tags for collections only
+
     public async Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));
@@ -21,11 +25,22 @@ internal sealed class JobTimeAllocationReportService(
         {
             var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.JobTimeAllocationReport, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: JobTimeAllocationReportTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create JobTimeAllocationReport.", ex);
         }
-        throw new NotImplementedException();
     }
 }

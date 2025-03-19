@@ -14,7 +14,7 @@ internal sealed class AuditDomainService(
     ICacheService cacheService)
     : IAuditDomainService
 {
-    private static readonly string[] AuditDomainTags = ["audit-domain", "audit-domain-list"];
+    private static readonly string[] AuditDomainTags = ["audit-domains", "audit-domain-list"];
     private static readonly string[] ListTags = ["audit-domain-list"]; // Tags for collections only
 
     public async Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomianModel)
@@ -27,6 +27,7 @@ internal sealed class AuditDomainService(
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditDomain, createdEntity.Id);
+            
             await cacheService.SetAsync(
                key: cacheKey,
                value: createdEntity,

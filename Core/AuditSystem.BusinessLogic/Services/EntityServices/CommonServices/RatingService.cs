@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Common;
@@ -13,6 +14,9 @@ internal sealed class RatingService(
     ICacheService cacheService)
     : IRatingService
 {
+    private static readonly string[] RatingTags = ["ratings", "rating-list"];
+    private static readonly string[] ListTags = ["rating-list"]; // Tags for collections only
+
     public async Task<Guid> CreateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
@@ -21,11 +25,22 @@ internal sealed class RatingService(
         {
             var entity = mapper.Map<Rating>(ratingModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Rating, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: RatingTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create Rating.", ex);
         }
-        throw new NotImplementedException();
     }
 }

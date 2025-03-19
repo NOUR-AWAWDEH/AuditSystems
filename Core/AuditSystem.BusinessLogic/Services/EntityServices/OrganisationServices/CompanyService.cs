@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organisation;
@@ -13,6 +14,9 @@ internal sealed class CompanyService(
     ICacheService cacheService)
     : ICompanyService
 {
+    private static readonly string[] CompanyTags = ["companies", "company-list"];
+    private static readonly string[] ListTags = ["company-list"]; // Tags for collections only
+
     public async Task<Guid> CreateCompanyAsync(CompanyModel companyModel)
     {
         ArgumentNullException.ThrowIfNull(companyModel, nameof(companyModel));
@@ -21,11 +25,23 @@ internal sealed class CompanyService(
         {
             var entity = mapper.Map<Company>(companyModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Company, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: CompanyTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
+
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create Company.", ex);
         }
-        throw new NotImplementedException();
     }
 }

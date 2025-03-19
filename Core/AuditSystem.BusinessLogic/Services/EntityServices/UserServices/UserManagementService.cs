@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Users;
@@ -13,6 +14,9 @@ internal sealed class UserManagementService(
     ICacheService cacheService) 
     : IUserManagementService
 {
+    private static readonly string[] UserManagementTags = ["user-managements", "user-management-list"];
+    private static readonly string[] ListTags = ["user-management-list"]; // Tags for collections only
+
     public async Task<Guid> CreateUserAsync(UserManagementModel userManagementModel)
     {
         ArgumentNullException.ThrowIfNull(userManagementModel, nameof(userManagementModel));
@@ -21,11 +25,22 @@ internal sealed class UserManagementService(
         {
             var entity = mapper.Map<UserManagement>(userManagementModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.UserManagement, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: UserManagementTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create UserManagement.", ex);
         }
-        throw new NotImplementedException();
     }
 }

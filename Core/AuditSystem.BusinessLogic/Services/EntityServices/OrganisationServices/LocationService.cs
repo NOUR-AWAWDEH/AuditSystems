@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organisation;
@@ -13,6 +14,9 @@ internal sealed class LocationService(
     ICacheService cacheService)
     : ILocationService
 {
+    private static readonly string[] LocationTags = ["locations", "location-list"];
+    private static readonly string[] ListTags = ["location-list"]; // Tags for collections only
+
     public async Task<Guid> CreateLocationAsync(LocationModel locationModel)
     {
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));
@@ -21,11 +25,22 @@ internal sealed class LocationService(
         {
             var entity = mapper.Map<Location>(locationModel);
             var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Location, createdEntity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: LocationTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+            return createdEntity.Id;
         }
         catch (Exception ex)
         {
-
+            throw new Exception("Failed to create Location.", ex);
         }
-        throw new NotImplementedException();
     }
 }

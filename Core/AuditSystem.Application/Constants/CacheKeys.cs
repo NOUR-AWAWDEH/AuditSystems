@@ -11,6 +11,7 @@ public static class CacheKeys
     public const string AuditUniverseObjective = "audit-universe-objective";
     public const string AuditUniverse = "audit-universe";
     public const string BusinessObjective = "business-objective";
+    public const string Objective = "objective";
     public const string SpecialProject = "special-project";
 
     //Checklist
@@ -69,7 +70,4 @@ public static class CacheKeys
 
     //Tasks
     public const string TaskManagement = "task-management";
-
-    //User
-    public const string UserManagement = "user-management";
 }

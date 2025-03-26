@@ -11,7 +11,6 @@ using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
-using AuditSystem.BusinessLogic.Services.EntityServices.UserServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
@@ -26,7 +25,6 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.TasksServices;
-using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 using AuditSystem.Contract.Interfaces.Transaction;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -57,12 +55,10 @@ public static class BusinessLogicDependencies
         .AddScoped<ISpecialProjectService, SpecialProjectService>()
         // Checklist Services
         .AddScoped<IChecklistService, ChecklistService>()
-        .AddScoped<IChecklistManagementService, ChecklistManagementService>()
         .AddScoped<IRemarkService, RemarkService>()
         // Common Services
         .AddScoped<IRatingService, RatingService>()
         // Compliance Services
-        .AddScoped<IComplianceAuditLinkService, ComplianceAuditLinkService>()
         .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()
         // Jobs Services
         .AddScoped<IAuditJobService, AuditJobService>()
@@ -91,14 +87,11 @@ public static class BusinessLogicDependencies
         // Risks Services
         .AddScoped<IRiskAssessmentService, RiskAssessmentService>()
         .AddScoped<IRiskFactorService, RiskFactorService>()
-        .AddScoped<ISpecificRiskFactorService, SpecificRiskFactorService>()
         // Skills Services
         .AddScoped<ISkillService, SkillService>()
         .AddScoped<ISkillSetService, SkillSetService>()
         // Supporting Docs Services
         .AddScoped<ISupportingDocService, SupportingDocService>()
         // Tasks Services
-        .AddScoped<ITaskManagementService, TaskManagementService>()
-        // Users Services
-        .AddScoped<IUserManagementService, UserManagementService>();
+        .AddScoped<ITaskManagementService, TaskManagementService>();
 }

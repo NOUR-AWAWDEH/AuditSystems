@@ -4,8 +4,7 @@ namespace AuditSystem.Contract.Models.Audit;
 
 public sealed class AuditUniverseObjectiveModel : BaseModel<Guid>
 {
-    public required Guid AuditUniverseID { get; set; }
-    public int SerialNumber { get; set; }
+    public Guid AuditUniverseID { get; set; }
     public string Impact { get; set; } = string.Empty;
     public int Amount { get; set; }
     public int ImpactAmount { get; set; }

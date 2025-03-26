@@ -10,5 +10,5 @@ public class RiskProgram : Entity<Guid>
     public string Description { get; set; } = string.Empty;
 
     public virtual Rating Rating { get; set; } = null!;
-    public virtual RiskControl RiskControl { get; set; } = null!;
+    public virtual RiskControls RiskControl { get; set; } = null!;
 }

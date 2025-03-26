@@ -4,7 +4,6 @@ namespace AuditSystem.Contract.Models.Reports;
 
 public sealed class PlanningReportModel : BaseModel<Guid>
 {
-    public int SerialNumber { get; set; }
     public string ReportName { get; set; } = string.Empty;
     public DateOnly ReportDate { get; set; }
     public required Guid CreatedById { get; set; }

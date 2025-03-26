@@ -2,8 +2,6 @@ using AuditSystem.Contract.Interfaces.Cache;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AuditSystem.Host.Caching;
 

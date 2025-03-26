@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AuditSystem.Contract\AuditSystem.Contract.csproj" />
+    <ProjectReference Include="..\AuditSystem.Domain\AuditSystem.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

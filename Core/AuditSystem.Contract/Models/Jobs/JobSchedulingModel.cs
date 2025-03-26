@@ -4,7 +4,6 @@ namespace AuditSystem.Contract.Models.Jobs;
 
 public sealed class JobSchedulingModel : BaseModel<Guid>
 {
-    public int SerialNumber { get; set; }
     public string AuditableUnit { get; set; } = string.Empty;
     public DateOnly AuditYear { get; set; }
     public DateOnly PlannedStartDate { get; set; }

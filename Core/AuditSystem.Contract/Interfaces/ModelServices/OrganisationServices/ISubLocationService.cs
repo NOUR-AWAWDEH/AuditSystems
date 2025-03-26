@@ -1,8 +1,8 @@
-﻿using AuditSystem.Contract.Models.Processes;
+﻿using AuditSystem.Contract.Models.Organisation;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
 
 public interface ISubLocationService
 {
-    public Task<Guid> CreateSubLocationAsync(SubProcessModel supProcessModel);
+    public Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel);
 }

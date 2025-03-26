@@ -6,6 +6,6 @@ public sealed class RiskProgramModel : BaseModel<Guid>
 {
     public required Guid RiskControlId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public required Guid RatingId { get; set; }
+    public Guid RatingId { get; set; }
     public string Description { get; set; } = string.Empty;
 }

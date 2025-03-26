@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.RiskControls;
 
 public class RiskControls : Entity<Guid>
 {
-    public Guid RiskId { get; set; }
+    public required Guid RiskId { get; set; }
     public Guid RatingId { get; set; }
     public string Description { get; set; } = string.Empty;
 

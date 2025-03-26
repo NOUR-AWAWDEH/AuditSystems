@@ -15,6 +15,7 @@ using AuditSystem.Contract.Models.Users;
 using AuditSystem.Domain.Entities;
 using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Checklists;
+using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Compliance;
 using AuditSystem.Domain.Entities.Jobs;
 using AuditSystem.Domain.Entities.Organisation;
@@ -44,14 +45,12 @@ public sealed class EntitiesMappingProfile : Profile
 
         //Checklist
         CreateMap<ChecklistModel, Checklist>().ReverseMap();
-        CreateMap<ChecklistManagementModel, ChecklistManagement>().ReverseMap();
         CreateMap<RemarkModel, Remark>().ReverseMap();
 
         //Common
         CreateMap<RatingModel, Rating>().ReverseMap();
 
         //Compliance
-        CreateMap<ComplianceAuditLinkModel, ComplianceAuditLink>().ReverseMap();
         CreateMap<ComplianceChecklistModel, ComplianceChecklist>().ReverseMap();
 
         //Jobs
@@ -87,7 +86,6 @@ public sealed class EntitiesMappingProfile : Profile
         CreateMap<RiskAssessmentModel, RiskAssessment>().ReverseMap();
         CreateMap<RiskFactorModel, RiskFactor>().ReverseMap();
         CreateMap<RiskModel, Risk>().ReverseMap();
-        CreateMap<SpecificRiskFactorModel, SpecificRiskFactor>().ReverseMap();
 
         //Skills
         CreateMap<SkillModel, Skill>().ReverseMap();

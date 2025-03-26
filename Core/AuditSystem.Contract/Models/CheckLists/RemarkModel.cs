@@ -5,5 +5,5 @@ namespace AuditSystem.Contract.Models.Checklists;
 public sealed class RemarkModel : BaseModel<Guid>
 {
     public required Guid CheckListManagementId { get; set; }
-    public required string Remarkcommants { get; set; } = string.Empty;
+    public string RemarkCommants { get; set; } = string.Empty;
 }

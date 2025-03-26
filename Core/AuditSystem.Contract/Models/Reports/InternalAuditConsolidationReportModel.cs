@@ -4,7 +4,6 @@ namespace AuditSystem.Contract.Models.Reports;
 
 public sealed class InternalAuditConsolidationReportModel : BaseModel<Guid>
 {
-    public int SerialNumber { get; set; }
     public string JobName { get; set; } = string.Empty;
     public string ReportName { get; set; } = string.Empty;
     public DateOnly ReportDate { get; set; }

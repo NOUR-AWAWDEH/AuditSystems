@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Identity;
 using AuditSystem.Domain.Entities.Organisation;
+using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Domain.Entities.Users;
 

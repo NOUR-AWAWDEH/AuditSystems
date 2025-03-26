@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.Organisation;
 
 public class Location : Entity<Guid>
 {
-    public Guid AuditorSettingsId { get; set; }
+    public required Guid AuditorSettingsId { get; set; }
     public string Name { get; set; } = string.Empty;
     
     public virtual AuditorSettings AuditorSettings { get; set; } = null!;

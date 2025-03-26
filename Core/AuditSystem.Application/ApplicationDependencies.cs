@@ -1,6 +1,5 @@
-using FluentValidation;
-using AutoMapper;
 using AuditSystem.Application.Behaviors;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;

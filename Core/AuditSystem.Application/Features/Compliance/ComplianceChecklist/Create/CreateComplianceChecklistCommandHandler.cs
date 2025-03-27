@@ -10,7 +10,7 @@ namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create
 internal sealed class CreateComplianceChecklistCommandHandler(
     IComplianceChecklistService complianceChecklistService,
     IMapper mapper,
-    ILogger logger) : IRequestHandler<CreateComplianceChecklistCommand, Result<CreateComplianceChecklistCommandResponse>>
+    ILogger<CreateComplianceChecklistCommandHandler> logger) : IRequestHandler<CreateComplianceChecklistCommand, Result<CreateComplianceChecklistCommandResponse>>
 {
     public async Task<Result<CreateComplianceChecklistCommandResponse>> Handle(CreateComplianceChecklistCommand request, CancellationToken cancellationToken)
     {

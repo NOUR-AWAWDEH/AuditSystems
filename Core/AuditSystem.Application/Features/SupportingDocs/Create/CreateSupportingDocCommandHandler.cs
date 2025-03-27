@@ -11,7 +11,7 @@ namespace AuditSystem.Application.Features.SupportingDocs.Create;
 internal class CreateSupportingDocCommandHandler(
     ISupportingDocService supportingDocService,
     IMapper mapper,
-    ILogger logger)
+    ILogger<CreateSupportingDocCommandHandler> logger)
     : IRequestHandler<CreateSupportingDocCommand, Result<CreateSupportingDocCommandResponse>>
 {
     public async Task<Result<CreateSupportingDocCommandResponse>> Handle(CreateSupportingDocCommand request, CancellationToken cancellationToken)

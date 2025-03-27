@@ -53,6 +53,7 @@ public static class BusinessLogicDependencies
         .AddScoped<IAuditUniverseService, AuditUniverseService>()
         .AddScoped<IBusinessObjectiveService, BusinessObjectiveService>()
         .AddScoped<ISpecialProjectService, SpecialProjectService>()
+        .AddScoped<IObjectiveService, ObjectiveService>()
         // Checklist Services
         .AddScoped<IChecklistService, ChecklistService>()
         .AddScoped<IRemarkService, RemarkService>()

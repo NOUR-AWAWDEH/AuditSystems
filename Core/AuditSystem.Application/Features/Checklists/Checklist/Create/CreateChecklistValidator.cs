@@ -2,9 +2,9 @@
 
 namespace AuditSystem.Application.Features.Checklists.Checklist.Create;
 
-public sealed class CreateCheklistValidator : AbstractValidator<CreateCheklistCommand>
+public sealed class CreateChecklistValidator : AbstractValidator<CreateChecklistCommand>
 {
-    public CreateCheklistValidator() 
+    public CreateChecklistValidator() 
     {
         RuleFor(x => x.Area)
             .NotEmpty()

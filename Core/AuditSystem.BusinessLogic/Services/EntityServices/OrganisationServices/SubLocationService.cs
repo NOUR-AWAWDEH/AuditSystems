@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Organisation;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Organisation;
 using AutoMapper;
@@ -17,13 +18,13 @@ internal sealed class SubLocationService(
     private static readonly string[] SubLocationTags = ["sub-locations", "sub-location-list"];
     private static readonly string[] ListTags = ["sub-location-list"]; // Tags for collections only
 
-    public async Task<Guid> CreateSubLocationAsync(SubProcessModel supProcessModel)
+    public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel)
     {
-        ArgumentNullException.ThrowIfNull(supProcessModel, nameof(supProcessModel));
+        ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
         
         try
         {
-            var entity = mapper.Map<SubLocation>(supProcessModel);
+            var entity = mapper.Map<SubLocation>(subLocationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SubLocation, createdEntity.Id);

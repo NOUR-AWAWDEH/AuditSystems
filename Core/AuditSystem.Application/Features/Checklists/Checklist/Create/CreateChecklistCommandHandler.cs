@@ -7,18 +7,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Features.Checklists.Checklist.Create;
 
-internal sealed class CreateCheklistCommandHandler(
+internal sealed class CreateChecklistCommandHandler(
     IChecklistService checklistService,
     IMapper mapper,
-    ILogger<CreateCheklistCommandHandler> logger)
-    : IRequestHandler<CreateCheklistCommand, Result<CreateCheklistCommandResponse>>
+    ILogger<CreateChecklistCommandHandler> logger)
+    : IRequestHandler<CreateChecklistCommand, Result<CreateChecklistCommandResponse>>
 {
-    public async Task<Result<CreateCheklistCommandResponse>> Handle(CreateCheklistCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreateChecklistCommandResponse>> Handle(CreateChecklistCommand request, CancellationToken cancellationToken)
     {
         var checklistModel = mapper.Map<ChecklistModel>(request);
         var checklistId = await checklistService.CreateCheckListAsync(checklistModel);
         logger.LogInformation("Checklist with Area {ChecklistArea} has been created.", request.Area);
 
-        return Result<CreateCheklistCommandResponse>.Created(new(checklistId));
+        return Result<CreateChecklistCommandResponse>.Created(new(checklistId));
     }
 }

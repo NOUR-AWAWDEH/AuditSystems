@@ -10,7 +10,7 @@ public sealed class CreateRemarkValidator : AbstractValidator<CreateRemarkComman
             .NotEmpty()
             .WithMessage("CheckList Management Id is required");
 
-        RuleFor(x => x.Remarkcommants)
+        RuleFor(x => x.RemarkCommants)
             .NotEmpty()
             .WithMessage("Remark comments are required")
             .MaximumLength(500)

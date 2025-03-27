@@ -17,7 +17,7 @@ internal sealed class CreateObjectiveCommandHandler(
     {
         var objectiveModel = mapper.Map<ObjectiveModel>(request);
         var objectiveId = await objectiveService.CreateObjectiveAsync(objectiveModel);
-        logger.LogInformation("Objective with Impact {ObjectiveImpact} has been created.", request.Impact);
+        logger.LogInformation("Objective with RatingID {ObjectiveRatingId} has been created.", request.RatingId);
 
         return Result<CreateObjectiveCommandResponse>.Created(new CreateObjectiveCommandResponse(objectiveId));
     }

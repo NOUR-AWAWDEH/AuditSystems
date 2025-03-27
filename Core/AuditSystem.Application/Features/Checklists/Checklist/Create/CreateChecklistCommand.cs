@@ -3,7 +3,7 @@ using AuditSystem.Application.Base;
 
 namespace AuditSystem.Application.Features.Checklists.Checklist.Create;
 
-public sealed record class CreateCheklistCommand : ICommand<Result<CreateCheklistCommandResponse>>
+public sealed record class CreateChecklistCommand : ICommand<Result<CreateChecklistCommandResponse>>
 {
     public string Area { get; set; } = string.Empty;
     public string Particulars { get; set; } = string.Empty;

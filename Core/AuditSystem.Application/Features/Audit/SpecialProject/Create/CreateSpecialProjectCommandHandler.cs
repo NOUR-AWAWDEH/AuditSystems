@@ -17,7 +17,7 @@ internal sealed class CreateSpecialProjectCommandHandler(
     {
         var specialProjectModel = mapper.Map<SpecialProjectModel>(request);
         var specialProjectId = await specialProjectService.CreateSpecialProjectAsync(specialProjectModel);
-        logger.LogInformation("Special Project with Impact {SpecialProjectImpact} has been created.", request.Impact);
+        logger.LogInformation("Special Project with Project Name {SpecialProjectName} has been created.", request.ProjectName);
 
         return Result<CreateSpecialProjectCommandResponse>.Created(new CreateSpecialProjectCommandResponse(specialProjectId));
     }

@@ -32,6 +32,7 @@ public static class AuthDependencies
         services.AddScoped<IAccountService, AccountService>();
 
 
+
         // JWT Settings
         var jwtSettings = new JwtSettings
         {

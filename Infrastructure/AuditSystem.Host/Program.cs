@@ -12,19 +12,23 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 var services = builder.Services;
 
-// Basic services
 services.AddControllers();
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-services.AddHttpContextAccessor();
-services.AddDistributedMemoryCache();
 
-// Health checks
 var healthCheckBuilder = builder.Services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
-// CORS configuration
-services.AddCors(settings =>
+services.AddEndpointsApiExplorer();
+
+var isProduction = builder.Environment.IsProduction();
+
+services.AddClients(configuration, isProduction);
+services.AddLogging();
+services.AddApplication();
+services.AddDomain();
+services.AddAuthDependencies(configuration);
+services.AddDataAccess(configuration, healthCheckBuilder);
+
+services.AddCors((settings) =>
 {
     settings.AddDefaultPolicy(policy =>
     {
@@ -34,55 +38,45 @@ services.AddCors(settings =>
     });
 });
 
-// File size limits configuration
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+services.AddHttpContextAccessor();
+services.AddDistributedMemoryCache();
+
+// Increase FormOption limits
 services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 1_000_000_000; // 1gb
 });
 
+// Increase Kestrel request body size limit
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 1_000_000_000; // 1gb
 });
 
-// Application services
-var isProduction = builder.Environment.IsProduction();
-services.AddClients(configuration, isProduction);
-services.AddLogging();
-services.AddApplication();
-services.AddDomain();
-services.AddDataAccess(configuration, healthCheckBuilder);
-services.AddAuthDependencies(configuration);
-
-
-
 var app = builder.Build();
 
-// Database migration
 app.MigrateDatabase();
 
-// Swagger configuration
 app.UseSwagger(options =>
 {
     options.RouteTemplate = "/openapi/{documentName}.json";
 });
 app.MapScalarApiReference();
 
-// Middleware pipeline
+app.UseScopedLogging();
 app.UseErrorHandling();
-app.UseHttpsRedirection();  // Add this if not present
-app.UseRouting();          // Add this if not present
-app.UseCors();
-app.UseAuthentication();    // Make sure this is before Authorization
-app.UseAuthorization();
-app.UseOutputCache();
+app.UseValidation();
 
-// Health checks endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json";
+
         var response = new
         {
             status = report.Status.ToString(),
@@ -95,9 +89,20 @@ app.MapHealthChecks("/health", new HealthCheckOptions
             }),
             timestamp = DateTime.UtcNow
         };
+
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
     }
 });
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+app.UseHttpsRedirection();
+
+app.UseCors();
+
+app.UseOutputCache();
 
 app.MapControllers();
 

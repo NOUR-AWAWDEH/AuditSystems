@@ -189,7 +189,7 @@ public class AuthenticationController : ControllerBase
         }
     }
 
-    [HttpPost]
+    [HttpPost("rigster")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

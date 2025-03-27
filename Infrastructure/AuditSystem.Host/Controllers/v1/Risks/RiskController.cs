@@ -51,56 +51,56 @@ namespace AuditSystem.Host.Controllers.v1.Risks
     {
         //Audits
         //Create Audit Domain
-        [HttpPost]
+        [HttpPost("Create-Audit-Domain")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditDomainCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditDomain([FromBody] CreateAuditDomainCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Engagement
-        [HttpPost]
+        [HttpPost("Create-Audit-Engagement")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditEngagementCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditEngagement([FromBody] CreateAuditEngagementCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Plan Summary
-        [HttpPost]
+        [HttpPost("Create-Audit-Plan-Summary")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditPlanSummaryCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditPlanSummary([FromBody] CreateAuditPlanSummaryCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Universe
-        [HttpPost]
+        [HttpPost("Create-Audit-Universe")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditUniverseCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditUniverse([FromBody] CreateAuditUniverseCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Universe Objective
-        [HttpPost]
+        [HttpPost("Create-Audit-Universe-Objective")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditUniverseObjectiveCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditUniverseObjective([FromBody] CreateAuditUniverseObjectiveCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Business Objective
-        [HttpPost]
+        [HttpPost("Create-Business-Objective")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateBusinessObjectiveCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateBusinessObjective([FromBody] CreateBusinessObjectiveCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Objective
-        [HttpPost]
+        [HttpPost("Create-Objective")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateObjectiveCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateObjective([FromBody] CreateObjectiveCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Specilal Project
-        [HttpPost]
+        [HttpPost("Create-Special-Project")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSpecialProjectCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSpecialProject([FromBody] CreateSpecialProjectCommand command) =>
@@ -109,14 +109,14 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Checklists
         //Create Checklist
-        [HttpPost]
+        [HttpPost("Create-Checklist")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateChecklistCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateChecklist([FromBody] CreateChecklistCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Remark
-        [HttpPost]
+        [HttpPost("Create-Remark")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRemarkCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRemark([FromBody] CreateRemarkCommand command) =>
@@ -125,7 +125,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Common
         //Create Rating
-        [HttpPost]
+        [HttpPost("Create-Rating")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRatingCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRating([FromBody] CreateRatingCommand command) =>
@@ -134,7 +134,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Compliance
         //Create Compliance
-        [HttpPost]
+        [HttpPost("Create-Compliance")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateComplianceChecklistCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateCompliance([FromBody] CreateComplianceChecklistCommand command) =>
@@ -143,21 +143,21 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Jobs
         //Create Audit Job
-        [HttpPost]
+        [HttpPost("Create-Audit-Job")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditJobCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditJob([FromBody] CreateAuditJobCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Job Prioritization
-        [HttpPost]
+        [HttpPost("Create-Job-Prioritization")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateJobPrioritizationCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateJobPrioritization([FromBody] CreateJobPrioritizationCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Job Scheduling
-        [HttpPost]
+        [HttpPost("Create-Job-Scheduling")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateJobSchedulingCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateJobScheduling([FromBody] CreateJobSchedulingCommand command) =>
@@ -166,35 +166,35 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Organization
         //Create Company
-        [HttpPost]
+        [HttpPost("Create-Company")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateCompanyCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateCompany([FromBody] CreateCompanyCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Department
-        [HttpPost]
+        [HttpPost("Create-Department")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateDepartmentCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Location
-        [HttpPost]
+        [HttpPost("Create-Location")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateLocationCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateLocation([FromBody] CreateLocationCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Sub Department
-        [HttpPost]
+        [HttpPost("Create-Sub-Department")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSubDepartmentCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSubDepartment([FromBody] CreateSubDepartmentCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Sub Location
-        [HttpPost]
+        [HttpPost("Create-Sub-Location")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSubLocationCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSubLocation([FromBody] CreateSubLocationCommand command) =>
@@ -203,14 +203,14 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Processes
         //Create Audit Process
-        [HttpPost]
+        [HttpPost("Create-Audit-Process")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditProcessCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditProcess([FromBody] CreateAuditProcessCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Sub Process
-        [HttpPost]
+        [HttpPost("Create-Audit-Sub-Process")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSubProcessCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditSubProcess([FromBody] CreateSubProcessCommand command) =>
@@ -219,42 +219,42 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Reports
         //Create Report
-        [HttpPost]
+        [HttpPost("Create-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditExceptionReportCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateReport([FromBody] CreateAuditExceptionReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Audit Plan Summary Report
-        [HttpPost]
+        [HttpPost("Create-Audit-Plan-Summary-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditPlanSummaryReportCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditPlanSummaryReport([FromBody] CreateAuditPlanSummaryReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Internal Audit Consolidated Report
-        [HttpPost]
+        [HttpPost("Create-Internal-Audit-Consolidated-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateInternalAuditConsolidationReportCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateInternalAuditConsolidatedReport([FromBody] CreateInternalAuditConsolidationReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Job Time Allocation Report
-        [HttpPost]
+        [HttpPost("Create-Job-Time-Allocation-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateJobTimeAllocationReportCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateJobTimeAllocationReport([FromBody] CreateJobTimeAllocationReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Planning Report
-        [HttpPost]
+        [HttpPost("Create-Planning-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreatePlanningReportCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreatePlanningReport([FromBody] CreatePlanningReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Reporting Follow Up
-        [HttpPost]
+        [HttpPost("Create-Reporting-Follow-Up")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateReportingFollowUpCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateReportingFollowUpReport([FromBody] CreateReportingFollowUpCommand command) =>
@@ -263,21 +263,21 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Create Risk Controls
         //Create Risk Control Matrix
-        [HttpPost]
+        [HttpPost("Create-Risk-Control-Matrix")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskControlMatrixCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRiskControlMatrix([FromBody] CreateRiskControlMatrixCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Risk Controls
-        [HttpPost]
+        [HttpPost("Create-Risk-Controls")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskControlsCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRiskControls([FromBody] CreateRiskControlsCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Risk Program
-        [HttpPost]
+        [HttpPost("Create-Risk-Program")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskProgramCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRiskProgram([FromBody] CreateRiskProgramCommand command) =>
@@ -286,21 +286,21 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Risks
         //Craete Risk
-        [HttpPost]
+        [HttpPost("Create-Risk")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRisk([FromBody] CreateRiskCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Risk Assessment
-        [HttpPost]
+        [HttpPost("Create-Risk-Assessment")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskAssessmentCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRiskAssessment([FromBody] CreateRiskAssessmentCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Risk Factor
-        [HttpPost]
+        [HttpPost("Create-Risk-Factor")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateRiskFactorCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateRiskFactor([FromBody] CreateRiskFactorCommand command) =>
@@ -309,7 +309,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //SupportingDocs
         //Create Supporting Document
-        [HttpPost]
+        [HttpPost("Create-Supporting-Document")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSupportingDocCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSupportingDocument([FromBody] CreateSupportingDocCommand command) =>
@@ -318,7 +318,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Tasks
         //Create TaskManagement
-        [HttpPost]
+        [HttpPost("Create-Task-Management")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateTaskManagementCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateTaskManagement([FromBody] CreateTaskManagementCommand command) =>
@@ -326,14 +326,14 @@ namespace AuditSystem.Host.Controllers.v1.Risks
 
         //Users
         //Create Skill
-        [HttpPost]
+        [HttpPost("Create-Skill")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSkillCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSkill([FromBody] CreateSkillCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Skill Set
-        [HttpPost]
+        [HttpPost("Create-Skill-Set")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateSkillSetCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSkillSet([FromBody] CreateSkillSetCommand command) =>

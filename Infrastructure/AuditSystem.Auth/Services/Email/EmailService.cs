@@ -1,38 +1,104 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
+using System.Reflection;
+using System.Text;
 
 namespace AuditSystem.Auth.Services.Email;
 
-public class EmailService(IConfiguration configuration) : IEmailService
+public class EmailService(
+    IOptions<SMTPConfigModel> smtpConfig,
+    ILogger<EmailService> logger) 
+    : IEmailService
 {
-    public async Task SendEmailAsync(string recipient, string subject, string body)
+    private readonly SMTPConfigModel _config = smtpConfig.Value;
+
+    public async Task SendEmailAsync(EmailRequest emailRequest)
     {
-        var email = configuration.GetValue<string>("EMAIL_CONFIGURATION:EMAIL")
-                    ?? throw new ArgumentNullException("Email configuration is missing.");
+        if (emailRequest == null)
+            throw new ArgumentNullException(nameof(emailRequest));
 
-        var password = configuration.GetValue<string>("EMAIL_CONFIGURATION:PASSWORD")
-                       ?? throw new ArgumentNullException("Password configuration is missing.");
+        var body = GetEmailBody(emailRequest.TemplateName);
 
-        var host = configuration.GetValue<string>("EMAIL_CONFIGURATION:HOST")
-                   ?? throw new ArgumentNullException("Host configuration is missing.");
-
-        var port = configuration.GetValue<int?>("EMAIL_CONFIGURATION:PORT")
-                   ?? throw new ArgumentNullException("Port configuration is missing.");
-
-        using var smtpClient = new SmtpClient(host, port)
+        foreach (var placeholder in emailRequest.Placeholders)
         {
-            EnableSsl = true,
+            body = body.Replace($"{{{placeholder.Key}}}", placeholder.Value);
+        }
+
+        await SendEmailInternalAsync(
+            emailRequest.ToEmails,
+            emailRequest.Subject,
+            body,
+            isHtml: true);
+    }
+
+    public async Task SendEmailAsync(string email, string subject, string body, bool isHtml = true)
+    {
+        await SendEmailAsync(new List<string> { email }, subject, body, isHtml);
+    }
+
+    public async Task SendEmailAsync(List<string> recipients, string subject, string body, bool isHtml = true)
+    {
+        await SendEmailInternalAsync(recipients, subject, body, isHtml);
+    }
+
+    private async Task SendEmailInternalAsync(List<string> recipients, string subject, string body, bool isHtml)
+    {
+        if (recipients == null || recipients.Count == 0)
+            throw new ArgumentException("Recipient email list cannot be empty.", nameof(recipients));
+
+        using MailMessage mailMessage = new()
+        {
+            From = new MailAddress(_config.SenderAddress, _config.SenderDisplayName),
+            IsBodyHtml = isHtml,
+            Subject = subject,
+            Body = body,
+            BodyEncoding = Encoding.UTF8
+        };
+
+        foreach (var recipient in recipients)
+        {
+            if (!string.IsNullOrWhiteSpace(recipient))
+            {
+                mailMessage.To.Add(recipient);
+            }
+        }
+
+        if (mailMessage.To.Count == 0)
+            throw new ArgumentException("No valid email addresses provided.", nameof(recipients));
+
+        using SmtpClient smtpClient = new()
+        {
+            Host = _config.Host,
+            Port = _config.Port,
+            EnableSsl = _config.EnableSSL,
             UseDefaultCredentials = false,
-            Credentials = new NetworkCredential(email, password)
+            Credentials = new NetworkCredential(_config.UserName, _config.Password),
+            DeliveryMethod = SmtpDeliveryMethod.Network
         };
 
-        using var message = new MailMessage(email, recipient, subject, body)
+        try
         {
-            IsBodyHtml = true
-        };
+            await smtpClient.SendMailAsync(mailMessage);
+        }
+        catch (SmtpException ex)
+        {
+            throw new EmailSendException("Failed to send email", ex);
+        }
+    }
+    
+    private string GetEmailBody(string templateName)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"AuditSystem.Auth.Services.Email.EmailTemplates.{templateName}.html";
 
-        await smtpClient.SendMailAsync(message);
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+        {
+            throw new FileNotFoundException($"Embedded resource not found: {resourceName}");
+        }
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 }
-

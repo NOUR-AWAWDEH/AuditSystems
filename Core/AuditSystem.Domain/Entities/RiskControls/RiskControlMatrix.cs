@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.RiskControls;
 
 public class RiskControlMatrix : Entity<Guid>
 {
-    public Guid SubProcessId { get; set; }
+    public required Guid SubProcessId { get; set; }
     public string Description { get; set; } = string.Empty;
     
     public virtual SubProcess SubProcess { get; set; } = null!;         

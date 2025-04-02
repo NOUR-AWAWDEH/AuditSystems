@@ -1,0 +1,27 @@
+﻿using FluentValidation;
+
+namespace AuditSystem.Application.Features.Reports.ReportingFollowUp.Create;
+
+public sealed class CreateReportingFollowUpValidator : AbstractValidator<CreateReportingFollowUpCommand>
+{
+    public CreateReportingFollowUpValidator() 
+    {
+        RuleFor(x => x.Reporting)
+            .NotEmpty()
+            .WithMessage("Reporting is required.")
+            .MaximumLength(200)
+            .WithMessage("Reporting must not exceed 200 characters.");
+
+        RuleFor(x => x.FollowUp)
+            .NotEmpty()
+            .WithMessage("Follow Up is required.")
+            .MaximumLength(300)
+            .WithMessage("Follow Up must not exceed 300 characters.");
+
+        RuleFor(x => x.Status)
+            .NotEmpty()
+            .WithMessage("Status is required.")
+            .MaximumLength(300)
+            .WithMessage("Status must not exceed 300 characters.");
+    }
+}

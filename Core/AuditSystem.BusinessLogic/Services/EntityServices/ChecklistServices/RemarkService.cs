@@ -1,0 +1,46 @@
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
+using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Checklists;
+using AuditSystem.Domain.Entities.Checklists;
+using AutoMapper;
+
+namespace AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
+
+internal sealed class RemarkService(
+    IRepository<Guid, Remark> repository,
+    IMapper mapper,
+    ICacheService cacheService)
+    : IRemarkService
+{
+    private static readonly string[] RemarkTags = ["remarks", "remark-list"];
+    private static readonly string[] ListTags = ["remark-list"]; // Tags for collections only
+
+    public async Task<Guid> CreateRemarkAsync(RemarkModel remarkModel)
+    {
+        ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));
+        
+        try
+        {
+            var entity = mapper.Map<Remark>(remarkModel);
+            var createdEntity = await repository.CreateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Remark, createdEntity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: createdEntity,
+                tags: RemarkTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            return createdEntity.Id;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to create Remark.", ex);
+        }
+    }
+}

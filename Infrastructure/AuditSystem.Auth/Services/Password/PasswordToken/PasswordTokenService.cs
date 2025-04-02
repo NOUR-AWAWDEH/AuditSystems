@@ -53,5 +53,4 @@ public class PasswordTokenService(UserManager<User> userManager) : IPasswordToke
 
         return await userManager.GeneratePasswordResetTokenAsync(user);
     }
-
 }

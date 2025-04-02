@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Net.Http;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -32,6 +31,8 @@ public static class AuthDependencies
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAccountService, AccountService>();
 
+        // Configure SMTP settings
+        ConfigureSmtpSettings(services, configuration);
 
         // JWT Settings
         var jwtSettings = new JwtSettings
@@ -106,6 +107,11 @@ public static class AuthDependencies
         });
 
         return services;
+    }
+
+    private static void ConfigureSmtpSettings(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<SMTPConfigModel>(configuration.GetSection("SMTPConfig"));
     }
 
     public static IApplicationBuilder UseAuthDependencies(this IApplicationBuilder app)

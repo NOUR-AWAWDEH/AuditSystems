@@ -1,0 +1,8 @@
+﻿using AuditSystem.Contract.Models.Checklists;
+
+namespace AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
+
+public interface IRemarkService
+{
+    public Task<Guid> CreateRemarkAsync(RemarkModel remarkModel);
+}

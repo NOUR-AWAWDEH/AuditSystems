@@ -1,18 +1,19 @@
-﻿using AuditSystem.Domain.Entities.Audit;
-using AuditSystem.Domain.Entities.CheckLists;
+﻿using AuditSystem.Domain.Entities;
+using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.Checklists;
+using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Compliance;
 using AuditSystem.Domain.Entities.Jobs;
 using AuditSystem.Domain.Entities.Organisation;
-using AuditSystem.Domain.Entities.Reporting;
-using AuditSystem.Domain.Entities.Risks;
-using AuditSystem.Domain.Entities.Tasks;
-using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Processes;
+using AuditSystem.Domain.Entities.Reports;
+using AuditSystem.Domain.Entities.RiskControls;
+using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
+using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using AuditSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.DataAccess.Contexts;
 
@@ -57,7 +58,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<SubLocation> SubLocations { get; set; }
 
     // Process
-    public required DbSet<Process> Processes { get; set; }
+    public required DbSet<AuditProcess> AuditProcesses { get; set; }
     public required DbSet<SubProcess> SubProcesses { get; set; }
 
     // Reporting
@@ -69,7 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<AuditExceptionReport> AuditExceptionReports { get; set; }
 
     // Risk Controls
-    public required DbSet<RiskControl> RiskControls { get; set; }
+    public required DbSet<RiskControls> RisksControls { get; set; }
     public required DbSet<RiskControlMatrix> RiskControlMatrices { get; set; }
     public required DbSet<RiskProgram> RiskPrograms { get; set; }
 
@@ -85,7 +86,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     // Tasks
     public required DbSet<TaskManagement> TaskManagements { get; set; }
 
-    // Users (Identity handles Users and Roles, so no need for UserRole)
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<UserManagement> UserManagements { get; set; }
     public required DbSet<AuditorSettings> AuditorSettings { get; set; }
@@ -96,26 +96,5 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-
-        // Seed Identity Roles with static GUIDs
-        modelBuilder.Entity<Role>().HasData(
-            new Role
-            {
-                Id = new Guid("a1b2c3d4-e5f6-7890-abcd-ef1234567890"),
-                Name = Role.Admin,
-                NormalizedName = Role.Admin.ToUpper()
-            },
-            new Role
-            {
-                Id = new Guid("b2c3d4e5-f678-90ab-cdef-1234567890ab"),
-                Name = Role.Auditor,
-                NormalizedName = Role.Auditor.ToUpper()
-            },
-            new Role
-            {
-                Id = new Guid("c3d4e5f6-7890-abcd-ef12-34567890abcd"),
-                Name = Role.User,
-                NormalizedName = Role.User.ToUpper()
-            });
     }
 }

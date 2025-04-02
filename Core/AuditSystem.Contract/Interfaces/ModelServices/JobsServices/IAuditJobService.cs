@@ -1,0 +1,8 @@
+﻿using AuditSystem.Contract.Models.Jobs;
+
+namespace AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
+
+public interface IAuditJobService
+{
+    public Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel);
+}

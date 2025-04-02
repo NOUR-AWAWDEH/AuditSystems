@@ -1,14 +1,12 @@
 using AuditSystem.Domain.Entities.Common;
-using AuditSystem.Domain.Entities.Audit;
 
 namespace AuditSystem.Domain.Entities.Jobs;
 
 public class AuditJob : Entity<Guid>
 {
-    public Guid AuditUniverseID { get; set; } 
-    public int SerialNumber { get; set; }
-    public string JobName { get; set; } = string.Empty; 
-    public string JobType { get; set; } = string.Empty; 
+    public Guid AuditUniverseID { get; set; }
+    public string JobName { get; set; } = string.Empty;
+    public string JobType { get; set; } = string.Empty;
 
     public virtual AuditUniverse AuditUniverse { get; set; } = null!;
 }

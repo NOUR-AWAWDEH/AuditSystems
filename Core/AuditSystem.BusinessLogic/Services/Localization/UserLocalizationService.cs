@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace AuditSystem.BusinessLogic.Services.Localization;
 
-internal sealed class UserLocalizationService(IHttpContextAccessor httpContextAccessor) : IUserLocalizationService
+internal sealed class UserLocalizationService( IHttpContextAccessor httpContextAccessor) : IUserLocalizationService
 {
     public string GetUserLocalization()
     {

@@ -10,10 +10,6 @@ public class UserManagementConfiguration : IEntityTypeConfiguration<UserManageme
     {
         builder.HasKey(um => um.Id);
 
-        builder.Property(um => um.Designation)
-            .IsRequired()
-            .HasMaxLength(100);
-
         // Relationships (Use Restrict or NoAction to avoid cascade paths)
         builder.HasOne(um => um.User)
             .WithMany()

@@ -4,7 +4,6 @@ namespace AuditSystem.Domain.Entities.Audit;
 public class AuditUniverseObjective : Entity<Guid>
 {
     public Guid AuditUniverseID { get; set; }
-    public int SerialNumber { get; set; }
     public string Impact { get; set; } = string.Empty;
     public int Amount { get; set; }
     public int ImpactAmount { get; set; }

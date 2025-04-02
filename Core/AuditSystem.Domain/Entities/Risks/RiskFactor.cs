@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.Risks;
 
 public class RiskFactor : Entity<Guid>
 {
-    public Guid AuditorSettingsId { get; set; }
+    public required Guid AuditorSettingsId { get; set; }
     public string Factor { get; set; } = string.Empty;
 
     public virtual AuditorSettings AuditorSettings { get; set; } = null!;

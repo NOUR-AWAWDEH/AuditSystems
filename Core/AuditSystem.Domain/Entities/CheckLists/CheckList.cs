@@ -1,6 +1,6 @@
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.CheckLists;
+namespace AuditSystem.Domain.Entities.Checklists;
 
 public class Checklist : Entity<Guid>
 {

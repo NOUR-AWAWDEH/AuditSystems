@@ -1,20 +1,19 @@
 using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Common;
 
-
 namespace AuditSystem.Domain.Entities;
 
 public class AuditUniverse : Entity<Guid>
 {
-    public string BusinessObjective { get; set; } = string.Empty;
+    public required string BusinessObjective { get; set; } = string.Empty;
     public string IndustryUpdate { get; set; } = string.Empty;
     public string CompanyUpdate { get; set; } = string.Empty;
-    public Guid DomainId { get; set; }
-    public bool IsFinancialQuantifiable { get; set; }
+    public required Guid DomainId { get; set; }
+    public bool IsFinancialQuantifiable { get; set; } = false;
 
     public bool IsSpecialProject { get; set; } = false;
+    public Guid SpecialProjectId { get; set; }
 
     public virtual AuditDomain Domain { get; set; } = null!;
-
     public virtual SpecialProject? SpecialProject { get; set; }
 }

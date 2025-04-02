@@ -20,9 +20,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(50);
 
-        // Foreign Key Relationships (nullable, optional)
+        // Foreign Key Relationships (required)
         builder.Property(u => u.RoleId)
-            .IsRequired(false);
+            .IsRequired();
 
         builder.Property(u => u.CompanyId)
             .IsRequired(false);

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuditSystem.DataAccess.Configurations;
 
-public class RiskControlConfiguration : IEntityTypeConfiguration<RiskControl>
+public class RiskControlConfiguration : IEntityTypeConfiguration<RiskControls>
 {
-    public void Configure(EntityTypeBuilder<RiskControl> builder)
+    public void Configure(EntityTypeBuilder<RiskControls> builder)
     {
         // Primary Key
         builder.HasKey(rc => rc.Id);

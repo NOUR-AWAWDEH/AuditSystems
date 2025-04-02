@@ -5,8 +5,7 @@ namespace AuditSystem.Domain.Entities.Audit;
 
 public class AuditEngagement : Entity<Guid>
 {
-    public int SerialNumber { get; set; }
-    public string JobName { get; set; } = string.Empty;
+    public required string JobName { get; set; } = string.Empty;
     public DateOnly PlannedStartDate { get; set; }
     public DateOnly PlannedEndDate { get; set; }
     public string JobType { get; set; } = string.Empty;

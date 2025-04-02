@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 
 namespace AuditSystem.Application.Behaviors;
+
 public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
     IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

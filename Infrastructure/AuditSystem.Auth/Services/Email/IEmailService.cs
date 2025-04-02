@@ -1,7 +1,8 @@
-﻿namespace AuditSystem.Auth.Services.Email
+﻿using AuditSystem.Auth.Dtos;
+namespace AuditSystem.Auth.Services.Email;
+public interface IEmailService
 {
-    public interface IEmailService
-    {
-        Task SendEmailAsync(string receptor, string subject, string body);
-    }
+    Task SendEmailAsync(EmailRequest emailRequest);
+    Task SendEmailAsync(string email, string subject, string body, bool isHtml = true);
+    Task SendEmailAsync(List<string> recipients, string subject, string body, bool isHtml = true);
 }

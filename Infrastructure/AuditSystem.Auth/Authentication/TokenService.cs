@@ -52,29 +52,36 @@ public class TokenService : ITokenService
         _expirationMinutes = _jwtSettings.ExpirationMinutes;
     }
 
-    public string GenerateJwtToken(User request)
+    public async Task<string> GenerateJwtToken(User request)
     {
-        var claims = new List<Claim>
+        if (request.Role == null)
         {
-            new Claim(ClaimTypes.NameIdentifier, request.Id.ToString()),
-            new Claim(ClaimTypes.Name, request.UserName ?? ""),
-            new Claim(ClaimTypes.Email, request.Email ?? "")
-        };
+            throw new InvalidOperationException("User must have an assigned role.");
+        }
+
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, request.Id.ToString()),
+        new Claim(ClaimTypes.Name, request.UserName ?? ""),
+        new Claim(ClaimTypes.Email, request.Email ?? ""),
+        new Claim(ClaimTypes.Role, request.Role.Name) // Using custom Role entity
+    };
 
         var token = new JwtSecurityToken(
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(_expirationMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationMinutes),
             signingCredentials: _signingCredentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateAccessToken(User user)
+
+    public async Task<string> GenerateAccessToken(User user)
     {
-        return GenerateJwtToken(user);
+        return await GenerateJwtToken(user);
     }
 
     public string GenerateRefreshToken()

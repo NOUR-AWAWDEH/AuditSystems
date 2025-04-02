@@ -6,9 +6,20 @@ namespace AuditSystem.DataAccess;
 
 public class DatabaseInitializer
 {
-    public static void InitializeDatabase(IServiceProvider serviceProvider)
+    public static void InitializeDatabase(IServiceProvider serviceProvider, bool isProduction)
     {
-        var context  = serviceProvider.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
-    }    
+        using (var scope = serviceProvider.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            if (!isProduction)
+            {
+                context.Database.Migrate(); // Auto-migrate in non-production
+            }
+            else
+            {
+                // More controlled migration in production (manual process)
+            }
+        }
+    }
 }

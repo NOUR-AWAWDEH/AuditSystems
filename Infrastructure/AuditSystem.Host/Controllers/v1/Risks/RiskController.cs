@@ -37,6 +37,7 @@ using AuditSystem.Application.Features.SupportingDocs.Create;
 using AuditSystem.Application.Features.Tasks.Create;
 using AuditSystem.Application.Features.Users.Skill.Create;
 using AuditSystem.Application.Features.Users.SkillSet.Create;
+using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         //Audits
         //Create Audit Domain
         [HttpPost("Create-Audit-Domain")]
+        //[Authorize(Roles = Role.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateAuditDomainCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditDomain([FromBody] CreateAuditDomainCommand command) =>

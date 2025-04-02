@@ -7,6 +7,7 @@
     <UserSecretsId>2a18ea02-2622-41ac-bedf-50ef963ba030</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Services\Email\EmailTemplates\*.html" />
     <PackageReference Include="MailKit" Version="4.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\AuditSystem.Domain\AuditSystem.Domain.csproj" />
+    <ProjectReference Include="..\AuditSystem.DataAccess\AuditSystem.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

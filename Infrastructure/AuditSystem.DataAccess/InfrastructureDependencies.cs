@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.DataAccess;
 
@@ -28,13 +29,15 @@ public static class InfrastructureDependencies
 {
     public static IServiceCollection AddDataAccess(this IServiceCollection services,
         IConfiguration configuration,
-        IHealthChecksBuilder healthChecksBuilder)
+        IHealthChecksBuilder healthChecksBuilder, bool isProduction)
     {
         services
-            .AddDbContext(configuration)
+            .AddDbContext(configuration, isProduction)
             .AddRepositories()
             .AddIdentity();
+
         healthChecksBuilder.AddDbContextHealthCheck();
+        services.AddScoped<IContext, EntityContext>();
         return services;
     }
 
@@ -48,6 +51,8 @@ public static class InfrastructureDependencies
             options.Password.RequireNonAlphanumeric = true;
             options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
+
+            options.SignIn.RequireConfirmedEmail = true;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
@@ -55,11 +60,12 @@ public static class InfrastructureDependencies
         return services;
     }
 
-    private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration) =>
-        services
-            .AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString(ConfigurationKeys.DefaultConnectionString)))
-            .AddScoped<IContext, EntityContext>();
+    private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration, bool isProduction) =>
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(configuration.GetConnectionString(ConfigurationKeys.DefaultConnectionString))
+                   .EnableSensitiveDataLogging(!isProduction)  // Disable sensitive data logging in production
+                   .LogTo(Console.WriteLine, LogLevel.Information));  // Optional query logging for debugging
+
 
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
     services

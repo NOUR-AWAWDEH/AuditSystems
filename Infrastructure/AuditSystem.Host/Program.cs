@@ -26,7 +26,7 @@ services.AddLogging();
 services.AddApplication();
 services.AddDomain();
 services.AddAuthDependencies(configuration);
-services.AddDataAccess(configuration, healthCheckBuilder);
+services.AddDataAccess(configuration, healthCheckBuilder,isProduction);
 
 services.AddCors((settings) =>
 {

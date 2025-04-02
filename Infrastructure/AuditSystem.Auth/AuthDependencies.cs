@@ -31,7 +31,8 @@ public static class AuthDependencies
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAccountService, AccountService>();
 
-
+        // Configure SMTP settings
+        ConfigureSmtpSettings(services, configuration);
 
         // JWT Settings
         var jwtSettings = new JwtSettings
@@ -106,6 +107,11 @@ public static class AuthDependencies
         });
 
         return services;
+    }
+
+    private static void ConfigureSmtpSettings(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<SMTPConfigModel>(configuration.GetSection("SMTPConfig"));
     }
 
     public static IApplicationBuilder UseAuthDependencies(this IApplicationBuilder app)

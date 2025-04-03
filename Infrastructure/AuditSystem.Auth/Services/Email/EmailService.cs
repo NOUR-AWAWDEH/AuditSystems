@@ -135,7 +135,4 @@ public class EmailService : IEmailService
 
         return template;
     }
-
-
-
 }

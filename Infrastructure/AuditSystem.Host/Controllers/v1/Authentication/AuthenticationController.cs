@@ -263,7 +263,4 @@ public class AuthenticationController : ControllerBase
             return StatusCode(500, "An error occurred while confirming email");
         }
     }
-
-
-
 }

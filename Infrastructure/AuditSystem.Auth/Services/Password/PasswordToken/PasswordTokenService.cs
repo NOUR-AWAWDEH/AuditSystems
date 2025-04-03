@@ -5,7 +5,7 @@ namespace AuditSystem.Auth.Services.Password.PasswordToken;
 
 public class PasswordTokenService(UserManager<User> userManager) : IPasswordTokenService
 {
-    public bool ValidateResetTokenAsync(User user, string token)
+    public  bool ValidateResetTokenAsync(User user, string token)
     {
         if (user == null)
         {

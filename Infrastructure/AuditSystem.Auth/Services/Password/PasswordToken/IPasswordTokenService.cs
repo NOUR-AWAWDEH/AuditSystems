@@ -1,5 +1,3 @@
-using AuditSystem.Domain.Entities.Users;
-
 namespace AuditSystem.Auth.Services.Password.PasswordToken;
 
 public interface IPasswordTokenService

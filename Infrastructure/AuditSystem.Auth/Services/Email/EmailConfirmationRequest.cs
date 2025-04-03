@@ -7,11 +7,14 @@ public class EmailConfirmationRequest : EmailRequest
 
     public EmailConfirmationRequest(string email, string userName, string confirmationLink)
     {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+
         ToEmails.Add(email);
-        Placeholders = new Dictionary<string, string>
+        Placeholders = new Dictionary<string, PlaceholderValue>
         {
-            { "UserName", userName },
-            { "ConfirmationLink", confirmationLink }
+            { "UserName", new PlaceholderValue { Value = userName, IsHtmlContent = false } },
+            { "ConfirmationLink", new PlaceholderValue { Value = confirmationLink, IsHtmlContent = false } }
         };
     }
 }

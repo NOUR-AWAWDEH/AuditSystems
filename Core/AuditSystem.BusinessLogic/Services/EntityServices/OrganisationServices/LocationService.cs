@@ -26,7 +26,7 @@ internal sealed class LocationService(
             var entity = mapper.Map<Location>(locationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Location, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Location, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

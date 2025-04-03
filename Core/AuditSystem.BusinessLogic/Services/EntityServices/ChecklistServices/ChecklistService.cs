@@ -26,7 +26,7 @@ internal sealed class ChecklistService(
             var entity = mapper.Map<Checklist>(checklistModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Checklist, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Checklist, createdEntity.Id);
             
             await cacheService.SetAsync(
                 key: cacheKey,

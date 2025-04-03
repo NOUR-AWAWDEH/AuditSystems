@@ -26,7 +26,7 @@ internal sealed class SubDepartmentService(
             var entity = mapper.Map<SubDepartment>(subDepartmentModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SubDepartment, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.SubDepartment, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

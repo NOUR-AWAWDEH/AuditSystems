@@ -26,7 +26,7 @@ internal sealed class BusinessObjectiveService(
             var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.BusinessObjective, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.BusinessObjective, createdEntity.Id);
             
             await cacheService.SetAsync(
                 key: cacheKey,

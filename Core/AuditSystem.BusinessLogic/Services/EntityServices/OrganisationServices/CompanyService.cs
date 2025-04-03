@@ -26,7 +26,7 @@ internal sealed class CompanyService(
             var entity = mapper.Map<Company>(companyModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Company, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Company, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

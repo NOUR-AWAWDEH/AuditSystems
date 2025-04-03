@@ -57,6 +57,30 @@ namespace AuditSystem.Auth.Services.Registration
             }
         }
 
+
+
+        public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme, IUrlHelper urlHelper)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user == null)
+                {
+                    throw new InvalidOperationException($"User with email '{request.Email}' does not exist");
+                }
+
+                var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme, urlHelper);
+                await SendConfirmationEmailAsync(user, confirmationLink);
+
+                _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Verfication Email failed for {UserEmail}", request.Email);
+                throw;
+            }
+        }
+
         private async Task<Role> ValidateAndGetRoleAsync(string roleName)
         {
             var role = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);

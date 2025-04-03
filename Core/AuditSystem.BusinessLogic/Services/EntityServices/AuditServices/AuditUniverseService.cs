@@ -26,7 +26,7 @@ internal sealed class AuditUniverseService(
             var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditUniverse, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.AuditUniverse, createdEntity.Id);
             
             await cacheService.SetAsync(
                 key: cacheKey,

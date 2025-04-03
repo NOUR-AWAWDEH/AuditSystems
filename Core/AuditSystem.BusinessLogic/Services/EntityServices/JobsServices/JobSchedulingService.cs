@@ -26,7 +26,7 @@ internal sealed class JobSchedulingService(
             var entity = mapper.Map<JobScheduling>(jobSchedulingModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.JobScheduling, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.JobScheduling, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

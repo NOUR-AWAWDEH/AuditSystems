@@ -26,7 +26,7 @@ internal sealed class RemarkService(
             var entity = mapper.Map<Remark>(remarkModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Remark, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Remark, createdEntity.Id);
             
             await cacheService.SetAsync(
                 key: cacheKey,

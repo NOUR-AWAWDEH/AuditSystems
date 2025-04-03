@@ -26,7 +26,7 @@ internal sealed class AuditPlanSummaryReportService(
             var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditPlanSummaryReport, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

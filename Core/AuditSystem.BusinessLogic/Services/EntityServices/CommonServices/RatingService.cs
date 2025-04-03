@@ -26,7 +26,7 @@ internal sealed class RatingService(
             var entity = mapper.Map<Rating>(ratingModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Rating, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Rating, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

@@ -63,7 +63,6 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             Roles = string.Join(", ", roles),
             AuthenticationType = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "auth_type")?.Value,
             IsEmailVerified = user.EmailConfirmed,
-            IsMfaAuthenticated = user.TwoFactorEnabled,
             ExpiresAt = jwtToken?.ValidTo > DateTime.MinValue ? jwtToken.ValidTo : DateTimeOffset.UtcNow.AddHours(1),
             AuthenticatedAt = jwtToken?.ValidFrom > DateTime.MinValue ? jwtToken.ValidFrom : DateTimeOffset.UtcNow,
             Claims = jwtToken?.Claims?.ToDictionary(

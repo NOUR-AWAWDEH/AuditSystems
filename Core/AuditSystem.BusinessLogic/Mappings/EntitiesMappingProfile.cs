@@ -1,3 +1,4 @@
+using AuditSystem.Application.Features.Audit.AuditDomain.Create;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Contract.Models.Common;
@@ -36,7 +37,10 @@ public sealed class EntitiesMappingProfile : Profile
     {
         //Audit
         CreateMap<AuditDomainModel, AuditDomain>().ReverseMap();
+        CreateMap<CreateAuditDomainCommand, AuditDomainModel>();
+
         CreateMap<AuditEngagementModel, AuditEngagement>().ReverseMap();
+        
         CreateMap<AuditPlanSummaryModel, AuditPlanSummary>().ReverseMap();
         CreateMap<AuditUniverseObjectiveModel, AuditUniverseObjective>().ReverseMap();
         CreateMap<AuditUniverseModel, AuditUniverse>().ReverseMap();

@@ -26,7 +26,7 @@ internal sealed class SubProcessService(
             var entity = mapper.Map<SubProcess>(subProcessModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SubProcess, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.SubProcess, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

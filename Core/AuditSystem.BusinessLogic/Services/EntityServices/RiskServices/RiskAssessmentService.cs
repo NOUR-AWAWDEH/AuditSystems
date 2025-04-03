@@ -26,7 +26,7 @@ internal sealed class RiskAssessmentService(
             var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.RiskAssessment, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.RiskAssessment, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

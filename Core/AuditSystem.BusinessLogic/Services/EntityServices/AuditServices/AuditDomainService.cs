@@ -26,7 +26,7 @@ internal sealed class AuditDomainService(
             var entity = mapper.Map<AuditDomain>(auditDomianModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditDomain, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.AuditDomain, createdEntity.Id);
             
             await cacheService.SetAsync(
                key: cacheKey,

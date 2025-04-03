@@ -26,7 +26,7 @@ internal sealed class PlanningReportService(
             var entity = mapper.Map<PlanningReport>(planningReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.PlanningReport, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.PlanningReport, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

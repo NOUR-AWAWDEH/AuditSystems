@@ -263,4 +263,46 @@ public class AuthenticationController : ControllerBase
             return StatusCode(500, "An error occurred while confirming email");
         }
     }
+
+    [HttpPost("send-verification-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<ApiResponse>> SendVerificationEmail([FromBody] VerificationEmailDto request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.SelectMany(x => x.Value.Errors)
+                    .Select(e => new ValidationError(
+                        errorCode: "VALIDATION_ERROR",
+                        errorMessage: e.ErrorMessage,
+                        propertyName: ModelState.Keys.FirstOrDefault(k => ModelState[k].Errors.Contains(e))
+                    ));
+                return BadRequest(ApiResponse.ValidationError(errors));
+            }
+
+            await _registrationService.VerificationEmailAsync(request, Request.Scheme, Url);
+            return Ok(ApiResponse.SuccessResponse("Verification email sent successfully. Please check your inbox."));
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Verification email failed for non-existing user {Email}", request.Email);
+            return BadRequest(ApiResponse.ErrorResponse(
+                ex.Message,
+                new List<ErrorDetail> { new ErrorDetail("USER_NOT_FOUND", ex.Message) }
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending verification email to {Email}", request.Email);
+            return StatusCode(500, ApiResponse.ErrorResponse(
+                "An unexpected error occurred",
+                "INTERNAL_ERROR",
+                ex.Message));
+        }
+    }
+
+
 }

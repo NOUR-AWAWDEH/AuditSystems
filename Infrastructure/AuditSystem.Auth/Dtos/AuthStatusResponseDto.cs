@@ -25,7 +25,5 @@
 
         public bool? IsEmailVerified { get; set; }
 
-        public bool? IsMfaAuthenticated { get; set; }
-
     }
 }

@@ -26,7 +26,7 @@ internal class ObjectiveService(
             var entity = mapper.Map<Objective>(objectiveModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Objective, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Objective, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

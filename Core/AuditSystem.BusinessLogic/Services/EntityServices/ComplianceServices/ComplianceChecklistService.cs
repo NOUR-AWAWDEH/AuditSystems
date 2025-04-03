@@ -27,7 +27,7 @@ internal sealed class ComplianceChecklistService(
             var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.ComplianceChecklist, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

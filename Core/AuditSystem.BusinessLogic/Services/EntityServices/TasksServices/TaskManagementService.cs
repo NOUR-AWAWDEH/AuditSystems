@@ -26,7 +26,7 @@ internal sealed class TaskManagementService(
             var entity = mapper.Map<TaskManagement>(taskManagementModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.TaskManagement, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.TaskManagement, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

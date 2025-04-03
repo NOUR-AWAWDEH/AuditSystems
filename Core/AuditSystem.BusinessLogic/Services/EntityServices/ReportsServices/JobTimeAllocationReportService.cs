@@ -26,7 +26,7 @@ internal sealed class JobTimeAllocationReportService(
             var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.JobTimeAllocationReport, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

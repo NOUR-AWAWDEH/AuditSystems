@@ -26,7 +26,7 @@ internal sealed class SupportingDocService(
             var entity = mapper.Map<SupportingDoc>(supportingDocModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SupportingDoc, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.SupportingDoc, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

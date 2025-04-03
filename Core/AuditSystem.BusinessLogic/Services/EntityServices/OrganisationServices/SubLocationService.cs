@@ -27,7 +27,7 @@ internal sealed class SubLocationService(
             var entity = mapper.Map<SubLocation>(subLocationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SubLocation, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.SubLocation, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

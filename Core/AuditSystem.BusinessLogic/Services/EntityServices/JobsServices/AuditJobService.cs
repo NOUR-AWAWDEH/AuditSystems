@@ -26,7 +26,7 @@ internal sealed class AuditJobService(
             var entity = mapper.Map<AuditJob>(auditJobModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditJob, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.AuditJob, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

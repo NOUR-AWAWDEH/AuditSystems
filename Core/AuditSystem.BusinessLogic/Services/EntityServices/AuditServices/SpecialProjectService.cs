@@ -26,7 +26,7 @@ internal sealed class SpecialProjectService(
             var entity = mapper.Map<SpecialProject>(specialProjectModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.SpecialProject, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.SpecialProject, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

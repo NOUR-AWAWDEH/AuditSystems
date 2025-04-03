@@ -26,7 +26,7 @@ internal sealed class JobPrioritizationService(
             var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.JobPrioritization, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.JobPrioritization, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

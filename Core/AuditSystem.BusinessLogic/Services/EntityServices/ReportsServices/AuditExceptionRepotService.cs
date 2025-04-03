@@ -26,7 +26,7 @@ internal sealed class AuditExceptionRepotService(
             var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.AuditExceptionReport, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

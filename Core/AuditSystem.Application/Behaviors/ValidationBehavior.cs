@@ -4,11 +4,11 @@ using MediatR;
 namespace AuditSystem.Application.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
-    IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
+    IPipelineBehavior<TRequest, ValidationResultResponse<TResponse>>
+    where TRequest : IRequest<ValidationResultResponse<TResponse>>
 {
-    public async Task<TResponse> Handle(TRequest request,
-        RequestHandlerDelegate<TResponse> next,
+    public async Task<ValidationResultResponse<TResponse>> Handle(TRequest request,
+        RequestHandlerDelegate<ValidationResultResponse<TResponse>> next,
         CancellationToken cancellationToken)
     {
         var context = new ValidationContext<TRequest>(request);
@@ -16,15 +16,24 @@ public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidat
         var errors = validationFailures
             .Where(validationResult => !validationResult.IsValid)
             .SelectMany(validationResult => validationResult.Errors)
+            .Select(error => error.ErrorMessage)
             .ToList();
 
         if (errors.Count != 0)
         {
-            throw new ValidationException(errors);
+            return new ValidationResultResponse<TResponse>
+            {
+                IsValid = false,
+                Errors = errors
+            };
         }
 
         var response = await next();
 
-        return response;
+        return new ValidationResultResponse<TResponse>
+        {
+            IsValid = true,
+            Response = response.Response
+        };
     }
 }

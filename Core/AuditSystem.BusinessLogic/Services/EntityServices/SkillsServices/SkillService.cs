@@ -26,7 +26,7 @@ internal sealed class SkillService(
             var entity = mapper.Map<Skill>(skillModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.Skill, createdEntity.Id);
+            var cacheKey = string.Format(CacheKeys.Skill, createdEntity.Id);
 
             await cacheService.SetAsync(
                 key: cacheKey,

@@ -34,10 +34,10 @@ using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Create;
 using AuditSystem.Application.Features.Risks.RiskFactor.Create;
 using AuditSystem.Application.Features.Skills.Skill.Create;
+using AuditSystem.Application.Features.Skills.SkillCategory.Create;
 using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.SupportingDocs.Create;
 using AuditSystem.Application.Features.Tasks.Create;
-using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -326,7 +326,7 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         public async Task<IActionResult> CreateTaskManagement([FromBody] CreateTaskManagementCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
-        //Users
+        //Skills
         //Create Skill
         [HttpPost("Create-Skill")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -340,5 +340,13 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         [ProducesResponseType(typeof(ApiResponse<CreateSkillSetCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSkillSet([FromBody] CreateSkillSetCommand command) =>
             await ProcessRequestToActionResultAsync(command);
+
+        //Create Skill Category
+        [HttpPost("Create-Skill-Category")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<CreateSkillCategoryCommandResponse>), StatusCodes.Status201Created)]
+        public async Task<IActionResult> CreateSkillCategory([FromBody] CreateSkillCategoryCommand command) =>
+            await ProcessRequestToActionResultAsync(command);
+
     }
 }

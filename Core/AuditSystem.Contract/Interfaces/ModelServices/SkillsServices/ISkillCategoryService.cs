@@ -4,5 +4,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 
 public interface ISkillCategoryService
 {
-    public Task<Guid> CreateSkillCategory(SkillCategoryModel skillCategoryModel);
+    public Task<Guid> CreateSkillCategoryAsync(SkillCategoryModel skillCategoryModel);
 }

@@ -17,7 +17,7 @@ internal sealed class SkillCategoryService(
     private static readonly string[] SkillCategoryTags = ["skill-categorys", "skill-Category-list"];
     private static readonly string[] ListTags = ["skill-category-list"]; // Tags for collections only
 
-    public async Task<Guid> CreateSkillCategory(SkillCategoryModel skillCategoryModel)
+    public async Task<Guid> CreateSkillCategoryAsync(SkillCategoryModel skillCategoryModel)
     {
         ArgumentNullException.ThrowIfNull(skillCategoryModel, nameof(skillCategoryModel));
 

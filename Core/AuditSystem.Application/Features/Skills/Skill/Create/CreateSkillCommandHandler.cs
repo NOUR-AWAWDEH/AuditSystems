@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Features.Skills.Skill.Create;
 
-internal sealed class CreateSkillCommandHander(
+internal sealed class CreateSkillCommandHandler(
     ISkillService skillService,
     IMapper mapper,
-    ILogger<CreateSkillCommandHander> logger)
+    ILogger<CreateSkillCommandHandler> logger)
     : IRequestHandler<CreateSkillCommand, Result<CreateSkillCommandResponse>>
 {
     public async Task<Result<CreateSkillCommandResponse>> Handle(CreateSkillCommand request, CancellationToken cancellationToken)

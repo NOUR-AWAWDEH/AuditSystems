@@ -4,9 +4,7 @@ namespace AuditSystem.Domain.Entities.Users;
 
 public class UserManagement : Entity<Guid>
 {
-    public required Guid AuditorSettingsID { get; set; }
     public required Guid UserID { get; set; }
-
-    public virtual AuditorSettings AuditorSettings { get; set; } = null!;
+    public required string Designation { get; set; } = string.Empty;
     public virtual User User { get; set; } = null!;
 }

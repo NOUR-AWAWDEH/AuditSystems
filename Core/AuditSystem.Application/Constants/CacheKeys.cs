@@ -64,6 +64,7 @@ public static class CacheKeys
     //Skills
     public const string Skill = "skill";
     public const string SkillSet = "skill-set";
+    public const string SkillCategory = "skill-category";
 
     //SupportingDocs
     public const string SupportingDoc = "supporting-doc";

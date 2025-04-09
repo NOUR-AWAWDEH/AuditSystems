@@ -9,9 +9,9 @@ public class AuditUniverse : Entity<Guid>
     public string IndustryUpdate { get; set; } = string.Empty;
     public string CompanyUpdate { get; set; } = string.Empty;
     public required Guid DomainId { get; set; }
-    public bool IsFinancialQuantifiable { get; set; } = false;
+    public required bool IsFinancialQuantifiable { get; set; } = false;
 
-    public bool IsSpecialProject { get; set; } = false;
+    public required bool IsSpecialProject { get; set; } = false;
     public Guid SpecialProjectId { get; set; }
 
     public virtual AuditDomain Domain { get; set; } = null!;

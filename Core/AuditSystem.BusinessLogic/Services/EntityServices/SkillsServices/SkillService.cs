@@ -3,7 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Skills;
-using AuditSystem.Domain.Entities.Users;
+using AuditSystem.Domain.Entities.Skills;
 using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;

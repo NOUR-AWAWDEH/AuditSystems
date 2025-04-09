@@ -4,7 +4,7 @@ namespace AuditSystem.Domain.Entities.Risks;
 
 public class RiskAssessment : Entity<Guid>
 {
-    public string BusinessObjective { get; set; } = string.Empty;
-    public string NatureThrough { get; set; } = string.Empty;
-    public string PerformRiskAssessment { get; set; } = string.Empty;
+    public required string BusinessObjective { get; set; } = string.Empty;
+    public required string NatureThrough { get; set; } = string.Empty;
+    public required string PerformRiskAssessment { get; set; } = string.Empty;
 }

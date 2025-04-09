@@ -1,4 +1,4 @@
-using AuditSystem.Auth.Dtos;
+using AuditSystem.Auth.Dtos.Register;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Auth.Services.Registration

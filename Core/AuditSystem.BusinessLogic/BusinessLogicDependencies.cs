@@ -91,6 +91,7 @@ public static class BusinessLogicDependencies
         // Skills Services
         .AddScoped<ISkillService, SkillService>()
         .AddScoped<ISkillSetService, SkillSetService>()
+        .AddScoped<ISkillCategoryService, SkillCategoryService>()
         // Supporting Docs Services
         .AddScoped<ISupportingDocService, SupportingDocService>()
         // Tasks Services

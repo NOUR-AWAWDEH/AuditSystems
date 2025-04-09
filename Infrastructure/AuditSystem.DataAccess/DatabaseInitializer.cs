@@ -16,10 +16,6 @@ public class DatabaseInitializer
             {
                 context.Database.Migrate(); // Auto-migrate in non-production
             }
-            else
-            {
-                // More controlled migration in production (manual process)
-            }
         }
     }
 }

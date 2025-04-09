@@ -3,9 +3,10 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.DataAccess.Constants;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.DataAccess.Repositories;
-using AuditSystem.Domain.Entities.Audit;
-using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities;
+using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.Auth;
+using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Compliance;
 using AuditSystem.Domain.Entities.Jobs;
@@ -14,6 +15,7 @@ using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
+using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
@@ -119,10 +121,14 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, SupportingDoc>()
         //Tasks
         .AddRepository<Guid, TaskManagement>()
-        //Users
+        //Skills
         .AddRepository<Guid, Skill>()
         .AddRepository<Guid, SkillSet>()
-        .AddRepository<Guid, UserManagement>();
+        .AddRepository<Guid, SkillCategory>()
+        //Users
+        .AddRepository<Guid, UserManagement>()
+        //Auth
+        .AddRepository<Guid, RefreshToken>();
 
 
     private static IServiceCollection AddRepository<TId, TEntity>(this IServiceCollection services)

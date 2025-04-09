@@ -1,7 +1,8 @@
-using AuditSystem.Auth.Dtos;
+using AuditSystem.Auth.Dtos.Register;
 using AuditSystem.Auth.Services.Email;
+using AuditSystem.DataAccess.Contexts;
+using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Users;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -21,6 +22,7 @@ namespace AuditSystem.Auth.Services.Registration
         private readonly ILogger<RegistrationService> _logger;
         private readonly LinkGenerator _linkGenerator;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _dbContext;
 
         public RegistrationService(
             UserManager<User> userManager,
@@ -28,7 +30,8 @@ namespace AuditSystem.Auth.Services.Registration
             ILogger<RegistrationService> logger,
             IEmailService emailService,
             LinkGenerator linkGenerator,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ApplicationDbContext applicationDbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -36,6 +39,7 @@ namespace AuditSystem.Auth.Services.Registration
             _emailService = emailService;
             _linkGenerator = linkGenerator;
             _configuration = configuration;
+            _dbContext = applicationDbContext;
         }
 
         public async Task RegisterAsync(RegisterDto request, string scheme, IUrlHelper urlHelper)
@@ -56,8 +60,6 @@ namespace AuditSystem.Auth.Services.Registration
                 throw;
             }
         }
-
-
 
         public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme, IUrlHelper urlHelper)
         {
@@ -98,7 +100,15 @@ namespace AuditSystem.Auth.Services.Registration
 
         private async Task<User> CreateUserAsync(RegisterDto request, Role role)
         {
-            // 1. Create user object
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                Token = Guid.NewGuid().ToString(),
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                CreatedAt = DateTime.UtcNow,
+                IsRevoked = false
+            };
+
             var newUser = new User
             {
                 UserName = request.UserName,
@@ -113,19 +123,25 @@ namespace AuditSystem.Auth.Services.Registration
                 EmailConfirmed = false
             };
 
-            // 2. Attempt creation
             var creationResult = await _userManager.CreateAsync(newUser, request.Password);
 
-            // 3. Return if successful
             if (creationResult.Succeeded)
             {
+                // Set the FK now that user is created
+                refreshToken.UserId = newUser.Id;
+
+                // Save refresh token manually
+                _dbContext.RefreshTokens.Add(refreshToken);
+                await _dbContext.SaveChangesAsync();
+
                 return newUser;
             }
 
-            // 4. Handle failure
             await HandleFailedCreationAsync(request.UserName, creationResult);
             throw CreateExceptionFromErrors("User creation failed", creationResult.Errors);
         }
+
+
 
         private async Task HandleFailedCreationAsync(string username, IdentityResult creationResult)
         {
@@ -141,8 +157,7 @@ namespace AuditSystem.Auth.Services.Registration
             }
         }
 
-        private static InvalidOperationException CreateExceptionFromErrors(
-            string prefix, IEnumerable<IdentityError> errors)
+        private static InvalidOperationException CreateExceptionFromErrors(string prefix, IEnumerable<IdentityError> errors)
         {
             var errorDescriptions = errors.Select(e => e.Description);
             return new InvalidOperationException(
@@ -162,7 +177,7 @@ namespace AuditSystem.Auth.Services.Registration
 
             return confirmationLink;
         }
- 
+
         private async Task SendConfirmationEmailAsync(User user, string confirmationLink)
         {
             await _emailService.SendEmailAsync(

@@ -1,5 +1,9 @@
 using AuditSystem.Auth.Common.ApiResponses;
-using AuditSystem.Auth.Dtos;
+using AuditSystem.Auth.Dtos.AuthStatus;
+using AuditSystem.Auth.Dtos.Login;
+using AuditSystem.Auth.Dtos.Logout;
+using AuditSystem.Auth.Dtos.Password;
+using AuditSystem.Auth.Dtos.Register;
 using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Authentication;
 using AuditSystem.Auth.Services.Email;
@@ -11,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
@@ -50,7 +55,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("login")]
     [EnableRateLimiting("loginPolicy")]
-    public async Task<ActionResult<ApiResponse<LoginResponseDto>>> LoginAsync([FromBody] LoginDto request)
+    public async Task<ActionResult<ApiResponse<LoginResponseDto>>> LoginAsync([FromBody] LoginRequestDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ApiResponse<LoginResponseDto>.ErrorResponse("Invalid request model"));
@@ -79,7 +84,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("authentication-status")]
-    public async Task<ActionResult<ApiResponse<AuthStatusResponseDto>>> AuthStatusAsync([FromBody] AuthStatusDto request)
+    public async Task<ActionResult<ApiResponse<AuthStatusResponseDto>>> AuthStatusAsync([FromBody] AuthStatusRequestDto request)
     {
         if (!ModelState.IsValid || string.IsNullOrEmpty(request.Token))
         {
@@ -105,10 +110,20 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("logout")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> LogOut()
+    public async Task<ActionResult<ApiResponse>> LogOut([FromBody] LogoutRequest request)
     {
-        await _authService.SignOutAsync();
-        return Ok(ApiResponse.SuccessResponse("Signed out successfully"));
+        if (string.IsNullOrEmpty(request.RefreshToken))
+            return BadRequest(ApiResponse.ErrorResponse("Refresh token is required"));
+
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(ApiResponse.ErrorResponse("User not found"));
+
+        var success = await _authService.RevokeRefreshTokenAsync(userId, request.RefreshToken);
+        if (!success)
+            return BadRequest(ApiResponse.ErrorResponse("Failed to revoke refresh token"));
+
+        return Ok(ApiResponse.SuccessResponse("Logged out successfully"));
     }
 
     [HttpPost("reset-password")]

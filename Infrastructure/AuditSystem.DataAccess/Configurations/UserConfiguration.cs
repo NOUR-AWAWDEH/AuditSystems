@@ -1,6 +1,6 @@
-﻿using AuditSystem.Domain.Entities.Users;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.DataAccess.Configurations;
 
@@ -8,10 +8,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        // Table name (optional, overrides Identity's default AspNetUsers)
-        builder.ToTable("Users");
-
-        // Properties with constraints
+        // Required properties
         builder.Property(u => u.FirstName)
             .IsRequired()
             .HasMaxLength(50);
@@ -20,73 +17,48 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(50);
 
-        // Foreign Key Relationships (required)
         builder.Property(u => u.RoleId)
             .IsRequired();
 
-        builder.Property(u => u.CompanyId)
-            .IsRequired(false);
-
-        builder.Property(u => u.DepartmentId)
-            .IsRequired(false);
-
-        builder.Property(u => u.SubDepartmentId)
-            .IsRequired(false);
-
-        // Other Properties
-        builder.Property(u => u.LastLogin)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        builder.Property(u => u.IsActive)
-            .IsRequired()
-            .HasDefaultValue(true);
-
-        builder.Property(u => u.TotalSessionTime)
-            .IsRequired()
-            .HasDefaultValue(TimeSpan.Zero);
-
-        builder.Property(u => u.CurrentSessionStart)
-            .IsRequired(false);
-
-        // Identity-related properties (optional)
-        builder.Property(u => u.RefreshToken)
-            .IsRequired(false);
-
+        // Optional properties with constraints
         builder.Property(u => u.PasswordResetCode)
-            .IsRequired(false);
-
-        builder.Property(u => u.PasswordResetCodeExpiration)
-            .IsRequired(false);
+            .HasMaxLength(100);
 
         builder.Property(u => u.PasswordResetToken)
-            .IsRequired(false);
-
-        builder.Property(u => u.PasswordResetTokenExpiration)
-            .IsRequired(false);
-
-        builder.Property(u => u.LastLogoutTime)
-            .IsRequired(false);
+            .HasMaxLength(200);
 
         // Relationships
         builder.HasOne(u => u.Role)
-            .WithMany() // No navigation property on UserRole side
+            .WithMany()
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(u => u.Company)
-            .WithMany(c => c.Users)
+            .WithMany()
             .HasForeignKey(u => u.CompanyId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict);  // Changed from SetNull to Restrict
 
         builder.HasOne(u => u.Department)
-            .WithMany(d => d.Users)
+            .WithMany()
             .HasForeignKey(u => u.DepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict);  // Changed from SetNull to Restrict
 
         builder.HasOne(u => u.SubDepartment)
-            .WithMany(s => s.Users)
+            .WithMany()
             .HasForeignKey(u => u.SubDepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict);  // Changed from SetNull to Restrict
+
+        builder.HasMany(u => u.RefreshTokens)
+            .WithOne(rt => rt.User)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Indexes
+        builder.HasIndex(u => u.RoleId);
+        builder.HasIndex(u => u.CompanyId);
+        builder.HasIndex(u => u.DepartmentId);
+        builder.HasIndex(u => u.SubDepartmentId);
+        builder.HasIndex(u => u.LastLogin);
+        builder.HasIndex(u => u.IsActive);
     }
 }

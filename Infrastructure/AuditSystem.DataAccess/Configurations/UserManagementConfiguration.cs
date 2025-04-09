@@ -9,16 +9,15 @@ public class UserManagementConfiguration : IEntityTypeConfiguration<UserManageme
     public void Configure(EntityTypeBuilder<UserManagement> builder)
     {
         builder.HasKey(um => um.Id);
+        
+        builder.Property(um => um.Designation)
+            .IsRequired()
+            .HasMaxLength(100);
 
         // Relationships (Use Restrict or NoAction to avoid cascade paths)
         builder.HasOne(um => um.User)
             .WithMany()
             .HasForeignKey(um => um.UserID)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(um => um.AuditorSettings)
-            .WithMany()
-            .HasForeignKey(um => um.AuditorSettingsID)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,8 +1,10 @@
 using AuditSystem.Auth.Authentication;
-using AuditSystem.Auth.Dtos;
+using AuditSystem.Auth.Dtos.AuthStatus;
+using AuditSystem.Auth.Dtos.Login;
 using AuditSystem.DataAccess.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -14,20 +16,23 @@ public class CustomAuthenticationService : ICustomAuthenticationService
     private readonly ApplicationDbContext _applicationDbContext;
     private readonly SignInManager<User> _signInManager;
     private readonly ITokenService _tokenService;
+    private readonly ILogger<CustomAuthenticationService> _logger;
 
     public CustomAuthenticationService(
         UserManager<User> userManager,
         ApplicationDbContext applicationDbContext,
         SignInManager<User> signInManager,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        ILogger<CustomAuthenticationService> logger)
     {
         _applicationDbContext = applicationDbContext;
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
+        _logger = logger;
     }
 
-    public async Task<AuthStatusResponseDto?> GetAuthStatusFromToken(AuthStatusDto token)
+    public async Task<AuthStatusResponseDto?> GetAuthStatusFromToken(AuthStatusRequestDto token)
     {
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token.Token);
@@ -77,7 +82,7 @@ public class CustomAuthenticationService : ICustomAuthenticationService
 
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginDto request)
+    public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
     {
         // Fetch user with Role included
         var user = await _userManager.Users
@@ -89,17 +94,17 @@ public class CustomAuthenticationService : ICustomAuthenticationService
 
         //Check if the email is confirmed
         if (!user.EmailConfirmed)
-            return new LoginResponseDto 
+            return new LoginResponseDto
             {
                 IsEmailVerified = false
             };
 
-        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
-        if (!result.Succeeded)
+        var result = _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
+        if (!result.IsCompletedSuccessfully)
             return null;
 
         // Generate tokens
-        var jwtToken = await _tokenService.GenerateJwtToken(user);
+        var jwtToken = _tokenService.GenerateJwtToken(user);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
         // Save refresh token
@@ -112,7 +117,34 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             IsEmailVerified = true
         };
     }
-    
+
+    public async Task<bool> RevokeRefreshTokenAsync(string userId, string refreshToken)
+    {
+        _logger.LogInformation("RevokeRefreshTokenAsync called with userId: {userId} and refreshToken: {refreshToken}", userId, refreshToken);
+        if (!Guid.TryParse(userId, out var userIdGuid))
+        {
+            _logger.LogWarning("Invalid userId format: {userId}", userId);
+            return false;
+        }
+
+        var token = await _applicationDbContext.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.UserId == userIdGuid
+                                    && rt.Token == refreshToken
+                                    && !rt.IsRevoked
+                                    && rt.ExpiresAt > DateTime.UtcNow);
+
+        if (token == null)
+        {
+            _logger.BeginScope("Token not found or already revoked for userId: {userId}", userId);
+            return false;
+        }
+
+        token.IsRevoked = true;
+        await _applicationDbContext.SaveChangesAsync();
+        _logger.LogInformation("Refresh token revoked successfully for userId: {userId}", userId);
+        return true;
+    }
+
     public async Task<bool> SignOutAsync()
     {
         try

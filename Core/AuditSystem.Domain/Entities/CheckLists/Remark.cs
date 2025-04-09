@@ -4,8 +4,8 @@ namespace AuditSystem.Domain.Entities.Checklists;
 
 public class Remark : Entity<Guid>
 {
-    public required Guid CheckListManagementId { get; set; }
     public string RemarkCommants { get; set; } = string.Empty;
+    public required Guid CheckListCollectionId { get; set; }
 
-    public virtual ChecklistManagement ChecklistManagement { get; set; } = null!;
+    public virtual ChecklistCollection ChecklistCollection { get; set; } = null!;
 }

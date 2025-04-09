@@ -7,6 +7,6 @@ public class RiskControlMatrix : Entity<Guid>
 {
     public required Guid SubProcessId { get; set; }
     public string Description { get; set; } = string.Empty;
-    
-    public virtual SubProcess SubProcess { get; set; } = null!;         
+
+    public virtual SubProcess SubProcess { get; set; } = null!;
 }

@@ -1,5 +1,6 @@
 ﻿using AuditSystem.Domain.Entities;
 using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Compliance;
@@ -9,6 +10,7 @@ using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
+using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
@@ -38,7 +40,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 
     // Checklists
     public required DbSet<Checklist> Checklists { get; set; }
-    public required DbSet<ChecklistManagement> ChecklistManagements { get; set; }
+    public required DbSet<ChecklistCollection> ChecklistManagements { get; set; }
     public required DbSet<Remark> Remarks { get; set; }
 
     // Compliance
@@ -88,9 +90,15 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 
     public required DbSet<Role> Roles { get; set; }
     public required DbSet<UserManagement> UserManagements { get; set; }
-    public required DbSet<AuditorSettings> AuditorSettings { get; set; }
+
+    // Auth
+    public required DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    // Skills
+    public required DbSet<SkillCategory> SkillCategories { get; set; }
     public required DbSet<Skill> Skills { get; set; }
     public required DbSet<SkillSet> SkillSets { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

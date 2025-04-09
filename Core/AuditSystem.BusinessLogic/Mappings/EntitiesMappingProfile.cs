@@ -31,10 +31,11 @@ using AuditSystem.Application.Features.RiskControls.RiskProgram.Create;
 using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Create;
 using AuditSystem.Application.Features.Risks.RiskFactor.Create;
+using AuditSystem.Application.Features.Skills.Skill.Create;
+using AuditSystem.Application.Features.Skills.SkillCategory.Create;
+using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.SupportingDocs.Create;
 using AuditSystem.Application.Features.Tasks.Create;
-using AuditSystem.Application.Features.Users.Skill.Create;
-using AuditSystem.Application.Features.Users.SkillSet.Create;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Contract.Models.Common;
@@ -60,6 +61,7 @@ using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
+using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
@@ -221,6 +223,9 @@ public sealed class EntitiesMappingProfile : Profile
         CreateMap<SkillSetModel, SkillSet>().ReverseMap();
         CreateMap<CreateSkillSetCommand, SkillSetModel>();
 
+        //SkillCategory
+        CreateMap<SkillCategoryModel, SkillCategory>().ReverseMap();
+        CreateMap<CreateSkillCategoryCommand, SkillCategoryModel>();
 
         //SupporitngDoc
         //SupportingDoc

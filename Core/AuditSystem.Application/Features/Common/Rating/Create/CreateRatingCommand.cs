@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Common.Rating.Create;
 
 public sealed record CreateRatingCommand : ICommand<Result<CreateRatingCommandResponse>>
 {
-    public string Level { get; init; } = string.Empty;
+    public required string Level { get; init; } = string.Empty;
 }

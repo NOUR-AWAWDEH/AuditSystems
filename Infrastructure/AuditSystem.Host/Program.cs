@@ -26,7 +26,7 @@ services.AddLogging();
 services.AddApplication();
 services.AddDomain();
 services.AddAuthDependencies(configuration);
-services.AddDataAccess(configuration, healthCheckBuilder,isProduction);
+services.AddDataAccess(configuration, healthCheckBuilder, isProduction);
 
 services.AddCors((settings) =>
 {
@@ -37,7 +37,6 @@ services.AddCors((settings) =>
               .AllowAnyMethod();
     });
 });
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -95,13 +94,10 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 });
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-
 app.UseCors();
-
 app.UseOutputCache();
 
 app.MapControllers();

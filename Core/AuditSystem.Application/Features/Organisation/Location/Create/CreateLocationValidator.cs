@@ -6,13 +6,11 @@ public sealed class CreateLocationValidator : AbstractValidator<CreateLocationCo
 {
     public CreateLocationValidator() 
     {
-        RuleFor(x => x.AuditorSettingsId)
-            .NotEmpty()
-            .WithMessage("Auditor Settings Id is required.");
-
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Location Name is required.")
+            .MinimumLength(2)
+            .WithMessage("Location Name must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Location Name must not exceed 200 characters.");
 

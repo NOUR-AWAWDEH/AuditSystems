@@ -6,17 +6,11 @@ public sealed class CreateSkillSetValidator : AbstractValidator<CreateSkillSetCo
 {
     public CreateSkillSetValidator() 
     {
-        RuleFor(x => x.UserManagementId)
-            .NotEmpty()
-            .WithMessage("User Management Id is required.");
-
-        RuleFor(x => x.SkillId)
-            .NotEmpty()
-            .WithMessage("Skill Id is required.");
-
         RuleFor(x => x.ProficiencyLevel)
             .NotEmpty()
             .WithMessage("Proficiency Level is required.")
+            .MinimumLength(2)
+            .WithMessage("Proficiency Level must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Proficiency Level must not exceed 200 characters.");
     }

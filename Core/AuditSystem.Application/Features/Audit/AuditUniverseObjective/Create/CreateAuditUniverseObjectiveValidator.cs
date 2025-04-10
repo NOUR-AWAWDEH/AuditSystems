@@ -8,6 +8,8 @@ public sealed class CreateAuditUniverseObjectiveValidator : AbstractValidator<Cr
     {
         RuleFor(x => x.AuditUniverseID)
             .NotEmpty()
+            .WithMessage("Audit Universe ID is required")
+            .NotNull()
             .WithMessage("Audit Universe ID is required");
 
         RuleFor(x => x.Impact)

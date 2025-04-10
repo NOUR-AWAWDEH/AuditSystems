@@ -6,9 +6,6 @@ public sealed class CreateRemarkValidator : AbstractValidator<CreateRemarkComman
 {
     public CreateRemarkValidator() 
     {
-        RuleFor(x => x.CheckListManagementId)
-            .NotEmpty()
-            .WithMessage("CheckList Management Id is required");
 
         RuleFor(x => x.RemarkCommants)
             .NotEmpty()

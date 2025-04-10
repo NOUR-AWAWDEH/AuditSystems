@@ -11,6 +11,7 @@ using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServies;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
@@ -25,6 +26,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.TasksServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserManagementServices;
 using AuditSystem.Contract.Interfaces.Transaction;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -95,5 +97,7 @@ public static class BusinessLogicDependencies
         // Supporting Docs Services
         .AddScoped<ISupportingDocService, SupportingDocService>()
         // Tasks Services
-        .AddScoped<ITaskManagementService, TaskManagementService>();
+        .AddScoped<ITaskManagementService, TaskManagementService>()
+        // User Desgination Services
+        .AddScoped<IUserDesignationService, UserDesignationService>();
 }

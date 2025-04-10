@@ -8,11 +8,11 @@ public sealed class CreateRiskControlMatrixValidator : AbstractValidator<CreateR
     {
         RuleFor(x => x.SubProcessId)
             .NotEmpty()
-            .WithMessage("Sub Process Id is required.");
+            .WithMessage("Sub Process Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Sub Process Id must be a valid GUID.");
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required.")
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
     }

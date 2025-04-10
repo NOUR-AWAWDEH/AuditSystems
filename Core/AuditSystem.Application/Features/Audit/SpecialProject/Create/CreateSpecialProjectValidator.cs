@@ -13,14 +13,12 @@ public sealed class CreateSpecialProjectValidator : AbstractValidator<CreateSpec
         RuleFor(x => x.ProjectName)
             .NotEmpty()
             .WithMessage("Project Name is required")
+            .MinimumLength(2)
+            .WithMessage("Project Name must be at least 2 characters long")
             .MaximumLength(200)
             .WithMessage("Project Name must not exceed 200 characters");
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required.")
-            .MinimumLength(5)
-            .WithMessage("Description must be at least 5 characters long.")
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
 

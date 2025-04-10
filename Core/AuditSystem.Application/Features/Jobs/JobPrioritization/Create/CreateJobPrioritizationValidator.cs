@@ -8,18 +8,16 @@ public sealed class CreateJobPrioritizationValidator : AbstractValidator<CreateJ
         RuleFor(x => x.AuditableUnit)
             .NotEmpty()
             .WithMessage("Auditable Unit is required.")
-            .MinimumLength(3)
-            .WithMessage("Auditable Unit must be at least 3 characters long.")
-            .MaximumLength(100)
-            .WithMessage("Auditable Unit must not exceed 100 characters.");
+            .MinimumLength(2)
+            .WithMessage("Auditable Unit must be at least 2 characters long.")
+            .MaximumLength(255)
+            .WithMessage("Auditable Unit must not exceed 255 characters.");
 
-        RuleFor(x => x.BusinessObjectiveId)
+        RuleFor(x => x.SelectForAudit)
             .NotEmpty()
-            .WithMessage("Business Objective ID is required.");
-
-        RuleFor(x => x.RatingId)
-            .NotEmpty()
-            .WithMessage("Rating ID is required.");
+            .WithMessage("Select For Audit is required.")
+            .Must(x => x == true || x == false)
+            .WithMessage("Select For Audit must be either true or false.");
 
         RuleFor(x => x.Comments)
             .MaximumLength(500)
@@ -30,11 +28,24 @@ public sealed class CreateJobPrioritizationValidator : AbstractValidator<CreateJ
             .WithMessage("Selected Year is required.")
             .Must(YearMustBeValid)
             .WithMessage("Selected Year must be a valid year.");
+
+        RuleFor(x => x.BusinessObjectiveId)
+            .NotEmpty()
+            .WithMessage("Business Objective Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Business Objective Id must be a valid GUID.");
+
+
+        RuleFor(x => x.RatingId)
+            .NotEmpty()
+            .WithMessage("Rating Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Rating Id must be a valid GUID.");
+
     }
 
     private bool YearMustBeValid(DateOnly date)
     {
-        // Ensure the year is within a reasonable range (e.g., not in the future)
         return date.Year <= DateTime.Now.Year;
     }
 }

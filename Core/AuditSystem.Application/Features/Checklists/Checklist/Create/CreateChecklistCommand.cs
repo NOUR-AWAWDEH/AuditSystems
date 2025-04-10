@@ -5,7 +5,8 @@ namespace AuditSystem.Application.Features.Checklists.Checklist.Create;
 
 public sealed record class CreateChecklistCommand : ICommand<Result<CreateChecklistCommandResponse>>
 {
-    public string Area { get; set; } = string.Empty;
-    public string Particulars { get; set; } = string.Empty;
-    public string Observation { get; set; } = string.Empty;
+    public required string Area { get; set; } = string.Empty;
+    public required string Particulars { get; set; } = string.Empty;
+    public required string Observation { get; set; } = string.Empty;
+    public required Guid ChecklistCollectionId { get; set; }
 }

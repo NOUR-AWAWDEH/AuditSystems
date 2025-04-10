@@ -1,4 +1,3 @@
-using AuditSystem.Domain.Entities.Users;
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
 
@@ -6,8 +5,8 @@ public class UserSessionManager : IUserSessionManager
 {
     public TimeSpan GetCurrentSessionDuration(User user)
     {
-        return user.CurrentSessionStart.HasValue 
-            ? DateTime.UtcNow - user.CurrentSessionStart.Value 
+        return user.CurrentSessionStart.HasValue
+            ? DateTime.UtcNow - user.CurrentSessionStart.Value
             : TimeSpan.Zero;
     }
 

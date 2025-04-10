@@ -71,4 +71,7 @@ public static class CacheKeys
 
     //Tasks
     public const string TaskManagement = "task-management";
+
+    //User
+    public const string UserDesignation = "user-designation";
 }

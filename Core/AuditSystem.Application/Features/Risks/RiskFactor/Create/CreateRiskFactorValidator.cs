@@ -6,13 +6,12 @@ public sealed class CreateRiskFactorValidator : AbstractValidator<CreateRiskFact
 {
     public CreateRiskFactorValidator() 
     {
-        RuleFor(x => x.AuditorSettingsId)
-            .NotEmpty()
-            .WithMessage("Auditor Settings Id is required.");
-
+       
         RuleFor(x => x.Factor)
             .NotEmpty()
             .WithMessage("Risk Factor Name is required.")
+            .MinimumLength(2)
+            .WithMessage("Risk Factor Name must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Risk Factor Name must not exceed 200 characters.");
     }

@@ -6,10 +6,6 @@ public sealed class CreateSupportingDocValidator : AbstractValidator<CreateSuppo
 {
     public CreateSupportingDocValidator() 
     {
-        RuleFor(x => x.AuditorSettingsId)
-            .NotEmpty()
-            .WithMessage("Auditor Settings Id is required.");
-
         RuleFor(x => x.FileName)
             .NotEmpty()
             .WithMessage("Supporting Doc File Name is required.")
@@ -25,7 +21,7 @@ public sealed class CreateSupportingDocValidator : AbstractValidator<CreateSuppo
         RuleFor(x => x.URL)
             .NotEmpty()
             .WithMessage("Supporting Doc URL is required.")
-            .MaximumLength(300)
-            .WithMessage("Supporting Doc URL must not exceed 300 characters.");
+            .MaximumLength(500)
+            .WithMessage("Supporting Doc URL must not exceed 500 characters.");
     }
 }

@@ -9,18 +9,20 @@ public sealed class CreateReportingFollowUpValidator : AbstractValidator<CreateR
         RuleFor(x => x.Reporting)
             .NotEmpty()
             .WithMessage("Reporting is required.")
+            .MinimumLength(2)
+            .WithMessage("Reporting must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Reporting must not exceed 200 characters.");
 
         RuleFor(x => x.FollowUp)
             .NotEmpty()
             .WithMessage("Follow Up is required.")
+            .MinimumLength(2)
+            .WithMessage("Follow Up must be at least 2 characters long.")
             .MaximumLength(300)
             .WithMessage("Follow Up must not exceed 300 characters.");
 
         RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Status is required.")
             .MaximumLength(300)
             .WithMessage("Status must not exceed 300 characters.");
     }

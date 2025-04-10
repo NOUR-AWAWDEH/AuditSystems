@@ -47,34 +47,30 @@ public static class AuthDependencies
 
         services.AddSingleton(jwtSettings);
 
-        // JWT Authentication
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
+        // Fix: Use AddAuthentication to get an AuthenticationBuilder, then call AddJwtBearer
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
-                ValidateIssuer = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidateAudience = true,
-                ValidAudience = jwtSettings.Audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero // Stricter token expiration
-            };
-        });
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Stricter token expiration
+                };
+            });
 
         // Rate Limiting
         services.AddRateLimiter(options =>
         {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.RejectionStatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status429TooManyRequests;
 
             // Optional: Global rate limit (e.g., 1000 requests per minute across all IPs)
-            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            options.GlobalLimiter = PartitionedRateLimiter.Create<Microsoft.AspNetCore.Http.HttpContext, string>(httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: "global",
                     factory: _ => new FixedWindowRateLimiterOptions
@@ -100,7 +96,7 @@ public static class AuthDependencies
             // Optional: Custom response for rate limit exceeded
             options.OnRejected = async (context, cancellationToken) =>
             {
-                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.StatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status429TooManyRequests;
                 await context.HttpContext.Response.WriteAsync(
                     "Too many requests. Please try again later.", cancellationToken);
             };
@@ -112,15 +108,5 @@ public static class AuthDependencies
     private static void ConfigureSmtpSettings(IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<SMTPConfigModel>(configuration.GetSection("SMTPConfig"));
-    }
-
-    public static IApplicationBuilder UseAuthDependencies(this IApplicationBuilder app)
-    {
-        app.UseHttpsRedirection();
-        app.UseRouting();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseRateLimiter();
-        return app;
     }
 }

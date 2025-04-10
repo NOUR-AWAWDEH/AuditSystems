@@ -20,11 +20,13 @@ public sealed class CreateAuditExceptionReportValidator : AbstractValidator<Crea
 
         RuleFor(x => x.CreatedById)
             .NotEmpty()
-            .WithMessage("Created By Id is required.");
+            .WithMessage("Created By Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Created By Id must be a valid GUID.");
 
         RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Status is required.")
+            .MinimumLength(2)
+            .WithMessage("Status must be at least 2 characters long.")
             .MaximumLength(300)
             .WithMessage("Status must not exceed 300 characters.");
 
@@ -32,6 +34,6 @@ public sealed class CreateAuditExceptionReportValidator : AbstractValidator<Crea
 
     private bool BeAValidDate(DateOnly date)
     {
-        return date != default;
+        return date != default && date <= DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

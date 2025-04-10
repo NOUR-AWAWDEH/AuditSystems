@@ -8,8 +8,8 @@ public sealed class CreateJobSchedulingValidator : AbstractValidator<CreateJobSc
         RuleFor(x => x.AuditableUnit)
             .NotEmpty()
             .WithMessage("Auditable Unit is required.")
-            .MinimumLength(3)
-            .WithMessage("Auditable Unit must be at least 3 characters long.")
+            .MinimumLength(2)
+            .WithMessage("Auditable Unit must be at least 2 characters long.")
             .MaximumLength(100)
             .WithMessage("Auditable Unit must not exceed 100 characters.");
 
@@ -34,10 +34,8 @@ public sealed class CreateJobSchedulingValidator : AbstractValidator<CreateJobSc
             .WithMessage("Planned End Date must be after Planned Start Date.");
 
         RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Status is required.")
-            .MinimumLength(3)
-            .WithMessage("Status must be at least 3 characters long.")
+            .MinimumLength(2)
+            .WithMessage("Status must be at least 2 characters long.")
             .MaximumLength(50)
             .WithMessage("Status must not exceed 50 characters.");
     }

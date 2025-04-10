@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Organisation.Company.Create;
 
 public sealed record class CreateCompanyCommand : ICommand<Result<CreateCompanyCommandResponse>>
 {
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; } = string.Empty;
 }

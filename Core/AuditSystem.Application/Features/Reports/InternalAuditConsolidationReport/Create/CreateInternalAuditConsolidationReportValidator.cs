@@ -26,17 +26,17 @@ public sealed class CreateInternalAuditConsolidationReportValidator : AbstractVa
 
         RuleFor(x => x.PreparedByUserId)
             .NotEmpty()
-            .WithMessage("Prepared By Id is required.");
+            .WithMessage("Prepared By Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Prepared By Id must be a valid GUID.");
 
         RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Status is required.")
             .MaximumLength(300)
             .WithMessage("Status must not exceed 300 characters.");
     }
 
     private bool BeAValidDate(DateOnly date)
     {
-        return date != default;
+        return date != default && date <= DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

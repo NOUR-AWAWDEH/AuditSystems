@@ -126,7 +126,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, SkillSet>()
         .AddRepository<Guid, SkillCategory>()
         //Users
-        .AddRepository<Guid, UserManagement>()
+        .AddRepository<Guid, UserDesignation>()
         //Auth
         .AddRepository<Guid, RefreshToken>();
 

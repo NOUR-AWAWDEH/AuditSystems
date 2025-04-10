@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AuditSystem.Application.Common.Validators;
+using FluentValidation;
 
 namespace AuditSystem.Application.Features.Organisation.SubLocation.Create;
 
@@ -8,7 +9,9 @@ public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLoca
     {
         RuleFor(x => x.LocationId)
             .NotEmpty()
-            .WithMessage("Location Id is required.");
+            .WithMessage("Location Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Location Id must be a valid GUID.");
 
         RuleFor(x => x.Name)
             .NotEmpty()

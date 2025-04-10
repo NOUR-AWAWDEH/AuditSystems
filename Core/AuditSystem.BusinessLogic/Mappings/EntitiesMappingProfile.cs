@@ -36,6 +36,7 @@ using AuditSystem.Application.Features.Skills.SkillCategory.Create;
 using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.SupportingDocs.Create;
 using AuditSystem.Application.Features.Tasks.Create;
+using AuditSystem.Application.Features.UserDesignation.Create;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Contract.Models.Common;
@@ -240,8 +241,8 @@ public sealed class EntitiesMappingProfile : Profile
 
 
         //Users
-        //UserManagement
-        CreateMap<UserManagementModel, UserManagement>().ReverseMap();
-        CreateMap<CreateUserManagementCommand, UserManagementModel>();
+        //UserDesignation
+        CreateMap<UserDesignationModel, UserDesignation>().ReverseMap();
+        CreateMap<CreateUserDesignationCommand, UserDesignationModel>();
     }
 }

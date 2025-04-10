@@ -89,7 +89,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<TaskManagement> TaskManagements { get; set; }
 
     public required DbSet<Role> Roles { get; set; }
-    public required DbSet<UserManagement> UserManagements { get; set; }
+    public required DbSet<UserDesignation> UserDesignations { get; set; }
 
     // Auth
     public required DbSet<RefreshToken> RefreshTokens { get; set; }

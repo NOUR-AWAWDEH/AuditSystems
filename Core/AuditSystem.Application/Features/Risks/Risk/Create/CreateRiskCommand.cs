@@ -5,8 +5,8 @@ namespace AuditSystem.Application.Features.Risks.Risk.Create;
 
 public sealed record class CreateRiskCommand : ICommand<Result<CreateRiskCommandResponse>>
 {
+    public required Guid ObjectiveId { get; set; }
     public required string RiskName { get; set; } = string.Empty;
-    public Guid RatingId { get; set; }
+    public required Guid RatingId { get; set; }
     public string Description { get; set; } = string.Empty;
-    public required Guid ObjectiveId { get; init; }
 }

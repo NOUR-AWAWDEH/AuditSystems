@@ -5,8 +5,8 @@ namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Create;
 
 public sealed record class CreateAuditExceptionReportCommand : ICommand<Result<CreateAuditExceptionReportCommandResponse>>
 {
-    public string ReportName { get; set; } = string.Empty;
-    public DateOnly ReportDate { get; set; }
+    public required string ReportName { get; set; } = string.Empty;
+    public required DateOnly ReportDate { get; set; }
     public required Guid CreatedById { get; set; }
     public string Status { get; set; } = string.Empty;
 }

@@ -25,7 +25,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(100);
 
         builder.Property(u => u.PasswordResetToken)
-            .HasMaxLength(200);
+            .HasMaxLength(3000);
 
         // Relationships
         builder.HasOne(u => u.Role)

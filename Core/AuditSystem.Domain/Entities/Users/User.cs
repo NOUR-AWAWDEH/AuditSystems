@@ -2,6 +2,7 @@ using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Organisation;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 public class User : IdentityUser<Guid>
 {
@@ -18,9 +19,9 @@ public class User : IdentityUser<Guid>
     public TimeSpan TotalSessionTime { get; set; } = TimeSpan.Zero;
     public DateTime? CurrentSessionStart { get; set; }
 
+    public string? PasswordResetToken { get; set; }
     public string? PasswordResetCode { get; set; }
     public DateTime? PasswordResetCodeExpiration { get; set; }
-    public string? PasswordResetToken { get; set; }
     public DateTime? PasswordResetTokenExpiration { get; set; }
     public DateTime? LastLogoutTime { get; set; }
 

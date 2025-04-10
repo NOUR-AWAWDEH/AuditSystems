@@ -8,15 +8,17 @@ public sealed class CreateRiskControlsValidator : AbstractValidator<CreateRiskCo
     {
         RuleFor(x => x.RiskId)
             .NotEmpty()
-            .WithMessage("Risk Id is required.");
+            .WithMessage("Risk Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Risk Id must be a valid GUID.");
 
         RuleFor(x => x.RatingId)
             .NotEmpty()
-            .WithMessage("Rating Id is required.");
+            .WithMessage("Rating Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Rating Id must be a valid GUID.");
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required.")
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
     }

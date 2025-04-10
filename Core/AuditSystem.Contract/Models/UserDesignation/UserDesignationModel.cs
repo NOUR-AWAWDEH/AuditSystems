@@ -2,7 +2,7 @@
 
 namespace AuditSystem.Contract.Models.Users;
 
-public sealed class UserManagementModel : BaseModel<Guid>
+public sealed class UserDesignationModel : BaseModel<Guid>
 {
     public required Guid UserID { get; set; }
     public required string Designation { get; set; } = string.Empty;

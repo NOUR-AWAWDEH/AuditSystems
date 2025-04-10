@@ -32,6 +32,6 @@ public sealed class CreatePlanningReportValidator : AbstractValidator<CreatePlan
 
     private bool BeAValidDate(DateOnly date)
     {
-        return date != default;
+        return date != default && date <= DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

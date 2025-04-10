@@ -90,18 +90,27 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
         if (user == null || string.IsNullOrEmpty(user.UserName))
+        {
+            _logger.LogError("User not found with username: {Username}", request.Username);
             return null;
+        }
 
-        //Check if the email is confirmed
+        // Check if the email is confirmed
         if (!user.EmailConfirmed)
+        {
             return new LoginResponseDto
             {
                 IsEmailVerified = false
             };
+        }
 
-        var result = _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
-        if (!result.IsCompletedSuccessfully)
+        // Check password
+        var result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, false, false);
+        if (!result.Succeeded)
+        {
+            _logger.LogError("Sign-in failed for user: {Username}", request.Username);
             return null;
+        }
 
         // Generate tokens
         var jwtToken = _tokenService.GenerateJwtToken(user);
@@ -117,6 +126,7 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             IsEmailVerified = true
         };
     }
+
 
     public async Task<bool> RevokeRefreshTokenAsync(string userId, string refreshToken)
     {

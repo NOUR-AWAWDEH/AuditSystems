@@ -1,17 +1,20 @@
 ﻿using FluentValidation;
 using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
+using AuditSystem.Application.Common.Validators;
 
 public sealed class CreateAuditPlanSummaryValidator : AbstractValidator<CreateAuditPlanSummaryCommand>
 {
     public CreateAuditPlanSummaryValidator()
     {
-        RuleFor(x => x.AuditorSettingsId)
-            .NotEmpty()
-            .WithMessage("The AuditorSettingsId field is required.");
 
         RuleFor(x => x.Component)
+            .NotEmpty()
+            .WithMessage("The Component field is required.")
+            .MinimumLength(2)
+            .WithMessage("The Component must be at least 2 characters long.")
             .MaximumLength(255)
             .WithMessage("The Component must not exceed 255 characters.");
+
 
         RuleFor(x => x.Description)
             .MaximumLength(500)

@@ -20,7 +20,7 @@ internal sealed class LocationService(
     public async Task<Guid> CreateLocationAsync(LocationModel locationModel)
     {
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));
-        
+
         try
         {
             var entity = mapper.Map<Location>(locationModel);

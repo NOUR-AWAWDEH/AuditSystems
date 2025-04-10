@@ -127,7 +127,6 @@ public class CustomAuthenticationService : ICustomAuthenticationService
         };
     }
 
-
     public async Task<bool> RevokeRefreshTokenAsync(string userId, string refreshToken)
     {
         _logger.LogInformation("RevokeRefreshTokenAsync called with userId: {userId} and refreshToken: {refreshToken}", userId, refreshToken);

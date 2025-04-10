@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Skills.Skill.Create;
 
 public sealed class CreateSkillValidator : AbstractValidator<CreateSkillCommand>
 {
-    public CreateSkillValidator() 
+    public CreateSkillValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -13,7 +13,7 @@ public sealed class CreateSkillValidator : AbstractValidator<CreateSkillCommand>
             .WithMessage("Skill Name must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Skill Name must not exceed 200 characters.");
-        
+
         RuleFor(x => x.CategoryId)
             .NotEmpty()
             .WithMessage("Skill Category Id is required.")

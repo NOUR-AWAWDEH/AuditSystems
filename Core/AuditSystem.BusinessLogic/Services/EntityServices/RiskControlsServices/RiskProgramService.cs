@@ -20,7 +20,7 @@ internal sealed class RiskProgramService(
     public async Task<Guid> CreateRiskProgramAsync(RiskProgramModel riskProgramModel)
     {
         ArgumentNullException.ThrowIfNull(riskProgramModel, nameof(riskProgramModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskProgram>(riskProgramModel);

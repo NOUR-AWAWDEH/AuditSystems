@@ -5,8 +5,8 @@ namespace AuditSystem.Application.Common.Validators;
 public static class PropertyValidators
 {
     public static IRuleBuilderOptions<T, string> ValidateRequiredString<T>(
-        this IRuleBuilder<T, string> ruleBuilder, 
-        int minLength, 
+        this IRuleBuilder<T, string> ruleBuilder,
+        int minLength,
         int maxLength,
         string propertyName)
     {

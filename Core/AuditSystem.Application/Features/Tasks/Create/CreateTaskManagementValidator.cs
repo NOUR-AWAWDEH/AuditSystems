@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Tasks.Create;
 
 public sealed class CreateTaskManagementValidator : AbstractValidator<CreateTaskManagementCommand>
 {
-    public CreateTaskManagementValidator() 
+    public CreateTaskManagementValidator()
     {
         RuleFor(x => x.Requirement)
             .NotEmpty()

@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Reports.ReportingFollowUp.Create;
 
 public sealed class CreateReportingFollowUpValidator : AbstractValidator<CreateReportingFollowUpCommand>
 {
-    public CreateReportingFollowUpValidator() 
+    public CreateReportingFollowUpValidator()
     {
         RuleFor(x => x.Reporting)
             .NotEmpty()

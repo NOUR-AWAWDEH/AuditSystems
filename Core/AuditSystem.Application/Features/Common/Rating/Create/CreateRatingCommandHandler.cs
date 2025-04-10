@@ -4,7 +4,6 @@ using AuditSystem.Contract.Models.Common;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Runtime.CompilerServices;
 
 namespace AuditSystem.Application.Features.Common.Rating.Create;
 

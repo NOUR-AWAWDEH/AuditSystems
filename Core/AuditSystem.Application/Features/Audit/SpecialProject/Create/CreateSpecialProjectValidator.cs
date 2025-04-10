@@ -2,9 +2,9 @@
 
 namespace AuditSystem.Application.Features.Audit.SpecialProject.Create;
 
-public sealed class CreateSpecialProjectValidator : AbstractValidator<CreateSpecialProjectCommand> 
+public sealed class CreateSpecialProjectValidator : AbstractValidator<CreateSpecialProjectCommand>
 {
-    public CreateSpecialProjectValidator() 
+    public CreateSpecialProjectValidator()
     {
         RuleFor(x => x.AuditUniverseId)
             .NotEmpty()

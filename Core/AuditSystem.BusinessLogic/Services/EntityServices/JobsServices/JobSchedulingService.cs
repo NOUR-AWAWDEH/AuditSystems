@@ -20,7 +20,7 @@ internal sealed class JobSchedulingService(
     public async Task<Guid> CreateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
     {
         ArgumentNullException.ThrowIfNull(jobSchedulingModel, nameof(jobSchedulingModel));
-        
+
         try
         {
             var entity = mapper.Map<JobScheduling>(jobSchedulingModel);

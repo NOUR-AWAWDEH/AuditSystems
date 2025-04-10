@@ -20,7 +20,7 @@ internal sealed class RiskFactorService(
     public async Task<Guid> CreateRiskFactorAsync(RiskFactorModel riskFactorModel)
     {
         ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskFactor>(riskFactorModel);

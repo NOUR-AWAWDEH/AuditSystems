@@ -20,7 +20,7 @@ internal sealed class SubProcessService(
     public async Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel)
     {
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
-        
+
         try
         {
             var entity = mapper.Map<SubProcess>(subProcessModel);

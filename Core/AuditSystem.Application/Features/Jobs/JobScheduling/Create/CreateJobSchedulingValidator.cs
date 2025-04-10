@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Jobs.JobScheduling.Create;
+﻿using AuditSystem.Application.Features.Jobs.JobScheduling.Create;
+using FluentValidation;
 
 public sealed class CreateJobSchedulingValidator : AbstractValidator<CreateJobSchedulingCommand>
 {
@@ -45,7 +45,7 @@ public sealed class CreateJobSchedulingValidator : AbstractValidator<CreateJobSc
         return date.Year <= DateTime.Now.Year;
     }
 
-    
+
     private bool DateMustBeInFuture(DateOnly date)
     {
         return date > DateOnly.FromDateTime(DateTime.Now);

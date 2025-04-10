@@ -20,7 +20,7 @@ internal sealed class SpecialProjectService(
     public async Task<Guid> CreateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));
-        
+
         try
         {
             var entity = mapper.Map<SpecialProject>(specialProjectModel);

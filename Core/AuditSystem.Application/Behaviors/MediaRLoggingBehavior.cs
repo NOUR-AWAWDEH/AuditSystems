@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Behaviors;
 
-internal sealed class MediatRLoggingBehavior<TRequest, TResponse>(ILogger<MediatRLoggingBehavior<TRequest, TResponse>> logger)
+internal sealed class MediatRLoggingBehavior<TRequest, TResponse>(
+    ILogger<MediatRLoggingBehavior<TRequest,
+    TResponse>> logger)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     public async Task<TResponse> Handle(TRequest request,

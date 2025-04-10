@@ -18,7 +18,7 @@ internal sealed class CreateAuditUniverseObjectiveCommandHandler(
         var auditUniverseObjectiveModel = mapper.Map<AuditUniverseObjectiveModel>(request);
         var auditUniverseObjectiveId = await auditUniverseObjectiveService.CreateAuditUniverseObjectiveAsync(auditUniverseObjectiveModel);
         logger.LogInformation("Audit Universe Objective with Impact {AuditUniverseObjectiveImpact} has been created.", request.Impact);
-        
+
         return Result<CreateAuditUniverseObjectiveCommandResponse>.Created(new CreateAuditUniverseObjectiveCommandResponse(auditUniverseObjectiveId));
     }
 }

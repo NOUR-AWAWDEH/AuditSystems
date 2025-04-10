@@ -10,7 +10,7 @@ namespace AuditSystem.Application.Features.Risks.RiskAssessment.Create;
 internal sealed class CreateRiskAssessmentCommandHandler(
     IRiskAssessmentService riskAssessmentService,
     IMapper mapper,
-    ILogger<CreateRiskAssessmentCommandHandler> logger) 
+    ILogger<CreateRiskAssessmentCommandHandler> logger)
     : IRequestHandler<CreateRiskAssessmentCommand, Result<CreateRiskAssessmentCommandResponse>>
 {
     public async Task<Result<CreateRiskAssessmentCommandResponse>> Handle(CreateRiskAssessmentCommand request, CancellationToken cancellationToken)

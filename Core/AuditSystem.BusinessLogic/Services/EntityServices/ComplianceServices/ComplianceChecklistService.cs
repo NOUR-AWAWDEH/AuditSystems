@@ -21,7 +21,7 @@ internal sealed class ComplianceChecklistService(
     public async Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));
-        
+
         try
         {
             var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);

@@ -68,7 +68,6 @@ public static class InfrastructureDependencies
                    .EnableSensitiveDataLogging(!isProduction)  // Disable sensitive data logging in production
                    .LogTo(Console.WriteLine, LogLevel.Information));  // Optional query logging for debugging
 
-
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
     services
         //Audits
@@ -129,7 +128,6 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, UserDesignation>()
         //Auth
         .AddRepository<Guid, RefreshToken>();
-
 
     private static IServiceCollection AddRepository<TId, TEntity>(this IServiceCollection services)
         where TId : IComparable<TId>

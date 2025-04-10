@@ -6,7 +6,7 @@ public sealed class CreateAuditProcessValidator : AbstractValidator<CreateAuditP
 {
     public CreateAuditProcessValidator()
     {
-        
+
         RuleFor(x => x.ProcessName)
             .NotEmpty()
             .WithMessage("Audit Process Name is required.")

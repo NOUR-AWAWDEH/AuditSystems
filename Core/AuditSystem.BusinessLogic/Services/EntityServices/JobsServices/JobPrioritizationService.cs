@@ -16,11 +16,11 @@ internal sealed class JobPrioritizationService(
 {
     private static readonly string[] JobPrioritizationTags = ["job-prioritizations", "job-prioritization-list"];
     private static readonly string[] ListTags = ["job-prioritization-list"]; // Tags for collections only
-    
+
     public async Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
-        
+
         try
         {
             var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);

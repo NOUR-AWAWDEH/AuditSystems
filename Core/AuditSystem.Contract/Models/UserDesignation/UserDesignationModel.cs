@@ -4,6 +4,9 @@ namespace AuditSystem.Contract.Models.Users;
 
 public sealed class UserDesignationModel : BaseModel<Guid>
 {
-    public required Guid UserID { get; set; }
     public required string Designation { get; set; } = string.Empty;
+    public required string Level { get; set; }
+    public required bool IsActive { get; set; } = true;
+    public required Guid UserId { get; set; }
+    public string Description { get; set; } = string.Empty;
 }

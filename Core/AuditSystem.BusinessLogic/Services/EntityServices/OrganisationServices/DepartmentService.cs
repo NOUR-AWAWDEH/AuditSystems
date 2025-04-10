@@ -20,7 +20,7 @@ internal sealed class DepartmentService(
     public async Task<Guid> CreateDepartmentAsync(DepartmentModel departmentModel)
     {
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));
-        
+
         try
         {
             var entity = mapper.Map<Department>(departmentModel);

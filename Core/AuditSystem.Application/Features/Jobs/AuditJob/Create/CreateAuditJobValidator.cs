@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Jobs.AuditJob.Create;
+﻿using AuditSystem.Application.Features.Jobs.AuditJob.Create;
+using FluentValidation;
 
 public sealed class CreateAuditJobValidator : AbstractValidator<CreateAuditJobCommand>
 {

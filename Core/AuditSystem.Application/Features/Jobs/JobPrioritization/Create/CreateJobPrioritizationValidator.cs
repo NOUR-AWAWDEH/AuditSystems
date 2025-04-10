@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Jobs.JobPrioritization.Create;
+﻿using AuditSystem.Application.Features.Jobs.JobPrioritization.Create;
+using FluentValidation;
 
 public sealed class CreateJobPrioritizationValidator : AbstractValidator<CreateJobPrioritizationCommand>
 {

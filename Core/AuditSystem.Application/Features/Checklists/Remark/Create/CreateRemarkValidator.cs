@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Checklists.Remark.Create;
 
 public sealed class CreateRemarkValidator : AbstractValidator<CreateRemarkCommand>
 {
-    public CreateRemarkValidator() 
+    public CreateRemarkValidator()
     {
 
         RuleFor(x => x.RemarkCommants)

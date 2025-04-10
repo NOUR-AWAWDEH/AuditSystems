@@ -20,28 +20,28 @@ internal sealed class AuditEngagementService(
     public async Task<Guid> CreateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));
-        
-        try 
+
+        try
         {
             var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.AuditEngagement, createdEntity.Id);
-            
+
             await cacheService.SetAsync(
-                key: cacheKey, 
+                key: cacheKey,
                 value: createdEntity,
                 tags: AuditEngagementServiceTags,
                 expiration: CacheExpirations.MediumTerm);
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
-            
+
             return createdEntity.Id;
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             throw new Exception("Failed to create AuditEngagement.", ex);
         }
-        
+
     }
 }

@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Create
 
 public sealed class CreateAuditPlanSummaryReportValidator : AbstractValidator<CreateAuditPlanSummaryReportCommand>
 {
-    public CreateAuditPlanSummaryReportValidator() 
+    public CreateAuditPlanSummaryReportValidator()
     {
         RuleFor(x => x.ReportName)
             .NotEmpty()

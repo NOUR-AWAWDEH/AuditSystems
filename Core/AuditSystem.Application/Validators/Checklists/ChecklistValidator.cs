@@ -6,10 +6,10 @@ namespace AuditSystem.Application.Validators.Checklists;
 internal sealed class ChecklistValidator<T> : PropertyValidator<T, string?>, IChecklistValidator
 {
     public override string Name => "ChecklistValidator";
-    
+
     protected override string GetDefaultMessageTemplate(string errorCode)
         => "Checklist '{PropertyValue}' is not valid.";
-    
+
     public override bool IsValid(ValidationContext<T> context, string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -21,4 +21,4 @@ internal sealed class ChecklistValidator<T> : PropertyValidator<T, string?>, ICh
     }
 }
 
-public interface IChecklistValidator : IPropertyValidator{}
+public interface IChecklistValidator : IPropertyValidator { }

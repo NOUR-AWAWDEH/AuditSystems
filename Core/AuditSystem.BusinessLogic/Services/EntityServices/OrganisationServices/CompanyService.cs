@@ -20,7 +20,7 @@ internal sealed class CompanyService(
     public async Task<Guid> CreateCompanyAsync(CompanyModel companyModel)
     {
         ArgumentNullException.ThrowIfNull(companyModel, nameof(companyModel));
-        
+
         try
         {
             var entity = mapper.Map<Company>(companyModel);

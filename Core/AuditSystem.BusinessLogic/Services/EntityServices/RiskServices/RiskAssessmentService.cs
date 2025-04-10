@@ -16,11 +16,11 @@ internal sealed class RiskAssessmentService(
 {
     private static readonly string[] RiskAssessmentTags = ["risk-assessments", "risk-assessment-list"];
     private static readonly string[] ListTags = ["risk-assessment-list"]; // Tags for collections only
-    
+
     public async Task<Guid> CreateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel)
     {
         ArgumentNullException.ThrowIfNull(riskAssessmentModel, nameof(riskAssessmentModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
@@ -35,7 +35,7 @@ internal sealed class RiskAssessmentService(
                 expiration: CacheExpirations.MediumTerm);
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
-            
+
             return createdEntity.Id;
         }
         catch (Exception ex)

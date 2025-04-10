@@ -1,5 +1,4 @@
 ﻿using AuditSystem.Auth.Services.Password.PasswordToken;
-using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

@@ -14,9 +14,7 @@ public class ErrorHandlingMiddleware
     }
 
     private RequestDelegate Next { get; }
-
     private ILogger<ErrorHandlingMiddleware> Logger { get; }
-
     private IHostEnvironment HostEnvironment { get; }
 
     public async Task Invoke(HttpContext httpContext)

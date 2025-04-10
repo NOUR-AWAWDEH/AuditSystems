@@ -13,8 +13,8 @@ public sealed class CreateUserDesignationValidator : AbstractValidator<CreateUse
             .WithMessage("Designation must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Designation must not exceed 200 characters.");
-        
-       
+
+
         RuleFor(x => x.Level)
             .NotEmpty()
             .WithMessage("Level is required.")

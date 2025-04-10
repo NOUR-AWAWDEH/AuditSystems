@@ -141,8 +141,6 @@ namespace AuditSystem.Auth.Services.Registration
             throw CreateExceptionFromErrors("User creation failed", creationResult.Errors);
         }
 
-
-
         private async Task HandleFailedCreationAsync(string username, IdentityResult creationResult)
         {
             var existingUser = await _userManager.FindByNameAsync(username);

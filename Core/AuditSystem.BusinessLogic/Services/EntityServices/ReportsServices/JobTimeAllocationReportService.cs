@@ -20,7 +20,7 @@ internal sealed class JobTimeAllocationReportService(
     public async Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));
-        
+
         try
         {
             var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);

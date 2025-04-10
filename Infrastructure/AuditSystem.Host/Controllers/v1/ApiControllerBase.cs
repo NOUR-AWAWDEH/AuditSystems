@@ -1,7 +1,7 @@
 using Ardalis.Result;
+using AuditSystem.Host.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using AuditSystem.Host.Extensions;
 
 namespace AuditSystem.Host.Controllers.v1;
 

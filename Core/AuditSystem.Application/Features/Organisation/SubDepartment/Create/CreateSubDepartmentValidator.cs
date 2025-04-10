@@ -2,9 +2,9 @@
 
 namespace AuditSystem.Application.Features.Organisation.SubDepartment.Create;
 
-public sealed class CreateSubDepartmentValidator : AbstractValidator<CreateSubDepartmentCommand> 
+public sealed class CreateSubDepartmentValidator : AbstractValidator<CreateSubDepartmentCommand>
 {
-    public CreateSubDepartmentValidator() 
+    public CreateSubDepartmentValidator()
     {
         RuleFor(x => x.DepartmentId)
             .NotEmpty()

@@ -20,14 +20,14 @@ internal sealed class BusinessObjectiveService(
     public async Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
-        
+
         try
         {
             var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.BusinessObjective, createdEntity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: createdEntity,
@@ -35,7 +35,7 @@ internal sealed class BusinessObjectiveService(
                 expiration: CacheExpirations.MediumTerm);
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
-            
+
             return createdEntity.Id;
         }
         catch (Exception ex)

@@ -11,7 +11,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices
 internal sealed class RiskControlService(
     IRepository<Guid, RiskControls> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : IRiskControlService
 {
     private static readonly string[] RiskControlTags = ["risk-controls", "risk-control-list"];
@@ -20,7 +20,7 @@ internal sealed class RiskControlService(
     public async Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskControls>(riskControlModel);

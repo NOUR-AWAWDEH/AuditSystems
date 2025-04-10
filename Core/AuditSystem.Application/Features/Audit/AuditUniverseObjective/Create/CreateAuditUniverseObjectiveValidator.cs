@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
 
 public sealed class CreateAuditUniverseObjectiveValidator : AbstractValidator<CreateAuditUniverseObjectiveCommand>
 {
-    public CreateAuditUniverseObjectiveValidator() 
+    public CreateAuditUniverseObjectiveValidator()
     {
         RuleFor(x => x.AuditUniverseID)
             .NotEmpty()

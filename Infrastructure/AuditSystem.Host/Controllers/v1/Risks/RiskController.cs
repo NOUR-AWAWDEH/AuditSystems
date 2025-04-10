@@ -347,6 +347,5 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         [ProducesResponseType(typeof(ApiResponse<CreateSkillCategoryCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateSkillCategory([FromBody] CreateSkillCategoryCommand command) =>
             await ProcessRequestToActionResultAsync(command);
-
     }
 }

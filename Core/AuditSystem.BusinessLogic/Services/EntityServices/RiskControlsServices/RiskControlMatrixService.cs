@@ -20,7 +20,7 @@ internal sealed class RiskControlMatrixService(
     public async Task<Guid> CreateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);

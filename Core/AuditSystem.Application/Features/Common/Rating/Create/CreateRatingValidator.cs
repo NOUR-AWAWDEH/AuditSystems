@@ -1,8 +1,8 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Common.Rating.Create;
+﻿using AuditSystem.Application.Features.Common.Rating.Create;
 using AuditSystem.Domain.Entities.Common;
+using FluentValidation;
 
-public sealed class CreateRatingValidator : AbstractValidator<CreateRatingCommand> 
+public sealed class CreateRatingValidator : AbstractValidator<CreateRatingCommand>
 {
     public CreateRatingValidator()
     {

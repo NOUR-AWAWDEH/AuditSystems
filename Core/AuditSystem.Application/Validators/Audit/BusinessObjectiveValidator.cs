@@ -21,4 +21,4 @@ internal sealed class BusinessObjectiveValidator<T> : PropertyValidator<T, strin
     }
 }
 
-public interface IBusinessObjectiveValidator : IPropertyValidator{}
+public interface IBusinessObjectiveValidator : IPropertyValidator { }

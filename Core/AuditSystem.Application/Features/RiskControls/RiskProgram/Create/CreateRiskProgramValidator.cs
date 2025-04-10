@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.RiskControls.RiskProgram.Create;
 
 public sealed class CreateRiskProgramValidator : AbstractValidator<CreateRiskProgramCommand>
 {
-    public CreateRiskProgramValidator() 
+    public CreateRiskProgramValidator()
     {
         RuleFor(x => x.RiskControlId)
             .NotEmpty()

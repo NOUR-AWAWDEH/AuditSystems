@@ -16,11 +16,11 @@ internal sealed class AuditPlanSummaryService(
 {
     private static readonly string[] AuditPlanSummaryTags = ["audit-plan-summaries", "audit-plan-summary-list"];
     private static readonly string[] ListTags = ["audit-plan-summary-list"]; // Tags for collections only
-    
+
     public async Task<Guid> CreateAuditPlanSummaryAsync(AuditPlanSummaryModel auditPlanSummaryModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryModel, nameof(auditPlanSummaryModel));
-        
+
         try
         {
             var entity = mapper.Map<AuditPlanSummary>(auditPlanSummaryModel);

@@ -10,7 +10,7 @@ namespace AuditSystem.Application.Features.Tasks.Create;
 internal sealed class CreateTaskManagementCommandHandler(
     ITaskManagementService taskManagementService,
     IMapper mapper,
-    ILogger<CreateTaskManagementCommandHandler> logger) 
+    ILogger<CreateTaskManagementCommandHandler> logger)
     : IRequestHandler<CreateTaskManagementCommand, Result<CreateTaskManagementCommandResponse>>
 {
     public async Task<Result<CreateTaskManagementCommandResponse>> Handle(CreateTaskManagementCommand request, CancellationToken cancellationToken)

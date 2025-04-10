@@ -11,7 +11,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
 internal sealed class TaskManagementService(
     IRepository<Guid, TaskManagement> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : ITaskManagementService
 {
     private static readonly string[] TaskManagementTags = ["task-managements", "task-management-list"];

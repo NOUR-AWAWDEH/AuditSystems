@@ -20,14 +20,14 @@ internal sealed class ChecklistService(
     public async Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));
-        
+
         try
         {
             var entity = mapper.Map<Checklist>(checklistModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.Checklist, createdEntity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: createdEntity,
@@ -35,7 +35,7 @@ internal sealed class ChecklistService(
                 expiration: CacheExpirations.MediumTerm);
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
-            
+
             return createdEntity.Id;
 
         }

@@ -12,7 +12,7 @@ internal sealed class CreateAuditDomainCommandHandler(
     IMapper mapper,
     ILogger<CreateAuditDomainCommandHandler> logger)
     : IRequestHandler<CreateAuditDomainCommand, Result<CreateAuditDomainCommandResponse>>
-    
+
 {
 
     public async Task<Result<CreateAuditDomainCommandResponse>> Handle(CreateAuditDomainCommand request, CancellationToken cancellationToken)
@@ -20,7 +20,7 @@ internal sealed class CreateAuditDomainCommandHandler(
         var DomainModel = mapper.Map<AuditDomainModel>(request);
         var DomainId = await auditDomainService.CreateAuditDomainAsync(DomainModel);
         logger.LogInformation("Audit Domain with name {DomainName} has been created.", request.DomainName);
-        
-        return Result<CreateAuditDomainCommandResponse>.Created(new (DomainId));
+
+        return Result<CreateAuditDomainCommandResponse>.Created(new(DomainId));
     }
 }

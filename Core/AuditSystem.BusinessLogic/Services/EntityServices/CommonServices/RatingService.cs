@@ -20,7 +20,7 @@ internal sealed class RatingService(
     public async Task<Guid> CreateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
-        
+
         try
         {
             var entity = mapper.Map<Rating>(ratingModel);

@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create;
+﻿using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create;
+using FluentValidation;
 
 public sealed class CreateComplianceChecklistValidator : AbstractValidator<CreateComplianceChecklistCommand>
 {

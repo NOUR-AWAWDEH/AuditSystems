@@ -6,10 +6,10 @@ namespace AuditSystem.Application.Validators.Skills;
 internal sealed class SkillSetValidator<T> : PropertyValidator<T, string?>, ISkillSetValidator
 {
     public override string Name => "SkillSetValidator";
-    
+
     protected override string GetDefaultMessageTemplate(string errorCode)
         => "SkillSet '{PropertyValue}' is not valid.";
-   
+
     public override bool IsValid(ValidationContext<T> context, string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -21,4 +21,4 @@ internal sealed class SkillSetValidator<T> : PropertyValidator<T, string?>, ISki
     }
 }
 
-public interface ISkillSetValidator : IPropertyValidator {}
+public interface ISkillSetValidator : IPropertyValidator { }

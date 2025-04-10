@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create
 
 public sealed class CreateRiskControlMatrixValidator : AbstractValidator<CreateRiskControlMatrixCommand>
 {
-    public CreateRiskControlMatrixValidator() 
+    public CreateRiskControlMatrixValidator()
     {
         RuleFor(x => x.SubProcessId)
             .NotEmpty()

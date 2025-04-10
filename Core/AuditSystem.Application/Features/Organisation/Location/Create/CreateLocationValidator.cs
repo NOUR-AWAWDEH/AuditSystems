@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Organisation.Location.Create;
 
 public sealed class CreateLocationValidator : AbstractValidator<CreateLocationCommand>
 {
-    public CreateLocationValidator() 
+    public CreateLocationValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()

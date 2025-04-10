@@ -1,13 +1,5 @@
-﻿using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
-using AuditSystem.Contract.Models.Skills;
-using AuditSystem.Domain.Entities.Skills;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Validators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AuditSystem.Application.Validators.Skills;
 

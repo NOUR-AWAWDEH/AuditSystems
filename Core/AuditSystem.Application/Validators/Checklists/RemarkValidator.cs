@@ -21,4 +21,4 @@ internal sealed class RemarkValidator<T> : PropertyValidator<T, string?>, IRemar
     }
 }
 
-public interface IRemarkValidator : IPropertyValidator{}
+public interface IRemarkValidator : IPropertyValidator { }

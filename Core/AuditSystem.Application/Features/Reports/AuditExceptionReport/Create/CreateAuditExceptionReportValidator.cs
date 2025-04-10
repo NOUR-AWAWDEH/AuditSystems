@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Create;
 
 public sealed class CreateAuditExceptionReportValidator : AbstractValidator<CreateAuditExceptionReportCommand>
 {
-    public CreateAuditExceptionReportValidator() 
+    public CreateAuditExceptionReportValidator()
     {
         RuleFor(x => x.ReportName)
             .NotEmpty()

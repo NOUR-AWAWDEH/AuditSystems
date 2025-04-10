@@ -4,9 +4,9 @@ namespace AuditSystem.Application.Features.Risks.RiskFactor.Create;
 
 public sealed class CreateRiskFactorValidator : AbstractValidator<CreateRiskFactorCommand>
 {
-    public CreateRiskFactorValidator() 
+    public CreateRiskFactorValidator()
     {
-       
+
         RuleFor(x => x.Factor)
             .NotEmpty()
             .WithMessage("Risk Factor Name is required.")

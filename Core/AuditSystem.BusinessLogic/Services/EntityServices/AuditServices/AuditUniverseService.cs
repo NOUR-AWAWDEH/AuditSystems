@@ -20,14 +20,14 @@ internal sealed class AuditUniverseService(
     public async Task<Guid> CreateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
-        
+
         try
         {
             var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.AuditUniverse, createdEntity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: createdEntity,
@@ -35,7 +35,7 @@ internal sealed class AuditUniverseService(
                 expiration: CacheExpirations.MediumTerm);
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
-            
+
             return createdEntity.Id;
         }
         catch (Exception ex)

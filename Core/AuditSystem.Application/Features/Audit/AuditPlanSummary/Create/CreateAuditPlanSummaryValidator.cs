@@ -1,6 +1,5 @@
-﻿using FluentValidation;
-using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
-using AuditSystem.Application.Common.Validators;
+﻿using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
+using FluentValidation;
 
 public sealed class CreateAuditPlanSummaryValidator : AbstractValidator<CreateAuditPlanSummaryCommand>
 {

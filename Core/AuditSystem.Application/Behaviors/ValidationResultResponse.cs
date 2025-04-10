@@ -4,5 +4,5 @@ public class ValidationResultResponse<TResponse>
 {
     public bool IsValid { get; set; }
     public List<string> Errors { get; set; } = new();
-    public TResponse Response { get; set; }
+    public TResponse Response { get; set; } = default!;
 }

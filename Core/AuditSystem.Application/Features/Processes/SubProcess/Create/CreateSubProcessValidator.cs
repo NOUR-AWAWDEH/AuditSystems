@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Processes.SubProcess.Create;
 
 public sealed class CreateSubProcessValidator : AbstractValidator<CreateSubProcessCommand>
 {
-    public CreateSubProcessValidator() 
+    public CreateSubProcessValidator()
     {
         RuleFor(x => x.ProcessId)
             .NotEmpty()

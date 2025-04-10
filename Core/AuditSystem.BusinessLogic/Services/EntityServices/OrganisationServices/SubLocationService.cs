@@ -3,7 +3,6 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organisation;
-using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Organisation;
 using AutoMapper;
 
@@ -12,7 +11,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices
 internal sealed class SubLocationService(
     IRepository<Guid, SubLocation> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : ISubLocationService
 {
     private static readonly string[] SubLocationTags = ["sub-locations", "sub-location-list"];
@@ -21,7 +20,7 @@ internal sealed class SubLocationService(
     public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
-        
+
         try
         {
             var entity = mapper.Map<SubLocation>(subLocationModel);

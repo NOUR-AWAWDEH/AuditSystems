@@ -18,7 +18,7 @@ internal sealed class CreateAuditPlanSummaryCommandHandler(
         var auditPlanSummary = mapper.Map<AuditPlanSummaryModel>(request);
         var auditPlanSummaryId = await auditPlanSummaryService.CreateAuditPlanSummaryAsync(auditPlanSummary);
         logger.LogInformation($"Audit Plan Summary created with Component: {request.Component}");
-        
+
         return Result<CreateAuditPlanSummaryCommandResponse>.Success(new CreateAuditPlanSummaryCommandResponse(auditPlanSummaryId));
     }
 }

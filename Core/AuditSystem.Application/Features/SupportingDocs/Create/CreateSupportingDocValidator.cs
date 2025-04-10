@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.SupportingDocs.Create;
 
 public sealed class CreateSupportingDocValidator : AbstractValidator<CreateSupportingDocCommand>
 {
-    public CreateSupportingDocValidator() 
+    public CreateSupportingDocValidator()
     {
         RuleFor(x => x.FileName)
             .NotEmpty()

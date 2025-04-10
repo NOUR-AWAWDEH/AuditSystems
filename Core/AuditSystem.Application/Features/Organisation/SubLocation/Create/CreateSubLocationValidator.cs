@@ -1,11 +1,10 @@
-﻿using AuditSystem.Application.Common.Validators;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace AuditSystem.Application.Features.Organisation.SubLocation.Create;
 
 public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLocationCommand>
 {
-    public CreateSubLocationValidator() 
+    public CreateSubLocationValidator()
     {
         RuleFor(x => x.LocationId)
             .NotEmpty()

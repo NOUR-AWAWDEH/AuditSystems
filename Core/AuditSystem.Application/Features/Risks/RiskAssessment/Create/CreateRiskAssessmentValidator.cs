@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Risks.RiskAssessment.Create;
 
 public sealed class CreateRiskAssessmentValidator : AbstractValidator<CreateRiskAssessmentCommand>
 {
-    public CreateRiskAssessmentValidator() 
+    public CreateRiskAssessmentValidator()
     {
         RuleFor(x => x.BusinessObjective)
             .NotEmpty()

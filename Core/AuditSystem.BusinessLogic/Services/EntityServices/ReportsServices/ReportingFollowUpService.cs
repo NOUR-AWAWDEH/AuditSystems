@@ -11,7 +11,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 internal sealed class ReportingFollowUpService(
     IRepository<Guid, ReportingFollowUp> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : IReportingFollowUpService
 {
     private static readonly string[] ReportingFollowUpTags = ["reporting-follow-ups", "reporting-follow-up-list"];
@@ -20,7 +20,7 @@ internal sealed class ReportingFollowUpService(
     public async Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
-        
+
         try
         {
             var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);

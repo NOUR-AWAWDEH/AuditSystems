@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Creat
 
 public sealed class CreateJobTimeAllocationReportValidator : AbstractValidator<CreateJobTimeAllocationReportCommand>
 {
-    public CreateJobTimeAllocationReportValidator() 
+    public CreateJobTimeAllocationReportValidator()
     {
         RuleFor(x => x.JobName)
             .NotEmpty()

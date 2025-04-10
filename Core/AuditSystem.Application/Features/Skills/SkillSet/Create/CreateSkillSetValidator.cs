@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Skills.SkillSet.Create;
 
 public sealed class CreateSkillSetValidator : AbstractValidator<CreateSkillSetCommand>
 {
-    public CreateSkillSetValidator() 
+    public CreateSkillSetValidator()
     {
         RuleFor(x => x.ProficiencyLevel)
             .NotEmpty()

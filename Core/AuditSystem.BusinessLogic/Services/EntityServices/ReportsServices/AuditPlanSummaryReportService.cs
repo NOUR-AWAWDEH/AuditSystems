@@ -20,7 +20,7 @@ internal sealed class AuditPlanSummaryReportService(
     public async Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));
-        
+
         try
         {
             var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);

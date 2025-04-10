@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Organisation.Department.Create;
 
 public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartmentCommand>
 {
-    public CreateDepartmentValidator() 
+    public CreateDepartmentValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -13,6 +13,6 @@ public sealed class CreateDepartmentValidator : AbstractValidator<CreateDepartme
             .WithMessage("Department Name must be at least 2 characters long.")
             .MaximumLength(200)
             .WithMessage("Department Name must not exceed 200 characters.");
-        
+
     }
 }

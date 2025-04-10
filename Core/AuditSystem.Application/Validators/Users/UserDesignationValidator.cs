@@ -1,5 +1,5 @@
-﻿using FluentValidation.Validators;
-using FluentValidation;
+﻿using FluentValidation;
+using FluentValidation.Validators;
 
 namespace AuditSystem.Application.Validators.Users;
 

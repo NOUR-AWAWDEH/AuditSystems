@@ -1,5 +1,4 @@
-﻿using AuditSystem.Auth.Dtos;
-namespace AuditSystem.Auth.Services.Email;
+﻿namespace AuditSystem.Auth.Services.Email;
 public interface IEmailService
 {
     Task SendEmailAsync(EmailRequest emailRequest);

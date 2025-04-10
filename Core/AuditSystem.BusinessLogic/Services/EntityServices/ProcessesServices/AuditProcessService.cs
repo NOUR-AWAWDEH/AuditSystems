@@ -20,7 +20,7 @@ internal sealed class AuditProcessService(
     public async Task<Guid> CreateAuditProcessAsync(AuditProcessModel processModel)
     {
         ArgumentNullException.ThrowIfNull(processModel, nameof(processModel));
-        
+
         try
         {
             var entity = mapper.Map<AuditProcess>(processModel);

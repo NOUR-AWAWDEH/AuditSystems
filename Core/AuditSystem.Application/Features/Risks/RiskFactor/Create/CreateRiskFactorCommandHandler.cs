@@ -16,7 +16,7 @@ internal sealed class CreateRiskFactorCommandHandler(
     public async Task<Result<CreateRiskFactorCommandResponse>> Handle(CreateRiskFactorCommand request, CancellationToken cancellationToken)
     {
         var riskFactorModel = mapper.Map<RiskFactorModel>(request);
-        var riskFactorId =  await riskFactorService.CreateRiskFactorAsync(riskFactorModel);
+        var riskFactorId = await riskFactorService.CreateRiskFactorAsync(riskFactorModel);
         logger.LogInformation("Risk Factor with Factor {RiskFactor}", request.Factor);
 
         return Result<CreateRiskFactorCommandResponse>.Created(new CreateRiskFactorCommandResponse(riskFactorId));

@@ -10,5 +10,5 @@ public sealed record class CreateJobPrioritizationCommand : ICommand<Result<Crea
     public string Comments { get; set; } = string.Empty;
     public required DateOnly SelectedYear { get; set; }
     public required Guid BusinessObjectiveId { get; set; }
-    public required Guid RatingId { get; set; } 
+    public required Guid RatingId { get; set; }
 }

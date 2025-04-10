@@ -1,4 +1,4 @@
-﻿ using AuditSystem.Contract.Models.Common;
+﻿using AuditSystem.Contract.Models.Common;
 
 namespace AuditSystem.Contract.Models.Audit;
 

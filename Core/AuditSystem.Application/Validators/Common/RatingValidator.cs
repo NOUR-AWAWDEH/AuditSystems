@@ -6,10 +6,10 @@ namespace AuditSystem.Application.Validators.Common;
 internal sealed class RatingValidator<T> : PropertyValidator<T, string?>, IRatingValidator
 {
     public override string Name => "RatingValidator";
-    
+
     protected override string GetDefaultMessageTemplate(string errorCode)
         => "Rating '{PropertyValue}' is not valid.";
-    
+
     public override bool IsValid(ValidationContext<T> context, string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -21,4 +21,4 @@ internal sealed class RatingValidator<T> : PropertyValidator<T, string?>, IRatin
     }
 }
 
-public interface IRatingValidator : IPropertyValidator{}
+public interface IRatingValidator : IPropertyValidator { }

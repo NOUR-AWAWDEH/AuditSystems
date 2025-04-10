@@ -11,7 +11,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 internal sealed class PlanningReportService(
     IRepository<Guid, PlanningReport> repository,
     IMapper mapper,
-    ICacheService cacheService) 
+    ICacheService cacheService)
     : IPlanningReportService
 {
     private static readonly string[] PlanningReportTags = ["planning-reports", "planning-report-list"];
@@ -20,7 +20,7 @@ internal sealed class PlanningReportService(
     public async Task<Guid> CreatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
         ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));
-        
+
         try
         {
             var entity = mapper.Map<PlanningReport>(planningReportModel);

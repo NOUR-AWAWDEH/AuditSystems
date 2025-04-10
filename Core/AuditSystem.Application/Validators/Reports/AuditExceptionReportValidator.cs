@@ -6,10 +6,10 @@ namespace AuditSystem.Application.Validators.Reports;
 internal sealed class AuditExceptionReportValidator<T> : PropertyValidator<T, string?>, IAuditExceptionReportValidator
 {
     public override string Name => "AuditExceptionReportValidator";
-    
+
     protected override string GetDefaultMessageTemplate(string errorCode)
         => "AuditExceptionReport '{PropertyValue}' is not valid.";
-    
+
     public override bool IsValid(ValidationContext<T> context, string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -21,4 +21,4 @@ internal sealed class AuditExceptionReportValidator<T> : PropertyValidator<T, st
     }
 }
 
-public interface IAuditExceptionReportValidator : IPropertyValidator{}
+public interface IAuditExceptionReportValidator : IPropertyValidator { }

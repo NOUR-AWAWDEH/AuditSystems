@@ -1,10 +1,10 @@
-using AutoMapper;
+using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
+using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
-using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
-using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Application.Constants;
+using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 
@@ -27,7 +27,7 @@ internal sealed class RiskService(
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.Risk, createdEntity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: createdEntity,

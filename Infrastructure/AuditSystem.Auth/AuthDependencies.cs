@@ -41,8 +41,8 @@ public static class AuthDependencies
             Issuer = configuration["JwtSettings:Issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer", "JwtSettings:Issuer is missing in configuration"),
             Audience = configuration["JwtSettings:Audience"] ?? throw new ArgumentNullException("JwtSettings:Audience", "JwtSettings:Audience is missing in configuration"),
             ExpirationMinutes = int.TryParse(configuration["JwtSettings:ExpirationMinutes"], out int expirationMinutes)
-                ? expirationMinutes
-                : throw new ArgumentException("Invalid or missing JwtSettings:ExpirationMinutes in configuration", "JwtSettings:ExpirationMinutes")
+        ? expirationMinutes
+        : throw new ArgumentException("Invalid or missing JwtSettings:ExpirationMinutes in configuration", "JwtSettings:ExpirationMinutes")
         };
 
         services.AddSingleton(jwtSettings);
@@ -60,7 +60,7 @@ public static class AuthDependencies
                     ValidateAudience = true,
                     ValidAudience = jwtSettings.Audience,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero // Stricter token expiration
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 

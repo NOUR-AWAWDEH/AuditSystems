@@ -2,6 +2,7 @@ using AuditSystem.Auth.Authentication;
 using AuditSystem.Auth.Dtos.AuthStatus;
 using AuditSystem.Auth.Dtos.Login;
 using AuditSystem.DataAccess.Contexts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,15 +18,18 @@ public class CustomAuthenticationService : ICustomAuthenticationService
     private readonly SignInManager<User> _signInManager;
     private readonly ITokenService _tokenService;
     private readonly ILogger<CustomAuthenticationService> _logger;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CustomAuthenticationService(
         UserManager<User> userManager,
         ApplicationDbContext applicationDbContext,
         SignInManager<User> signInManager,
-        ITokenService tokenService,
+        IHttpContextAccessor httpContextAccessor,
+    ITokenService tokenService,
         ILogger<CustomAuthenticationService> logger)
     {
         _applicationDbContext = applicationDbContext;
+        _httpContextAccessor = httpContextAccessor;
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
@@ -39,15 +43,9 @@ public class CustomAuthenticationService : ICustomAuthenticationService
 
         var userIdClaim = jwtToken?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        if (string.IsNullOrEmpty(userIdClaim))
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
             return new AuthStatusResponseDto { IsAuthenticated = false };
-        }
-
-        Guid? userId = null;
-        if (Guid.TryParse(userIdClaim, out var parsedUserId))
-        {
-            userId = parsedUserId;
         }
 
         var user = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -56,9 +54,39 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             return new AuthStatusResponseDto { IsAuthenticated = false };
         }
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = jwtToken!.Claims
+            .Where(c => c.Type == ClaimTypes.Role)
+            .Select(c => c.Value);
 
-        var claimsDict = jwtToken?.Claims?.ToDictionary(c => c.Type, c => c.Value) ?? new Dictionary<string, string>();
+        var ipAddress = _httpContextAccessor?.HttpContext?.Request?.Headers["X-Forwarded-For"].FirstOrDefault()
+                       ?? _httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+
+        // Validate dates
+        DateTimeOffset? expiresAtRaw = null;
+        DateTimeOffset? authenticatedAtRaw = null;
+
+        if (jwtToken.ValidTo != default && jwtToken.ValidTo.Year >= 1970 && jwtToken.ValidTo.Year <= 9999)
+        {
+            expiresAtRaw = jwtToken.ValidTo;
+        }
+
+        if (jwtToken.ValidFrom != default && jwtToken.ValidFrom.Year >= 1970 && jwtToken.ValidFrom.Year <= 9999)
+        {
+            authenticatedAtRaw = jwtToken.ValidFrom; // Uses nbf claim
+        }
+        else
+        {
+            // Fallback to iat claim
+            var iatClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iat)?.Value;
+            if (iatClaim != null && long.TryParse(iatClaim, out var iatUnixTime))
+            {
+                authenticatedAtRaw = DateTimeOffset.FromUnixTimeSeconds(iatUnixTime);
+                if (authenticatedAtRaw?.Year is < 1970 or > 9999)
+                {
+                    authenticatedAtRaw = null;
+                }
+            }
+        }
 
         return new AuthStatusResponseDto
         {
@@ -66,21 +94,17 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             UserId = user.Id.ToString(),
             Email = user.Email,
             Roles = string.Join(", ", roles),
-            AuthenticationType = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "auth_type")?.Value,
+            AuthenticationType = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",
             IsEmailVerified = user.EmailConfirmed,
-            ExpiresAt = jwtToken?.ValidTo > DateTime.MinValue ? jwtToken.ValidTo : DateTimeOffset.UtcNow.AddHours(1),
-            AuthenticatedAt = jwtToken?.ValidFrom > DateTime.MinValue ? jwtToken.ValidFrom : DateTimeOffset.UtcNow,
-            Claims = jwtToken?.Claims?.ToDictionary(
-                c => c.Type,
-                c => c.Type == "exp"
-            ? DateTimeOffset.FromUnixTimeSeconds(long.Parse(c.Value)).ToString("yyyy-MM-dd HH:mm:ss 'UTC'")
-            : c.Value
-            ) ?? new Dictionary<string, string>(),
-            IsAuthenticated = true
+            ExpiresAtRaw = expiresAtRaw,
+            AuthenticatedAtRaw = authenticatedAtRaw,
+            IpAddress = ipAddress,
+            IsAuthenticated = true,
+            ExpiresAt = expiresAtRaw?.ToString("MMM dd, yyyy hh:mm:ss tt 'UTC'"),
+            AuthenticatedAt = authenticatedAtRaw?.ToString("MMM dd, yyyy hh:mm:ss tt 'UTC'")
         };
-
-
     }
+
 
     public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
     {

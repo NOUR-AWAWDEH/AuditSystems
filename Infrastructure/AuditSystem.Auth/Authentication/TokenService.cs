@@ -59,11 +59,15 @@ public class TokenService : ITokenService
         }
 
         var claims = new List<Claim>
-        {
+{
             new Claim(ClaimTypes.NameIdentifier, request.Id.ToString()),
             new Claim(ClaimTypes.Name, request.UserName ?? ""),
             new Claim(ClaimTypes.Email, request.Email ?? ""),
-            new Claim(ClaimTypes.Role, request.Role.Name) // Using custom Role entity
+            new Claim(ClaimTypes.Role, request.Role.Name),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64), // Issued At (login time)
+            new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64), // Not Before
+            new Claim("login_time", DateTimeOffset.UtcNow.ToString("o")), // Custom login time claim (ISO 8601 format)
+            new Claim("auth_type", "Bearer") // To fix authenticationType: null
         };
 
         var token = new JwtSecurityToken(

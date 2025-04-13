@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 public interface IAuditDomainService
 {
     public Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomianModel);
+    public Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel);
 }

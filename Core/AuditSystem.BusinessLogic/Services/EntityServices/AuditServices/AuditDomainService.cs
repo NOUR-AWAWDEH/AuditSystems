@@ -44,4 +44,30 @@ internal sealed class AuditDomainService(
             throw new Exception("Failed to create AuditDomain.", ex);
         }
     }
+
+    public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));
+        
+        try 
+        {
+            var entity = mapper.Map<AuditDomain>(auditDomianModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.AuditDomain, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditDomainTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditDomain.", ex);
+        }
+    }
 }

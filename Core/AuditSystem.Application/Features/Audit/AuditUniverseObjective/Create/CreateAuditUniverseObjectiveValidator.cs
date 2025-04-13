@@ -29,6 +29,5 @@ public sealed class CreateAuditUniverseObjectiveValidator : AbstractValidator<Cr
         RuleFor(x => x.Percentage)
             .InclusiveBetween(0, 100)
             .WithMessage("Percentage must be between 0 and 100");
-
     }
 }

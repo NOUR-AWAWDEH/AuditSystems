@@ -43,4 +43,29 @@ internal sealed class TaskManagementService(
             throw new Exception("Failed to create TaskManagement.", ex);
         }
     }
+
+    public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)
+    {
+        ArgumentNullException.ThrowIfNull(taskManagementModel, nameof(taskManagementModel));
+        
+        try 
+        {
+            var entity = mapper.Map<TaskManagement>(taskManagementModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.TaskManagement, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: TaskManagementTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update TaskManagement.", ex);
+        }
+    }
 }

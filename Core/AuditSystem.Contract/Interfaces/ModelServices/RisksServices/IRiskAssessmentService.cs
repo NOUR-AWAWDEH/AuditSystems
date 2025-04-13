@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 public interface IRiskAssessmentService
 {
     public Task<Guid> CreateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel);
+    public Task UpdateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel);
 }

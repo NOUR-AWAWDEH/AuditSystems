@@ -1,6 +1,6 @@
-﻿using AuditSystem.Application.Features.Audit.AuditDomain.Create;
-using FluentValidation;
+﻿using FluentValidation;
 
+namespace AuditSystem.Application.Features.Audit.AuditDomain.Create;
 public sealed class CreateAuditDomainValidator : AbstractValidator<CreateAuditDomainCommand>
 {
     public CreateAuditDomainValidator()

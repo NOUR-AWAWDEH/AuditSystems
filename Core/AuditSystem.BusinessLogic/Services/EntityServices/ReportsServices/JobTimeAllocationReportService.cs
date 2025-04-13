@@ -43,4 +43,29 @@ internal sealed class JobTimeAllocationReportService(
             throw new Exception("Failed to create JobTimeAllocationReport.", ex);
         }
     }
+
+    public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
+    {
+        ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobTimeAllocationReportTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update JobTimeAllocationReport.", ex);
+        }
+    }
 }

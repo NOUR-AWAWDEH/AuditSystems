@@ -15,7 +15,7 @@ internal sealed class UserDesignationService(
     ) : IUserDesignationService
 {
     private static readonly string[] UserDesignationTags = ["user-designations", "user-designation-list"];
-    private static readonly string[] ListTags = ["user-designation-list"]; // 
+    private static readonly string[] ListTags = ["user-designation-list"];
 
     public async Task<Guid> CreateUserDesignationAsync(UserDesignationModel userDesignationModel)
     {
@@ -41,6 +41,31 @@ internal sealed class UserDesignationService(
         catch (Exception ex)
         {
             throw new Exception("Failed to create User Designation.", ex);
+        }
+    }
+
+    public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)
+    {
+        ArgumentNullException.ThrowIfNull(userDesignationModel, nameof(userDesignationModel));
+
+        try
+        {
+            var entity = mapper.Map<UserDesignation>(userDesignationModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.UserDesignation, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: UserDesignationTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update User Designation.", ex);
         }
     }
 }

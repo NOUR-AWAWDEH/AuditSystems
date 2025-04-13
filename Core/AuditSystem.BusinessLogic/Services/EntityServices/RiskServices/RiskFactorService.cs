@@ -43,4 +43,29 @@ internal sealed class RiskFactorService(
             throw new Exception("Failed to create RiskFactor.", ex);
         }
     }
+
+    public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)
+    {
+        ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));
+
+        try
+        {
+            var entity = mapper.Map<RiskFactor>(riskFactorModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.RiskFactor, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskFactorTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update RiskFactor.", ex);
+        }
+    }
 }

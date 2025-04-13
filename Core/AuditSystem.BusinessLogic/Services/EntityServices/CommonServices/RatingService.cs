@@ -43,4 +43,29 @@ internal sealed class RatingService(
             throw new Exception("Failed to create Rating.", ex);
         }
     }
+
+    public async Task UpdateRatingAsync(RatingModel ratingModel)
+    {
+        ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
+
+        try 
+        {
+            var entity = mapper.Map<Rating>(ratingModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.Rating, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RatingTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update Rating.", ex);
+        }
+    }
 }

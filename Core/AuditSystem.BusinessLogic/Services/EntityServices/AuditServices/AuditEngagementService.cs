@@ -44,4 +44,29 @@ internal sealed class AuditEngagementService(
         }
 
     }
+
+    public async Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));
+        
+        try 
+        {
+            var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.AuditEngagement, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditEngagementServiceTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditEngagement.", ex);
+        }
+    }
 }

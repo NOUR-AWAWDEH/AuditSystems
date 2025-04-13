@@ -44,4 +44,29 @@ internal sealed class ChecklistService(
             throw new Exception("Failed to create Checklist.", ex);
         }
     }
+
+    public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
+    {
+        ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));
+
+        try
+        {
+            var entity = mapper.Map<Checklist>(checklistModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.Checklist, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ChecklistTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update Checklist.", ex);
+        }
+    }
 }

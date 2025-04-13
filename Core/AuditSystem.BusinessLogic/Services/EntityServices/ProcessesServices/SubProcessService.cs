@@ -43,4 +43,30 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to create SubProcess.", ex);
         }
     }
+
+    public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)
+    {
+        ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
+
+        try
+        {
+            var entity = mapper.Map<SubProcess>(subProcessModel);
+            
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.SubProcess, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SubProcessTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update SubProcess.", ex);
+        }
+    }
 }

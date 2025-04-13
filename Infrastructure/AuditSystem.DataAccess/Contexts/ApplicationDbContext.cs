@@ -52,7 +52,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<JobPrioritization> JobPrioritizations { get; set; }
     public required DbSet<JobScheduling> JobSchedulings { get; set; }
 
-    // Organisation
+    // Organization
     public required DbSet<Company> Companies { get; set; }
     public required DbSet<Department> Departments { get; set; }
     public required DbSet<Location> Locations { get; set; }

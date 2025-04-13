@@ -43,4 +43,29 @@ internal sealed class BusinessObjectiveService(
             throw new Exception("Failed to create BusinessObjective.", ex);
         }
     }
+
+    public async Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
+    {
+        ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
+        
+        try 
+        {
+            var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.BusinessObjective, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: BusinessObjectiveTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update BusinessObjective.", ex);
+        }
+    }
 }

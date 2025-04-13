@@ -1,6 +1,6 @@
-﻿using AuditSystem.Application.Features.Audit.AuditEngagement.Create;
-using FluentValidation;
+﻿using FluentValidation;
 
+namespace AuditSystem.Application.Features.Audit.AuditEngagement.Create;
 public sealed class CreateAuditEngagementValidator : AbstractValidator<CreateAuditEngagementCommand>
 {
     public CreateAuditEngagementValidator()

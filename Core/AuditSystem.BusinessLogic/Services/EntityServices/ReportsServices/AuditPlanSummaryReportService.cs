@@ -43,4 +43,30 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception("Failed to create AuditPlanSummaryReport.", ex);
         }
     }
+
+    public async Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));
+
+        try
+        {
+            var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
+            
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditPlanSummaryReportTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditPlanSummaryReport.", ex);
+        }
+    }
 }

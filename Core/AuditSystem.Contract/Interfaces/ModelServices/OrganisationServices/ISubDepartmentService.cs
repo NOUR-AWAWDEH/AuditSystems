@@ -1,8 +1,0 @@
-﻿using AuditSystem.Contract.Models.Organisation;
-
-namespace AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
-
-public interface ISubDepartmentService
-{
-    public Task<Guid> CreateSubDepartmentAsync(SubDepartmentModel subDepartmentModel);
-}

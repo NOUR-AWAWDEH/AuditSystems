@@ -43,4 +43,30 @@ internal sealed class JobSchedulingService(
             throw new Exception("Failed to create JobScheduling.", ex);
         }
     }
+
+    public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
+    {
+        ArgumentNullException.ThrowIfNull(jobSchedulingModel, nameof(jobSchedulingModel));
+
+        try
+        {
+            var entity = mapper.Map<JobScheduling>(jobSchedulingModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.JobScheduling, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobSchedulingTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update JobScheduling.", ex);
+        }
+    }
+
 }

@@ -43,4 +43,29 @@ internal sealed class PlanningReportService(
             throw new Exception("Failed to create PlanningReport.", ex);
         }
     }
+
+    public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
+    {
+        ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));
+        
+        try
+        {
+            var entity = mapper.Map<PlanningReport>(planningReportModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.PlanningReport, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: PlanningReportTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update PlanningReport.", ex);
+        }
+    }
 }

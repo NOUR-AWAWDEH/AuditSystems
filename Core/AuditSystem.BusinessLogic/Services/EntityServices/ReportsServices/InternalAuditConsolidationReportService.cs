@@ -43,4 +43,28 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception("Failed to create InternalAuditConsolidationReport.", ex);
         }
     }
+
+    public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
+    {
+        ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));
+        try
+        {
+            var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: InternalAuditConsolidationReportTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update InternalAuditConsolidationReport.", ex);
+        }
+    }
 }

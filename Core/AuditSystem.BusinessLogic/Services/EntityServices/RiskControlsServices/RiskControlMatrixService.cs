@@ -43,4 +43,29 @@ internal sealed class RiskControlMatrixService(
             throw new Exception("Failed to create RiskControlMatrix.", ex);
         }
     }
+
+    public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
+    {
+        ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));
+
+        try
+        {
+            var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskControlMatrixTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update RiskControlMatrix.", ex);
+        }
+    }
 }

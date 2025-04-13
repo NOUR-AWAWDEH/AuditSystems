@@ -1,4 +1,6 @@
-﻿using AuditSystem.Application.Features.Audit.AuditDomain.Create;
+﻿using Ardalis.Result;
+using AuditSystem.Application.Features.Audit.AuditDomain.Create;
+using AuditSystem.Application.Features.Audit.AuditDomain.Update;
 using AuditSystem.Application.Features.Audit.AuditEngagement.Create;
 using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Create;
@@ -15,7 +17,7 @@ using AuditSystem.Application.Features.Jobs.JobPrioritization.Create;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Create;
 using AuditSystem.Application.Features.Organisation.Company.Create;
 using AuditSystem.Application.Features.Organisation.Department.Create;
-using AuditSystem.Application.Features.Organisation.Location.Create;
+using AuditSystem.Application.Features.Organisation.LocationModle.Create;
 using AuditSystem.Application.Features.Organisation.SubDepartment.Create;
 using AuditSystem.Application.Features.Organisation.SubLocation.Create;
 using AuditSystem.Application.Features.Processes.AuditProcess.Creat;
@@ -58,6 +60,13 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         [ProducesResponseType(typeof(ApiResponse<CreateAuditDomainCommandResponse>), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateAuditDomain([FromBody] CreateAuditDomainCommand command) =>
             await ProcessRequestToActionResultAsync(command);
+
+        [HttpPut("Update-Audit-Domain")]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateTenant([FromBody] UpdateAuditDomainCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync(command);
+
 
         //Create Audit Engagement
         [HttpPost("Create-Audit-Engagement")]
@@ -252,14 +261,14 @@ namespace AuditSystem.Host.Controllers.v1.Risks
         [HttpPost("Create-Planning-Report")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreatePlanningReportCommandResponse>), StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreatePlanningReport([FromBody] CreatePlanningReportCommand command) =>
+        public async Task<IActionResult> CreatePlanningReport([FromBody] Application.Features.Reports.PlanningReport.Create.CreatePlanningReportCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
         //Create Reporting Follow Up
         [HttpPost("Create-Reporting-Follow-Up")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<CreateReportingFollowUpCommandResponse>), StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreateReportingFollowUpReport([FromBody] CreateReportingFollowUpCommand command) =>
+        public async Task<IActionResult> CreateReportingFollowUpReport([FromBody] Application.Features.Reports.ReportingFollowUp.Create.CreateReportingFollowUpCommand command) =>
             await ProcessRequestToActionResultAsync(command);
 
 

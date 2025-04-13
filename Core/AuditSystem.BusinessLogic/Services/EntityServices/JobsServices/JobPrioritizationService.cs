@@ -43,4 +43,29 @@ internal sealed class JobPrioritizationService(
             throw new Exception("Failed to create JobPrioritization.", ex);
         }
     }
+
+    public async Task UpdateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
+    {
+        ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
+
+        try
+        {
+            var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.JobPrioritization, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobPrioritizationTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update JobPrioritization.", ex);
+        }
+    }
 }

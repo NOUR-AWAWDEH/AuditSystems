@@ -43,4 +43,29 @@ internal sealed class RiskAssessmentService(
             throw new Exception("Failed to create RiskAssessment.", ex);
         }
     }
+
+    public async Task UpdateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel)
+    {
+        ArgumentNullException.ThrowIfNull(riskAssessmentModel, nameof(riskAssessmentModel));
+
+        try
+        {
+            var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.RiskAssessment, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskAssessmentTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update RiskAssessment.", ex);
+        }
+    }
 }

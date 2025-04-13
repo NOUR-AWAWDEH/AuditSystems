@@ -100,9 +100,14 @@ public sealed class ApiResponse<T> : ApiResponse
         new() { Success = true, StatusCode = StatusCodes.Status201Created, Result = result };
 }
 
-public sealed class ApiErrorResponse(string message)
+public sealed class ApiErrorResponse
 {
-    public string? Message { get; } = message;
+    public ApiErrorResponse(string message)
+    {
+        Message = message;
+    }
+
+    public string? Message { get; }
 
     public override string ToString() => Message ?? string.Empty;
 }

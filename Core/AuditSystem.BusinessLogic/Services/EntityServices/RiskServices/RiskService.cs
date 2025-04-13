@@ -43,4 +43,28 @@ internal sealed class RiskService(
             throw new Exception("Failed to create risk.", ex);
         }
     }
+
+    public async Task UpdateRiskAsync(RiskModel riskModel)
+    {
+        ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
+        try
+        {
+            var entity = mapper.Map<Risk>(riskModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.Risk, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update risk.", ex);
+        }
+    }
 }

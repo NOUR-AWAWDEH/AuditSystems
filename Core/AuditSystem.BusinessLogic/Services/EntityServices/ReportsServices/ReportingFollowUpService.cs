@@ -43,4 +43,29 @@ internal sealed class ReportingFollowUpService(
             throw new Exception("Failed to create ReportingFollowUp.", ex);
         }
     }
+
+    public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
+    {
+        ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
+
+        try
+        {
+            var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ReportingFollowUpTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update ReportingFollowUp.", ex);
+        }
+    }
 }

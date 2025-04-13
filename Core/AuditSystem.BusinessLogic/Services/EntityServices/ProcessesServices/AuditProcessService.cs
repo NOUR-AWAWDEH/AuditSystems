@@ -43,4 +43,29 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to create AuditProcess.", ex);
         }
     }
+
+    public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));
+
+        try
+        {
+            var entity = mapper.Map<AuditProcess>(auditProcessModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.AuditProcess, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditProcessTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditProcess.", ex);
+        }
+    }
 }

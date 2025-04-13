@@ -43,4 +43,30 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception("Failed to create AuditExceptionReport.", ex);
         }
     }
+
+    public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));
+
+        try
+        {
+            var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
+
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditExceptionReportTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditExceptionReport.", ex);
+        }
+    }
 }

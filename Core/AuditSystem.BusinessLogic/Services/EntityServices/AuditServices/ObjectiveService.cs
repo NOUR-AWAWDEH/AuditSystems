@@ -43,4 +43,29 @@ internal class ObjectiveService(
             throw new Exception("Failed to create Objective.", ex);
         }
     }
+
+    public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
+    {
+        ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));
+        
+        try 
+        {
+            var entity = mapper.Map<Objective>(objectiveModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ObjectiveTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update Objective.", ex);
+        }
+    }
 }

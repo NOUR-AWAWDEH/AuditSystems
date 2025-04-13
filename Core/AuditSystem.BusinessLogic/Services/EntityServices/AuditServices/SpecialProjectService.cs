@@ -43,4 +43,29 @@ internal sealed class SpecialProjectService(
             throw new Exception("Failed to create SpecialProject.", ex);
         }
     }
+
+    public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
+    {
+        ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));
+
+        try
+        {
+            var entity = mapper.Map<SpecialProject>(specialProjectModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.SpecialProject, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SpecialProjectTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update SpecialProject.", ex);
+        }
+    }
 }

@@ -43,4 +43,30 @@ internal sealed class SkillCategoryService(
             throw new Exception("Failed to create Skill Category.", ex);
         }
     }
+
+    public async Task UpdateSkillCategoryAsync(SkillCategoryModel skillCategoryModel)
+    {
+        ArgumentNullException.ThrowIfNull(skillCategoryModel, nameof(skillCategoryModel));
+
+        try
+        {
+            var entity = mapper.Map<SkillCategory>(skillCategoryModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.SkillCategory, entity.Id);
+            
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SkillCategoryTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update Skill Category.", ex);
+        }
+    }
 }

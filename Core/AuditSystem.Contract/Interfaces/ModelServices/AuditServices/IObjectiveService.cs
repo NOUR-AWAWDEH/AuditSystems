@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 public interface IObjectiveService
 {
     public Task<Guid> CreateObjectiveAsync(ObjectiveModel objectiveModel);
+    public Task UpdateObjectiveAsync(ObjectiveModel objectiveModel);
 }

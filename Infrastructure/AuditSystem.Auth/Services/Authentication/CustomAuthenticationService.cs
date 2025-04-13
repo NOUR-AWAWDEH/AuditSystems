@@ -151,6 +151,35 @@ public class CustomAuthenticationService : ICustomAuthenticationService
         };
     }
 
+    public async Task<bool> RevokeAllRefreshTokensAsync(string userId)
+    {
+        _logger.LogInformation("RevokeAllRefreshTokensAsync called with userId: {userId}", userId);
+        if (!Guid.TryParse(userId, out var userIdGuid))
+        {
+            _logger.LogWarning("Invalid userId format: {userId}", userId);
+            return false;
+        }
+
+        var tokens = await _applicationDbContext.RefreshTokens
+            .Where(rt => rt.UserId == userIdGuid && !rt.IsRevoked)
+            .ToListAsync();
+
+        if (!tokens.Any())
+        {
+            _logger.LogInformation("No active refresh tokens found for userId: {userId}", userId);
+            return false;
+        }
+
+        foreach (var token in tokens)
+        {
+            token.IsRevoked = true;
+        }
+
+        await _applicationDbContext.SaveChangesAsync();
+        _logger.LogInformation("All refresh tokens revoked successfully for userId: {userId}", userId);
+        return true;
+    }
+
     public async Task<bool> RevokeRefreshTokenAsync(string userId, string refreshToken)
     {
         _logger.LogInformation("RevokeRefreshTokenAsync called with userId: {userId} and refreshToken: {refreshToken}", userId, refreshToken);

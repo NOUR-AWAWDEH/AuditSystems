@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 public interface IAuditExceptionRepotService
 {
     public Task<Guid> CreateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel);
+    public Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel);
 }

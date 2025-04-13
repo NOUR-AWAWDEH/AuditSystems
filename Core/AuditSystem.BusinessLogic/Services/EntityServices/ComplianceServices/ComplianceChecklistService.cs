@@ -44,4 +44,29 @@ internal sealed class ComplianceChecklistService(
             throw new Exception("Failed to create ComplianceChecklist.", ex);
         }
     }
+
+    public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
+    {
+        ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));
+
+        try
+        {
+            var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ComplianceChecklistTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update ComplianceChecklist.", ex);
+        }
+    }
 }

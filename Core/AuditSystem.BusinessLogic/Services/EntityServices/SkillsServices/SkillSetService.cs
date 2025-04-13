@@ -43,4 +43,29 @@ internal sealed class SkillSetService(
             throw new Exception("Failed to create SkillSet.", ex);
         }
     }
+
+    public async Task UpdateSkillSetAsync(SkillSetModel skillSetModel)
+    {
+        ArgumentNullException.ThrowIfNull(skillSetModel, nameof(skillSetModel));
+
+        try
+        {
+            var entity = mapper.Map<SkillSet>(skillSetModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.SkillSet, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SkillSetTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update SkillSet.", ex);
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
@@ -36,17 +37,33 @@ public static class BusinessLogicDependencies
 {
     public static IServiceCollection AddDomain(this IServiceCollection services) =>
         services
-            .AddMapper()
+            .AddMappers()
             .AddServices();
 
-    private static IServiceCollection AddMapper(this IServiceCollection services) =>
-        services
-            .AddAutoMapper(typeof(BusinessLogicDependencies).Assembly);
+    private static IServiceCollection AddMappers(this IServiceCollection services) =>
+    services
+        .AddAutoMapper(typeof(BusinessLogicDependencies).Assembly)
+        .AddAutoMapper(typeof(AuditMappingProfile).Assembly)
+        .AddAutoMapper(typeof(ChecklistMappingProfile).Assembly)
+        .AddAutoMapper(typeof(CommonMappingProfile).Assembly)
+        .AddAutoMapper(typeof(ComplianceMappingProfile).Assembly)
+        .AddAutoMapper(typeof(JobsMappingProfile).Assembly)
+        .AddAutoMapper(typeof(OrganizationMappingProfile).Assembly)
+        .AddAutoMapper(typeof(ProcessMappingProfile).Assembly)
+        .AddAutoMapper(typeof(ReportsMappingProfile).Assembly)
+        .AddAutoMapper(typeof(RiskControlsMappingProfile).Assembly)
+        .AddAutoMapper(typeof(RisksMappingProfile).Assembly)
+        .AddAutoMapper(typeof(SkillsMappingProfile).Assembly)
+        .AddAutoMapper(typeof(SupportingDocsMappingProfile).Assembly)
+        .AddAutoMapper(typeof(TaskManagementMappingProfile).Assembly)
+        .AddAutoMapper(typeof(UserDesignationMappingProfile).Assembly);
+
 
     private static IServiceCollection AddServices(this IServiceCollection services) =>
     services
         .AddScoped<ITransaction, Transaction>()
         .AddScoped<IRiskService, RiskService>()
+
         // Audit Services
         .AddScoped<IAuditDomainService, AuditDomainService>()
         .AddScoped<IAuditEngagementService, AuditEngagementService>()
@@ -56,26 +73,34 @@ public static class BusinessLogicDependencies
         .AddScoped<IBusinessObjectiveService, BusinessObjectiveService>()
         .AddScoped<ISpecialProjectService, SpecialProjectService>()
         .AddScoped<IObjectiveService, ObjectiveService>()
+
         // Checklist Services
         .AddScoped<IChecklistService, ChecklistService>()
         .AddScoped<IRemarkService, RemarkService>()
+        .AddAutoMapper(typeof(ChecklistMappingProfile).Assembly)
+
         // Common Services
         .AddScoped<IRatingService, RatingService>()
+
         // Compliance Services
         .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()
+
         // Jobs Services
         .AddScoped<IAuditJobService, AuditJobService>()
         .AddScoped<IJobPrioritizationService, JobPrioritizationService>()
         .AddScoped<IJobSchedulingService, JobSchedulingService>()
+
         // Organization Services
         .AddScoped<ICompanyService, CompanyService>()
         .AddScoped<IDepartmentService, DepartmentService>()
         .AddScoped<ILocationService, LocationService>()
         .AddScoped<ISubDepartmentService, SubDepartmentService>()
         .AddScoped<ISubLocationService, SubLocationService>()
+
         // Processes Services
         .AddScoped<IAuditProcessService, AuditProcessService>()
         .AddScoped<ISubProcessService, SubProcessService>()
+
         // Reports Services
         .AddScoped<IAuditExceptionRepotService, AuditExceptionRepotService>()
         .AddScoped<IAuditPlanSummaryReportService, AuditPlanSummaryReportService>()
@@ -83,21 +108,27 @@ public static class BusinessLogicDependencies
         .AddScoped<IJobTimeAllocationReportService, JobTimeAllocationReportService>()
         .AddScoped<IPlanningReportService, PlanningReportService>()
         .AddScoped<IReportingFollowUpService, ReportingFollowUpService>()
+
         // Risk Control Services
         .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()
         .AddScoped<IRiskControlService, RiskControlService>()
         .AddScoped<IRiskProgramService, RiskProgramService>()
+
         // Risks Services
         .AddScoped<IRiskAssessmentService, RiskAssessmentService>()
         .AddScoped<IRiskFactorService, RiskFactorService>()
+
         // Skills Services
         .AddScoped<ISkillService, SkillService>()
         .AddScoped<ISkillSetService, SkillSetService>()
         .AddScoped<ISkillCategoryService, SkillCategoryService>()
+
         // Supporting Docs Services
         .AddScoped<ISupportingDocService, SupportingDocService>()
+
         // Tasks Services
         .AddScoped<ITaskManagementService, TaskManagementService>()
+
         // User Desgination Services
         .AddScoped<IUserDesignationService, UserDesignationService>();
 }

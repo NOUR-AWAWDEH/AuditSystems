@@ -1,6 +1,6 @@
-﻿using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
-using FluentValidation;
+﻿using FluentValidation;
 
+namespace AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
 public sealed class CreateAuditPlanSummaryValidator : AbstractValidator<CreateAuditPlanSummaryCommand>
 {
     public CreateAuditPlanSummaryValidator()
@@ -13,7 +13,6 @@ public sealed class CreateAuditPlanSummaryValidator : AbstractValidator<CreateAu
             .WithMessage("The Component must be at least 2 characters long.")
             .MaximumLength(255)
             .WithMessage("The Component must not exceed 255 characters.");
-
 
         RuleFor(x => x.Description)
             .MaximumLength(500)

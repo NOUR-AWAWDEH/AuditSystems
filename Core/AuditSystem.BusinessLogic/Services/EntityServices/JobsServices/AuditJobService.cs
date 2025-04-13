@@ -43,4 +43,29 @@ internal sealed class AuditJobService(
             throw new Exception("Failed to create AuditJob.", ex);
         }
     }
+
+    public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));
+
+        try 
+        {
+            var entity = mapper.Map<AuditJob>(auditJobModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.AuditJob, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditJobTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditJob.", ex);
+        }
+    }
 }

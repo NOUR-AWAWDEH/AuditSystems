@@ -43,4 +43,30 @@ internal sealed class RemarkService(
             throw new Exception("Failed to create Remark.", ex);
         }
     }
+
+    public async Task UpdateRemarkAsync(RemarkModel remarkModel)
+    {
+        ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));
+
+        try
+        {
+            var entity = mapper.Map<Remark>(remarkModel);
+
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.Remark, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RemarkTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update Remark.", ex);
+        }
+    }
 }

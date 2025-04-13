@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 public interface IRiskFactorService
 {
     public Task<Guid> CreateRiskFactorAsync(RiskFactorModel riskFactorModel);
+    public Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel);
 }

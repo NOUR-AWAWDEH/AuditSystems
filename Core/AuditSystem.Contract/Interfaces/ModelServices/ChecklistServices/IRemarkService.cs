@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 public interface IRemarkService
 {
     public Task<Guid> CreateRemarkAsync(RemarkModel remarkModel);
+    public Task UpdateRemarkAsync(RemarkModel remarkModel);
 }

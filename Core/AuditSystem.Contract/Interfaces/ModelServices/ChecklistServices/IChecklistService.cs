@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 public interface IChecklistService
 {
     public Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel);
+    public Task UpdateChecklistAsync(ChecklistModel checklistModel);
 }

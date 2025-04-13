@@ -43,4 +43,29 @@ internal sealed class SupportingDocService(
             throw new Exception("Failed to create SupportingDoc.", ex);
         }
     }
+
+    public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)
+    {
+        ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));
+
+        try
+        {
+            var entity = mapper.Map<SupportingDoc>(supportingDocModel);
+            await repository.UpdateAsync(entity);
+            
+            var cacheKey = string.Format(CacheKeys.SupportingDoc, entity.Id);
+            
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SupportingDocTags,
+                expiration: CacheExpirations.MediumTerm);
+            
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update SupportingDoc.", ex);
+        }
+    }
 }

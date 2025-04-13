@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 public interface IAuditEngagementService
 {
     public Task<Guid> CreateAuditEngagementAsync(AuditEngagementModel auditEngagementModel);
+    public Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel);
 }

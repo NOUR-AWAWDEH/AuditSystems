@@ -43,4 +43,29 @@ internal sealed class AuditUniverseService(
             throw new Exception("Failed to create AuditUniverse.", ex);
         }
     }
+
+    public async Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
+    {
+        ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
+
+        try 
+        {
+            var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.AuditUniverse, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditUniverseTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update AuditUniverse.", ex);
+        }
+    }
 }

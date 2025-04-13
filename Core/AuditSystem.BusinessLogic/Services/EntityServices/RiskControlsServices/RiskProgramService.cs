@@ -43,4 +43,29 @@ internal sealed class RiskProgramService(
             throw new Exception("Failed to create RiskProgram.", ex);
         }
     }
+
+    public async Task UpdateRiskProgramAsync(RiskProgramModel riskProgramModel)
+    {
+        ArgumentNullException.ThrowIfNull(riskProgramModel, nameof(riskProgramModel));
+
+        try
+        {
+            var entity = mapper.Map<RiskProgram>(riskProgramModel);
+            await repository.UpdateAsync(entity);
+
+            var cacheKey = string.Format(CacheKeys.RiskProgram, entity.Id);
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskProgramTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to update RiskProgram.", ex);
+        }
+    }
 }

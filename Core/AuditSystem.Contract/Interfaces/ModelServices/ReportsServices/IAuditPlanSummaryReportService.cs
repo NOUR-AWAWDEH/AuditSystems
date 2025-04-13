@@ -5,4 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 public interface IAuditPlanSummaryReportService
 {
     public Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel);
+    public Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel);
 }

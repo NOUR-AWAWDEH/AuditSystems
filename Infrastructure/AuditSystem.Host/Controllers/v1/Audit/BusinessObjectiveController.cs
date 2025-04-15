@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Create;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class BusinessObjectiveController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateBusinessObjective([FromBody] UpdateBusinessObjectiveCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

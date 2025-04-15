@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Create;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class AuditExceptionReportController(IMediator mediator) : ApiCont
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateReport([FromBody] UpdateAuditExceptionReportCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

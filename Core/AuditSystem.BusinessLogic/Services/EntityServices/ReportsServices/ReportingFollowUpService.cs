@@ -44,6 +44,28 @@ internal sealed class ReportingFollowUpService(
         }
     }
 
+    public async Task DeleteReportingFollowUpAsync(Guid reportingFollowUpId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(reportingFollowUpId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"ReportingFollowUp with ID {reportingFollowUpId} not found.");
+            }
+
+            await repository.DeleteAsync(reportingFollowUpId);
+            
+            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, reportingFollowUpId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete ReportingFollowUp.", ex);
+        }
+    }
+
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));

@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.Skills.SkillSet.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class SkillSetController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSkillSet([FromBody] UpdateSkillSetCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

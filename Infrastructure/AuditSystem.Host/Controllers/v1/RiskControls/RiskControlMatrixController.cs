@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create;
 using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class RiskControlMatrixController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskControlMatrix([FromBody] UpdateRiskControlMatrixCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

@@ -44,6 +44,28 @@ internal sealed class RiskControlMatrixService(
         }
     }
 
+    public async Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(riskControlMatrixId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskControlMatrix with ID {riskControlMatrixId} not found.");
+            }
+
+            await repository.DeleteAsync(riskControlMatrixId);
+
+            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, riskControlMatrixId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete RiskControlMatrix.", ex);
+        }
+    }
+
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));
@@ -52,15 +74,15 @@ internal sealed class RiskControlMatrixService(
         {
             var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.RiskControlMatrix, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: RiskControlMatrixTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

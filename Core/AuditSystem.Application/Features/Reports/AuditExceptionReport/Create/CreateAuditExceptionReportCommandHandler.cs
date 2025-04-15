@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Create;
 
 internal sealed class CreateAuditExceptionReportCommandHandler(
-    IAuditExceptionRepotService auditExceptionRepotService,
+    IAuditExceptionReportService auditExceptionRepotService,
     IMapper mapper,
     ILogger<CreateAuditExceptionReportCommandHandler> logger)
     : IRequestHandler<CreateAuditExceptionReportCommand, Result<CreateAuditExceptionReportCommandResponse>>

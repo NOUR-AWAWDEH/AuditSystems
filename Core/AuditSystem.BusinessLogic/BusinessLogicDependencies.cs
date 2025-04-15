@@ -102,7 +102,7 @@ public static class BusinessLogicDependencies
         .AddScoped<ISubProcessService, SubProcessService>()
 
         // Reports Services
-        .AddScoped<IAuditExceptionRepotService, AuditExceptionRepotService>()
+        .AddScoped<IAuditExceptionReportService, AuditExceptionRepotService>()
         .AddScoped<IAuditPlanSummaryReportService, AuditPlanSummaryReportService>()
         .AddScoped<IInternalAuditConsolidationReportService, InternalAuditConsolidationReportService>()
         .AddScoped<IJobTimeAllocationReportService, JobTimeAllocationReportService>()

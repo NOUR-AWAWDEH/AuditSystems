@@ -44,6 +44,28 @@ internal sealed class AuditProcessService(
         }
     }
 
+    public async Task DeleteAuditProcessAsync(Guid auditProcessId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(auditProcessId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditProcess with ID {auditProcessId} not found.");
+            }
+
+            await repository.DeleteAsync(auditProcessId);
+
+            var cacheKey = string.Format(CacheKeys.AuditProcess, auditProcessId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete AuditProcess.", ex);
+        }
+    }
+
     public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
     {
         ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));

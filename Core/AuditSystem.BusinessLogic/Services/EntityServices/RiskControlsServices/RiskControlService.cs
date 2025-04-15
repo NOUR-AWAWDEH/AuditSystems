@@ -44,23 +44,45 @@ internal sealed class RiskControlService(
         }
     }
 
+    public async Task DeleteRiskControlAsync(Guid riskControlId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(riskControlId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskControl with ID {riskControlId} not found.");
+            }
+
+            await repository.DeleteAsync(riskControlId);
+
+            var cacheKey = string.Format(CacheKeys.RiskControl, riskControlId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete RiskControl.", ex);
+        }
+    }
+
     public async Task UpdateRiskControlAsync(RiskControlsModel riskControlModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
-        
+
         try
         {
             var entity = mapper.Map<RiskControls>(riskControlModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.RiskControl, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: RiskControlTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

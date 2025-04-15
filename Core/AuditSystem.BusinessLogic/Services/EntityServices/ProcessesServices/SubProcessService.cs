@@ -44,6 +44,28 @@ internal sealed class SubProcessService(
         }
     }
 
+    public async Task DeleteSubProcessAsync(Guid subProcessId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(subProcessId);
+            if (entity == null)
+            {
+                throw new Exception("SubProcess not found.");
+            }
+
+            await repository.DeleteAsync(subProcessId);
+
+            var cacheKey = string.Format(CacheKeys.SubProcess, subProcessId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SubProcess.", ex);
+        }
+    }
+
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)
     {
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));

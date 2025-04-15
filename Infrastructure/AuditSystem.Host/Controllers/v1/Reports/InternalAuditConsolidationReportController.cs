@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Create;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class InternalAuditConsolidationReportController(IMediator mediato
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateInternalAuditConsolidatedReport([FromBody] UpdateInternalAuditConsolidationReportCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

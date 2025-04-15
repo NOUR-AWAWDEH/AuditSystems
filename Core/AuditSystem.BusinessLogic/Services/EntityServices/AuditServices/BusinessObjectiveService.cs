@@ -44,6 +44,28 @@ internal sealed class BusinessObjectiveService(
         }
     }
 
+    public async Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(businessObjectiveId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"BusinessObjective with ID {businessObjectiveId} not found.");
+            }
+            
+            await repository.DeleteAsync(businessObjectiveId);
+            
+            var cacheKey = string.Format(CacheKeys.BusinessObjective, businessObjectiveId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete BusinessObjective.", ex);
+        }
+    }
+
     public async Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));

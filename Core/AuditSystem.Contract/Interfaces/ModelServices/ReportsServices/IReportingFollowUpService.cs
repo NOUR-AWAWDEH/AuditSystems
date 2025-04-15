@@ -6,4 +6,5 @@ public interface IReportingFollowUpService
 {
     public Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel);
     public Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel);
+    public Task DeleteReportingFollowUpAsync(Guid reportingFollowUpId);
 }

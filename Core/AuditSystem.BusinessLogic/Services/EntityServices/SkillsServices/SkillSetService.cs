@@ -44,6 +44,28 @@ internal sealed class SkillSetService(
         }
     }
 
+    public async Task DeleteSkillSetAsync(Guid skillSetId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(skillSetId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SkillSet with ID {skillSetId} not found.");
+            }
+
+            await repository.DeleteAsync(skillSetId);
+
+            var cacheKey = string.Format(CacheKeys.SkillSet, skillSetId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SkillSet.", ex);
+        }
+    }
+
     public async Task UpdateSkillSetAsync(SkillSetModel skillSetModel)
     {
         ArgumentNullException.ThrowIfNull(skillSetModel, nameof(skillSetModel));
@@ -52,15 +74,15 @@ internal sealed class SkillSetService(
         {
             var entity = mapper.Map<SkillSet>(skillSetModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.SkillSet, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: SkillSetTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

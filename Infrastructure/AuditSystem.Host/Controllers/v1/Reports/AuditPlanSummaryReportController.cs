@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Create;
 using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class AuditPlanSummaryReportController(IMediator mediator) : ApiCo
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditPlanSummaryReport([FromBody] UpdateAuditPlanSummaryReportCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

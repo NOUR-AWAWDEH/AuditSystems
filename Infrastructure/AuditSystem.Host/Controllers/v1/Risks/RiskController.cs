@@ -1,4 +1,5 @@
-﻿using AuditSystem.Application.Features.Risks.Risk.Create;
+﻿using Ardalis.Result;
+using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.Risk.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -24,5 +25,5 @@ public sealed class RiskController(IMediator mediator) : ApiControllerBase(media
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRisk([FromBody] UpdateRiskCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

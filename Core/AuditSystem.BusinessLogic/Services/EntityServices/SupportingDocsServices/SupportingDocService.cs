@@ -44,6 +44,28 @@ internal sealed class SupportingDocService(
         }
     }
 
+    public async Task DeleteSupportingDocAsync(Guid supportingDocId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(supportingDocId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SupportingDoc with ID {supportingDocId} not found.");
+            }
+
+            await repository.DeleteAsync(supportingDocId);
+
+            var cacheKey = string.Format(CacheKeys.SupportingDoc, supportingDocId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SupportingDoc.", ex);
+        }
+    }
+
     public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
         ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));
@@ -52,15 +74,15 @@ internal sealed class SupportingDocService(
         {
             var entity = mapper.Map<SupportingDoc>(supportingDocModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.SupportingDoc, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: SupportingDocTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

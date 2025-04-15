@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.Objective.Create;
 using AuditSystem.Application.Features.Audit.Objective.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateObjective([FromBody] UpdateObjectiveCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

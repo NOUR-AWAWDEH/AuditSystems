@@ -44,6 +44,28 @@ internal sealed class RiskFactorService(
         }
     }
 
+    public async Task DeleteRiskFactorAsync(Guid riskFactorId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(riskFactorId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskFactor with ID {riskFactorId} not found.");
+            }
+
+            await repository.DeleteAsync(riskFactorId);
+            
+            var cacheKey = string.Format(CacheKeys.RiskFactor, riskFactorId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete RiskFactor.", ex);
+        }
+    }
+
     public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)
     {
         ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));

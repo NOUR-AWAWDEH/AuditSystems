@@ -44,6 +44,28 @@ internal sealed class UserDesignationService(
         }
     }
 
+    public async Task DeleteUserDesignationAsync(Guid userDesignationId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(userDesignationId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"UserDesignation with ID {userDesignationId} not found.");
+            }
+
+            await repository.DeleteAsync(userDesignationId);
+
+            var cacheKey = string.Format(CacheKeys.UserDesignation, userDesignationId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete User Designation.", ex);
+        }
+    }
+
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)
     {
         ArgumentNullException.ThrowIfNull(userDesignationModel, nameof(userDesignationModel));

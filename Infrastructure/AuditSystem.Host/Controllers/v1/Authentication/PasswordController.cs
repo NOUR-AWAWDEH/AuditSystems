@@ -51,7 +51,7 @@ public class PasswordController : ControllerBase
 
         await _emailService.SendEmailAsync(new PasswordResetEmailRequest(
             email: request.Email,
-            userName: user.UserName,
+            userName: user.UserName ?? string.Empty,
             resetCode: resetCode,
             supportEmail: "support@yourapp.com"
         ));

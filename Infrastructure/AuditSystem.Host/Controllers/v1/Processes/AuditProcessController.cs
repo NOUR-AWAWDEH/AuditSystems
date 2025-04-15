@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Processes.AuditProcess.Creat;
 using AuditSystem.Application.Features.Processes.AuditProcess.Create;
 using AuditSystem.Application.Features.Processes.AuditProcess.Update;
@@ -25,5 +26,5 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditProcess([FromBody] UpdateAuditProcessCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

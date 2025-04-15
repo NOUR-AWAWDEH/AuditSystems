@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Create;
 using AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class JobTimeAllocationReportController(IMediator mediator) : ApiC
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateJobTimeAllocationReport([FromBody] UpdateJobTimeAllocationReportCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

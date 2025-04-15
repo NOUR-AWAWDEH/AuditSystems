@@ -1,9 +1,11 @@
 using AuditSystem.Application.Features.Audit.AuditDomain.Create;
+using AuditSystem.Application.Features.Audit.AuditDomain.Delete;
 using AuditSystem.Application.Features.Audit.AuditDomain.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ardalis.Result;
 
 namespace AuditSystem.Host.Controllers.v1.Audit;
 
@@ -24,5 +26,12 @@ public sealed class AuditDomainController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateTenant([FromBody] UpdateAuditDomainCommand command) =>
-    await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Delete Audit Domain
+    [HttpDelete("delete-audit-domain")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteTenant([FromBody] DeleteAuditDomainCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Jobs.JobPrioritization.Create;
 using AuditSystem.Application.Features.Jobs.JobPrioritization.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class JobPrioritizationController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateJobPrioritization([FromBody] UpdateJobPrioritizationCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Risks.RiskFactor.Create;
 using AuditSystem.Application.Features.Risks.RiskFactor.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class RiskFactorController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskFactor([FromBody] UpdateRiskFactorCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

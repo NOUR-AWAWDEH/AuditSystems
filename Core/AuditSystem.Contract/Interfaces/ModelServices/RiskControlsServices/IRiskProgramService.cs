@@ -6,4 +6,5 @@ public interface IRiskProgramService
 {
     public Task<Guid> CreateRiskProgramAsync(RiskProgramModel riskProgramModel);
     public Task UpdateRiskProgramAsync(RiskProgramModel riskProgramModel);
+    public Task DeleteRiskProgramAsync(Guid riskProgramId);
 }

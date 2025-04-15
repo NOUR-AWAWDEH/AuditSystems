@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+using Ardalis.Result;
 using AuditSystem.Application.Features.Checklists.Checklist.Create;
 using AuditSystem.Application.Features.Checklists.Checklist.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +26,5 @@ public sealed class ChecklistController(IMediator mediator) : ApiControllerBase(
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateChecklist([FromBody] UpdateChecklistCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

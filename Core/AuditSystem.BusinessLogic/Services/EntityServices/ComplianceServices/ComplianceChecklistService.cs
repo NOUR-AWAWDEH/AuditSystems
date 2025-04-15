@@ -45,6 +45,28 @@ internal sealed class ComplianceChecklistService(
         }
     }
 
+    public async Task DeleteComplianceChecklistAsync(Guid complianceChecklistId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(complianceChecklistId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"ComplianceChecklist with ID {complianceChecklistId} not found.");
+            }
+            
+            await repository.DeleteAsync(complianceChecklistId);
+
+            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, complianceChecklistId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete ComplianceChecklist.", ex);
+        }
+    }
+
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));

@@ -6,4 +6,5 @@ public interface ISkillService
 {
     public Task<Guid> CreateSkillAsync(SkillModel skillModel);
     public Task UpdateSkillAsync(SkillModel skillModel);
+    public Task DeleteSkillAsync(Guid skillId);
 }

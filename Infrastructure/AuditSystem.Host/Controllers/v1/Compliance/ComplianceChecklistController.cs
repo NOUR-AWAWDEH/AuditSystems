@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class ComplianceChecklistController(IMediator mediator) : ApiContr
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompliance([FromBody] UpdateComplianceChecklistCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

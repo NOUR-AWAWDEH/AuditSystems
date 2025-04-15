@@ -44,6 +44,28 @@ internal sealed class SubLocationService(
         }
     }
 
+    public async Task DeleteSubLocationAsync(Guid subLocationId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(subLocationId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SubLocation with ID {subLocationId} not found.");
+            }
+
+            await repository.DeleteAsync(subLocationId);
+            
+            var cacheKey = string.Format(CacheKeys.SubLocation, subLocationId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SubLocation.", ex);
+        }
+    }
+
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));

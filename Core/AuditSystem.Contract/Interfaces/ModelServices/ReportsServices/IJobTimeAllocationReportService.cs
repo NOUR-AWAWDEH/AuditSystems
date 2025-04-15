@@ -6,4 +6,5 @@ public interface IJobTimeAllocationReportService
 {
     public Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel);
     public Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel);
+    public Task DeleteJobTimeAllocationReportAsync(Guid jobTimeAllocationReportId);
 }

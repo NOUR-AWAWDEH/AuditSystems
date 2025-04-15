@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Skills.SkillCategory.Create;
 using AuditSystem.Application.Features.Skills.SkillCategory.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class SkillCategoryController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSkillCategory([FromBody] UpdateSkillCategoryCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

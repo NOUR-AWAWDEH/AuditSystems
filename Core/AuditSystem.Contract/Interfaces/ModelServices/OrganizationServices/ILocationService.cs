@@ -6,4 +6,5 @@ public interface ILocationService
 {
     public Task<Guid> CreateLocationAsync(LocationModel locationModel);
     public Task UpdateLocationAsync(LocationModel locationModel);
+    public Task DeleteLocationAsync(Guid locationId);
 }

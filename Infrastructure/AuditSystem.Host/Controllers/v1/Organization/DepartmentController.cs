@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.Department.Create;
 using AuditSystem.Application.Features.Organisation.Department.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

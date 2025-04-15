@@ -44,6 +44,27 @@ internal sealed class SkillService(
         }
     }
 
+    public async Task DeleteSkillAsync(Guid skillId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(skillId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Skill with ID {skillId} not found.");
+            }
+            await repository.DeleteAsync(skillId);
+
+            var cacheKey = string.Format(CacheKeys.Skill, skillId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Skill.", ex);
+        }
+    }
+
     public async Task UpdateSkillAsync(SkillModel skillModel)
     {
         ArgumentNullException.ThrowIfNull(skillModel, nameof(skillModel));

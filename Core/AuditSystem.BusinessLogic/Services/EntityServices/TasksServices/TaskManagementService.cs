@@ -44,23 +44,46 @@ internal sealed class TaskManagementService(
         }
     }
 
+    public async Task DeleteTaskAsync(Guid taskManagementId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(taskManagementId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"TaskManagement with ID {taskManagementId} not found.");
+            }
+
+            await repository.DeleteAsync(taskManagementId);
+
+            var cacheKey = string.Format(CacheKeys.TaskManagement, taskManagementId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete TaskManagement.", ex);
+        }
+
+    }
+
     public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)
     {
         ArgumentNullException.ThrowIfNull(taskManagementModel, nameof(taskManagementModel));
-        
-        try 
+
+        try
         {
             var entity = mapper.Map<TaskManagement>(taskManagementModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.TaskManagement, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: TaskManagementTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

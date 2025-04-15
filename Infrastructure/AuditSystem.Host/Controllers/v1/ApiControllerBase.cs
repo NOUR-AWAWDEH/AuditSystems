@@ -1,38 +1,21 @@
 using Ardalis.Result;
-using AuditSystem.Host.Responses;
+using AuditSystem.Host.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AuditSystem.Host.Controllers;
+namespace AuditSystem.Host.Controllers.v1;
 
-public abstract class ApiControllerBase : ControllerBase
+public abstract class ApiControllerBase(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    protected ApiControllerBase(IMediator mediator)
+    public async Task<IActionResult> ProcessRequestToActionResultAsync<TResponse>(IRequest<Result<TResponse>> request)
     {
-        _mediator = mediator;
+        var response = await mediator.Send(request);
+        return response.ToActionResult();
     }
 
-    protected async Task<IActionResult> ProcessRequestToActionResultAsync<TResponse>(IRequest<Result<TResponse>> request)
+    public async Task<IActionResult> ProcessRequestToActionNoContentResultAsync<TResponse>(IRequest<Result> request)
     {
-        var response = await _mediator.Send(request);
-
-        if (!response.IsSuccess)
-            return BadRequest(ApiResponse<TResponse>.BadRequest(response.Errors.Select(e => new ApiErrorResponse(e))));
-
-        return Ok(ApiResponse<TResponse>.Ok(response.Value!, "Request processed successfully"));
-    }
-
-    protected async Task<IActionResult> ProcessRequestToActionNoContentResultAsync(
-        IRequest<Result> request,
-        string successMessage = "Operation completed successfully")
-    {
-        var response = await _mediator.Send(request);
-
-        if (!response.IsSuccess)
-            return BadRequest(ApiResponse.BadRequest(response.Errors.Select(e => new ApiErrorResponse(e))));
-
-        return Ok(ApiResponse.Ok(successMessage));
+        var response = await mediator.Send(request);
+        return response.ToActionResult();
     }
 }

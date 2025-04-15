@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Tasks.Create;
 using AuditSystem.Application.Features.Tasks.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class TaskManagementController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateTaskManagement([FromBody] UpdateTaskManagementCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

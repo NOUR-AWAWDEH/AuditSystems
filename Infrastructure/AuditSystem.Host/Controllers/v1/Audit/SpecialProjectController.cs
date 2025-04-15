@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.SpecialProject.Create;
 using AuditSystem.Application.Features.Audit.SpecialProject.Update;
 using AuditSystem.Host.Responses;
@@ -24,6 +25,6 @@ public sealed class SpecialProjectController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSpecialProject([FromBody] UpdateSpecialProjectCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
 }

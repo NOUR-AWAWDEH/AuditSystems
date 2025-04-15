@@ -44,6 +44,29 @@ internal sealed class RemarkService(
         }
     }
 
+    public async Task DeleteRemarkAsync(Guid remarkId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(remarkId);
+            if (entity is null)
+            {
+                throw new KeyNotFoundException($"Remark with ID {remarkId} not found.");
+            }
+
+            await repository.DeleteAsync(remarkId);
+
+            var cacheKey = string.Format(CacheKeys.Remark, remarkId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Remark.", ex);
+        }
+
+    }
+
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));

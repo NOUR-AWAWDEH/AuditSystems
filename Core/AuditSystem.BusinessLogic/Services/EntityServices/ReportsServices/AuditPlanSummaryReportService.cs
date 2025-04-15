@@ -44,6 +44,28 @@ internal sealed class AuditPlanSummaryReportService(
         }
     }
 
+    public async Task DeleteAuditPlanSummaryReportAsync(Guid auditPlanSummaryReportId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(auditPlanSummaryReportId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditPlanSummaryReport with ID {auditPlanSummaryReportId} not found.");
+            }
+
+            await repository.DeleteAsync(auditPlanSummaryReportId);
+
+            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, auditPlanSummaryReportId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete AuditPlanSummaryReport.", ex);
+        }
+    }
+
     public async Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));

@@ -44,6 +44,28 @@ internal sealed class SubDepartmentService(
         }
     }
 
+    public async Task DeleteSubDepartmentAsync(Guid subDepartmentId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(subDepartmentId);
+            if (entity == null)
+            {
+               throw new KeyNotFoundException($"SubDepartment with ID {subDepartmentId} not found.");
+            }
+
+            await repository.DeleteAsync(subDepartmentId);
+
+            var cacheKey = string.Format(CacheKeys.SubDepartment, subDepartmentId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SubDepartment.", ex);
+        }
+    }
+
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)
     {
         ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));

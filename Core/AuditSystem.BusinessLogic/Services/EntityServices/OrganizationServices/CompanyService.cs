@@ -45,6 +45,28 @@ internal sealed class CompanyService(
         }
     }
 
+    public async Task DeleteCompanyAsync(Guid companyId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(companyId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Company with ID {companyId} not found.");
+            }
+            
+            await repository.DeleteAsync(companyId);
+            
+            var cacheKey = string.Format(CacheKeys.Company, companyId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Company.", ex);
+        }
+    }
+
     public async Task UpdateCompanyAsync(CompanyModel companyModel)
     {
         ArgumentNullException.ThrowIfNull(companyModel, nameof(companyModel));

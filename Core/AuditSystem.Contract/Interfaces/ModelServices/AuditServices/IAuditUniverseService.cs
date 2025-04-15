@@ -6,4 +6,5 @@ public interface IAuditUniverseService
 {
     public Task<Guid> CreateAuditUniverseAsync(AuditUniverseModel auditUniverseModel);
     public Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel);
+    public Task DeleteAuditUniverseAsync(Guid auditUniverseId);
 }

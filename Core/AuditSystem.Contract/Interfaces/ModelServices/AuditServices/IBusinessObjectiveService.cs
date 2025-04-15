@@ -6,4 +6,5 @@ public interface IBusinessObjectiveService
 {
     public Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel);
     public Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel);
+    public Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId);
 }

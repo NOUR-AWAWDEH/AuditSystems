@@ -44,6 +44,28 @@ internal sealed class LocationService(
         }
     }
 
+    public async Task DeleteLocationAsync(Guid locationId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(locationId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Location with ID {locationId} not found.");
+            }
+            
+            await repository.DeleteAsync(locationId);
+            
+            var cacheKey = string.Format(CacheKeys.Location, locationId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Location.", ex);
+        }
+    }
+
     public async Task UpdateLocationAsync(LocationModel locationModel)
     {
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));

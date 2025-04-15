@@ -45,6 +45,28 @@ internal sealed class ChecklistService(
         }
     }
 
+    public async Task DeleteChecklistAsync(Guid checklistId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(checklistId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Checklist with ID {checklistId} not found.");
+            }
+
+            await repository.DeleteAsync(checklistId);
+
+            var cacheKey = string.Format(CacheKeys.Checklist, checklistId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Checklist.", ex);
+        }
+    }
+
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));

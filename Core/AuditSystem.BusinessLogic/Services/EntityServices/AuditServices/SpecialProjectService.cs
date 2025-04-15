@@ -44,6 +44,28 @@ internal sealed class SpecialProjectService(
         }
     }
 
+    public async Task DeleteSpecialProjectAsync(Guid specialProjectId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(specialProjectId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SpecialProject with ID {specialProjectId} not found.");
+            }
+            
+            await repository.DeleteAsync(specialProjectId);
+            
+            var cacheKey = string.Format(CacheKeys.SpecialProject, specialProjectId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete SpecialProject.", ex);
+        }
+    }
+
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));

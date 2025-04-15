@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class AuditUniverseObjectiveController(IMediator mediator) : ApiCo
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditUniverseObjective([FromBody] UpdateAuditUniverseObjectiveCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

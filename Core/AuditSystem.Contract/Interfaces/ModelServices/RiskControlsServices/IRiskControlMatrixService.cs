@@ -6,4 +6,5 @@ public interface IRiskControlMatrixService
 {
     public Task<Guid> CreateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel);
     public Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel);
+    public Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId);
 }

@@ -44,6 +44,28 @@ internal sealed class SkillCategoryService(
         }
     }
 
+    public async Task DeleteSkillCategoryAsync(Guid skillCategoryId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(skillCategoryId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Skill Category with ID {skillCategoryId} not found.");
+            }
+
+            await repository.DeleteAsync(skillCategoryId);
+
+            var cacheKey = string.Format(CacheKeys.SkillCategory, skillCategoryId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Skill Category.", ex);
+        }
+    }
+
     public async Task UpdateSkillCategoryAsync(SkillCategoryModel skillCategoryModel)
     {
         ArgumentNullException.ThrowIfNull(skillCategoryModel, nameof(skillCategoryModel));
@@ -52,16 +74,16 @@ internal sealed class SkillCategoryService(
         {
             var entity = mapper.Map<SkillCategory>(skillCategoryModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.SkillCategory, entity.Id);
-            
-            
+
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: SkillCategoryTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

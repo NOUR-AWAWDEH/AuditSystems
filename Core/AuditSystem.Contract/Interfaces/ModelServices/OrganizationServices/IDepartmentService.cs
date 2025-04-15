@@ -6,4 +6,5 @@ public interface IDepartmentService
 {
     public Task<Guid> CreateDepartmentAsync(DepartmentModel departmentModel);
     public Task UpdateDepartmentAsync(DepartmentModel departmentModel);
+    public Task DeleteDepartmentAsync(Guid departmentId);
 }

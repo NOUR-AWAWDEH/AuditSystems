@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Common.Rating.Create;
 using AuditSystem.Application.Features.Common.Rating.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class RatingController(IMediator mediator) : ApiControllerBase(med
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRating([FromBody] UpdateRatingCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

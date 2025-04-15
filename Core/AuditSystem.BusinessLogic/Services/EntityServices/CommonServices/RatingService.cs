@@ -44,6 +44,28 @@ internal sealed class RatingService(
         }
     }
 
+    public async Task DeleteRatingAsync(Guid ratingId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(ratingId);
+            if (entity is null)
+            {
+                throw new KeyNotFoundException($"Rating with ID {ratingId} not found.");
+            }
+            
+            await repository.DeleteAsync(ratingId);
+            
+            var cacheKey = string.Format(CacheKeys.Rating, ratingId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Rating.", ex);
+        }
+    }
+
     public async Task UpdateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));

@@ -6,5 +6,6 @@ public interface IAuditJobService
 {
     public Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel);
     public Task UpdateAuditJobAsync(AuditJobModel auditJobModel);
+    public Task DeleteAuditJobAsync(Guid auditJobId);
 
 }

@@ -44,6 +44,28 @@ internal class ObjectiveService(
         }
     }
 
+    public async Task DeleteObjectiveAsync(Guid objectiveId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(objectiveId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
+            }
+            
+            await repository.DeleteAsync(objectiveId);
+            
+            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete Objective.", ex);
+        }
+    }
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));

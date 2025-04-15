@@ -44,6 +44,28 @@ internal sealed class RiskAssessmentService(
         }
     }
 
+    public async Task DeleteRiskAssessmentAsync(Guid riskAssessmentId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(riskAssessmentId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskAssessment with ID {riskAssessmentId} not found.");
+            }
+
+            await repository.DeleteAsync(riskAssessmentId);
+
+            var cacheKey = string.Format(CacheKeys.RiskAssessment, riskAssessmentId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete RiskAssessment.", ex);
+        }
+    }
+
     public async Task UpdateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel)
     {
         ArgumentNullException.ThrowIfNull(riskAssessmentModel, nameof(riskAssessmentModel));
@@ -52,15 +74,15 @@ internal sealed class RiskAssessmentService(
         {
             var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
             await repository.UpdateAsync(entity);
-            
+
             var cacheKey = string.Format(CacheKeys.RiskAssessment, entity.Id);
-            
+
             await cacheService.SetAsync(
                 key: cacheKey,
                 value: entity,
                 tags: RiskAssessmentTags,
                 expiration: CacheExpirations.MediumTerm);
-            
+
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }
         catch (Exception ex)

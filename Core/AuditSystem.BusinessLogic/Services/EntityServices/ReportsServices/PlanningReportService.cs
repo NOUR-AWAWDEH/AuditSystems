@@ -44,6 +44,28 @@ internal sealed class PlanningReportService(
         }
     }
 
+    public async Task DeletePlanningReportAsync(Guid planningReportId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(planningReportId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"PlanningReport with ID {planningReportId} not found.");
+            }
+
+            await repository.DeleteAsync(planningReportId);
+
+            var cacheKey = string.Format(CacheKeys.PlanningReport, planningReportId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete PlanningReport.", ex);
+        }
+    }
+
     public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
         ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));

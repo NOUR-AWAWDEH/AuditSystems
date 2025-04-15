@@ -6,4 +6,5 @@ public interface IAuditPlanSummaryReportService
 {
     public Task<Guid> CreateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel);
     public Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel);
+    public Task DeleteAuditPlanSummaryReportAsync(Guid auditPlanSummaryReportId);
 }

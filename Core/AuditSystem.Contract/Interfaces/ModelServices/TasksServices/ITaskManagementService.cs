@@ -6,4 +6,5 @@ public interface ITaskManagementService
 {
     public Task<Guid> CreateTaskAsync(TaskManagementModel taskManagementModel);
     public Task UpdateTaskAsync(TaskManagementModel taskManagementModel);
+    public Task DeleteTaskAsync(Guid taskManagementId);
 }

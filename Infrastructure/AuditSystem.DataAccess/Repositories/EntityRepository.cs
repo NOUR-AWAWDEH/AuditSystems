@@ -27,7 +27,7 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         entities.ToList().ForEach(e => context.Entry(e).State = EntityState.Detached);
     }
 
-    public async Task<TEntity?> GetAsync(TId id)
+    public async Task<TEntity?> GetByIdAsync(TId id)
     {
         return await _entities.FindAsync(id);
     }
@@ -50,7 +50,7 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
 
     public async Task DeleteAsync(TId id)
     {
-        var entity = await GetAsync(id);
+        var entity = await GetByIdAsync(id);
         if (entity != null)
         {
             _entities.Remove(entity);

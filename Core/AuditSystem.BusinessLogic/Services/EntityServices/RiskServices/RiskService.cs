@@ -44,6 +44,28 @@ internal sealed class RiskService(
         }
     }
 
+    public async Task DeleteRiskAsync(Guid riskId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(riskId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Risk with ID {riskId} not found.");
+            }
+            
+            await repository.DeleteAsync(riskId);
+            
+            var cacheKey = string.Format(CacheKeys.Risk, riskId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete risk.", ex);
+        }
+    }
+
     public async Task UpdateRiskAsync(RiskModel riskModel)
     {
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));

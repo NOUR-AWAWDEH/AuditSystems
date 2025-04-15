@@ -44,6 +44,28 @@ internal sealed class JobPrioritizationService(
         }
     }
 
+    public async Task DeleteJobPrioritizationAsync(Guid jobPrioritizationId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(jobPrioritizationId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobPrioritization with ID {jobPrioritizationId} not found.");
+            }
+
+            await repository.DeleteAsync(jobPrioritizationId);
+
+            var cacheKey = string.Format(CacheKeys.JobPrioritization, jobPrioritizationId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete JobPrioritization.", ex);
+        }
+    }
+
     public async Task UpdateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));

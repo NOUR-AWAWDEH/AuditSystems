@@ -6,4 +6,5 @@ public interface IRatingService
 {
     public Task<Guid> CreateRatingAsync(RatingModel ratingModel);
     public Task UpdateRatingAsync(RatingModel ratingModel);
+    public Task DeleteRatingAsync(Guid ratingId);
 }

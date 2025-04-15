@@ -44,6 +44,28 @@ internal sealed class AuditUniverseObjectiveService(
         }
     }
 
+    public async Task DeleteAuditUniverseObjectiveAsync(Guid auditUniverseObjectiveId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(auditUniverseObjectiveId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditUniverseObjective with ID {auditUniverseObjectiveId} not found.");
+            }
+
+            await repository.DeleteAsync(auditUniverseObjectiveId);
+            
+            var cacheKey = string.Format(CacheKeys.AuditUniverseObjective, auditUniverseObjectiveId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete AuditUniverseObjective.", ex);
+        }
+    }
+
     public async Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseObjectiveModel, nameof(auditUniverseObjectiveModel));

@@ -45,6 +45,28 @@ internal sealed class AuditDomainService(
         }
     }
 
+    public async Task DeleteAuditDomainAsync(Guid auditDomainId)
+    {
+        try
+        {
+            var entity = await repository.GetByIdAsync(auditDomainId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditEngagement with ID {auditDomainId} not found.");
+            }
+
+            await repository.DeleteAsync(auditDomainId);
+            
+            var cacheKey = string.Format(CacheKeys.AuditDomain, auditDomainId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete AuditDomain.", ex);
+        }
+    }
+
     public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel)
     {
         ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));

@@ -6,4 +6,5 @@ public interface IJobSchedulingService
 {
     public Task<Guid> CreateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel);
     public Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel);
+    public Task DeleteJobSchedulingAsync(Guid jobSchedulingId);
 }

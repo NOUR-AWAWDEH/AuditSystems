@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.SubLocation.Create;
 using AuditSystem.Application.Features.Organisation.SubLocation.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSubLocation([FromBody] UpdateSubLocationCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

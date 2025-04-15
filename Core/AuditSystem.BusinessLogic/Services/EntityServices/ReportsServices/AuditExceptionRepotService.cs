@@ -12,7 +12,7 @@ internal sealed class AuditExceptionRepotService(
     IRepository<Guid, AuditExceptionReport> repository,
     IMapper mapper,
     ICacheService cacheService)
-    : IAuditExceptionRepotService
+    : IAuditExceptionReportService
 {
     private static readonly string[] AuditExceptionReportTags = ["audit-exception-reports", "audit-exception-report-list"];
     private static readonly string[] ListTags = ["audit-exception-report-list"]; // Tags for collections only
@@ -41,6 +41,28 @@ internal sealed class AuditExceptionRepotService(
         catch (Exception ex)
         {
             throw new Exception("Failed to create AuditExceptionReport.", ex);
+        }
+    }
+
+    public async Task DeleteAuditExceptionReportAsync(Guid auditExceptionReportId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(auditExceptionReportId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditExceptionReport with ID {auditExceptionReportId} not found.");
+            }
+
+            await repository.DeleteAsync(auditExceptionReportId);
+
+            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, auditExceptionReportId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete AuditExceptionReport.", ex);
         }
     }
 

@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.Company.Create;
 using AuditSystem.Application.Features.Organisation.Company.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class CompanyController(IMediator mediator) : ApiControllerBase(me
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

@@ -6,4 +6,5 @@ public interface ICompanyService
 {
     public Task<Guid> CreateCompanyAsync(CompanyModel companyModel);
     public Task UpdateCompanyAsync(CompanyModel companyModel);
+    public Task DeleteCompanyAsync(Guid companyId);
 }

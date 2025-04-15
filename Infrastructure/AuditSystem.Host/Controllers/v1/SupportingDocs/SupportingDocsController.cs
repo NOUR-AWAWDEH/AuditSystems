@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.SupportingDocs.Create;
 using AuditSystem.Application.Features.SupportingDocs.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSupportingDocument([FromBody] UpdateSupportingDocCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

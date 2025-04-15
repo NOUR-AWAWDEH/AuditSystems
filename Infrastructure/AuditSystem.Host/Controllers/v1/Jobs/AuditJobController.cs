@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Jobs.AuditJob.Create;
 using AuditSystem.Application.Features.Jobs.AuditJob.Update;
 using AuditSystem.Host.Responses;
@@ -24,5 +25,5 @@ public sealed class AuditJobController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditJob([FromBody] UpdateAuditJobCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync(command);
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

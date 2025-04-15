@@ -44,6 +44,29 @@ internal sealed class JobTimeAllocationReportService(
         }
     }
 
+    public async Task DeleteJobTimeAllocationReportAsync(Guid jobTimeAllocationReportId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(jobTimeAllocationReportId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobTimeAllocationReport with ID {jobTimeAllocationReportId} not found.");
+            }
+
+            await repository.DeleteAsync(jobTimeAllocationReportId);
+
+            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, jobTimeAllocationReportId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(JobTimeAllocationReportTags);
+        }
+        catch (Exception ex) 
+        {
+            throw new Exception("Failed to delete JobTimeAllocationReport.", ex);
+        }
+        
+    }
+
     public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));

@@ -44,6 +44,28 @@ internal sealed class JobSchedulingService(
         }
     }
 
+    public async Task DeleteJobSchedulingAsync(Guid jobSchedulingId)
+    {
+        try 
+        {
+            var entity = await repository.GetByIdAsync(jobSchedulingId);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobScheduling with ID {jobSchedulingId} not found.");
+            }
+
+            await repository.DeleteAsync(jobSchedulingId);
+
+            var cacheKey = string.Format(CacheKeys.JobScheduling, jobSchedulingId);
+            await cacheService.RemoveAsync(cacheKey);
+            await cacheService.RemoveCacheByTagAsync(ListTags);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to delete JobScheduling.", ex);
+        }
+    }
+
     public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
     {
         ArgumentNullException.ThrowIfNull(jobSchedulingModel, nameof(jobSchedulingModel));

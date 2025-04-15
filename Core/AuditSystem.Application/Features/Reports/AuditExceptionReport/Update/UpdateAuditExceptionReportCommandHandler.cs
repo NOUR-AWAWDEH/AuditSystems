@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Update;
 
 internal sealed class UpdateAuditExceptionReportCommandHandler(
-    IAuditExceptionRepotService auditExceptionRepotService,
+    IAuditExceptionReportService auditExceptionRepotService,
     IMapper mapper,
     ILogger<UpdateAuditExceptionReportCommandHandler> logger)
     : IRequestHandler<UpdateAuditExceptionReportCommand, Result>

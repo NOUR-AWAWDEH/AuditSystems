@@ -9,7 +9,7 @@ public interface IRepository<TId, TEntity>
 {
     Task<TEntity> CreateAsync(TEntity entity);
     Task CreateRangeAsync(IEnumerable<TEntity> entities);
-    Task<TEntity?> GetAsync(TId id);
+    Task<TEntity?> GetByIdAsync(TId id);
     Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null);
     Task DeleteAsync(TId id);
     ValueTask DeleteRangeAsync(ICollection<TEntity> entities);

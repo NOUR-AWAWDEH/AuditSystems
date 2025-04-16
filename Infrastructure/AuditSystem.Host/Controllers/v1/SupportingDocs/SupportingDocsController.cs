@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.SupportingDocs.Create;
+using AuditSystem.Application.Features.SupportingDocs.Delete;
 using AuditSystem.Application.Features.SupportingDocs.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSupportingDocument([FromBody] UpdateSupportingDocCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Supporting Document
+    [HttpDelete("delete-supporting-document")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteSupportingDocument([FromBody] DeleteSupportingDocCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

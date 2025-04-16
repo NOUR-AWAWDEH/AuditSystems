@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.UserDesignation.Create;
+using AuditSystem.Application.Features.UserDesignation.Delete;
 using AuditSystem.Application.Features.UserDesignation.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class UserDesignationController(IMediator mediator) : ApiControlle
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateUserDesignation([FromBody] UpdateUserDesignationCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete User Designation
+    [HttpDelete("delete-user-designation")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteUserDesignation([FromBody] DeleteUserDesignationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

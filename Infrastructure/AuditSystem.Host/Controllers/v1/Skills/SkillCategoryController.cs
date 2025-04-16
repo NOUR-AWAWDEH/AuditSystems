@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Skills.SkillCategory.Create;
+using AuditSystem.Application.Features.Skills.SkillCategory.Delete;
 using AuditSystem.Application.Features.Skills.SkillCategory.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class SkillCategoryController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSkillCategory([FromBody] UpdateSkillCategoryCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Skill Category
+    [HttpDelete("delete-skill-category")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteSkillCategory([FromBody] DeleteSkillCategoryCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

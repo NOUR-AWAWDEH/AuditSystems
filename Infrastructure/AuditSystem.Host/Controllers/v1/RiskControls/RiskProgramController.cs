@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Create;
+using AuditSystem.Application.Features.RiskControls.RiskProgram.Delete;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class RiskProgramController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskProgram([FromBody] UpdateRiskProgramCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Risk Program
+    [HttpDelete("delete-risk-program")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRiskProgram([FromBody] DeleteRiskProgramCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

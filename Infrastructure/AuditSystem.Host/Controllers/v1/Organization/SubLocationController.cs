@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.SubLocation.Create;
 using AuditSystem.Application.Features.Organisation.SubLocation.Update;
+using AuditSystem.Application.Features.Organization.SubLocation.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,5 +26,13 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSubLocation([FromBody] UpdateSubLocationCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Sub Location
+    [HttpDelete("delete-sub-location")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteSubLocation([FromBody] DeleteSubLocationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

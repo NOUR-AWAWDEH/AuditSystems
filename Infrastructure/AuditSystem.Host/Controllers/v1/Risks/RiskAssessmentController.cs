@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Create;
+using AuditSystem.Application.Features.Risks.RiskAssessment.Delete;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class RiskAssessmentController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskAssessment([FromBody] UpdateRiskAssessmentCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Risk Assessment
+    [HttpDelete("delete-risk-assessment")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRiskAssessment([FromBody] DeleteRiskAssessmentCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

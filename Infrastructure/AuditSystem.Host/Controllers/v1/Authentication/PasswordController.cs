@@ -11,28 +11,14 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PasswordController : ControllerBase
+public sealed class PasswordController(
+        IAccountService _accountService,
+        IEmailService _emailService,
+        IPasswordResetService _passwordResetService,
+        IPasswordTokenService _passwordTokenService,
+        ILogger<PasswordController> _logger) :
+        ControllerBase
 {
-    private readonly IAccountService _accountService;
-    private readonly IEmailService _emailService;
-    private readonly IPasswordResetService _passwordResetService;
-    private readonly IPasswordTokenService _passwordTokenService;
-    private readonly ILogger<PasswordController> _logger;
-
-    public PasswordController(
-        IAccountService accountService,
-        IEmailService emailService,
-        IPasswordResetService passwordResetService,
-        IPasswordTokenService passwordTokenService,
-        ILogger<PasswordController> logger)
-    {
-        _accountService = accountService;
-        _emailService = emailService;
-        _passwordResetService = passwordResetService;
-        _passwordTokenService = passwordTokenService;
-        _logger = logger;
-    }
-
     [HttpPost("forgot-password")]
     public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {

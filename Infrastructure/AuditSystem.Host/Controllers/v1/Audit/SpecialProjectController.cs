@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.SpecialProject.Create;
+using AuditSystem.Application.Features.Audit.SpecialProject.Delete;
 using AuditSystem.Application.Features.Audit.SpecialProject.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -26,5 +27,12 @@ public sealed class SpecialProjectController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSpecialProject([FromBody] UpdateSpecialProjectCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-
+    
+    //Delete Special Project
+    [HttpDelete("delete-special-project")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteSpecialProject([FromBody] DeleteSpecialProjectCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

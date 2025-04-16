@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Create;
+using AuditSystem.Application.Features.Reports.ReportingFollowUp.Delete;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class ReportingFollowUpController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateReportingFollowUp([FromBody] UpdateReportingFollowUpCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Delete Reporting Follow Up
+    [HttpDelete("delete-reporting-follow-up")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteReportingFollowUp([FromBody] DeleteReportingFollowUpCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

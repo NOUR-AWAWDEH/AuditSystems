@@ -10,21 +10,12 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RegistrationController : ControllerBase
+public sealed class RegistrationController(
+        IRegistrationService _registrationService,
+        UserManager<User> _userManager,
+        ILogger<RegistrationController> _logger) 
+        : ControllerBase
 {
-    private readonly IRegistrationService _registrationService;
-    private readonly UserManager<User> _userManager;
-    private readonly ILogger<RegistrationController> _logger;
-
-    public RegistrationController(
-        IRegistrationService registrationService,
-        UserManager<User> userManager,
-        ILogger<RegistrationController> logger)
-    {
-        _registrationService = registrationService;
-        _userManager = userManager;
-        _logger = logger;
-    }
 
     [HttpPost("register")]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterDto model)
@@ -83,7 +74,6 @@ public class RegistrationController : ControllerBase
         }
     }
 
-    //verification-email for old account
     [HttpPost("send-verification-email")]
     public async Task<ActionResult<ApiResponse>> SendVerificationEmail([FromBody] VerificationEmailDto request)
     {

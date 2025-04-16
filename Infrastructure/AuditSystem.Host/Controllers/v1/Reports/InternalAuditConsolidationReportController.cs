@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Create;
+using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Delete;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class InternalAuditConsolidationReportController(IMediator mediato
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateInternalAuditConsolidatedReport([FromBody] UpdateInternalAuditConsolidationReportCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Internal Audit Consolidated Report
+    [HttpDelete("delete-internal-audit-consolidated-report")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteInternalAuditConsolidatedReport([FromBody] DeleteInternalAuditConsolidationReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

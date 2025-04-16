@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Processes.AuditProcess.Creat;
 using AuditSystem.Application.Features.Processes.AuditProcess.Create;
+using AuditSystem.Application.Features.Processes.AuditProcess.Delete;
 using AuditSystem.Application.Features.Processes.AuditProcess.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -26,5 +27,13 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditProcess([FromBody] UpdateAuditProcessCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Audit Process
+    [HttpDelete("delete-audit-process")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAuditProcess([FromBody] DeleteAuditProcessCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

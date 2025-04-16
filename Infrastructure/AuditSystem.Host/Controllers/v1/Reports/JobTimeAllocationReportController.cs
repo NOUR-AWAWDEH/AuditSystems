@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Create;
+using AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Delete;
 using AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class JobTimeAllocationReportController(IMediator mediator) : ApiC
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateJobTimeAllocationReport([FromBody] UpdateJobTimeAllocationReportCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Job Time Allocation Report
+    [HttpDelete("delete-job-time-allocation-report")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteJobTimeAllocationReport([FromBody] DeleteJobTimeAllocationReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

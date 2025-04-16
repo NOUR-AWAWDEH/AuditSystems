@@ -31,7 +31,8 @@ public sealed class AuditDomainController(IMediator mediator) : ApiControllerBas
     //Delete Audit Domain
     [HttpDelete("delete-audit-domain")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTenant([FromBody] DeleteAuditDomainCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

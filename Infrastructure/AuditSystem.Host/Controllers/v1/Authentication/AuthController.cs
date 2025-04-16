@@ -12,18 +12,11 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public sealed class AuthController(
+        ICustomAuthenticationService _authService,
+        ILogger<AuthController> _logger) :
+        ControllerBase
 {
-    private readonly ICustomAuthenticationService _authService;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(
-        ICustomAuthenticationService authService,
-        ILogger<AuthController> logger)
-    {
-        _authService = authService;
-        _logger = logger;
-    }
 
     [HttpPost("login")]
     [EnableRateLimiting("loginPolicy")]

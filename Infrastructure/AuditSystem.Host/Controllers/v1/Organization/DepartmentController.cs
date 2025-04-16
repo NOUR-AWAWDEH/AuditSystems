@@ -22,8 +22,9 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
 
     //Update Department
     [HttpPut("update-department")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

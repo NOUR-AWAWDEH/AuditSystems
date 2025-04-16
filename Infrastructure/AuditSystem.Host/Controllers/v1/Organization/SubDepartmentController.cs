@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.SubDepartment.Create;
 using AuditSystem.Application.Features.Organisation.SubDepartment.Update;
+using AuditSystem.Application.Features.Organization.SubDepartment.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,5 +26,13 @@ public sealed class SubDepartmentController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSubDepartment([FromBody] UpdateSubDepartmentCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Sub Department
+    [HttpDelete("delete-sub-department")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteSubDepartment([FromBody] DeleteSubDepartmentCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

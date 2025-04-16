@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create;
+using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Delete;
 using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class RiskControlMatrixController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskControlMatrix([FromBody] UpdateRiskControlMatrixCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Delete Risk Control Matrix
+    [HttpDelete("delete-risk-control-matrix")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRiskControlMatrix([FromBody] DeleteRiskControlMatrixCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

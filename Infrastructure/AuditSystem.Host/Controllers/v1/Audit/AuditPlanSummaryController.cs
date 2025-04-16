@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditPlanSummary.Create;
+using AuditSystem.Application.Features.Audit.AuditPlanSummary.Delete;
 using AuditSystem.Application.Features.Audit.AuditPlanSummary.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -25,5 +26,13 @@ public sealed class AuditPlanSummaryController(IMediator mediator) : ApiControll
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditPlanSummary([FromBody] UpdateAuditPlanSummaryCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Delete Audit Plan Summary
+    [HttpDelete("delete-audit-plan-summary")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteAuditPlanSummary([FromBody] DeleteAuditPlanSummaryCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

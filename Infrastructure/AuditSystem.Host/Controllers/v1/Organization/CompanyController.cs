@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Organisation.Company.Create;
 using AuditSystem.Application.Features.Organisation.Company.Update;
+using AuditSystem.Application.Features.Organization.Company.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,5 +26,13 @@ public sealed class CompanyController(IMediator mediator) : ApiControllerBase(me
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Delete Company
+    [HttpDelete("delete-company")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteCompany([FromBody] DeleteCompanyCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

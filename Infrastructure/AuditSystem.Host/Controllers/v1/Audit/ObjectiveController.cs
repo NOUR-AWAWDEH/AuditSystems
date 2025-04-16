@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.Objective.Create;
+using AuditSystem.Application.Features.Audit.Objective.Delete;
 using AuditSystem.Application.Features.Audit.Objective.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -26,4 +27,13 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateObjective([FromBody] UpdateObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Delete Objective
+    [HttpDelete("delete-objective")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteObjective([FromQuery] DeleteObjectiveCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
 }

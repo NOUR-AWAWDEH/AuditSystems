@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.SubLocation.Update;
+namespace AuditSystem.Application.Features.Organization.SubLocation.Update;
 
 public sealed class UpdateSubLocationValidator : AbstractValidator<UpdateSubLocationCommand>
 {

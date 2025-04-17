@@ -66,6 +66,11 @@ internal class ObjectiveService(
         }
     }
 
+    public Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));

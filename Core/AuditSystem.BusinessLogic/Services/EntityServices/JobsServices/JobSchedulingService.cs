@@ -66,6 +66,11 @@ internal sealed class JobSchedulingService(
         }
     }
 
+    public Task<JobSchedulingModel> GetJobSchedulingByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
     {
         ArgumentNullException.ThrowIfNull(jobSchedulingModel, nameof(jobSchedulingModel));
@@ -90,5 +95,4 @@ internal sealed class JobSchedulingService(
             throw new Exception("Failed to update JobScheduling.", ex);
         }
     }
-
 }

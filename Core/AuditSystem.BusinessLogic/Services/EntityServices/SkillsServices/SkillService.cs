@@ -65,6 +65,11 @@ internal sealed class SkillService(
         }
     }
 
+    public Task<SkillModel> GetSkillByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSkillAsync(SkillModel skillModel)
     {
         ArgumentNullException.ThrowIfNull(skillModel, nameof(skillModel));

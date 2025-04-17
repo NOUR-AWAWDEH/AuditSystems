@@ -66,6 +66,11 @@ internal sealed class JobPrioritizationService(
         }
     }
 
+    public Task<JobPrioritizationModel> GetJobPrioritizationByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));

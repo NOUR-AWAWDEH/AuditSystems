@@ -67,6 +67,11 @@ internal sealed class TaskManagementService(
 
     }
 
+    public Task<TaskManagementModel> GetTaskByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)
     {
         ArgumentNullException.ThrowIfNull(taskManagementModel, nameof(taskManagementModel));

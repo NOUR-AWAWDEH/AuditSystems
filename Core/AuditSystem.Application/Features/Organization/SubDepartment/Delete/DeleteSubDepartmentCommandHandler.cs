@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

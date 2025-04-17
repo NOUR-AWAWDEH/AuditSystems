@@ -7,4 +7,5 @@ public interface IComplianceChecklistService
     public Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel);
     public Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel);
     public Task DeleteComplianceChecklistAsync(Guid complianceChecklistId);
+    public Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid Id);
 }

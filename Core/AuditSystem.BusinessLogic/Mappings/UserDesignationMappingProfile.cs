@@ -1,6 +1,6 @@
 ﻿using AuditSystem.Application.Features.UserDesignation.Create;
 using AuditSystem.Application.Features.UserDesignation.Update;
-using AuditSystem.Contract.Models.Users;
+using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Domain.Entities.Users;
 using AutoMapper;
 

@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Base;
 
-namespace AuditSystem.Application.Features.Organisation.Department.Update;
+namespace AuditSystem.Application.Features.Organization.Department.Update;
 
 public sealed record class UpdateDepartmentCommand : ICommand<Result>
 {

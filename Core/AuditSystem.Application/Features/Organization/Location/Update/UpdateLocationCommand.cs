@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Base;
 
-namespace AuditSystem.Application.Features.Organisation.LocationModle.Update;
+namespace AuditSystem.Application.Features.Organization.Location.Update;
 
 public sealed record class UpdateLocationCommand : ICommand<Result>
 {

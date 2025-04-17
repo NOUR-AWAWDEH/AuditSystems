@@ -1,9 +1,9 @@
 ﻿using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Contract.Models.Organisation;
-using AuditSystem.Domain.Entities.Organisation;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
@@ -65,6 +65,11 @@ internal sealed class CompanyService(
         {
             throw new Exception("Failed to delete Company.", ex);
         }
+    }
+
+    public Task<CompanyModel> GetCompanyByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateCompanyAsync(CompanyModel companyModel)

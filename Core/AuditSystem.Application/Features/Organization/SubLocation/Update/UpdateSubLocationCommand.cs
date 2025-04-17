@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Base;
 
-namespace AuditSystem.Application.Features.Organisation.SubLocation.Update;
+namespace AuditSystem.Application.Features.Organization.SubLocation.Update;
 
 public sealed record class UpdateSubLocationCommand : ICommand<Result>
 {

@@ -1,6 +1,6 @@
 ﻿using AuditSystem.Contract.Models.Common;
 
-namespace AuditSystem.Contract.Models.Users;
+namespace AuditSystem.Contract.Models.UserDesignation;
 
 public sealed class UserDesignationModel : BaseModel<Guid>
 {

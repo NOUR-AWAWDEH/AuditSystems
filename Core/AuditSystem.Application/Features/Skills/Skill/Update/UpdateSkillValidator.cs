@@ -1,40 +1,38 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Skills.Skill.Update
+namespace AuditSystem.Application.Features.Skills.Skill.Update;
+public sealed class UpdateSkillValidator : AbstractValidator<UpdateSkillCommand>
 {
-    public sealed class UpdateSkillValidator : AbstractValidator<UpdateSkillCommand>
+    public UpdateSkillValidator()
     {
-        public UpdateSkillValidator()
-        {
-            RuleFor(x => x.Id)
-                .NotEmpty()
-                .WithMessage("Id is required.")
-                .Must(id => id != Guid.Empty)
-                .WithMessage("Id must not be empty.");
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage("Id is required.")
+            .Must(id => id != Guid.Empty)
+            .WithMessage("Id must not be empty.");
 
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage("Name is required.")
-                .MinimumLength(2)
-                .WithMessage("Name must be at least 2 characters long.")
-                .MaximumLength(100)
-                .WithMessage("Name must not exceed 100 characters.");
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Name is required.")
+            .MinimumLength(2)
+            .WithMessage("Name must be at least 2 characters long.")
+            .MaximumLength(100)
+            .WithMessage("Name must not exceed 100 characters.");
 
-            RuleFor(x => x.CategoryId)
-                .NotEmpty()
-                .WithMessage("CategoryId is required.")
-                .Must(id => id != Guid.Empty)
-                .WithMessage("CategoryId must not be empty.");
+        RuleFor(x => x.CategoryId)
+            .NotEmpty()
+            .WithMessage("CategoryId is required.")
+            .Must(id => id != Guid.Empty)
+            .WithMessage("CategoryId must not be empty.");
 
-            RuleFor(x => x.SkillSetId)
-                .NotEmpty()
-                .WithMessage("SkillSetId is required.")
-                .Must(id => id != Guid.Empty)
-                .WithMessage("SkillSetId must not be empty.");
+        RuleFor(x => x.SkillSetId)
+            .NotEmpty()
+            .WithMessage("SkillSetId is required.")
+            .Must(id => id != Guid.Empty)
+            .WithMessage("SkillSetId must not be empty.");
 
-            RuleFor(x => x.Description)
-                .MaximumLength(500)
-                .WithMessage("Description must not exceed 500 characters.");
-        }
+        RuleFor(x => x.Description)
+            .MaximumLength(500)
+            .WithMessage("Description must not exceed 500 characters.");
     }
 }

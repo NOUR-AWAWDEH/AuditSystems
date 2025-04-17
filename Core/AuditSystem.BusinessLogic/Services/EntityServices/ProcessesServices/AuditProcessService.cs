@@ -66,6 +66,11 @@ internal sealed class AuditProcessService(
         }
     }
 
+    public Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
     {
         ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));

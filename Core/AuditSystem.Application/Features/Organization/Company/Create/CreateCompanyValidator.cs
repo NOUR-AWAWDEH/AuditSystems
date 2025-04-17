@@ -1,6 +1,6 @@
-﻿using AuditSystem.Application.Features.Organisation.Company.Create;
-using FluentValidation;
+﻿using FluentValidation;
 
+namespace AuditSystem.Application.Features.Organization.Company.Create;
 public sealed class CreateCompanyValidator : AbstractValidator<CreateCompanyCommand>
 {
     public CreateCompanyValidator()

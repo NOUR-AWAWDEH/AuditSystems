@@ -67,6 +67,11 @@ internal sealed class ChecklistService(
         }
     }
 
+    public Task<ChecklistModel> GetChecklistByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));

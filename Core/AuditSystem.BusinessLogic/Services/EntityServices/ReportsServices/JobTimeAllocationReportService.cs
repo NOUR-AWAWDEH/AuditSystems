@@ -67,6 +67,11 @@ internal sealed class JobTimeAllocationReportService(
         
     }
 
+    public Task<JobTimeAllocationReportModel> GetJobTimeAllocationReportByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));

@@ -7,4 +7,5 @@ public interface IAuditProcessService
     public Task<Guid> CreateAuditProcessAsync(AuditProcessModel auditProcessModel);
     public Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel);
     public Task DeleteAuditProcessAsync(Guid auditProcessId);
+    public Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid Id);
 }

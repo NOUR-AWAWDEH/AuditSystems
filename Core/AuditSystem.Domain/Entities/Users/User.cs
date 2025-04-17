@@ -1,5 +1,5 @@
 using AuditSystem.Domain.Entities.Auth;
-using AuditSystem.Domain.Entities.Organisation;
+using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 

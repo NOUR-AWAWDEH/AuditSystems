@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.SubLocation.Create;
+namespace AuditSystem.Application.Features.Organization.SubLocation.Create;
 
 public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLocationCommand>
 {

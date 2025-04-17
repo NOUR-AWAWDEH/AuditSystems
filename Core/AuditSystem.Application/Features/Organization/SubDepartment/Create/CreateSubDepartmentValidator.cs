@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.SubDepartment.Create;
+namespace AuditSystem.Application.Features.Organization.SubDepartment.Create;
 
 public sealed class CreateSubDepartmentValidator : AbstractValidator<CreateSubDepartmentCommand>
 {

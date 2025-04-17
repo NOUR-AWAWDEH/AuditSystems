@@ -66,6 +66,11 @@ internal sealed class AuditExceptionRepotService(
         }
     }
 
+    public Task<AuditExceptionReportModel> GetAuditExceptionReportByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));

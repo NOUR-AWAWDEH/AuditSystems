@@ -7,4 +7,5 @@ public interface IInternalAuditConsolidationReportService
     public Task<Guid> CreateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel);
     public Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel);
     public Task DeleteInternalAuditConsolidationReportAsync(Guid internalAuditConsolidationReportId);
+    public Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid Id);
 }

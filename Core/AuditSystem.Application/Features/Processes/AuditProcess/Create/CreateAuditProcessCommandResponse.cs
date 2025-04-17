@@ -1,3 +1,3 @@
-﻿namespace AuditSystem.Application.Features.Processes.AuditProcess.Creat;
+﻿namespace AuditSystem.Application.Features.Processes.AuditProcess.Create;
 
 public sealed record class CreateAuditProcessCommandResponse(Guid AuditProcessId);

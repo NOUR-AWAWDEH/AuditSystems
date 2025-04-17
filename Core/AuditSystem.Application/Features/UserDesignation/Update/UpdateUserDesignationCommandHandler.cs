@@ -1,6 +1,6 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.UserManagementServices;
-using AuditSystem.Contract.Models.Users;
+using AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
+using AuditSystem.Contract.Models.UserDesignation;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;

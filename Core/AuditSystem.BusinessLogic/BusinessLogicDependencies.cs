@@ -19,7 +19,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ComplianceServices;
 using AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
@@ -27,7 +27,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.TasksServices;
-using AuditSystem.Contract.Interfaces.ModelServices.UserManagementServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
 using AuditSystem.Contract.Interfaces.Transaction;
 using Microsoft.Extensions.DependencyInjection;
 

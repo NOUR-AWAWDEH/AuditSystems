@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.SubDepartment.Update;
+namespace AuditSystem.Application.Features.Organization.SubDepartment.Update;
 
 public sealed class UpdateSubDepartmentValidator : AbstractValidator<UpdateSubDepartmentCommand>
 {

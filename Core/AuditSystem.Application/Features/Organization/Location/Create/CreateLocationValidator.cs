@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.LocationModle.Create;
+namespace AuditSystem.Application.Features.Organization.Location.Create;
 
 public sealed class CreateLocationValidator : AbstractValidator<CreateLocationCommand>
 {

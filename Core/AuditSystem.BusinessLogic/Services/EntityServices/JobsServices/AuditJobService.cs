@@ -66,6 +66,11 @@ internal sealed class AuditJobService(
         }
     }
 
+    public Task<AuditJobModel> GetAuditJobByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));

@@ -66,6 +66,11 @@ internal sealed class ReportingFollowUpService(
         }
     }
 
+    public Task<ReportingFollowUpModel> GetReportingFollowUpByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));

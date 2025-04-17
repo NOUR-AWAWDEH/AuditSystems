@@ -67,6 +67,11 @@ internal sealed class AuditDomainService(
         }
     }
 
+    public Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel)
     {
         ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));

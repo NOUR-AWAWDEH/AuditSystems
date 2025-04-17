@@ -67,6 +67,11 @@ internal sealed class AuditEngagementService(
         }
     }
 
+    public Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));

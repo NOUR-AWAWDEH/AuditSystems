@@ -66,6 +66,11 @@ internal sealed class PlanningReportService(
         }
     }
 
+    public Task<PlanningReportModel> GetPlanningReportByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
         ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));

@@ -66,6 +66,11 @@ internal sealed class RiskControlMatrixService(
         }
     }
 
+    public Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));

@@ -1,11 +1,11 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
-using AuditSystem.Contract.Models.Organisation;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Models.Organization;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace AuditSystem.Application.Features.Organisation.LocationModle.Update;
+namespace AuditSystem.Application.Features.Organization.Location.Update;
 
 internal sealed class UpdateLocationCommandHandler(
     ILocationService locationService,

@@ -5,7 +5,7 @@ using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Compliance;
 using AuditSystem.Domain.Entities.Jobs;
-using AuditSystem.Domain.Entities.Organisation;
+using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;

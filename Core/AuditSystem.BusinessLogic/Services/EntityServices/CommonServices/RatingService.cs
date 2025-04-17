@@ -66,6 +66,11 @@ internal sealed class RatingService(
         }
     }
 
+    public Task<RatingModel> GetRatingByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));

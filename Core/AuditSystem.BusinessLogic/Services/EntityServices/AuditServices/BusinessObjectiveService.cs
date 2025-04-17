@@ -66,6 +66,11 @@ internal sealed class BusinessObjectiveService(
         }
     }
 
+    public Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));

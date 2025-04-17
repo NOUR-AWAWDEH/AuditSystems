@@ -67,6 +67,11 @@ internal sealed class RemarkService(
 
     }
 
+    public Task<RemarkModel> GetRemarkByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));

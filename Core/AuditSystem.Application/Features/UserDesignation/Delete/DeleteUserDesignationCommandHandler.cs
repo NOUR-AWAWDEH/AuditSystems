@@ -1,6 +1,6 @@
 ﻿using Ardalis.Result;
 using MediatR;
-using AuditSystem.Contract.Interfaces.ModelServices.UserManagementServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Features.UserDesignation.Delete;

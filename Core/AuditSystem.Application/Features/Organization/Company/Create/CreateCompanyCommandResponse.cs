@@ -1,3 +1,3 @@
-﻿namespace AuditSystem.Application.Features.Organisation.Company.Create;
+﻿namespace AuditSystem.Application.Features.Organization.Company.Create;
 
 public sealed record class CreateCompanyCommandResponse(Guid CompanyId);

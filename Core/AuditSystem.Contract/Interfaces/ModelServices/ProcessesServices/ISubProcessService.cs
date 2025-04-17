@@ -7,4 +7,5 @@ public interface ISubProcessService
     public Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel);
     public Task UpdateSubProcessAsync(SubProcessModel subProcessModel);
     public Task DeleteSubProcessAsync(Guid subProcessId);
+    public Task<SubProcessModel> GetSubProcessByIdAsync(Guid Id);
 }

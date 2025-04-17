@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.LocationModle.Update;
+namespace AuditSystem.Application.Features.Organization.Location.Update;
 
 public sealed class UpdateLocationValidator : AbstractValidator<UpdateLocationCommand>
 {

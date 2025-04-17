@@ -1,6 +1,6 @@
 using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.Organisation;
+namespace AuditSystem.Domain.Entities.Organization;
 
 public class SubLocation : Entity<Guid>
 {

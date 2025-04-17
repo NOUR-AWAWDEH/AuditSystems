@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Base;
 
-namespace AuditSystem.Application.Features.Organisation.SubDepartment.Create;
+namespace AuditSystem.Application.Features.Organization.SubDepartment.Create;
 
 public sealed record class CreateSubDepartmentCommand : ICommand<Result<CreateSubDepartmentCommandResponse>>
 {

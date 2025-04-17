@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organisation.Company.Update
+namespace AuditSystem.Application.Features.Organization.Company.Update
 {
     public sealed class UpdateCompanyValidator : AbstractValidator<UpdateCompanyCommand>
     {

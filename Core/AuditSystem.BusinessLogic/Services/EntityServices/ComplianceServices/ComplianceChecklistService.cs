@@ -67,6 +67,11 @@ internal sealed class ComplianceChecklistService(
         }
     }
 
+    public Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));

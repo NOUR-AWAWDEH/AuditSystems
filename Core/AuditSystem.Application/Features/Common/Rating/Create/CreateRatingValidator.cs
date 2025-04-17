@@ -1,6 +1,7 @@
-﻿using AuditSystem.Application.Features.Common.Rating.Create;
-using AuditSystem.Domain.Entities.Common;
+﻿using AuditSystem.Application.Common;
 using FluentValidation;
+
+namespace AuditSystem.Application.Features.Common.Rating.Create;
 
 public sealed class CreateRatingValidator : AbstractValidator<CreateRatingCommand>
 {
@@ -8,7 +9,7 @@ public sealed class CreateRatingValidator : AbstractValidator<CreateRatingComman
     {
         RuleFor(x => x.Level)
             .NotEmpty()
-            .Must(level => Rating.ValidLevels.Contains(level))
-            .WithMessage("Invalid rating level. Valid values are: " + string.Join(", ", Rating.ValidLevels));
+            .Must(RatingValidator.IsValidLevel)
+            .WithMessage("Invalid rating level. Valid values are: " + string.Join(", ", RatingValidator.ValidLevels));
     }
 }

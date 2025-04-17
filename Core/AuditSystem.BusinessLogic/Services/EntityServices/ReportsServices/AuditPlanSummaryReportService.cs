@@ -66,6 +66,11 @@ internal sealed class AuditPlanSummaryReportService(
         }
     }
 
+    public Task<AuditPlanSummaryReportModel> GetAuditPlanSummaryReportByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));

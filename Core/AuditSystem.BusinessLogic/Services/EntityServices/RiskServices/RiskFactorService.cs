@@ -66,6 +66,11 @@ internal sealed class RiskFactorService(
         }
     }
 
+    public Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)
     {
         ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));

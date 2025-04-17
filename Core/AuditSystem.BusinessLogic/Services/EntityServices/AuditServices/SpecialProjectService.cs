@@ -66,6 +66,11 @@ internal sealed class SpecialProjectService(
         }
     }
 
+    public Task<SpecialProjectModel> GetSpecialProjectByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));

@@ -66,6 +66,11 @@ internal sealed class SupportingDocService(
         }
     }
 
+    public Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
         ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));

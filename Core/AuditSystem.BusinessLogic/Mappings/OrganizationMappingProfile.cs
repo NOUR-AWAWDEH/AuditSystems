@@ -1,15 +1,15 @@
-﻿using AuditSystem.Application.Features.Organisation.Company.Create;
-using AuditSystem.Application.Features.Organisation.Company.Update;
-using AuditSystem.Application.Features.Organisation.Department.Create;
-using AuditSystem.Application.Features.Organisation.Department.Update;
-using AuditSystem.Application.Features.Organisation.LocationModle.Create;
-using AuditSystem.Application.Features.Organisation.LocationModle.Update;
-using AuditSystem.Application.Features.Organisation.SubDepartment.Create;
-using AuditSystem.Application.Features.Organisation.SubDepartment.Update;
-using AuditSystem.Application.Features.Organisation.SubLocation.Create;
-using AuditSystem.Application.Features.Organisation.SubLocation.Update;
-using AuditSystem.Contract.Models.Organisation;
-using AuditSystem.Domain.Entities.Organisation;
+﻿using AuditSystem.Application.Features.Organization.Company.Create;
+using AuditSystem.Application.Features.Organization.Company.Update;
+using AuditSystem.Application.Features.Organization.Department.Create;
+using AuditSystem.Application.Features.Organization.Department.Update;
+using AuditSystem.Application.Features.Organization.Location.Create;
+using AuditSystem.Application.Features.Organization.Location.Update;
+using AuditSystem.Application.Features.Organization.SubDepartment.Create;
+using AuditSystem.Application.Features.Organization.SubDepartment.Update;
+using AuditSystem.Application.Features.Organization.SubLocation.Create;
+using AuditSystem.Application.Features.Organization.SubLocation.Update;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Mappings;

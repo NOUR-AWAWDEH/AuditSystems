@@ -1,8 +1,8 @@
 ﻿using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.UserManagementServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Contract.Models.Users;
+using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Domain.Entities.Users;
 using AutoMapper;
 
@@ -64,6 +64,11 @@ internal sealed class UserDesignationService(
         {
             throw new Exception("Failed to delete User Designation.", ex);
         }
+    }
+
+    public Task<UserDesignationModel> GetUserDesignationByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)

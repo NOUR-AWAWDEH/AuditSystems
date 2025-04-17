@@ -66,6 +66,11 @@ internal sealed class InternalAuditConsolidationReportService(
         }
     }
 
+    public Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));

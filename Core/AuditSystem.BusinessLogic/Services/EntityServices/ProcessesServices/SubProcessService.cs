@@ -66,6 +66,11 @@ internal sealed class SubProcessService(
         }
     }
 
+    public Task<SubProcessModel> GetSubProcessByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)
     {
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));

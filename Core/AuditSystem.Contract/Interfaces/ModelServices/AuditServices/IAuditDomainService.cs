@@ -7,4 +7,5 @@ public interface IAuditDomainService
     public Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomianModel);
     public Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel);
     public Task DeleteAuditDomainAsync(Guid auditDomainId);
+    public Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid Id);
 }

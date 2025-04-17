@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MediatR;
 using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganisationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 
 namespace AuditSystem.Application.Features.Organization.Company.Delete;
 

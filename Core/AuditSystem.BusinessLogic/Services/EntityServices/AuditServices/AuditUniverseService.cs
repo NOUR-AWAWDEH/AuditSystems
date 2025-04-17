@@ -66,6 +66,11 @@ internal sealed class AuditUniverseService(
         }
     }
 
+    public Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid Id)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));

@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organisation.SubLocation.Create;
-using AuditSystem.Application.Features.Organisation.SubLocation.Update;
+using AuditSystem.Application.Features.Organization.SubLocation.Create;
+using AuditSystem.Application.Features.Organization.SubLocation.Update;
 using AuditSystem.Application.Features.Organization.SubLocation.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;

@@ -43,7 +43,6 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception("Failed to create AuditPlanSummaryReport.", ex);
         }
     }
-
     public async Task DeleteAuditPlanSummaryReportAsync(Guid auditPlanSummaryReportId)
     {
         try
@@ -65,12 +64,38 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception("Failed to delete AuditPlanSummaryReport.", ex);
         }
     }
-
-    public Task<AuditPlanSummaryReportModel> GetAuditPlanSummaryReportByIdAsync(Guid Id)
+    public async Task<AuditPlanSummaryReportModel> GetAuditPlanSummaryReportByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, id);
 
+            var cachedEntity = await cacheService.GetAsync<AuditPlanSummaryReport>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<AuditPlanSummaryReportModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditPlanSummaryReport with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditPlanSummaryReportTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<AuditPlanSummaryReportModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditPlanSummaryReport by ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));
@@ -87,7 +112,8 @@ internal sealed class AuditPlanSummaryReportService(
                 key: cacheKey,
                 value: entity,
                 tags: AuditPlanSummaryReportTags,
-                expiration: CacheExpirations.MediumTerm);
+                expiration: CacheExpirations.MediumTerm
+            );
             
             await cacheService.RemoveCacheByTagAsync(ListTags);
         }

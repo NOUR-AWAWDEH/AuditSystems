@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class DepartmentService(
     IRepository<Guid, Department> repository,
@@ -43,7 +43,6 @@ internal sealed class DepartmentService(
             throw new Exception("Failed to create Department.", ex);
         }
     }
-
     public async Task DeleteDepartmentAsync(Guid departmentId)
     {
         try
@@ -65,12 +64,39 @@ internal sealed class DepartmentService(
             throw new Exception("Failed to delete Department.", ex);
         }
     }
-
-    public Task<DepartmentModel> GetDepartmentByIdAsync(Guid Id)
+    public async Task<DepartmentModel> GetDepartmentByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Department, id);
 
+            var cachedDepartment = await cacheService.GetAsync<Department>(cacheKey);
+            if (cachedDepartment != null)
+            {
+                return mapper.Map<DepartmentModel>(cachedDepartment);
+            }
+
+            var department = await repository.GetByIdAsync(id);
+
+            if (department == null)
+            {
+                throw new KeyNotFoundException($"Department with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: department,
+                tags: DepartmentTags,
+                expiration: CacheExpirations.MediumTerm 
+            );
+
+            return mapper.Map<DepartmentModel>(department);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Department ID {id}.", ex);
+        }
+    }
     public async Task UpdateDepartmentAsync(DepartmentModel departmentModel)
     {
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));

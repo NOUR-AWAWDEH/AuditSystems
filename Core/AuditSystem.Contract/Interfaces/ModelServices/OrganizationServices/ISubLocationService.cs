@@ -7,5 +7,5 @@ public interface ISubLocationService
     public Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel);
     public Task UpdateSubLocationAsync(SubLocationModel subLocationModel);
     public Task DeleteSubLocationAsync(Guid subLocationId);
-    public Task<SubLocationModel> GetSubLocationByIdAsync(Guid Id);
+    public Task<SubLocationModel> GetSubLocationByIdAsync(Guid id);
 }

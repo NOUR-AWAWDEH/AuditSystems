@@ -66,9 +66,37 @@ internal sealed class RiskFactorService(
         }
     }
 
-    public Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid Id)
+    public async Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.RiskFactor, id);
+
+            var cachedRiskFactor = await cacheService.GetAsync<RiskFactor>(cacheKey);
+            if (cachedRiskFactor != null)
+            {
+                return mapper.Map<RiskFactorModel>(cachedRiskFactor);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskFactor with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskFactorTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<RiskFactorModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get RiskFactor by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)

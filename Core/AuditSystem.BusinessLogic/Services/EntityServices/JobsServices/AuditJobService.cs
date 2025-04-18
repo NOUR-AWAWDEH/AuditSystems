@@ -43,7 +43,6 @@ internal sealed class AuditJobService(
             throw new Exception("Failed to create AuditJob.", ex);
         }
     }
-
     public async Task DeleteAuditJobAsync(Guid auditJobId)
     {
         try 
@@ -65,12 +64,38 @@ internal sealed class AuditJobService(
             throw new Exception("Failed to delete AuditJob.", ex);
         }
     }
-
-    public Task<AuditJobModel> GetAuditJobByIdAsync(Guid Id)
+    public async Task<AuditJobModel> GetAuditJobByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditJob, id);
+            
+            var cachedEntity = await cacheService.GetAsync<AuditJob>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<AuditJobModel>(cachedEntity);
+            }
 
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditJob with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditJobTags,
+                expiration: CacheExpirations.MediumTerm    
+            );
+
+            return mapper.Map<AuditJobModel>(entity);  
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditJob by ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));

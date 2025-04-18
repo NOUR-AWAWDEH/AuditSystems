@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organisation.SubDepartment.Create;
-using AuditSystem.Application.Features.Organisation.SubDepartment.Update;
+using AuditSystem.Application.Features.Organization.SubDepartment.Create;
+using AuditSystem.Application.Features.Organization.SubDepartment.Update;
 using AuditSystem.Application.Features.Organization.SubDepartment.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;

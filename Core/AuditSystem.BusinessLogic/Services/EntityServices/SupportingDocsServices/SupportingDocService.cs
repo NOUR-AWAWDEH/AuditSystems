@@ -66,9 +66,37 @@ internal sealed class SupportingDocService(
         }
     }
 
-    public Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid Id)
+    public async Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SupportingDoc, id);
+
+            var cachedEntity = await cacheService.GetAsync<SupportingDoc>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<SupportingDocModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SupportingDoc with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SupportingDocTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<SupportingDocModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get SupportingDoc ID {id}.", ex);
+        }
     }
 
     public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)

@@ -16,7 +16,6 @@ internal sealed class SpecialProjectService(
 {
     private static readonly string[] SpecialProjectTags = ["special-projects", "special-project-list"];
     private static readonly string[] ListTags = ["special-project-list"]; // Tags for collections only
-
     public async Task<Guid> CreateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));
@@ -43,7 +42,6 @@ internal sealed class SpecialProjectService(
             throw new Exception("Failed to create SpecialProject.", ex);
         }
     }
-
     public async Task DeleteSpecialProjectAsync(Guid specialProjectId)
     {
         try 
@@ -65,12 +63,39 @@ internal sealed class SpecialProjectService(
             throw new Exception("Failed to delete SpecialProject.", ex);
         }
     }
-
-    public Task<SpecialProjectModel> GetSpecialProjectByIdAsync(Guid Id)
+    public async Task<SpecialProjectModel> GetSpecialProjectByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+       try
+       {
+           var cacheKey = string.Format(CacheKeys.SpecialProject, id);
 
+           var cachedEntity = await cacheService.GetAsync<SpecialProject>(cacheKey);
+
+           if (cachedEntity != null)
+           {
+               return mapper.Map<SpecialProjectModel>(cachedEntity);
+           }
+
+           var entity = await repository.GetByIdAsync(id);
+           if (entity == null)
+           {
+               throw new KeyNotFoundException($"SpecialProject with ID {id} not found.");
+           }
+
+           await cacheService.SetAsync(
+               key: cacheKey,
+               value: entity,
+               tags: SpecialProjectTags,
+               expiration: CacheExpirations.MediumTerm  
+           );
+
+           return mapper.Map<SpecialProjectModel>(entity);
+       }
+       catch (Exception ex)
+       {
+           throw new Exception($"Failed to get SpecialProject with ID {id}.", ex);
+       }
+    }
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));

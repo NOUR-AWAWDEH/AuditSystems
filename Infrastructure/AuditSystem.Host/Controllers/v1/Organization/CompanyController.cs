@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organisation.Company.Create;
-using AuditSystem.Application.Features.Organisation.Company.Update;
+using AuditSystem.Application.Features.Organization.Company.Create;
+using AuditSystem.Application.Features.Organization.Company.Update;
 using AuditSystem.Application.Features.Organization.Company.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;

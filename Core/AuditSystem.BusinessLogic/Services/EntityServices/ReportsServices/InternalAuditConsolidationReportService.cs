@@ -43,7 +43,6 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception("Failed to create InternalAuditConsolidationReport.", ex);
         }
     }
-
     public async Task DeleteInternalAuditConsolidationReportAsync(Guid internalAuditConsolidationReportId)
     {
         try
@@ -65,12 +64,40 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception("Failed to delete InternalAuditConsolidationReport.", ex);
         }
     }
-
-    public Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid Id)
+    public async Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, id);
 
+            var internalAuditConsolidationReport = await cacheService.GetAsync<InternalAuditConsolidationReport>(cacheKey);
+
+            if (internalAuditConsolidationReport != null)
+            {
+                return mapper.Map<InternalAuditConsolidationReportModel>(internalAuditConsolidationReport);
+            }
+
+            internalAuditConsolidationReport = await repository.GetByIdAsync(id);
+
+            if (internalAuditConsolidationReport == null)
+            {
+                throw new KeyNotFoundException($"InternalAuditConsolidationReport with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: internalAuditConsolidationReport,
+                tags: InternalAuditConsolidationReportTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<InternalAuditConsolidationReportModel>(internalAuditConsolidationReport);  
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get InternalAuditConsolidationReport by ID {id}.", ex);
+        }
+    }
     public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));

@@ -66,9 +66,37 @@ internal sealed class SkillSetService(
         }
     }
 
-    public Task<SkillSetModel> GetSkillSetByIdAsync(Guid Id)
+    public async Task<SkillSetModel> GetSkillSetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SkillSet, id);
+
+            var cachedSkillSet = await cacheService.GetAsync<SkillSet>(cacheKey);
+            if (cachedSkillSet != null)
+            {
+                return mapper.Map<SkillSetModel>(cachedSkillSet);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SkillSet with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SkillSetTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<SkillSetModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get SkillSet by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateSkillSetAsync(SkillSetModel skillSetModel)

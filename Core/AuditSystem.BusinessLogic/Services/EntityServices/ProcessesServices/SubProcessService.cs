@@ -43,7 +43,6 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to create SubProcess.", ex);
         }
     }
-
     public async Task DeleteSubProcessAsync(Guid subProcessId)
     {
         try 
@@ -65,12 +64,39 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to delete SubProcess.", ex);
         }
     }
-
-    public Task<SubProcessModel> GetSubProcessByIdAsync(Guid Id)
+    public async Task<SubProcessModel> GetSubProcessByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SubProcess, id);
 
+            var cachedSubProcess = await cacheService.GetAsync<SubProcess>(cacheKey);
+            if (cachedSubProcess != null)
+            {
+                return mapper.Map<SubProcessModel>(cachedSubProcess);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+               throw new KeyNotFoundException($"SubProcess with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SubProcessTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<SubProcessModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get SubProcess by ID {id}.", ex);
+        }
+    }
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)
     {
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));

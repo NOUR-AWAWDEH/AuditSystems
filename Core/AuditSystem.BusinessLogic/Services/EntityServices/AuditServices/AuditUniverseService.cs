@@ -43,7 +43,6 @@ internal sealed class AuditUniverseService(
             throw new Exception("Failed to create AuditUniverse.", ex);
         }
     }
-
     public async Task DeleteAuditUniverseAsync(Guid auditUniverseId)
     {
         try
@@ -65,12 +64,38 @@ internal sealed class AuditUniverseService(
            throw new Exception("Failed to delete AuditUniverse.", ex);
         }
     }
-
-    public Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid Id)
+    public async Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditUniverse, id);
+            
+            var cachedAuditUniverseModel = await cacheService.GetAsync<AuditUniverse>(cacheKey);
+            if (cachedAuditUniverseModel != null)
+            { 
+                return mapper.Map<AuditUniverseModel>(cachedAuditUniverseModel);
+            }
 
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null) 
+            {
+                throw new KeyNotFoundException($"AuditUniverse with ID {id} not found.");    
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditUniverseTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<AuditUniverseModel>(entity);  
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditUniverse by ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));

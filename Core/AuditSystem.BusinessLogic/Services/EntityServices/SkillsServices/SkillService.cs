@@ -65,9 +65,37 @@ internal sealed class SkillService(
         }
     }
 
-    public Task<SkillModel> GetSkillByIdAsync(Guid Id)
+    public async Task<SkillModel> GetSkillByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Skill, id);
+
+            var cachedSkill = await cacheService.GetAsync<Skill>(cacheKey) ;
+            if (cachedSkill != null)
+            {
+                return mapper.Map<SkillModel>(cachedSkill);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Skill with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SkillTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<SkillModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Skill by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateSkillAsync(SkillModel skillModel)

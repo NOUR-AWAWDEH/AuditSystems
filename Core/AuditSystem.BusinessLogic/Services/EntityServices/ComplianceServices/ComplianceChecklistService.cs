@@ -44,7 +44,6 @@ internal sealed class ComplianceChecklistService(
             throw new Exception("Failed to create ComplianceChecklist.", ex);
         }
     }
-
     public async Task DeleteComplianceChecklistAsync(Guid complianceChecklistId)
     {
         try
@@ -66,12 +65,39 @@ internal sealed class ComplianceChecklistService(
             throw new Exception("Failed to delete ComplianceChecklist.", ex);
         }
     }
-
-    public Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid Id)
+    public async Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, id);
 
+            var cachedEntity = await cacheService.GetAsync<ComplianceChecklist>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<ComplianceChecklistModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"ComplianceChecklist with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ComplianceChecklistTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<ComplianceChecklistModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get ComplianceChecklist ID {id}.", ex);
+        }
+    }
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));

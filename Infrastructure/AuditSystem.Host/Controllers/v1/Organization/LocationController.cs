@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organisation.LocationModle.Create;
-using AuditSystem.Application.Features.Organisation.LocationModle.Update;
+using AuditSystem.Application.Features.Organization.Location.Create;
+using AuditSystem.Application.Features.Organization.Location.Update;
 using AuditSystem.Application.Features.Organization.Location.Delete;
 using AuditSystem.Host.Responses;
 using MediatR;

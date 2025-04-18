@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class CompanyService(
     IRepository<Guid, Company> repository,
@@ -67,9 +67,37 @@ internal sealed class CompanyService(
         }
     }
 
-    public Task<CompanyModel> GetCompanyByIdAsync(Guid Id)
+    public async Task<CompanyModel> GetCompanyByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Company, id);
+            var cachedCompany = await cacheService.GetAsync<Company>(cacheKey);
+
+            if (cachedCompany != null)
+            {
+                return mapper.Map<CompanyModel>(cachedCompany);
+            }
+
+            var company = await repository.GetByIdAsync(id);
+            if (company == null)
+            {
+                throw new KeyNotFoundException($"Company with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: company,
+                tags: CompanyTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<CompanyModel>(company); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Company ID {id}.", ex);
+        }
     }
 
     public async Task UpdateCompanyAsync(CompanyModel companyModel)

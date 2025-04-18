@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class SubLocationService(
     IRepository<Guid, SubLocation> repository,
@@ -43,7 +43,6 @@ internal sealed class SubLocationService(
             throw new Exception("Failed to create SubLocation.", ex);
         }
     }
-
     public async Task DeleteSubLocationAsync(Guid subLocationId)
     {
         try 
@@ -65,12 +64,38 @@ internal sealed class SubLocationService(
             throw new Exception("Failed to delete SubLocation.", ex);
         }
     }
-
-    public Task<SubLocationModel> GetSubLocationByIdAsync(Guid Id)
+    public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SubLocation, id);
 
+            var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<SubLocationModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SubLocation with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SubLocationTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<SubLocationModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get SubLocation by ID {id}.", ex);
+        }
+    }
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));

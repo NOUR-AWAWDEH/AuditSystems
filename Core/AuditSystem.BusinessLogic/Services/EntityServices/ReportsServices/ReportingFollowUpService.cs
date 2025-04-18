@@ -43,7 +43,6 @@ internal sealed class ReportingFollowUpService(
             throw new Exception("Failed to create ReportingFollowUp.", ex);
         }
     }
-
     public async Task DeleteReportingFollowUpAsync(Guid reportingFollowUpId)
     {
         try
@@ -65,12 +64,38 @@ internal sealed class ReportingFollowUpService(
             throw new Exception("Failed to delete ReportingFollowUp.", ex);
         }
     }
-
-    public Task<ReportingFollowUpModel> GetReportingFollowUpByIdAsync(Guid Id)
+    public async Task<ReportingFollowUpModel> GetReportingFollowUpByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, id);
+            
+            var cachedEntity = await cacheService.GetAsync<ReportingFollowUp>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<ReportingFollowUpModel>(cachedEntity);
+            }
 
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"ReportingFollowUp with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ReportingFollowUpTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<ReportingFollowUpModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get ReportingFollowUp by ID {id}.", ex);
+        }
+    }
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));

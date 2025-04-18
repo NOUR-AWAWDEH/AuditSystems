@@ -66,9 +66,37 @@ internal sealed class RiskProgramService(
         }
     }
 
-    public Task<RiskProgramModel> GetRiskProgramByIdAsync(Guid Id)
+    public async Task<RiskProgramModel> GetRiskProgramByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+       try
+       {
+            var cacheKey = string.Format(CacheKeys.RiskProgram, id);
+
+            var cachedRiskProgram = await cacheService.GetAsync<RiskProgram>(cacheKey);
+            if (cachedRiskProgram != null)
+            {
+                return mapper.Map<RiskProgramModel>(cachedRiskProgram);
+            }
+
+            var riskProgram = await repository.GetByIdAsync(id);
+            if (riskProgram == null)
+            {
+                throw new KeyNotFoundException($"RiskProgram with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: riskProgram,
+                tags: RiskProgramTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<RiskProgramModel>(riskProgram);
+       }
+       catch (Exception ex)
+       {
+           throw new Exception($"Failed to get RiskProgram by ID {id}.", ex);
+       }
     }
 
     public async Task UpdateRiskProgramAsync(RiskProgramModel riskProgramModel)

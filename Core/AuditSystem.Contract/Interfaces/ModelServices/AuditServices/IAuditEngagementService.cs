@@ -7,5 +7,5 @@ public interface IAuditEngagementService
     public Task<Guid> CreateAuditEngagementAsync(AuditEngagementModel auditEngagementModel);
     public Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel);
     public Task DeleteAuditEngagementAsync(Guid auditEngagementId);
-    public Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid Id);
+    public Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid id);
 }

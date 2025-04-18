@@ -16,7 +16,6 @@ internal sealed class ChecklistService(
 {
     private static readonly string[] ChecklistTags = ["checklists", "checklist-list"];
     private static readonly string[] ListTags = ["checklist-list"]; // Tags for collections only
-
     public async Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));
@@ -44,7 +43,6 @@ internal sealed class ChecklistService(
             throw new Exception("Failed to create Checklist.", ex);
         }
     }
-
     public async Task DeleteChecklistAsync(Guid checklistId)
     {
         try 
@@ -66,12 +64,38 @@ internal sealed class ChecklistService(
             throw new Exception("Failed to delete Checklist.", ex);
         }
     }
-
-    public Task<ChecklistModel> GetChecklistByIdAsync(Guid Id)
+    public async Task<ChecklistModel> GetChecklistByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Checklist, id);
+            
+            var cachedEntity = await cacheService.GetAsync<Checklist>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<ChecklistModel>(cachedEntity);  
+            }
 
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Checklist with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ChecklistTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<ChecklistModel>(cachedEntity);      
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Checklist with ID {id}.", ex);
+        }
+    }
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));

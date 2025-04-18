@@ -43,7 +43,6 @@ internal sealed class JobTimeAllocationReportService(
             throw new Exception("Failed to create JobTimeAllocationReport.", ex);
         }
     }
-
     public async Task DeleteJobTimeAllocationReportAsync(Guid jobTimeAllocationReportId)
     {
         try 
@@ -66,12 +65,38 @@ internal sealed class JobTimeAllocationReportService(
         }
         
     }
-
-    public Task<JobTimeAllocationReportModel> GetJobTimeAllocationReportByIdAsync(Guid Id)
+    public async Task<JobTimeAllocationReportModel> GetJobTimeAllocationReportByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, id);
 
+            var entity = await cacheService.GetAsync<JobTimeAllocationReport>(cacheKey);
+            if (entity != null)
+            {
+                return mapper.Map<JobTimeAllocationReportModel>(entity); 
+            }
+
+            entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobTimeAllocationReport with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobTimeAllocationReportTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<JobTimeAllocationReportModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to get JobTimeAllocationReport by ID.", ex);
+        }
+    }
     public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));

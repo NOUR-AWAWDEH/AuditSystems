@@ -66,9 +66,37 @@ internal sealed class AuditUniverseObjectiveService(
         }
     }
 
-    public Task<AuditUniverseObjectiveModel> GetAuditUniverseObjectiveByIdAsync(Guid Id)
+    public async Task<AuditUniverseObjectiveModel> GetAuditUniverseObjectiveByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditUniverseObjective, id);
+            
+            var cachedModel = await cacheService.GetAsync<AuditUniverseObjective>(cacheKey);
+            if (cachedModel != null)   
+            {
+                return mapper.Map<AuditUniverseObjectiveModel>(cachedModel);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Audit Universe Objective with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditUniverseObjectiveTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<AuditUniverseObjectiveModel>(entity);  
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Audit Universe Objective ID {id}.", ex);
+        }
     }
 
     public async Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)

@@ -67,9 +67,37 @@ internal sealed class TaskManagementService(
 
     }
 
-    public Task<TaskManagementModel> GetTaskByIdAsync(Guid Id)
+    public async Task<TaskManagementModel> GetTaskByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+           var cacheKey = string.Format(CacheKeys.TaskManagement, id);
+
+            var cachedEntity = await cacheService.GetAsync<TaskManagement>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<TaskManagementModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"TaskManagement with ID {id} not found.");
+            } 
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: TaskManagementTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<TaskManagementModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get TaskManagement by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)

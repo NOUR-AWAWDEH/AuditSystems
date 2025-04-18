@@ -66,9 +66,37 @@ internal sealed class RiskControlService(
         }
     }
 
-    public Task<RiskControlsModel> GetRiskControlByIdAsync(Guid Id)
+    public async Task<RiskControlsModel> GetRiskControlByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.RiskControl, id);
+
+            var cachedRiskControl = await cacheService.GetAsync<RiskControls>(cacheKey);
+            if (cachedRiskControl != null)
+            {
+                return mapper.Map<RiskControlsModel>(cachedRiskControl);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskControl with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskControlTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<RiskControlsModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get RiskControl by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateRiskControlAsync(RiskControlsModel riskControlModel)

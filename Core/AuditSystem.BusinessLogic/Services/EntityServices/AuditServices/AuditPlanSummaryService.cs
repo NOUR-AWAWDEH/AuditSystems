@@ -16,7 +16,6 @@ internal sealed class AuditPlanSummaryService(
 {
     private static readonly string[] AuditPlanSummaryTags = ["audit-plan-summaries", "audit-plan-summary-list"];
     private static readonly string[] ListTags = ["audit-plan-summary-list"]; // Tags for collections only
-
     public async Task<Guid> CreateAuditPlanSummaryAsync(AuditPlanSummaryModel auditPlanSummaryModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryModel, nameof(auditPlanSummaryModel));
@@ -44,7 +43,6 @@ internal sealed class AuditPlanSummaryService(
             throw new Exception("Failed to create AuditPlanSummary.", ex);
         }
     }
-
     public async Task DeleteAuditPlanSummaryAsync(Guid auditPlanSummaryId)
     {
         try
@@ -66,12 +64,38 @@ internal sealed class AuditPlanSummaryService(
             throw new Exception("Failed to delete AuditPlanSummary.", ex);
         }
     }
-
-    public Task<AuditPlanSummaryModel> GetAuditPlanSummaryByIdAsync(Guid Id)
+    public async Task<AuditPlanSummaryModel> GetAuditPlanSummaryByIdAsync(Guid Id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditPlanSummary, Id);
+            
+            var cachedModel = await cacheService.GetAsync<AuditPlanSummary>(cacheKey);
+            if (cachedModel != null)
+            {
+                return mapper.Map<AuditPlanSummaryModel>(cachedModel);
+            }
 
+            var entity = await repository.GetByIdAsync(Id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditPlanSummary with ID {Id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditPlanSummaryTags,
+                expiration: CacheExpirations.MediumTerm
+                );
+
+            return mapper.Map<AuditPlanSummaryModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditPlanSummary ID {Id}.", ex);
+        }
+    }
     public async Task UpdateAuditPlanSummaryAsync(AuditPlanSummaryModel auditPlanSummaryModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryModel, nameof(auditPlanSummaryModel));

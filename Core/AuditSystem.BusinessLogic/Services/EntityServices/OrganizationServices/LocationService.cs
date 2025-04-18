@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class LocationService(
     IRepository<Guid, Location> repository,
@@ -43,7 +43,6 @@ internal sealed class LocationService(
             throw new Exception("Failed to create Location.", ex);
         }
     }
-
     public async Task DeleteLocationAsync(Guid locationId)
     {
         try 
@@ -65,12 +64,38 @@ internal sealed class LocationService(
             throw new Exception("Failed to delete Location.", ex);
         }
     }
-
-    public Task<LocationModel> GetLocationByIdAsync(Guid Id)
+    public async Task<LocationModel> GetLocationByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Location, id);
 
+            var cachedLocation = await cacheService.GetAsync<Location>(cacheKey);
+            if (cachedLocation != null)
+            {
+                return mapper.Map<LocationModel>(cachedLocation);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Location with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: LocationTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+
+            return mapper.Map<LocationModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Location by ID {id}.", ex);
+        }  
+    }
     public async Task UpdateLocationAsync(LocationModel locationModel)
     {
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));

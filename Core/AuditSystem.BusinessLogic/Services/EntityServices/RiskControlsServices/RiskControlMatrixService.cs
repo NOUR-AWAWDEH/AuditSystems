@@ -43,7 +43,6 @@ internal sealed class RiskControlMatrixService(
             throw new Exception("Failed to create RiskControlMatrix.", ex);
         }
     }
-
     public async Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId)
     {
         try
@@ -65,12 +64,38 @@ internal sealed class RiskControlMatrixService(
             throw new Exception("Failed to delete RiskControlMatrix.", ex);
         }
     }
-
-    public Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid Id)
+    public async Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, id);
 
+            var cachedEntity = await cacheService.GetAsync<RiskControlMatrix>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<RiskControlMatrixModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskControlMatrix with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskControlMatrixTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<RiskControlMatrixModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get RiskControlMatrix by ID {id}.", ex);
+        }
+    }
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));

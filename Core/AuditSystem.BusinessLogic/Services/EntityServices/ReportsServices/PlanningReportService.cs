@@ -43,7 +43,6 @@ internal sealed class PlanningReportService(
             throw new Exception("Failed to create PlanningReport.", ex);
         }
     }
-
     public async Task DeletePlanningReportAsync(Guid planningReportId)
     {
         try
@@ -65,12 +64,39 @@ internal sealed class PlanningReportService(
             throw new Exception("Failed to delete PlanningReport.", ex);
         }
     }
-
-    public Task<PlanningReportModel> GetPlanningReportByIdAsync(Guid Id)
+    public async Task<PlanningReportModel> GetPlanningReportByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.PlanningReport, id);
 
+            var cachedEntity = await cacheService.GetAsync<PlanningReport>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<PlanningReportModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"PlanningReport with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: PlanningReportTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<PlanningReportModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get PlanningReport by ID {id}.", ex);
+        }  
+    }
     public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
         ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));

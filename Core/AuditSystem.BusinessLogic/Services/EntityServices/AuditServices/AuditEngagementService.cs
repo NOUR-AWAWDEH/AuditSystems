@@ -32,7 +32,8 @@ internal sealed class AuditEngagementService(
                 key: cacheKey,
                 value: createdEntity,
                 tags: AuditEngagementServiceTags,
-                expiration: CacheExpirations.MediumTerm);
+                expiration: CacheExpirations.MediumTerm
+            );
 
             await cacheService.RemoveCacheByTagAsync(ListTags);
 
@@ -67,9 +68,37 @@ internal sealed class AuditEngagementService(
         }
     }
 
-    public Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid Id)
+    public async Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid Id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditEngagement, Id);
+
+            var cachedModel = await cacheService.GetAsync<AuditEngagement>(cacheKey);
+            if (cachedModel != null)
+            {
+                return mapper.Map<AuditEngagementModel>(cachedModel);
+            }
+
+            var entity = await repository.GetByIdAsync(Id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Audit Engagement with ID {Id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditEngagementServiceTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<AuditEngagementModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Audit Engagment by ID {Id}.", ex);
+        }
     }
 
     public async Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)

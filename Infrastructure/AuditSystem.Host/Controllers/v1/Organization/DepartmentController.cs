@@ -1,6 +1,6 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organisation.Department.Create;
-using AuditSystem.Application.Features.Organisation.Department.Update;
+using AuditSystem.Application.Features.Organization.Department.Create;
+using AuditSystem.Application.Features.Organization.Department.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

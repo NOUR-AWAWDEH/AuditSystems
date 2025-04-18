@@ -17,13 +17,13 @@ internal sealed class AuditDomainService(
     private static readonly string[] AuditDomainTags = ["audit-domains", "audit-domain-list"];
     private static readonly string[] ListTags = ["audit-domain-list"]; // Tags for collections only
 
-    public async Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomianModel)
+    public async Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomainModel)
     {
-        ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));
+        ArgumentNullException.ThrowIfNull(auditDomainModel, nameof(auditDomainModel));
 
         try
         {
-            var entity = mapper.Map<AuditDomain>(auditDomianModel);
+            var entity = mapper.Map<AuditDomain>(auditDomainModel);
             var createdEntity = await repository.CreateAsync(entity);
 
             var cacheKey = string.Format(CacheKeys.AuditDomain, createdEntity.Id);
@@ -44,7 +44,7 @@ internal sealed class AuditDomainService(
             throw new Exception("Failed to create AuditDomain.", ex);
         }
     }
-
+    
     public async Task DeleteAuditDomainAsync(Guid auditDomainId)
     {
         try
@@ -66,12 +66,43 @@ internal sealed class AuditDomainService(
             throw new Exception("Failed to delete AuditDomain.", ex);
         }
     }
-
-    public Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid Id)
+    
+    public async Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditDomain, id);
+            
+            // Try to get from cache first
+            var cachedEntity = await cacheService.GetAsync<AuditDomain>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<AuditDomainModel>(cachedEntity);
+            }
 
+            // Cache miss - get from repository
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditDomain with ID {id} not found.");
+            }
+
+            // Store entity in cache
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditDomainTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            // Map to model and return
+            return mapper.Map<AuditDomainModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditDomain with ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel)
     {
         ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));

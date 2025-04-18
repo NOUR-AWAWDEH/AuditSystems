@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Domain.Entities.Users;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServies;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServices;
 
 internal sealed class UserDesignationService(
     IRepository<Guid, UserDesignation> repository,
@@ -66,9 +66,37 @@ internal sealed class UserDesignationService(
         }
     }
 
-    public Task<UserDesignationModel> GetUserDesignationByIdAsync(Guid Id)
+    public async Task<UserDesignationModel> GetUserDesignationByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.UserDesignation, id);
+
+            var cachedEntity = await cacheService.GetAsync<UserDesignation>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<UserDesignationModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"User Designation with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: UserDesignationTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+            
+            return mapper.Map<UserDesignationModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get User Designation by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)
@@ -80,7 +108,7 @@ internal sealed class UserDesignationService(
             var entity = mapper.Map<UserDesignation>(userDesignationModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.UserDesignation, entity.Id);
+            var cacheKey = string.Format(CacheKeys.UserDesignation.ToString(), entity.Id);
             
             await cacheService.SetAsync(
                 key: cacheKey,

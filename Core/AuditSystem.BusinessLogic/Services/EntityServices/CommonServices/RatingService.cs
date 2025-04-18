@@ -43,7 +43,6 @@ internal sealed class RatingService(
             throw new Exception("Failed to create Rating.", ex);
         }
     }
-
     public async Task DeleteRatingAsync(Guid ratingId)
     {
         try
@@ -65,12 +64,38 @@ internal sealed class RatingService(
             throw new Exception("Failed to delete Rating.", ex);
         }
     }
-
-    public Task<RatingModel> GetRatingByIdAsync(Guid Id)
+    public async Task<RatingModel> GetRatingByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Rating, id);
 
+            var cachedEntity = await cacheService.GetAsync<Rating>(cacheKey);
+            if (cachedEntity is not null)
+            {
+                return mapper.Map<RatingModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity is null)
+            {
+                throw new KeyNotFoundException($"Rating with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RatingTags,
+                expiration: CacheExpirations.MediumTerm 
+            );
+
+            return mapper.Map<RatingModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Rating by ID.{id}", ex);
+        }
+    }
     public async Task UpdateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));

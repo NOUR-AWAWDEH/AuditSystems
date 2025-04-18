@@ -6,7 +6,7 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganisationServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class SubDepartmentService(
     IRepository<Guid, SubDepartment> repository,
@@ -43,7 +43,6 @@ internal sealed class SubDepartmentService(
             throw new Exception("Failed to create SubDepartment.", ex);
         }
     }
-
     public async Task DeleteSubDepartmentAsync(Guid subDepartmentId)
     {
         try 
@@ -65,12 +64,40 @@ internal sealed class SubDepartmentService(
             throw new Exception("Failed to delete SubDepartment.", ex);
         }
     }
-
-    public Task<SubDepartmentModel> GetSubDepartmentByIdAsync(Guid Id)
+    public async Task<SubDepartmentModel> GetSubDepartmentByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SubDepartment, id);
 
+            var cachedEntity = await cacheService.GetAsync<SubDepartment>(cacheKey);
+
+            if (cachedEntity != null)
+            {
+                return mapper.Map<SubDepartmentModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"SubDepartment with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SubDepartmentTags,
+                expiration: CacheExpirations.MediumTerm  
+            );
+
+            return mapper.Map<SubDepartmentModel>(entity);  
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get SubDepartment by ID {id}.", ex);
+        }
+    }
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)
     {
         ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));

@@ -16,7 +16,6 @@ internal sealed class RemarkService(
 {
     private static readonly string[] RemarkTags = ["remarks", "remark-list"];
     private static readonly string[] ListTags = ["remark-list"]; // Tags for collections only
-
     public async Task<Guid> CreateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));
@@ -43,7 +42,6 @@ internal sealed class RemarkService(
             throw new Exception("Failed to create Remark.", ex);
         }
     }
-
     public async Task DeleteRemarkAsync(Guid remarkId)
     {
         try
@@ -66,12 +64,38 @@ internal sealed class RemarkService(
         }
 
     }
-
-    public Task<RemarkModel> GetRemarkByIdAsync(Guid Id)
+    public async Task<RemarkModel> GetRemarkByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+       try
+       {
+            var cacheKey = string.Format(CacheKeys.Remark, id);
 
+            var cachedEntity = await cacheService.GetAsync<Remark>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<RemarkModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Remark with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RemarkTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<RemarkModel>(entity);  
+       }
+       catch (Exception ex)
+       {
+            throw new Exception($"Failed to get Remark ID {id}.", ex);
+       }
+    }
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));

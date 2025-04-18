@@ -16,7 +16,6 @@ internal sealed class BusinessObjectiveService(
 {
     private static readonly string[] BusinessObjectiveTags = ["business-objectives", "business-objective-list"];
     private static readonly string[] ListTags = ["business-objective-list"]; // Tags for collections only
-
     public async Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
@@ -43,7 +42,6 @@ internal sealed class BusinessObjectiveService(
             throw new Exception("Failed to create BusinessObjective.", ex);
         }
     }
-
     public async Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId)
     {
         try 
@@ -65,10 +63,37 @@ internal sealed class BusinessObjectiveService(
             throw new Exception("Failed to delete BusinessObjective.", ex);
         }
     }
-
-    public Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid Id)
+    public async Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.BusinessObjective, id);
+
+            var cachedBusinessObjectiveModel = await cacheService.GetAsync<BusinessObjective>(cacheKey);
+            if (cachedBusinessObjectiveModel!= null)
+            {
+                return mapper.Map<BusinessObjectiveModel>(cachedBusinessObjectiveModel);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"BusinessObjective with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: BusinessObjectiveTags,
+                expiration: CacheExpirations.MediumTerm 
+            );
+
+            return mapper.Map<BusinessObjectiveModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get BusinessObjective ID {id}", ex);
+        }
     }
 
     public async Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)

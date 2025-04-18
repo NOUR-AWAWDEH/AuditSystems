@@ -43,7 +43,6 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception("Failed to create AuditExceptionReport.", ex);
         }
     }
-
     public async Task DeleteAuditExceptionReportAsync(Guid auditExceptionReportId)
     {
         try 
@@ -65,12 +64,39 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception("Failed to delete AuditExceptionReport.", ex);
         }
     }
-
-    public Task<AuditExceptionReportModel> GetAuditExceptionReportByIdAsync(Guid Id)
+    public async Task<AuditExceptionReportModel> GetAuditExceptionReportByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, id);
 
+            var cachedEntity = await cacheService.GetAsync<AuditExceptionReport>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<AuditExceptionReportModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditExceptionReport with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditExceptionReportTags,
+                expiration: CacheExpirations.MediumTerm
+            ); 
+
+            return mapper.Map<AuditExceptionReportModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditExceptionReport by ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));

@@ -16,7 +16,6 @@ internal sealed class JobPrioritizationService(
 {
     private static readonly string[] JobPrioritizationTags = ["job-prioritizations", "job-prioritization-list"];
     private static readonly string[] ListTags = ["job-prioritization-list"]; // Tags for collections only
-
     public async Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
@@ -43,7 +42,6 @@ internal sealed class JobPrioritizationService(
             throw new Exception("Failed to create JobPrioritization.", ex);
         }
     }
-
     public async Task DeleteJobPrioritizationAsync(Guid jobPrioritizationId)
     {
         try 
@@ -65,12 +63,38 @@ internal sealed class JobPrioritizationService(
             throw new Exception("Failed to delete JobPrioritization.", ex);
         }
     }
-
-    public Task<JobPrioritizationModel> GetJobPrioritizationByIdAsync(Guid Id)
+    public async Task<JobPrioritizationModel> GetJobPrioritizationByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.JobPrioritization, id);
 
+            var cachedEntity = await cacheService.GetAsync<JobPrioritization>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<JobPrioritizationModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobPrioritization with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobPrioritizationTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<JobPrioritizationModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to retrieve JobPrioritization by ID {id}.", ex);
+        }
+    }
     public async Task UpdateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));

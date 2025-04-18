@@ -43,7 +43,6 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to create AuditProcess.", ex);
         }
     }
-
     public async Task DeleteAuditProcessAsync(Guid auditProcessId)
     {
         try 
@@ -65,12 +64,38 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to delete AuditProcess.", ex);
         }
     }
-
-    public Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid Id)
+    public async Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.AuditProcess, id);
 
+            var cachedEntity = await cacheService.GetAsync<AuditProcess>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<AuditProcessModel>(cachedEntity); 
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"AuditProcess with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: AuditProcessTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<AuditProcessModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get AuditProcess ID {id}.", ex);
+        }
+    }
     public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
     {
         ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));

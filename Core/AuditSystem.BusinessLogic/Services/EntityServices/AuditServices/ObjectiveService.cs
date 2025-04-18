@@ -16,7 +16,6 @@ internal class ObjectiveService(
 {
     private static readonly string[] ObjectiveTags = ["objectives", "objective-list"];
     private static readonly string[] ListTags = ["objective-list"];
-
     public async Task<Guid> CreateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(ObjectiveModel));
@@ -43,7 +42,6 @@ internal class ObjectiveService(
             throw new Exception("Failed to create Objective.", ex);
         }
     }
-
     public async Task DeleteObjectiveAsync(Guid objectiveId)
     {
         try
@@ -65,12 +63,38 @@ internal class ObjectiveService(
             throw new Exception("Failed to delete Objective.", ex);
         }
     }
-
-    public Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
+    public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.Objective, Id);
 
+            var cachedObjectiveModel = await cacheService.GetAsync<Objective>(cacheKey);
+            if (cachedObjectiveModel != null)
+            {
+                return mapper.Map<ObjectiveModel>(cachedObjectiveModel);
+            }
+
+            var entity = await repository.GetByIdAsync(Id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Objective with ID {Id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: ObjectiveTags,
+                expiration: CacheExpirations.MediumTerm  
+            );
+
+            return mapper.Map<ObjectiveModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to get Objective.", ex);
+        }
+    }
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));

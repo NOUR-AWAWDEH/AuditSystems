@@ -66,9 +66,37 @@ internal sealed class RiskAssessmentService(
         }
     }
 
-    public Task<RiskAssessmentModel> GetRiskAssessmentByIdAsync(Guid Id)
+    public async Task<RiskAssessmentModel> GetRiskAssessmentByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.RiskAssessment, id);
+
+            var cachedRiskAssessment = await cacheService.GetAsync<RiskAssessment>(cacheKey);
+            if (cachedRiskAssessment != null)
+            {
+                return mapper.Map<RiskAssessmentModel>(cachedRiskAssessment);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"RiskAssessment with ID {id} not found."); 
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: RiskAssessmentTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<RiskAssessmentModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get RiskAssessment ID {id}.", ex);
+        }
     }
 
     public async Task UpdateRiskAssessmentAsync(RiskAssessmentModel riskAssessmentModel)

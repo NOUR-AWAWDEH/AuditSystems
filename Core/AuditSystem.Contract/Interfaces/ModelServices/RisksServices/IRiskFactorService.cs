@@ -7,5 +7,5 @@ public interface IRiskFactorService
     public Task<Guid> CreateRiskFactorAsync(RiskFactorModel riskFactorModel);
     public Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel);
     public Task DeleteRiskFactorAsync(Guid riskFactorId);
-    public Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid Id);
+    public Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid id);
 }

@@ -66,9 +66,37 @@ internal sealed class JobSchedulingService(
         }
     }
 
-    public Task<JobSchedulingModel> GetJobSchedulingByIdAsync(Guid Id)
+    public async Task<JobSchedulingModel> GetJobSchedulingByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.JobScheduling, id);
+
+            var cachedEntity = await cacheService.GetAsync<JobScheduling>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<JobSchedulingModel>(cachedEntity);
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"JobScheduling with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: JobSchedulingTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<JobSchedulingModel>(entity); 
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to get JobScheduling by ID.", ex);
+        }
     }
 
     public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)

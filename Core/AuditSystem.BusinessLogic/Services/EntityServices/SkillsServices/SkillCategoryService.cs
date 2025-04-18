@@ -66,9 +66,37 @@ internal sealed class SkillCategoryService(
         }
     }
 
-    public Task<SkillCategoryModel> GetSkillCategoryByIdAsync(Guid Id)
+    public async Task<SkillCategoryModel> GetSkillCategoryByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var cacheKey = string.Format(CacheKeys.SkillCategory, id);
+
+            var cachedEntity = await cacheService.GetAsync<SkillCategory>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<SkillCategoryModel>(cachedEntity); 
+            }
+
+            var entity = await repository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Skill Category with ID {id} not found.");
+            }
+
+            await cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: SkillCategoryTags,
+                expiration: CacheExpirations.MediumTerm
+            );
+
+            return mapper.Map<SkillCategoryModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to get Skill Category by ID {id}.", ex);
+        }
     }
 
     public async Task UpdateSkillCategoryAsync(SkillCategoryModel skillCategoryModel)

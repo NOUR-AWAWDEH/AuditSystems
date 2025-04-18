@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.DataAccess", "I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Host", "Infrastructure\AuditSystem.Host\AuditSystem.Host.csproj", "{98FFC83F-75FE-45E3-BB1E-CCED67338445}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Auth", "Infrastructure\AuditSystem.Auth\AuditSystem.Auth.csproj", "{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,18 @@ Global
 		{98FFC83F-75FE-45E3-BB1E-CCED67338445}.Release|x64.Build.0 = Release|Any CPU
 		{98FFC83F-75FE-45E3-BB1E-CCED67338445}.Release|x86.ActiveCfg = Release|Any CPU
 		{98FFC83F-75FE-45E3-BB1E-CCED67338445}.Release|x86.Build.0 = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|x64.Build.0 = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Debug|x86.Build.0 = Debug|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|x64.ActiveCfg = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|x64.Build.0 = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|x86.ActiveCfg = Release|Any CPU
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,5 +126,9 @@ Global
 		{BFC43A19-32E9-459C-93E4-BEE2CCB7986C} = {FBF56CC3-7AE6-AD2D-3F14-7F97FD322CD6}
 		{4374BBF0-C776-4B61-9479-00B40845A0CE} = {DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}
 		{98FFC83F-75FE-45E3-BB1E-CCED67338445} = {DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}
+		{EA80EB17-CB9C-46A2-9F9A-844145CF26AA} = {DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B470A10F-4A70-430E-9787-628D326732DD}
 	EndGlobalSection
 EndGlobal

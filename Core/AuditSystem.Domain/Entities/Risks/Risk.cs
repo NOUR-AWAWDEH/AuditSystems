@@ -1,15 +1,15 @@
-using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.Common;
 
-namespace AuditSystem.Domain.Entities.Risks
+namespace AuditSystem.Domain.Entities.Risks;
+
+public class Risk : Entity<Guid>
 {
-    public class Risk : Entity<Guid>
-    {
-        public Guid ObjectiveId { get; set; }
-        public string Rating { get; set; } = string.Empty;
-        public string RiskName { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+    public required Guid ObjectiveId { get; set; }
+    public required string RiskName { get; set; } = string.Empty;
+    public required Guid RatingId { get; set; }
+    public string Description { get; set; } = string.Empty;
 
-        public Objective Objective { get; set; } = null!;
-    }
+    public virtual Rating Rating { get; set; } = null!;
+    public virtual Objective Objective { get; set; } = null!;
 }

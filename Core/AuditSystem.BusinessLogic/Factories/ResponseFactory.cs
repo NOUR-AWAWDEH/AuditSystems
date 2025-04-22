@@ -15,7 +15,7 @@ public static class ResponseFactory
             Content = JsonSerializer.Serialize(new
             {
                 error = "too_many_requests",
-                message = "Too many login attempts. Please try again later.",
+                message = "Too many request attempts. Please try again later.",
                 retry_after_seconds = (int)remainingTime.TotalSeconds
             })
         };

@@ -4,6 +4,7 @@ using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
+using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Host.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ public sealed class PasswordController(
         ControllerBase
 {
     [HttpPost("forgot-password")]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         if (string.IsNullOrEmpty(request.Email))
@@ -46,6 +48,7 @@ public sealed class PasswordController(
     }
 
     [HttpPost("verify-reset-code")]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse<string>>> VerifyResetCode([FromBody] VerifyResetCodeDto request)
     {
         var user = await _accountService.FindByEmailAsync(request.Email);
@@ -61,6 +64,7 @@ public sealed class PasswordController(
     }
 
     [HttpPost("reset-password")]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ResetPassword([FromBody] ResetPasswordDto request)
     {
         if (request.NewPassword != request.ConfirmNewPassword)

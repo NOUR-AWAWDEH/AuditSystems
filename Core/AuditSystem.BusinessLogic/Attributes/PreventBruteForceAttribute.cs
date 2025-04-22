@@ -10,14 +10,14 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.BusinessLogic.Attributes;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class PreventLoginBruteForceAttribute : Attribute, IAsyncActionFilter
+public sealed class PreventBruteForceAttribute : Attribute, IAsyncActionFilter
 {
     private const int DefaultRequestLimit = 5;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly int _requestLimit;
 
-    public PreventLoginBruteForceAttribute(int requestLimit = DefaultRequestLimit)
+    public PreventBruteForceAttribute(int requestLimit = DefaultRequestLimit)
     {
         _requestLimit = requestLimit > 0 ? requestLimit : DefaultRequestLimit;
     }
@@ -26,7 +26,7 @@ public sealed class PreventLoginBruteForceAttribute : Attribute, IAsyncActionFil
     {
         var serviceProvider = context.HttpContext.RequestServices;
         var cache = serviceProvider.GetRequiredService<IMemoryCache>();
-        var logger = serviceProvider.GetService<ILogger<PreventLoginBruteForceAttribute>>();
+        var logger = serviceProvider.GetService<ILogger<PreventBruteForceAttribute>>();
         var ip = IpHelper.GetClientIp(context.HttpContext);
 
         await _semaphore.WaitAsync();

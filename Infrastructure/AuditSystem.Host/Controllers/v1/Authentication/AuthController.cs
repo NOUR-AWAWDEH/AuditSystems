@@ -19,7 +19,7 @@ public sealed class AuthController(
 {
 
     [HttpPost("login")]
-    [PreventLoginBruteForce]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> LoginAsync([FromBody] LoginRequestDto request)
     {
         if (!ModelState.IsValid)

@@ -35,76 +35,70 @@ internal sealed class AuditPlanSummaryReportService(
             var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditPlanSummaryReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for AuditPlanSummaryReportModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create AuditPlanSummaryReport.", ex);
+            logger.LogError(ex, "Failed to create AuditPlanSummaryReport");
+            throw new InvalidOperationException("Failed to create AuditPlanSummaryReport.", ex);
         }
     }
     
     public async Task DeleteAuditPlanSummaryReportAsync(Guid auditPlanSummaryReportId)
     {
+        var cacheKey = GetCacheKey(auditPlanSummaryReportId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(auditPlanSummaryReportId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditPlanSummaryReport with ID {auditPlanSummaryReportId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(auditPlanSummaryReportId)
+                ?? throw new KeyNotFoundException($"AuditPlanSummaryReport with ID {auditPlanSummaryReportId} not found.");
 
             await repository.DeleteAsync(auditPlanSummaryReportId);
-
-            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, auditPlanSummaryReportId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "AuditPlanSummaryReport with ID {ReportId} not found", auditPlanSummaryReportId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete AuditPlanSummaryReport.", ex);
+            logger.LogError(ex, "Failed to delete AuditPlanSummaryReport ID {ReportId}", auditPlanSummaryReportId);
+            throw new InvalidOperationException($"Failed to delete AuditPlanSummaryReport: {auditPlanSummaryReportId}", ex);
         }
     }
     
     public async Task<AuditPlanSummaryReportModel> GetAuditPlanSummaryReportByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, id);
-
             var cachedEntity = await cacheService.GetAsync<AuditPlanSummaryReport>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<AuditPlanSummaryReportModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditPlanSummaryReport with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"AuditPlanSummaryReport with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditPlanSummaryReportTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<AuditPlanSummaryReportModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<AuditPlanSummaryReportModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get AuditPlanSummaryReport by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve AuditPlanSummaryReport with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve AuditPlanSummaryReport with ID '{id}'", ex);
         }
     }
     
@@ -115,23 +109,15 @@ internal sealed class AuditPlanSummaryReportService(
         try
         {
             var entity = mapper.Map<AuditPlanSummaryReport>(auditPlanSummaryReportModel);
-            
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.AuditPlanSummaryReport, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditPlanSummaryReportTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update AuditPlanSummaryReport.", ex);
+            logger.LogError(ex, "Failed to update AuditPlanSummaryReport with ID {Id}", auditPlanSummaryReportModel.Id);
+            throw new InvalidOperationException($"Failed to update AuditPlanSummaryReport with ID '{auditPlanSummaryReportModel.Id}'", ex);
         }
     }
 }

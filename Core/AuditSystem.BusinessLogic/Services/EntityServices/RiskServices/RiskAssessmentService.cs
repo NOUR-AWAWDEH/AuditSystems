@@ -35,76 +35,70 @@ internal sealed class RiskAssessmentService(
             var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskAssessment, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskAssessmentTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RiskAssessmentModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create RiskAssessment.", ex);
+            logger.LogError(ex, "Failed to create RiskAssessment");
+            throw new InvalidOperationException("Failed to create RiskAssessment.", ex);
         }
     }
 
     public async Task DeleteRiskAssessmentAsync(Guid riskAssessmentId)
     {
+        var cacheKey = GetCacheKey(riskAssessmentId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(riskAssessmentId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskAssessment with ID {riskAssessmentId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(riskAssessmentId)
+                ?? throw new KeyNotFoundException($"RiskAssessment with ID {riskAssessmentId} not found.");
 
             await repository.DeleteAsync(riskAssessmentId);
-
-            var cacheKey = string.Format(CacheKeys.RiskAssessment, riskAssessmentId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "RiskAssessment with ID {AssessmentId} not found", riskAssessmentId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete RiskAssessment.", ex);
+            logger.LogError(ex, "Failed to delete RiskAssessment ID {AssessmentId}", riskAssessmentId);
+            throw new InvalidOperationException($"Failed to delete RiskAssessment: {riskAssessmentId}", ex);
         }
     }
 
     public async Task<RiskAssessmentModel> GetRiskAssessmentByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.RiskAssessment, id);
-
-            var cachedRiskAssessment = await cacheService.GetAsync<RiskAssessment>(cacheKey);
-            if (cachedRiskAssessment != null)
+            var entity = await cacheService.GetAsync<RiskAssessment>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<RiskAssessmentModel>(cachedRiskAssessment);
+                return mapper.Map<RiskAssessmentModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskAssessment with ID {id} not found."); 
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"RiskAssessment with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskAssessmentTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<RiskAssessmentModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<RiskAssessmentModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get RiskAssessment ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve RiskAssessment with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve RiskAssessment with ID '{id}'", ex);
         }
     }
 
@@ -116,20 +110,14 @@ internal sealed class RiskAssessmentService(
         {
             var entity = mapper.Map<RiskAssessment>(riskAssessmentModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskAssessment, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskAssessmentTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update RiskAssessment.", ex);
+            logger.LogError(ex, "Failed to update RiskAssessment with ID {Id}", riskAssessmentModel.Id);
+            throw new InvalidOperationException($"Failed to update RiskAssessment with ID '{riskAssessmentModel.Id}'", ex);
         }
     }
 }

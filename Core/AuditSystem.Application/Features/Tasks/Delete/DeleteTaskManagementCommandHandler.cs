@@ -16,7 +16,7 @@ internal sealed class DeleteTaskManagementCommandHandler(
         {
             await taskManagementService.DeleteTaskAsync(request.Id);
             logger.LogInformation("Task management with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Task management deleted");  
         }
         catch (Exception ex)
         {

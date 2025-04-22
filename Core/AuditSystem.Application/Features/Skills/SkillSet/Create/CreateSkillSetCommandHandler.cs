@@ -19,6 +19,6 @@ internal sealed class CreateSkillSetCommandHandler(
         var skillSetId = await skillSetService.CreateSkillSetAsync(skillSetModel);
         logger.LogInformation("SkillSet with Proficiency Level {ProficiencyLevel} has been created.", request.ProficiencyLevel);
 
-        return Result<CreateSkillSetCommandResponse>.Created(new CreateSkillSetCommandResponse(skillSetId));
+        return Result<CreateSkillSetCommandResponse>.Created(new CreateSkillSetCommandResponse(skillSetId), "SkillSet created.");
     }
 }

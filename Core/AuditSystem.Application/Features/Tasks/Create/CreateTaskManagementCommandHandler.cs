@@ -19,6 +19,6 @@ internal sealed class CreateTaskManagementCommandHandler(
         var taskManagementId = await taskManagementService.CreateTaskAsync(taskManagementModel);
         logger.LogInformation("Task Management with Job Name {TaskManagementJobName} has been created.", request.JobName);
 
-        return Result<CreateTaskManagementCommandResponse>.Created(new CreateTaskManagementCommandResponse(taskManagementId));
+        return Result<CreateTaskManagementCommandResponse>.Created(new CreateTaskManagementCommandResponse(taskManagementId), "Task Management created.");
     }
 }

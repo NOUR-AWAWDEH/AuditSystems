@@ -19,6 +19,6 @@ internal sealed class UpdateAuditDomainCommandHandler(
         await auditDomainService.UpdateAuditDomainAsync(auditDomainModel);
 
         logger.LogInformation("Audit domain has been updated successfully");
-        return Result.SuccessWithMessage("Audit Domain has been updated successfully");
+        return Result.SuccessWithMessage("Audit Domain has been updated successfully.");
     }
 }

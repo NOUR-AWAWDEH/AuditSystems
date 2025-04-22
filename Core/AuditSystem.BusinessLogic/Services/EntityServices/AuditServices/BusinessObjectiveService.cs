@@ -54,56 +54,51 @@ internal sealed class BusinessObjectiveService(
     
     public async Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId)
     {
+        var cacheKey = GetCacheKey(businessObjectiveId);
         try 
         {
-            var entity = await repository.GetByIdAsync(businessObjectiveId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"BusinessObjective with ID {businessObjectiveId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(businessObjectiveId)
+                    ?? throw new KeyNotFoundException($"BusinessObjective with ID {businessObjectiveId} not found.");
+            
             
             await repository.DeleteAsync(businessObjectiveId);
-            
-            var cacheKey = string.Format(CacheKeys.BusinessObjective, businessObjectiveId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex,"BusinessObjective with ID : {id} not found.",businessObjectiveId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete BusinessObjective.", ex);
+            logger.LogError(ex, "Failed to delete BusinessObjective.");
+            throw new InvalidOperationException("Failed to delete BusinessObjective.", ex);
         }
     }
     
     public async Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.BusinessObjective, id);
-
-            var cachedBusinessObjectiveModel = await cacheService.GetAsync<BusinessObjective>(cacheKey);
-            if (cachedBusinessObjectiveModel!= null)
+            var cachedEntity = await cacheService.GetAsync<BusinessObjective>(cacheKey);
+            if (cachedEntity != null)
             {
-                return mapper.Map<BusinessObjectiveModel>(cachedBusinessObjectiveModel);
+                return mapper.Map<BusinessObjectiveModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"BusinessObjective with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"BusinessObjective with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: BusinessObjectiveTags,
-                expiration: CacheExpirations.MediumTerm 
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<BusinessObjectiveModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get BusinessObjective ID {id}", ex);
+            logger.LogError(ex, "Failed to retrieve BusinessObjective with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve BusinessObjective with ID '{id}'", ex);
         }
     }
 
@@ -116,19 +111,13 @@ internal sealed class BusinessObjectiveService(
             var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.BusinessObjective, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: BusinessObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update BusinessObjective.", ex);
+            logger.LogError(ex, "Failed to update BusinessObjective with ID {Id}", businessObjectiveModel.Id);
+            throw new InvalidOperationException($"Failed to update BusinessObjective with ID '{businessObjectiveModel.Id}'", ex);
         }
     }
 }

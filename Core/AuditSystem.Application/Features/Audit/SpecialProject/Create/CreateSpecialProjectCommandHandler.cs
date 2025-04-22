@@ -19,6 +19,6 @@ internal sealed class CreateSpecialProjectCommandHandler(
         var specialProjectId = await specialProjectService.CreateSpecialProjectAsync(specialProjectModel);
         logger.LogInformation("Special Project with Project Name {SpecialProjectName} has been created.", request.ProjectName);
 
-        return Result<CreateSpecialProjectCommandResponse>.Created(new CreateSpecialProjectCommandResponse(specialProjectId));
+        return Result<CreateSpecialProjectCommandResponse>.Created(new CreateSpecialProjectCommandResponse(specialProjectId), "Special Project created.");
     }
 }

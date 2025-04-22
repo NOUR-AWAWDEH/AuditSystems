@@ -35,78 +35,70 @@ internal sealed class SubDepartmentService(
             var entity = mapper.Map<SubDepartment>(subDepartmentModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SubDepartment, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: SubDepartmentTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for SubDepartmentModel");
+            throw new ArgumentException("Invalid data mapping occurred", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create SubDepartment.", ex);
+            logger.LogError(ex, "Failed to create SubDepartment");
+            throw new InvalidOperationException("Failed to create SubDepartment.", ex);
         }
     }
     
     public async Task DeleteSubDepartmentAsync(Guid subDepartmentId)
     {
-        try 
+        var cacheKey = GetCacheKey(subDepartmentId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(subDepartmentId);
-            if (entity == null)
-            {
-               throw new KeyNotFoundException($"SubDepartment with ID {subDepartmentId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(subDepartmentId)
+                ?? throw new KeyNotFoundException($"SubDepartment with ID {subDepartmentId} not found.");
 
             await repository.DeleteAsync(subDepartmentId);
-
-            var cacheKey = string.Format(CacheKeys.SubDepartment, subDepartmentId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "SubDepartment with ID {SubDepartmentId} not found", subDepartmentId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete SubDepartment.", ex);
+            logger.LogError(ex, "Failed to delete SubDepartment ID {SubDepartmentId}", subDepartmentId);
+            throw new InvalidOperationException($"Failed to delete SubDepartment: {subDepartmentId}", ex);
         }
     }
     
     public async Task<SubDepartmentModel> GetSubDepartmentByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.SubDepartment, id);
-
             var cachedEntity = await cacheService.GetAsync<SubDepartment>(cacheKey);
-
             if (cachedEntity != null)
             {
                 return mapper.Map<SubDepartmentModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"SubDepartment with ID '{id}' not found.");
 
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SubDepartment with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubDepartmentTags,
-                expiration: CacheExpirations.MediumTerm  
-            );
-
-            return mapper.Map<SubDepartmentModel>(entity);  
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<SubDepartmentModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get SubDepartment by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve SubDepartment with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve SubDepartment with ID '{id}'", ex);
         }
     }
     
@@ -117,21 +109,15 @@ internal sealed class SubDepartmentService(
         try
         {
             var entity = mapper.Map<SubDepartment>(subDepartmentModel);
-            
             await repository.UpdateAsync(entity);
-            var cacheKey = string.Format(CacheKeys.SubDepartment, entity.Id);
             
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubDepartmentTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update SubDepartment.", ex);
+            logger.LogError(ex, "Failed to update SubDepartment with ID {Id}", subDepartmentModel.Id);
+            throw new InvalidOperationException($"Failed to update SubDepartment with ID '{subDepartmentModel.Id}'", ex);
         }
     }
 }

@@ -16,7 +16,7 @@ internal sealed class DeleteAuditEngagementCommandHandler (
         {
             await auditEngagementService.DeleteAuditEngagementAsync(request.Id);
             logger.LogInformation("Deleting audit engagement with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit engagement deleted.");
 
         }
         catch (Exception ex)

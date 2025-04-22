@@ -24,7 +24,7 @@ internal sealed class SupportingDocService(
     ISupportingDocService
 {
     private static readonly string[] SupportingDocTags = ["supporting-docs", "supporting-doc-list"];
-    private static readonly string[] ListTags = ["supporting-doc-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["supporting-doc-list"];
 
     public async Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
@@ -35,101 +35,89 @@ internal sealed class SupportingDocService(
             var entity = mapper.Map<SupportingDoc>(supportingDocModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SupportingDoc, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: SupportingDocTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for SupportingDocModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create SupportingDoc.", ex);
+            logger.LogError(ex, "Failed to create SupportingDoc");
+            throw new InvalidOperationException("Failed to create SupportingDoc.", ex);
         }
     }
 
     public async Task DeleteSupportingDocAsync(Guid supportingDocId)
     {
+        var cacheKey = GetCacheKey(supportingDocId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(supportingDocId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SupportingDoc with ID {supportingDocId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(supportingDocId)
+                ?? throw new KeyNotFoundException($"SupportingDoc with ID {supportingDocId} not found.");
 
             await repository.DeleteAsync(supportingDocId);
-
-            var cacheKey = string.Format(CacheKeys.SupportingDoc, supportingDocId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "SupportingDoc with ID {SupportingDocId} not found", supportingDocId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete SupportingDoc.", ex);
+            logger.LogError(ex, "Failed to delete SupportingDoc ID {SupportingDocId}", supportingDocId);
+            throw new InvalidOperationException($"Failed to delete SupportingDoc: {supportingDocId}", ex);
         }
     }
 
     public async Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.SupportingDoc, id);
-
-            var cachedEntity = await cacheService.GetAsync<SupportingDoc>(cacheKey);
-            if (cachedEntity != null)
+            var entity = await cacheService.GetAsync<SupportingDoc>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<SupportingDocModel>(cachedEntity);
+                return mapper.Map<SupportingDocModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SupportingDoc with ID {id} not found."); 
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"SupportingDoc with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SupportingDocTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
+            await SetCacheAsync(cacheKey, entity);
             
             return mapper.Map<SupportingDocModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get SupportingDoc ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve SupportingDoc with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve SupportingDoc with ID '{id}'", ex);
         }
     }
 
     public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
         ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));
-
+        
         try
         {
             var entity = mapper.Map<SupportingDoc>(supportingDocModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.SupportingDoc, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SupportingDocTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update SupportingDoc.", ex);
+            logger.LogError(ex, "Failed to update SupportingDoc with ID {Id}", supportingDocModel.Id);
+            throw new InvalidOperationException($"Failed to update SupportingDoc with ID '{supportingDocModel.Id}'", ex);
         }
     }
 }

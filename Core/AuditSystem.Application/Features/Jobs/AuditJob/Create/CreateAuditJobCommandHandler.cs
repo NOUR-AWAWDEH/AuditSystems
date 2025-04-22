@@ -19,6 +19,6 @@ internal sealed class CreateAuditJobCommandHandler(
         var auditJobId = await auditJobService.CreateAuditJobAsync(auditJobModel);
         logger.LogInformation("Audit Job with Job Name {AuditJobName} has been created.", request.JobName);
 
-        return Result<CreateAuditJobCommandResponse>.Created(new(auditJobId));
+        return Result<CreateAuditJobCommandResponse>.Created(new(auditJobId), "Audit Job created.");
     }
 }

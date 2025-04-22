@@ -55,56 +55,51 @@ internal sealed class RatingService(
     
     public async Task DeleteRatingAsync(Guid ratingId)
     {
+        var cacheKey = GetCacheKey(ratingId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(ratingId);
-            if (entity is null)
-            {
-                throw new KeyNotFoundException($"Rating with ID {ratingId} not found.");
-            }
-            
+            var entity = await repository.GetByIdAsync(ratingId)
+                ?? throw new KeyNotFoundException($"Rating with ID {ratingId} not found.");
+
             await repository.DeleteAsync(ratingId);
-            
-            var cacheKey = string.Format(CacheKeys.Rating, ratingId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning(ex, "Rating with ID {RatingId} not found", ratingId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete Rating.", ex);
+            logger.LogError(ex, "Failed to delete Rating ID {RatingId}", ratingId);
+            throw new InvalidOperationException($"Failed to delete rating: {ratingId}", ex);
         }
     }
     
     public async Task<RatingModel> GetRatingByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.Rating, id);
-
             var cachedEntity = await cacheService.GetAsync<Rating>(cacheKey);
             if (cachedEntity is not null)
             {
                 return mapper.Map<RatingModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity is null)
-            {
-                throw new KeyNotFoundException($"Rating with ID {id} not found."); 
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Rating with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RatingTags,
-                expiration: CacheExpirations.MediumTerm 
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<RatingModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get Rating by ID.{id}", ex);
+            logger.LogError(ex, "Failed to retrieve Rating with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve Rating with ID '{id}'", ex);
         }
     }
 
@@ -117,19 +112,13 @@ internal sealed class RatingService(
             var entity = mapper.Map<Rating>(ratingModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Rating, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RatingTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update Rating.", ex);
+            logger.LogError(ex, "Failed to update Rating with ID {Id}", ratingModel.Id);
+            throw new InvalidOperationException($"Failed to update Rating with ID '{ratingModel.Id}'", ex);
         }
     }
 }

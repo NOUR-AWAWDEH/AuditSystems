@@ -16,7 +16,7 @@ internal sealed class DeleteRemarkCommandHandler(
         {
             await remarkService.DeleteRemarkAsync(request.Id);
             logger.LogInformation("Deleting remark with ID {Id}", request.Id);
-            return Result.Success(); 
+            return Result.SuccessWithMessage("Remark deleted successfully"); 
         } 
         catch (Exception ex)
         {

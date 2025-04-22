@@ -19,6 +19,6 @@ internal sealed class CreateRiskProgramCommandHandler(
         var riskProgramId = await riskProgramService.CreateRiskProgramAsync(riskProgramModel);
         logger.LogInformation("Risk Program with Name {RiskProgramName} has been created.", request.Name);
 
-        return Result<CreateRiskProgramCommandResponse>.Created(new CreateRiskProgramCommandResponse(riskProgramId));
+        return Result<CreateRiskProgramCommandResponse>.Created(new CreateRiskProgramCommandResponse(riskProgramId), "Risk Program created.");
     }
 }

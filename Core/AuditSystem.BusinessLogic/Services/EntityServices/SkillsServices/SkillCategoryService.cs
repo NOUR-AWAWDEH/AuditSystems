@@ -35,76 +35,70 @@ internal sealed class SkillCategoryService(
             var entity = mapper.Map<SkillCategory>(skillCategoryModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SkillCategory, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: SkillCategoryTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for SkillCategoryModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Skill Category.", ex);
+            logger.LogError(ex, "Failed to create SkillCategory");
+            throw new InvalidOperationException("Failed to create SkillCategory.", ex);
         }
     }
 
     public async Task DeleteSkillCategoryAsync(Guid skillCategoryId)
     {
+        var cacheKey = GetCacheKey(skillCategoryId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(skillCategoryId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Skill Category with ID {skillCategoryId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(skillCategoryId)
+                ?? throw new KeyNotFoundException($"Skill Category with ID {skillCategoryId} not found.");
 
             await repository.DeleteAsync(skillCategoryId);
-
-            var cacheKey = string.Format(CacheKeys.SkillCategory, skillCategoryId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "Skill Category with ID {SkillCategoryId} not found", skillCategoryId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete Skill Category.", ex);
+            logger.LogError(ex, "Failed to delete Skill Category ID {SkillCategoryId}", skillCategoryId);
+            throw new InvalidOperationException($"Failed to delete Skill Category: {skillCategoryId}", ex);
         }
     }
 
     public async Task<SkillCategoryModel> GetSkillCategoryByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.SkillCategory, id);
-
-            var cachedEntity = await cacheService.GetAsync<SkillCategory>(cacheKey);
-            if (cachedEntity != null)
+            var entity = await cacheService.GetAsync<SkillCategory>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<SkillCategoryModel>(cachedEntity); 
+                return mapper.Map<SkillCategoryModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Skill Category with ID {id} not found.");
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Skill Category with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SkillCategoryTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<SkillCategoryModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get Skill Category by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve Skill Category with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve Skill Category with ID '{id}'", ex);
         }
     }
 
@@ -116,21 +110,14 @@ internal sealed class SkillCategoryService(
         {
             var entity = mapper.Map<SkillCategory>(skillCategoryModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.SkillCategory, entity.Id);
-
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SkillCategoryTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update Skill Category.", ex);
+            logger.LogError(ex, "Failed to update Skill Category with ID {Id}", skillCategoryModel.Id);
+            throw new InvalidOperationException($"Failed to update Skill Category with ID '{skillCategoryModel.Id}'", ex);
         }
     }
 }

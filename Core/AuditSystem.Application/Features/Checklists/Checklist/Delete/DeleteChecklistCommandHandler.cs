@@ -16,7 +16,7 @@ internal class DeleteChecklistCommandHandler(
         {
             await checklistService.DeleteChecklistAsync(request.Id);
             logger.LogInformation("Deleting checklist with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Checklist deleted successfully");
         }
         catch (Exception ex)
         {

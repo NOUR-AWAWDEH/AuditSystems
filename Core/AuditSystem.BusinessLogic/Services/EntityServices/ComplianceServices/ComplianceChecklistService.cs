@@ -54,57 +54,51 @@ internal sealed class ComplianceChecklistService(
     
     public async Task DeleteComplianceChecklistAsync(Guid complianceChecklistId)
     {
+        var cacheKey = GetCacheKey(complianceChecklistId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(complianceChecklistId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"ComplianceChecklist with ID {complianceChecklistId} not found.");
-            }
-            
-            await repository.DeleteAsync(complianceChecklistId);
+            var entity = await repository.GetByIdAsync(complianceChecklistId)
+                ?? throw new KeyNotFoundException($"ComplianceChecklist with ID {complianceChecklistId} not found.");
 
-            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, complianceChecklistId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await repository.DeleteAsync(complianceChecklistId);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "ComplianceChecklist with ID {ComplianceChecklistId} not found", complianceChecklistId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete ComplianceChecklist.", ex);
+            logger.LogError(ex, "Failed to delete ComplianceChecklist ID {ComplianceChecklistId}", complianceChecklistId);
+            throw new InvalidOperationException($"Failed to delete ComplianceChecklist: {complianceChecklistId}", ex);
         }
     }
     
     public async Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, id);
-
             var cachedEntity = await cacheService.GetAsync<ComplianceChecklist>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<ComplianceChecklistModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"ComplianceChecklist with ID '{id}' not found.");
 
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"ComplianceChecklist with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ComplianceChecklistTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<ComplianceChecklistModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get ComplianceChecklist ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve ComplianceChecklist with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve ComplianceChecklist with ID '{id}'", ex);
         }
     }
     
@@ -117,19 +111,13 @@ internal sealed class ComplianceChecklistService(
             var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ComplianceChecklistTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update ComplianceChecklist.", ex);
+            logger.LogError(ex, "Failed to update ComplianceChecklist with ID {Id}", complianceChecklistModel.Id);
+            throw new InvalidOperationException($"Failed to update ComplianceChecklist with ID '{complianceChecklistModel.Id}'", ex);
         }
     }
 }

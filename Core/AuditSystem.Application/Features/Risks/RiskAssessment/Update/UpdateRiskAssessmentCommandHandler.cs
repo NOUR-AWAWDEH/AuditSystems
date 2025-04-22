@@ -19,6 +19,6 @@ internal sealed class UpdateRiskAssessmentCommandHandler(
         await riskAssessmentService.UpdateRiskAssessmentAsync(riskAssessmentModel);
         
         logger.LogInformation("Risk assessment updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Risk assessment updated successfully");
     }
 }

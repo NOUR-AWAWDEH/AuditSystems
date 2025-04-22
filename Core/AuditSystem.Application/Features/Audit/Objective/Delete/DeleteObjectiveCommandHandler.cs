@@ -16,7 +16,7 @@ internal class DeleteObjectiveCommandHandler(
         {
             await objectiveService.DeleteObjectiveAsync(request.Id);
             logger.LogInformation("Deleting objective with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Objective deleted successfully.");
         }
         catch (Exception ex)
         {

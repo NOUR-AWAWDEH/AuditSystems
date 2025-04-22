@@ -54,56 +54,51 @@ internal sealed class ChecklistService(
     
     public async Task DeleteChecklistAsync(Guid checklistId)
     {
-        try 
+        var cacheKey = GetCacheKey(checklistId);
+
+        try
         {
-            var entity = await repository.GetByIdAsync(checklistId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Checklist with ID {checklistId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(checklistId)
+                ?? throw new KeyNotFoundException($"Checklist with ID {checklistId} not found.");
 
             await repository.DeleteAsync(checklistId);
-
-            var cacheKey = string.Format(CacheKeys.Checklist, checklistId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "Checklist with ID: {id} not found.", checklistId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete Checklist.", ex);
+            logger.LogError(ex, "Failed to delete Checklist with ID: {id}.", checklistId);
+            throw new InvalidOperationException("Failed to delete Checklist.", ex);
         }
     }
     
     public async Task<ChecklistModel> GetChecklistByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.Checklist, id);
-            
             var cachedEntity = await cacheService.GetAsync<Checklist>(cacheKey);
             if (cachedEntity != null)
             {
-                return mapper.Map<ChecklistModel>(cachedEntity);  
+                return mapper.Map<ChecklistModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Checklist with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Checklist with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ChecklistTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<ChecklistModel>(cachedEntity);      
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<ChecklistModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get Checklist with ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve Checklist with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve Checklist with ID '{id}'", ex);
         }
     }
     
@@ -116,19 +111,13 @@ internal sealed class ChecklistService(
             var entity = mapper.Map<Checklist>(checklistModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Checklist, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ChecklistTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update Checklist.", ex);
+            logger.LogError(ex, "Failed to update Checklist with ID {Id}", checklistModel.Id);
+            throw new InvalidOperationException($"Failed to update Checklist with ID '{checklistModel.Id}'", ex);
         }
     }
 }

@@ -16,7 +16,7 @@ internal sealed class DeleteSubLocationCommandHandler(
         {
             await subLocationService.DeleteSubLocationAsync(request.Id);
             logger.LogInformation("Deleting sublocation with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Sublocation deleted successfully");
         }
         catch (Exception ex)
         {

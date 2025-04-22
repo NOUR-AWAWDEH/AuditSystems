@@ -35,76 +35,70 @@ internal sealed class SubLocationService(
             var entity = mapper.Map<SubLocation>(subLocationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SubLocation, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: SubLocationTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for SubLocationModel");
+            throw new ArgumentException("Invalid data mapping occurred", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create SubLocation.", ex);
+            logger.LogError(ex, "Failed to create SubLocation");
+            throw new InvalidOperationException("Failed to create SubLocation.", ex);
         }
     }
     
     public async Task DeleteSubLocationAsync(Guid subLocationId)
     {
-        try 
+        var cacheKey = GetCacheKey(subLocationId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(subLocationId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SubLocation with ID {subLocationId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(subLocationId)
+                ?? throw new KeyNotFoundException($"SubLocation with ID {subLocationId} not found.");
 
             await repository.DeleteAsync(subLocationId);
-            
-            var cacheKey = string.Format(CacheKeys.SubLocation, subLocationId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "SubLocation with ID {SubLocationId} not found", subLocationId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete SubLocation.", ex);
+            logger.LogError(ex, "Failed to delete SubLocation ID {SubLocationId}", subLocationId);
+            throw new InvalidOperationException($"Failed to delete SubLocation: {subLocationId}", ex);
         }
     }
     
     public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.SubLocation, id);
-
             var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<SubLocationModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SubLocation with ID {id} not found."); 
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"SubLocation with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubLocationTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<SubLocationModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<SubLocationModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get SubLocation by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve SubLocation with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve SubLocation with ID '{id}'", ex);
         }
     }
     
@@ -115,21 +109,15 @@ internal sealed class SubLocationService(
         try
         {
             var entity = mapper.Map<SubLocation>(subLocationModel);
-            
             await repository.UpdateAsync(entity);
-            var cacheKey = string.Format(CacheKeys.SubLocation, entity.Id);
             
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubLocationTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update SubLocation.", ex);
+            logger.LogError(ex, "Failed to update SubLocation with ID {Id}", subLocationModel.Id);
+            throw new InvalidOperationException($"Failed to update SubLocation with ID '{subLocationModel.Id}'", ex);
         }
     }
 }

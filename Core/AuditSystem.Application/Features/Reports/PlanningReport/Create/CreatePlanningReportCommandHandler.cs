@@ -19,6 +19,6 @@ internal sealed class CreatePlanningReportCommandHandler(
         var planningReportId = await planningReportService.CreatePlanningReportAsync(planningReportModel);
         logger.LogInformation("Planning Report with Name {PlanningReportName} has been created.", request.ReportName);
 
-        return Result<CreatePlanningReportCommandResponse>.Created(new CreatePlanningReportCommandResponse(planningReportId));
+        return Result<CreatePlanningReportCommandResponse>.Created(new CreatePlanningReportCommandResponse(planningReportId), "Planning Report created.");
     }
 }

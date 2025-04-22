@@ -35,76 +35,70 @@ internal sealed class JobSchedulingService(
             var entity = mapper.Map<JobScheduling>(jobSchedulingModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.JobScheduling, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: JobSchedulingTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for JobSchedulingModel");
+            throw new ArgumentException("Mapping failed for JobSchedulingModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create JobScheduling.", ex);
+            logger.LogError(ex, "An error occurred while creating the JobScheduling.");
+            throw new InvalidOperationException("An error occurred while creating the JobScheduling.", ex);
         }
     }
 
     public async Task DeleteJobSchedulingAsync(Guid jobSchedulingId)
     {
-        try 
+        var cacheKey = GetCacheKey(jobSchedulingId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(jobSchedulingId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"JobScheduling with ID {jobSchedulingId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(jobSchedulingId)
+                ?? throw new KeyNotFoundException($"JobScheduling with ID {jobSchedulingId} not found.");
 
             await repository.DeleteAsync(jobSchedulingId);
-
-            var cacheKey = string.Format(CacheKeys.JobScheduling, jobSchedulingId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "JobScheduling with ID {JobSchedulingId} not found", jobSchedulingId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete JobScheduling.", ex);
+            logger.LogError(ex, "Failed to delete JobScheduling ID {JobSchedulingId}", jobSchedulingId);
+            throw new InvalidOperationException($"Failed to delete JobScheduling: {jobSchedulingId}", ex);
         }
     }
 
     public async Task<JobSchedulingModel> GetJobSchedulingByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.JobScheduling, id);
-
             var cachedEntity = await cacheService.GetAsync<JobScheduling>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<JobSchedulingModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"JobScheduling with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"JobScheduling with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: JobSchedulingTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<JobSchedulingModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<JobSchedulingModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to get JobScheduling by ID.", ex);
+            logger.LogError(ex, "Failed to retrieve JobScheduling with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve JobScheduling with ID '{id}'", ex);
         }
     }
 
@@ -117,19 +111,13 @@ internal sealed class JobSchedulingService(
             var entity = mapper.Map<JobScheduling>(jobSchedulingModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.JobScheduling, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: JobSchedulingTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update JobScheduling.", ex);
+            logger.LogError(ex, "Failed to update JobScheduling with ID {Id}", jobSchedulingModel.Id);
+            throw new InvalidOperationException($"Failed to update JobScheduling with ID '{jobSchedulingModel.Id}'", ex);
         }
     }
 }

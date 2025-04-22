@@ -19,6 +19,6 @@ internal sealed class UpdateRiskFactorCommandHandler(
         await riskFactorService.UpdateRiskFactorAsync(riskFactorModel);
         
         logger.LogInformation("Risk factor updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Risk factor updated successfully");
     }
 }

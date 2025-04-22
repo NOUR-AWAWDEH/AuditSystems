@@ -16,7 +16,7 @@ internal sealed class DeleteComplianceChecklistCommandHandler(
         {
             await complianceChecklistService.DeleteComplianceChecklistAsync(request.Id);
             logger.LogInformation("Deleting compliance checklist with ID {Id}", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Compliance checklist deleted successfully.");  
         }
         catch (Exception ex)
         {

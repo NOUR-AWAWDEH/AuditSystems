@@ -35,77 +35,70 @@ internal sealed class JobTimeAllocationReportService(
             var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: JobTimeAllocationReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for JobTimeAllocationReportModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create JobTimeAllocationReport.", ex);
+            logger.LogError(ex, "Failed to create JobTimeAllocationReport");
+            throw new InvalidOperationException("Failed to create JobTimeAllocationReport.", ex);
         }
     }
     
     public async Task DeleteJobTimeAllocationReportAsync(Guid jobTimeAllocationReportId)
     {
-        try 
+        var cacheKey = GetCacheKey(jobTimeAllocationReportId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(jobTimeAllocationReportId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"JobTimeAllocationReport with ID {jobTimeAllocationReportId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(jobTimeAllocationReportId)
+                ?? throw new KeyNotFoundException($"JobTimeAllocationReport with ID {jobTimeAllocationReportId} not found.");
 
             await repository.DeleteAsync(jobTimeAllocationReportId);
-
-            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, jobTimeAllocationReportId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(JobTimeAllocationReportTags);
+            await ClearCacheAsync(cacheKey);
         }
-        catch (Exception ex) 
+        catch (KeyNotFoundException ex)
         {
-            throw new Exception("Failed to delete JobTimeAllocationReport.", ex);
+            logger.LogError(ex, "JobTimeAllocationReport with ID {ReportId} not found", jobTimeAllocationReportId);
+            throw;
         }
-        
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to delete JobTimeAllocationReport ID {ReportId}", jobTimeAllocationReportId);
+            throw new InvalidOperationException($"Failed to delete JobTimeAllocationReport: {jobTimeAllocationReportId}", ex);
+        }
     }
     
     public async Task<JobTimeAllocationReportModel> GetJobTimeAllocationReportByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, id);
-
             var entity = await cacheService.GetAsync<JobTimeAllocationReport>(cacheKey);
             if (entity != null)
             {
-                return mapper.Map<JobTimeAllocationReportModel>(entity); 
+                return mapper.Map<JobTimeAllocationReportModel>(entity);
             }
 
-            entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"JobTimeAllocationReport with ID {id} not found.");
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"JobTimeAllocationReport with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: JobTimeAllocationReportTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<JobTimeAllocationReportModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to get JobTimeAllocationReport by ID.", ex);
+            logger.LogError(ex, "Failed to retrieve JobTimeAllocationReport with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve JobTimeAllocationReport with ID '{id}'", ex);
         }
     }
     
@@ -118,19 +111,13 @@ internal sealed class JobTimeAllocationReportService(
             var entity = mapper.Map<JobTimeAllocationReport>(jobTimeAllocationReportModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.JobTimeAllocationReport, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: JobTimeAllocationReportTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update JobTimeAllocationReport.", ex);
+            logger.LogError(ex, "Failed to update JobTimeAllocationReport with ID {Id}", jobTimeAllocationReportModel.Id);
+            throw new InvalidOperationException($"Failed to update JobTimeAllocationReport with ID '{jobTimeAllocationReportModel.Id}'", ex);
         }
     }
 }

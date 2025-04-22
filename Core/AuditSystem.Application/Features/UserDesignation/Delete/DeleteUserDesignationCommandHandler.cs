@@ -15,7 +15,7 @@ internal class DeleteUserDesignationCommandHandler(
         {
             await userDesignationService.DeleteUserDesignationAsync(request.Id);
             logger.LogInformation("User Designation with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("User Designation deleted");  
         }
         catch (Exception ex)
         {

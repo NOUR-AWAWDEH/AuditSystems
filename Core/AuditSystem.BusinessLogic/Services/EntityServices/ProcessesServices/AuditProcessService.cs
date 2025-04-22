@@ -14,10 +14,17 @@ internal sealed class AuditProcessService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<AuditProcessService> logger) : 
+    BaseEntityCacheService<AuditProcess>(
+        cacheService,
+        logger,
+        CacheKeys.AuditProcess,
+        AuditProcessTags,
+        ListTags
+    ),
     IAuditProcessService
 {
     private static readonly string[] AuditProcessTags = ["audit-processes", "audit-process-list"];
-    private static readonly string[] ListTags = ["audit-process-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-process-list"];
 
     public async Task<Guid> CreateAuditProcessAsync(AuditProcessModel processModel)
     {
@@ -28,76 +35,70 @@ internal sealed class AuditProcessService(
             var entity = mapper.Map<AuditProcess>(processModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditProcess, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditProcessTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for AuditProcessModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create AuditProcess.", ex);
+            logger.LogError(ex, "Failed to create AuditProcess");
+            throw new InvalidOperationException("Failed to create AuditProcess.", ex);
         }
     }
     
     public async Task DeleteAuditProcessAsync(Guid auditProcessId)
     {
-        try 
+        var cacheKey = GetCacheKey(auditProcessId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(auditProcessId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditProcess with ID {auditProcessId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(auditProcessId)
+                ?? throw new KeyNotFoundException($"AuditProcess with ID {auditProcessId} not found.");
 
             await repository.DeleteAsync(auditProcessId);
-
-            var cacheKey = string.Format(CacheKeys.AuditProcess, auditProcessId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "AuditProcess with ID {AuditProcessId} not found", auditProcessId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete AuditProcess.", ex);
+            logger.LogError(ex, "Failed to delete AuditProcess with ID {AuditProcessId}", auditProcessId);
+            throw new InvalidOperationException($"Failed to delete AuditProcess with ID {auditProcessId}", ex);
         }
     }
     
     public async Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.AuditProcess, id);
-
             var cachedEntity = await cacheService.GetAsync<AuditProcess>(cacheKey);
             if (cachedEntity != null)
             {
-                return mapper.Map<AuditProcessModel>(cachedEntity); 
+                return mapper.Map<AuditProcessModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditProcess with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"AuditProcess with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditProcessTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<AuditProcessModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get AuditProcess ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve AuditProcess with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve AuditProcess with ID '{id}'", ex);
         }
     }
     
@@ -110,25 +111,13 @@ internal sealed class AuditProcessService(
             var entity = mapper.Map<AuditProcess>(auditProcessModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.AuditProcess, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditProcessTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update AuditProcess.", ex);
+            logger.LogError(ex, "Failed to update AuditProcess with ID {Id}", auditProcessModel.Id);
+            throw new InvalidOperationException($"Failed to update AuditProcess with ID '{auditProcessModel.Id}'", ex);
         }
     }
-
-    #region Private Helpers
-    private static string GetCacheKey(Guid id) => 
-        string.Format(CacheKeys.CacheKey, CacheKeys.AuditProcess, id, "en");
-    
-    #endregion
 }

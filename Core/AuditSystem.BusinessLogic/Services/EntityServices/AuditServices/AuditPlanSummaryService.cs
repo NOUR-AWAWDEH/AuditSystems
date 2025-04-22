@@ -88,8 +88,8 @@ internal sealed class AuditPlanSummaryService(
                 return mapper.Map<AuditPlanSummaryModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id) ?? 
-                throw new KeyNotFoundException($"AuditPlanSummary with ID '{id}' not found.");
+            var entity = await repository.GetByIdAsync(id) 
+                         ?? throw new KeyNotFoundException($"AuditPlanSummary with ID '{id}' not found.");
 
             await SetCacheAsync(cacheKey, entity);
 

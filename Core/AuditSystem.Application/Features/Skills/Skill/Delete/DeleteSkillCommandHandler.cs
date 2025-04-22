@@ -16,7 +16,7 @@ internal sealed class DeleteSkillCommandHandler(
         {
             await skillService.DeleteSkillAsync(request.Id);
             logger.LogInformation("Skill with id {id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Skill deleted.");
         }
         catch (Exception ex)
         {

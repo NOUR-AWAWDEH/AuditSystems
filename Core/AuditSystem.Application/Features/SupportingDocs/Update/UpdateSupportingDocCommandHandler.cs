@@ -19,6 +19,6 @@ internal sealed class UpdateSupportingDocCommandHandler(
         await supportingDocService.UpdateSupportingDocAsync(supportingDocModel);
         
         logger.LogInformation("Supporting document with ID {Id} updated successfully.", request.Id);
-        return Result.Success();
+        return Result.SuccessWithMessage("Supporting document updated successfully.");
     }
 }

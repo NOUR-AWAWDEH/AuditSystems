@@ -35,76 +35,71 @@ internal sealed class RiskControlService(
             var entity = mapper.Map<RiskControls>(riskControlModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskControl, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm);
-
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
             await cacheService.RemoveCacheByTagAsync(ListTags);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RiskControlsModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create RiskControl.", ex);
+            logger.LogError(ex, "Failed to create RiskControl");
+            throw new InvalidOperationException("Failed to create RiskControl.", ex);
         }
     }
 
     public async Task DeleteRiskControlAsync(Guid riskControlId)
     {
+        var cacheKey = GetCacheKey(riskControlId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(riskControlId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControl with ID {riskControlId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(riskControlId)
+                ?? throw new KeyNotFoundException($"RiskControl with ID {riskControlId} not found.");
 
             await repository.DeleteAsync(riskControlId);
-
-            var cacheKey = string.Format(CacheKeys.RiskControl, riskControlId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "RiskControl with ID {RiskControlId} not found", riskControlId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete RiskControl.", ex);
+            logger.LogError(ex, "Failed to delete RiskControl ID {RiskControlId}", riskControlId);
+            throw new InvalidOperationException($"Failed to delete RiskControl: {riskControlId}", ex);
         }
     }
 
     public async Task<RiskControlsModel> GetRiskControlByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.RiskControl, id);
-
-            var cachedRiskControl = await cacheService.GetAsync<RiskControls>(cacheKey);
-            if (cachedRiskControl != null)
+            var entity = await cacheService.GetAsync<RiskControls>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<RiskControlsModel>(cachedRiskControl);
+                return mapper.Map<RiskControlsModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControl with ID {id} not found.");
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"RiskControl with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
+            await SetCacheAsync(cacheKey, entity);
             
             return mapper.Map<RiskControlsModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get RiskControl by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve RiskControl with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve RiskControl with ID '{id}'", ex);
         }
     }
 
@@ -116,20 +111,14 @@ internal sealed class RiskControlService(
         {
             var entity = mapper.Map<RiskControls>(riskControlModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskControl, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update RiskControl.", ex);
+            logger.LogError(ex, "Failed to update RiskControl with ID {Id}", riskControlModel.Id);
+            throw new InvalidOperationException($"Failed to update RiskControl with ID '{riskControlModel.Id}'", ex);
         }
     }
 }

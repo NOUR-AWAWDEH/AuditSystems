@@ -16,7 +16,7 @@ internal sealed class DeleteSubDepartmentCommandHandler(
         {
             await subDepartmentService.DeleteSubDepartmentAsync(request.Id);
             logger.LogInformation("Deleting subdepartment with ID {Id}", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Subdepartment deleted.");  
         }
         catch (Exception ex)
         {

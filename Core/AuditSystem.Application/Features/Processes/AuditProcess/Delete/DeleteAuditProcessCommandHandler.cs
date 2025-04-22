@@ -16,7 +16,7 @@ internal sealed class DeleteAuditProcessCommandHandler(
         {
             await auditProcessService.DeleteAuditProcessAsync(request.Id);
             logger.LogInformation("Audit process with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit process deleted");
         }
         catch (Exception ex)
         {

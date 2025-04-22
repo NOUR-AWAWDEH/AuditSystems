@@ -19,6 +19,6 @@ internal sealed class CreateSkillCommandHandler(
         var skillId = await skillService.CreateSkillAsync(skillModel);
         logger.LogInformation("Skill with Name {SkillName} has been created.", request.Name);
 
-        return Result<CreateSkillCommandResponse>.Created(new CreateSkillCommandResponse(skillId));
+        return Result<CreateSkillCommandResponse>.Created(new CreateSkillCommandResponse(skillId), "Skill created.");
     }
 }

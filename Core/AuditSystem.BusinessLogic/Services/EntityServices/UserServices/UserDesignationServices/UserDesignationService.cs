@@ -35,101 +35,89 @@ internal sealed class UserDesignationService(
             var entity = mapper.Map<UserDesignation>(userDesignationModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.UserDesignation, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: UserDesignationTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for UserDesignationModel");
+            throw new ArgumentException("Invalid data mapping occurred", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create User Designation.", ex);
+            logger.LogError(ex, "Failed to create User Designation");
+            throw new InvalidOperationException("Failed to create User Designation.", ex);
         }
     }
 
     public async Task DeleteUserDesignationAsync(Guid userDesignationId)
     {
+        var cacheKey = GetCacheKey(userDesignationId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(userDesignationId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"UserDesignation with ID {userDesignationId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(userDesignationId)
+                ?? throw new KeyNotFoundException($"UserDesignation with ID {userDesignationId} not found.");
 
             await repository.DeleteAsync(userDesignationId);
-
-            var cacheKey = string.Format(CacheKeys.UserDesignation, userDesignationId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "UserDesignation with ID {UserDesignationId} not found", userDesignationId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete User Designation.", ex);
+            logger.LogError(ex, "Failed to delete UserDesignation ID {UserDesignationId}", userDesignationId);
+            throw new InvalidOperationException($"Failed to delete UserDesignation: {userDesignationId}", ex);
         }
     }
 
     public async Task<UserDesignationModel> GetUserDesignationByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.UserDesignation, id);
-
-            var cachedEntity = await cacheService.GetAsync<UserDesignation>(cacheKey);
-            if (cachedEntity != null)
+            var entity = await cacheService.GetAsync<UserDesignation>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<UserDesignationModel>(cachedEntity);
+                return mapper.Map<UserDesignationModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"User Designation with ID {id} not found."); 
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"User Designation with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: UserDesignationTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
+            await SetCacheAsync(cacheKey, entity);
             
             return mapper.Map<UserDesignationModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get User Designation by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve User Designation with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve User Designation with ID '{id}'", ex);
         }
     }
 
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)
     {
         ArgumentNullException.ThrowIfNull(userDesignationModel, nameof(userDesignationModel));
-
+        
         try
         {
             var entity = mapper.Map<UserDesignation>(userDesignationModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.UserDesignation.ToString(), entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: UserDesignationTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update User Designation.", ex);
+            logger.LogError(ex, "Failed to update User Designation with ID {Id}", userDesignationModel.Id);
+            throw new InvalidOperationException($"Failed to update User Designation with ID '{userDesignationModel.Id}'", ex);
         }
     }
 }

@@ -19,6 +19,6 @@ internal sealed class UpdateAuditPlanSummaryReportCommandHandler(
         await auditPlanSummaryReportService.UpdateAuditPlanSummaryReportAsync(auditPlanSummaryReportModel);
 
         logger.LogInformation("Audit plan summary report updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit plan summary report updated successfully");
     }
 }

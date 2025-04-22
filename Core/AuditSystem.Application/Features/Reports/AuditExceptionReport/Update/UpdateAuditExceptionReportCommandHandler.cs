@@ -19,6 +19,6 @@ internal sealed class UpdateAuditExceptionReportCommandHandler(
         await auditExceptionRepotService.UpdateAuditExceptionReportAsync(auditExceptionReportModel);
 
         logger.LogInformation("Audit exception report updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit exception report updated successfully");
     }
 }

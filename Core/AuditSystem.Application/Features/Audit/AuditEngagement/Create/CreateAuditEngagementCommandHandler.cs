@@ -19,6 +19,6 @@ internal sealed class CreateAuditEngagementCommandHandler(
         var auditEngagementId = await auditEngagementService.CreateAuditEngagementAsync(auditEngagementModel);
         logger.LogInformation("Audit engagement with name {AuditEngagementName} has been created.", request.JobName);
 
-        return Result<CreateAuditEngagementCommandResponse>.Created(new CreateAuditEngagementCommandResponse(auditEngagementId));
+        return Result<CreateAuditEngagementCommandResponse>.Created(new CreateAuditEngagementCommandResponse(auditEngagementId), "Audit engagement created.");
     }
 }

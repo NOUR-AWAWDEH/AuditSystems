@@ -16,7 +16,7 @@ internal sealed class DeleteAuditJobCommandHandler(
         {
             await auditJobService.DeleteAuditJobAsync(request.Id);
             logger.LogInformation("Deleting audit job with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit job deleted successfully");
         }
         catch (Exception ex)
         {

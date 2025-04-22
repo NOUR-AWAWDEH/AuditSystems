@@ -64,9 +64,14 @@ internal sealed class AuditDomainService(
             await repository.DeleteAsync(auditDomainId);
             await ClearCacheAsync(cacheKey);
         }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning(ex, "AuditDomain with ID {Id} not found", auditDomainId);
+            throw;
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to delete AuditDomain with ID {AuditDomainId}", auditDomainId);
+            logger.LogError(ex, "Failed to delete AuditDomain with ID {Id}", auditDomainId);
             throw new InvalidOperationException($"Failed to delete AuditDomain with ID {auditDomainId}", ex);
         }
     }

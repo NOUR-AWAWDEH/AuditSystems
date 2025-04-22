@@ -19,6 +19,6 @@ internal sealed class UpdateAuditJobCommandHandler(
         await auditJobService.UpdateAuditJobAsync(auditJobModel);
 
         logger.LogInformation("Audit job updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit job updated successfully");
     }
 }

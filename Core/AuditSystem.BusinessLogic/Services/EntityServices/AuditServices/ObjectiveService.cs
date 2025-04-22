@@ -54,56 +54,50 @@ internal class ObjectiveService(
     
     public async Task DeleteObjectiveAsync(Guid objectiveId)
     {
+        var cacheKey = GetCacheKey(objectiveId);
         try
         {
-            var entity = await repository.GetByIdAsync(objectiveId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(objectiveId)
+                    ?? throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
             
             await repository.DeleteAsync(objectiveId);
-            
-            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "Objective with ID: {id} not found.", objectiveId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete Objective.", ex);
+            logger.LogError(ex, "Failed to delete Objective.");
+            throw new InvalidOperationException("Failed to delete Objective.", ex);
         }
     }
     
-    public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
+    public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.Objective, Id);
-
-            var cachedObjectiveModel = await cacheService.GetAsync<Objective>(cacheKey);
-            if (cachedObjectiveModel != null)
+            var cachedEntity = await cacheService.GetAsync<Objective>(cacheKey);
+            if (cachedEntity != null)
             {
-                return mapper.Map<ObjectiveModel>(cachedObjectiveModel);
+                return mapper.Map<ObjectiveModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(Id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Objective with ID {Id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Objective with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm  
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<ObjectiveModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to get Objective.", ex);
+            logger.LogError(ex, "Failed to retrieve Objective with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve Objective with ID '{id}'", ex);
         }
     }
 
@@ -116,25 +110,13 @@ internal class ObjectiveService(
             var entity = mapper.Map<Objective>(objectiveModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update Objective.", ex);
+            logger.LogError(ex, "Failed to update Objective with ID {Id}", objectiveModel.Id);
+            throw new InvalidOperationException($"Failed to update Objective with ID '{objectiveModel.Id}'", ex);
         }
     }
-
-    #region Private Helpers
-    private static string GetCacheKey(Guid id) => 
-        string.Format(CacheKeys.CacheKey, CacheKeys.Objective, id, "en");
-    
-    #endregion
 }

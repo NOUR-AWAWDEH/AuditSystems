@@ -54,20 +54,20 @@ internal sealed class AuditEngagementService(
 
     public async Task DeleteAuditEngagementAsync(Guid auditEngagementId)
     {
-        if (auditEngagementId == Guid.Empty)
-        {
-            throw new ArgumentException("Audit engagement ID cannot be empty.", nameof(auditEngagementId));
-        }
-
         var cacheKey = GetCacheKey(auditEngagementId);
 
         try
         {
             var entity = await repository.GetByIdAsync(auditEngagementId)
-                         ?? throw new KeyNotFoundException($"AuditEngagement with ID {auditEngagementId} not found.");
-
+                    ?? throw new KeyNotFoundException($"AuditEngagement with ID '{auditEngagementId}' not found.");
+            
             await repository.DeleteAsync(auditEngagementId);
             await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException)
+        {
+            logger.LogWarning("AuditEngagement with ID {AuditEngagementId} not found", auditEngagementId);
+            throw;
         }
         catch (Exception ex)
         {

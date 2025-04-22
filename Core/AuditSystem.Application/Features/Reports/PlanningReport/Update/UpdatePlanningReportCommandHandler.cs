@@ -19,6 +19,6 @@ internal sealed class UpdatePlanningReportCommandHandler(
         await planningReportService.UpdatePlanningReportAsync(planningReportModel);
 
         logger.LogInformation("Planning report updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Planning report updated successfully");
     }
 }

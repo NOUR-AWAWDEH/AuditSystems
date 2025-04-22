@@ -13,11 +13,18 @@ internal sealed class SubProcessService(
     IRepository<Guid, SubProcess> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<SubProcessService> logger) : 
+    ILogger<SubProcessService> logger) :
+    BaseEntityCacheService<SubProcess>(
+        cacheService,
+        logger,
+        CacheKeys.SubProcess,
+        SubProcessTags,
+        ListTags
+    ), 
     ISubProcessService
 {
     private static readonly string[] SubProcessTags = ["sub-processes", "sub-process-list"];
-    private static readonly string[] ListTags = ["sub-process-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["sub-process-list"];
 
     public async Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel)
     {
@@ -28,77 +35,70 @@ internal sealed class SubProcessService(
             var entity = mapper.Map<SubProcess>(subProcessModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SubProcess, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: SubProcessTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for SubProcessModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create SubProcess.", ex);
+            logger.LogError(ex, "Failed to create SubProcess");
+            throw new InvalidOperationException("Failed to create SubProcess.", ex);
         }
     }
     
     public async Task DeleteSubProcessAsync(Guid subProcessId)
     {
-        try 
+        var cacheKey = GetCacheKey(subProcessId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(subProcessId);
-            if (entity == null)
-            {
-                throw new Exception("SubProcess not found.");
-            }
+            var entity = await repository.GetByIdAsync(subProcessId)
+                ?? throw new KeyNotFoundException($"SubProcess with ID {subProcessId} not found.");
 
             await repository.DeleteAsync(subProcessId);
-
-            var cacheKey = string.Format(CacheKeys.SubProcess, subProcessId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "SubProcess with ID {SubProcessId} not found", subProcessId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete SubProcess.", ex);
+            logger.LogError(ex, "Failed to delete SubProcess ID {SubProcessId}", subProcessId);
+            throw new InvalidOperationException($"Failed to delete SubProcess: {subProcessId}", ex);
         }
     }
     
     public async Task<SubProcessModel> GetSubProcessByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.SubProcess, id);
-
-            var cachedSubProcess = await cacheService.GetAsync<SubProcess>(cacheKey);
-            if (cachedSubProcess != null)
+            var cachedEntity = await cacheService.GetAsync<SubProcess>(cacheKey);
+            if (cachedEntity != null)
             {
-                return mapper.Map<SubProcessModel>(cachedSubProcess);
+                return mapper.Map<SubProcessModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"SubProcess with ID '{id}' not found.");
 
-            if (entity == null)
-            {
-               throw new KeyNotFoundException($"SubProcess with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubProcessTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<SubProcessModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<SubProcessModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get SubProcess by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve SubProcess with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve SubProcess with ID '{id}'", ex);
         }
     }
     
@@ -109,28 +109,15 @@ internal sealed class SubProcessService(
         try
         {
             var entity = mapper.Map<SubProcess>(subProcessModel);
-            
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.SubProcess, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SubProcessTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update SubProcess.", ex);
+            logger.LogError(ex, "Failed to update SubProcess with ID {Id}", subProcessModel.Id);
+            throw new InvalidOperationException($"Failed to update SubProcess with ID '{subProcessModel.Id}'", ex);
         }
     }
-
-    #region Private Helpers
-    private static string GetCacheKey(Guid id) => 
-        string.Format(CacheKeys.CacheKey, CacheKeys.SubProcess, id, "en");
-    
-    #endregion
 }

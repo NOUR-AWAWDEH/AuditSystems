@@ -19,6 +19,6 @@ internal sealed class UpdateComplianceChecklistCommandHandler(
         await complianceChecklistService.UpdateComplianceChecklistAsync(complianceChecklistModel);
 
         logger.LogInformation("Compliance checklist updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Compliance checklist updated successfully");
     }
 }

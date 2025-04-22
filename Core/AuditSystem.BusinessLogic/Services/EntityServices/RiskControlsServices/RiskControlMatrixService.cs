@@ -24,7 +24,7 @@ internal sealed class RiskControlMatrixService(
     IRiskControlMatrixService
 {
     private static readonly string[] RiskControlMatrixTags = ["risk-control-matrices", "risk-control-matrix-list"];
-    private static readonly string[] ListTags = ["risk-control-matrix-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["risk-control-matrix-list"];
 
     public async Task<Guid> CreateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
@@ -35,76 +35,70 @@ internal sealed class RiskControlMatrixService(
             var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskControlMatrixTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RiskControlMatrixModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create RiskControlMatrix.", ex);
+            logger.LogError(ex, "Failed to create RiskControlMatrix");
+            throw new InvalidOperationException("Failed to create RiskControlMatrix.", ex);
         }
     }
     
     public async Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId)
     {
+        var cacheKey = GetCacheKey(riskControlMatrixId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(riskControlMatrixId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControlMatrix with ID {riskControlMatrixId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(riskControlMatrixId)
+                ?? throw new KeyNotFoundException($"RiskControlMatrix with ID {riskControlMatrixId} not found.");
 
             await repository.DeleteAsync(riskControlMatrixId);
-
-            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, riskControlMatrixId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "RiskControlMatrix with ID {MatrixId} not found", riskControlMatrixId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete RiskControlMatrix.", ex);
+            logger.LogError(ex, "Failed to delete RiskControlMatrix ID {MatrixId}", riskControlMatrixId);
+            throw new InvalidOperationException($"Failed to delete RiskControlMatrix: {riskControlMatrixId}", ex);
         }
     }
     
     public async Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, id);
-
-            var cachedEntity = await cacheService.GetAsync<RiskControlMatrix>(cacheKey);
-            if (cachedEntity != null)
+            var entity = await cacheService.GetAsync<RiskControlMatrix>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<RiskControlMatrixModel>(cachedEntity);
+                return mapper.Map<RiskControlMatrixModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControlMatrix with ID {id} not found."); 
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"RiskControlMatrix with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlMatrixTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<RiskControlMatrixModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<RiskControlMatrixModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get RiskControlMatrix by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve RiskControlMatrix with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve RiskControlMatrix with ID '{id}'", ex);
         }
     }
     
@@ -116,20 +110,14 @@ internal sealed class RiskControlMatrixService(
         {
             var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskControlMatrix, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlMatrixTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update RiskControlMatrix.", ex);
+            logger.LogError(ex, "Failed to update RiskControlMatrix with ID {Id}", riskControlMatrixModel.Id);
+            throw new InvalidOperationException($"Failed to update RiskControlMatrix with ID '{riskControlMatrixModel.Id}'", ex);
         }
     }
 }

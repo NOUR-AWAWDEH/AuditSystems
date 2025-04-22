@@ -19,6 +19,6 @@ internal class CreateSupportingDocCommandHandler(
         var supportingDocId = await supportingDocService.CreateSupportingDocAsync(supportingDocModel);
         logger.LogInformation("Supporting Doc with File Name {SupportingDocFileName} has been created.", request.FileName);
 
-        return Result<CreateSupportingDocCommandResponse>.Created(new CreateSupportingDocCommandResponse(supportingDocId));
+        return Result<CreateSupportingDocCommandResponse>.Created(new CreateSupportingDocCommandResponse(supportingDocId), "Supporting Doc created.");
     }
 }

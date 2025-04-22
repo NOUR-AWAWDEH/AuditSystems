@@ -16,7 +16,7 @@ internal sealed class DeleteJobTimeAllocationReportCommandHandler(
         {
             await jobTimeAllocationReportService.DeleteJobTimeAllocationReportAsync(request.Id);
             logger.LogInformation("Job time allocation report with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Job time allocation report was deleted");  
         }
         catch(Exception ex)
         {

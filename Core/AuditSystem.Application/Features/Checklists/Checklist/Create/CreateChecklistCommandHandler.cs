@@ -19,6 +19,6 @@ internal sealed class CreateChecklistCommandHandler(
         var checklistId = await checklistService.CreateCheckListAsync(checklistModel);
         logger.LogInformation("Checklist with Area {ChecklistArea} has been created.", request.Area);
 
-        return Result<CreateChecklistCommandResponse>.Created(new(checklistId));
+        return Result<CreateChecklistCommandResponse>.Created(new(checklistId), "Checklist created.");
     }
 }

@@ -19,6 +19,6 @@ internal sealed class UpdateSubDepartmentCommandHandler(
         await departmentService.UpdateSubDepartmentAsync(subDepartmentModel);
         
         logger.LogInformation("SubDepartment updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("SubDepartment updated successfully");
     }
 }

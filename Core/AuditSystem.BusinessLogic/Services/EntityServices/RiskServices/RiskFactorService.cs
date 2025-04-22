@@ -35,101 +35,89 @@ internal sealed class RiskFactorService(
             var entity = mapper.Map<RiskFactor>(riskFactorModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskFactor, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskFactorTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RiskFactorModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create RiskFactor.", ex);
+            logger.LogError(ex, "Failed to create RiskFactor");
+            throw new InvalidOperationException("Failed to create RiskFactor.", ex);
         }
     }
 
     public async Task DeleteRiskFactorAsync(Guid riskFactorId)
     {
-        try 
+        var cacheKey = GetCacheKey(riskFactorId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(riskFactorId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskFactor with ID {riskFactorId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(riskFactorId)
+                ?? throw new KeyNotFoundException($"RiskFactor with ID {riskFactorId} not found.");
 
             await repository.DeleteAsync(riskFactorId);
-            
-            var cacheKey = string.Format(CacheKeys.RiskFactor, riskFactorId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "RiskFactor with ID {RiskFactorId} not found", riskFactorId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete RiskFactor.", ex);
+            logger.LogError(ex, "Failed to delete RiskFactor ID {RiskFactorId}", riskFactorId);
+            throw new InvalidOperationException($"Failed to delete RiskFactor: {riskFactorId}", ex);
         }
     }
 
     public async Task<RiskFactorModel> GetRiskFactorByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.RiskFactor, id);
-
-            var cachedRiskFactor = await cacheService.GetAsync<RiskFactor>(cacheKey);
-            if (cachedRiskFactor != null)
+            var entity = await cacheService.GetAsync<RiskFactor>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<RiskFactorModel>(cachedRiskFactor);
+                return mapper.Map<RiskFactorModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskFactor with ID {id} not found.");
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"RiskFactor with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskFactorTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<RiskFactorModel>(entity); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<RiskFactorModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get RiskFactor by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve RiskFactor with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve RiskFactor with ID '{id}'", ex);
         }
     }
 
     public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)
     {
         ArgumentNullException.ThrowIfNull(riskFactorModel, nameof(riskFactorModel));
-
+        
         try
         {
             var entity = mapper.Map<RiskFactor>(riskFactorModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.RiskFactor, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskFactorTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update RiskFactor.", ex);
+            logger.LogError(ex, "Failed to update RiskFactor with ID {Id}", riskFactorModel.Id);
+            throw new InvalidOperationException($"Failed to update RiskFactor with ID '{riskFactorModel.Id}'", ex);
         }
     }
 }

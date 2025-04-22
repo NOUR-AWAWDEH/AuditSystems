@@ -17,7 +17,7 @@ internal sealed class DeleteRiskControlMatrixCommandHandler(
         {
             await riskControlMatrixService.DeleteRiskControlMatrixAsync(request.Id);
             logger.LogInformation("Risk control matrix with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Risk control matrix was deleted");
         }
         catch (Exception ex)
         {

@@ -18,6 +18,6 @@ internal sealed class CreateComplianceChecklistCommandHandler(
         var complianceChecklistId = await complianceChecklistService.CreateComplianceChecklistAsync(complianceChecklistModel);
         logger.LogInformation("Compliance Checklist with Area {ComplianceChecklistArea} has been created.", request.Area);
 
-        return Result<CreateComplianceChecklistCommandResponse>.Created(new CreateComplianceChecklistCommandResponse(complianceChecklistId));
+        return Result<CreateComplianceChecklistCommandResponse>.Created(new CreateComplianceChecklistCommandResponse(complianceChecklistId), "Compliance Checklist created.");
     }
 }

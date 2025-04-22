@@ -19,6 +19,6 @@ internal sealed class UpdateAuditUniverseCommandHandler(
         await auditUniverseService.UpdateAuditUniverseAsync(auditUniverseModel);
 
         logger.LogInformation("Audit universe updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit universe updated successfully");
     }
 }

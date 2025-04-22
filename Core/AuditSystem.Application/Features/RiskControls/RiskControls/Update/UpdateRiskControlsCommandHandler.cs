@@ -18,6 +18,6 @@ internal sealed class UpdateRiskControlsCommandHandler(
         var riskControlModel = mapper.Map<RiskControlsModel>(request);
         await riskControlService.UpdateRiskControlAsync(riskControlModel);
         logger.LogInformation("Risk control updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Risk control updated successfully");
     }
 }

@@ -35,102 +35,89 @@ internal sealed class TaskManagementService(
             var entity = mapper.Map<TaskManagement>(taskManagementModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.TaskManagement, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: TaskManagementTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for TaskManagementModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create TaskManagement.", ex);
+            logger.LogError(ex, "Failed to create TaskManagement");
+            throw new InvalidOperationException("Failed to create TaskManagement.", ex);
         }
     }
 
     public async Task DeleteTaskAsync(Guid taskManagementId)
     {
+        var cacheKey = GetCacheKey(taskManagementId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(taskManagementId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"TaskManagement with ID {taskManagementId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(taskManagementId)
+                ?? throw new KeyNotFoundException($"TaskManagement with ID {taskManagementId} not found.");
 
             await repository.DeleteAsync(taskManagementId);
-
-            var cacheKey = string.Format(CacheKeys.TaskManagement, taskManagementId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "TaskManagement with ID {TaskManagementId} not found", taskManagementId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete TaskManagement.", ex);
+            logger.LogError(ex, "Failed to delete TaskManagement ID {TaskManagementId}", taskManagementId);
+            throw new InvalidOperationException($"Failed to delete TaskManagement: {taskManagementId}", ex);
         }
-
     }
 
     public async Task<TaskManagementModel> GetTaskByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-           var cacheKey = string.Format(CacheKeys.TaskManagement, id);
-
-            var cachedEntity = await cacheService.GetAsync<TaskManagement>(cacheKey);
-            if (cachedEntity != null)
+            var entity = await cacheService.GetAsync<TaskManagement>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<TaskManagementModel>(cachedEntity);
+                return mapper.Map<TaskManagementModel>(entity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"TaskManagement with ID {id} not found.");
-            } 
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"TaskManagement with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: TaskManagementTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
+            await SetCacheAsync(cacheKey, entity);
             
             return mapper.Map<TaskManagementModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get TaskManagement by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve TaskManagement with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve TaskManagement with ID '{id}'", ex);
         }
     }
 
     public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)
     {
         ArgumentNullException.ThrowIfNull(taskManagementModel, nameof(taskManagementModel));
-
+        
         try
         {
             var entity = mapper.Map<TaskManagement>(taskManagementModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.TaskManagement, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: TaskManagementTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update TaskManagement.", ex);
+            logger.LogError(ex, "Failed to update TaskManagement with ID {Id}", taskManagementModel.Id);
+            throw new InvalidOperationException($"Failed to update TaskManagement with ID '{taskManagementModel.Id}'", ex);
         }
     }
 }

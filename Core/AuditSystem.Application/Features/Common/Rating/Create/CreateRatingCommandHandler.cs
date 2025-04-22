@@ -19,6 +19,6 @@ internal sealed class CreateRatingCommandHandler(
         var ratingId = await ratingService.CreateRatingAsync(ratingModel);
         logger.LogInformation("Rating with Level {RatingLevel} has been created.", request.Level);
 
-        return Result<CreateRatingCommandResponse>.Created(new(ratingId));
+        return Result<CreateRatingCommandResponse>.Created(new(ratingId), "Rating created.");
     }
 }

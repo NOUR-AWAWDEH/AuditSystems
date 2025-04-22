@@ -35,77 +35,71 @@ internal sealed class RiskProgramService(
             var entity = mapper.Map<RiskProgram>(riskProgramModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskProgram, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RiskProgramModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create RiskProgram.", ex);
+            logger.LogError(ex, "Failed to create RiskProgram");
+            throw new InvalidOperationException("Failed to create RiskProgram.", ex);
         }
     }
 
     public async Task DeleteRiskProgramAsync(Guid riskProgramId)
     {
+        var cacheKey = GetCacheKey(riskProgramId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(riskProgramId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskProgram with ID {riskProgramId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(riskProgramId)
+                ?? throw new KeyNotFoundException($"RiskProgram with ID {riskProgramId} not found.");
 
             await repository.DeleteAsync(riskProgramId);
-
-            var cacheKey = string.Format(CacheKeys.RiskProgram, riskProgramId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "RiskProgram with ID {RiskProgramId} not found", riskProgramId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete RiskProgram.", ex);
+            logger.LogError(ex, "Failed to delete RiskProgram ID {RiskProgramId}", riskProgramId);
+            throw new InvalidOperationException($"Failed to delete RiskProgram: {riskProgramId}", ex);
         }
     }
 
     public async Task<RiskProgramModel> GetRiskProgramByIdAsync(Guid id)
     {
-       try
-       {
-            var cacheKey = string.Format(CacheKeys.RiskProgram, id);
-
-            var cachedRiskProgram = await cacheService.GetAsync<RiskProgram>(cacheKey);
-            if (cachedRiskProgram != null)
+        var cacheKey = GetCacheKey(id);
+        
+        try
+        {
+            var entity = await cacheService.GetAsync<RiskProgram>(cacheKey);
+            if (entity != null)
             {
-                return mapper.Map<RiskProgramModel>(cachedRiskProgram);
+                return mapper.Map<RiskProgramModel>(entity);
             }
 
-            var riskProgram = await repository.GetByIdAsync(id);
-            if (riskProgram == null)
-            {
-                throw new KeyNotFoundException($"RiskProgram with ID {id} not found."); 
-            }
+            entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"RiskProgram with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: riskProgram,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
+            await SetCacheAsync(cacheKey, entity);
             
-            return mapper.Map<RiskProgramModel>(riskProgram);
-       }
-       catch (Exception ex)
-       {
-           throw new Exception($"Failed to get RiskProgram by ID {id}.", ex);
-       }
+            return mapper.Map<RiskProgramModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve RiskProgram with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve RiskProgram with ID '{id}'", ex);
+        }
     }
 
     public async Task UpdateRiskProgramAsync(RiskProgramModel riskProgramModel)
@@ -116,20 +110,14 @@ internal sealed class RiskProgramService(
         {
             var entity = mapper.Map<RiskProgram>(riskProgramModel);
             await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskProgram, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update RiskProgram.", ex);
+            logger.LogError(ex, "Failed to update RiskProgram with ID {Id}", riskProgramModel.Id);
+            throw new InvalidOperationException($"Failed to update RiskProgram with ID '{riskProgramModel.Id}'", ex);
         }
     }
 }

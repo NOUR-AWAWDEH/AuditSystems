@@ -19,6 +19,6 @@ internal sealed class UpdateJobSchedulingCommandHandler(
         await jobSchedulingService.UpdateJobSchedulingAsync(jobSchedulingModel);
 
         logger.LogInformation("Job scheduling updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Job scheduling updated successfully");
     }
 }

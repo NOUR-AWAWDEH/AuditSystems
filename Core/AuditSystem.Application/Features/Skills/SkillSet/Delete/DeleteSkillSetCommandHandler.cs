@@ -16,7 +16,7 @@ internal class DeleteSkillSetCommandHandler(
         {
             await skillSetService.DeleteSkillSetAsync(request.Id);  
             logger.LogInformation("Skill set with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Skill set deleted");  
         }
         catch (Exception ex)
         {

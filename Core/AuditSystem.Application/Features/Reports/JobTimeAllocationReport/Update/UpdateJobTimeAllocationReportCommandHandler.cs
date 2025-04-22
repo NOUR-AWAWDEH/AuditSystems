@@ -19,6 +19,6 @@ internal sealed class UpdateJobTimeAllocationReportCommandHandler(
         await jobTimeAllocationReportService.UpdateJobTimeAllocationReportAsync(jobTimeAllocationReportModel);
 
         logger.LogInformation("Job time allocation report updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Job time allocation report updated successfully");
     }
 }

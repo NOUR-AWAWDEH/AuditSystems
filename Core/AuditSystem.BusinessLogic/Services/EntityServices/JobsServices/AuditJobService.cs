@@ -54,56 +54,51 @@ internal sealed class AuditJobService(
     
     public async Task DeleteAuditJobAsync(Guid auditJobId)
     {
-        try 
+        var cacheKey = GetCacheKey(auditJobId);
+        
+        try
         {
-            var entity = await repository.GetByIdAsync(auditJobId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditJob with ID {auditJobId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(auditJobId)
+                ?? throw new KeyNotFoundException($"AuditJob with ID {auditJobId} not found.");
 
             await repository.DeleteAsync(auditJobId);
-
-            var cacheKey = string.Format(CacheKeys.AuditJob, auditJobId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "AuditJob with ID {AuditJobId} not found", auditJobId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete AuditJob.", ex);
+            logger.LogError(ex, "Failed to delete AuditJob ID {AuditJobId}", auditJobId);
+            throw new InvalidOperationException($"Failed to delete AuditJob: {auditJobId}", ex);
         }
     }
     
     public async Task<AuditJobModel> GetAuditJobByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.AuditJob, id);
-            
             var cachedEntity = await cacheService.GetAsync<AuditJob>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<AuditJobModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditJob with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"AuditJob with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm    
-            );
-
-            return mapper.Map<AuditJobModel>(entity);  
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<AuditJobModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get AuditJob by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve AuditJob with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve AuditJob with ID '{id}'", ex);
         }
     }
     
@@ -116,19 +111,13 @@ internal sealed class AuditJobService(
             var entity = mapper.Map<AuditJob>(auditJobModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.AuditJob, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update AuditJob.", ex);
+            logger.LogError(ex, "Failed to update AuditJob with ID {Id}", auditJobModel.Id);
+            throw new InvalidOperationException($"Failed to update AuditJob with ID '{auditJobModel.Id}'", ex);
         }
     }
 }

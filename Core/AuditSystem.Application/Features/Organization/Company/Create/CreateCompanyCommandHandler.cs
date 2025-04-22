@@ -19,6 +19,6 @@ internal sealed class CreateCompanyCommandHandler(
         var companyId = await companyService.CreateCompanyAsync(companyModel);
         logger.LogInformation("Company with Name {CompanyName} has been created.", request.Name);
 
-        return Result<CreateCompanyCommandResponse>.Created(new CreateCompanyCommandResponse(companyId));
+        return Result<CreateCompanyCommandResponse>.Created(new CreateCompanyCommandResponse(companyId), "Company created.");
     }
 }

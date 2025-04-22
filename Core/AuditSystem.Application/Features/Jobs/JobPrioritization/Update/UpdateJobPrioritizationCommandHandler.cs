@@ -19,6 +19,6 @@ internal sealed class UpdateJobPrioritizationCommandHandler(
         await jobPrioritizationService.UpdateJobPrioritizationAsync(jobPrioritizationModel);
 
         logger.LogInformation("Job prioritization updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Job prioritization updated successfully");
     }
 }

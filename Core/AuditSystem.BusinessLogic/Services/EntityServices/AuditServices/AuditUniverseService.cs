@@ -55,56 +55,51 @@ internal sealed class AuditUniverseService(
     
     public async Task DeleteAuditUniverseAsync(Guid auditUniverseId)
     {
+        var cacheKey = GetCacheKey(auditUniverseId);
+
         try
         {
-            var entity = await repository.GetByIdAsync(auditUniverseId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(auditUniverseId)
+                         ?? throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
 
             await repository.DeleteAsync(auditUniverseId);
-
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, auditUniverseId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogWarning(ex, "AuditUniverse with ID {Id} not found", auditUniverseId);
+            throw;
         }
         catch (Exception ex)
         {
-           throw new Exception("Failed to delete AuditUniverse.", ex);
+            logger.LogError(ex, "Failed to delete AuditUniverse with ID {Id}", auditUniverseId);
+            throw new InvalidOperationException($"Failed to delete AuditUniverse with ID {auditUniverseId}", ex);
         }
     }
     
     public async Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+
         try
         {
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, id);
-            
-            var cachedAuditUniverseModel = await cacheService.GetAsync<AuditUniverse>(cacheKey);
-            if (cachedAuditUniverseModel != null)
-            { 
-                return mapper.Map<AuditUniverseModel>(cachedAuditUniverseModel);
-            }
-
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null) 
+            var cachedEntity = await cacheService.GetAsync<AuditUniverse>(cacheKey);
+            if (cachedEntity != null)
             {
-                throw new KeyNotFoundException($"AuditUniverse with ID {id} not found.");    
+                return mapper.Map<AuditUniverseModel>(cachedEntity);
             }
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm
-            );
+            var entity = await repository.GetByIdAsync(id)
+                         ?? throw new KeyNotFoundException($"AuditUniverse with ID '{id}' not found.");
 
-            return mapper.Map<AuditUniverseModel>(entity);  
+            await SetCacheAsync(cacheKey, entity);
+
+            return mapper.Map<AuditUniverseModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get AuditUniverse by ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve AuditUniverse with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve AuditUniverse with ID '{id}'", ex);
         }
     }
     
@@ -117,19 +112,13 @@ internal sealed class AuditUniverseService(
             var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update AuditUniverse.", ex);
+            logger.LogError(ex, "Failed to update AuditUniverse with ID {Id}", auditUniverseModel.Id);
+            throw new InvalidOperationException($"Failed to update AuditUniverse with ID '{auditUniverseModel.Id}'", ex);
         }
     }
 }

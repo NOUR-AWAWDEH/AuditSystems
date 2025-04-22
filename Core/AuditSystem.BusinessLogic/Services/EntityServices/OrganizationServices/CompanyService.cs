@@ -35,77 +35,70 @@ internal sealed class CompanyService(
             var entity = mapper.Map<Company>(companyModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Company, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: CompanyTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
-
+        }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for CompanyModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Company.", ex);
+            logger.LogError(ex, "Failed to create Company");
+            throw new InvalidOperationException("Failed to create Company.", ex);
         }
     }
 
     public async Task DeleteCompanyAsync(Guid companyId)
     {
+        var cacheKey = GetCacheKey(companyId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(companyId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Company with ID {companyId} not found.");
-            }
-            
+            var entity = await repository.GetByIdAsync(companyId)
+                ?? throw new KeyNotFoundException($"Company with ID {companyId} not found.");
+
             await repository.DeleteAsync(companyId);
-            
-            var cacheKey = string.Format(CacheKeys.Company, companyId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "Company with ID {CompanyId} not found", companyId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete Company.", ex);
+            logger.LogError(ex, "Failed to delete Company ID {CompanyId}", companyId);
+            throw new InvalidOperationException($"Failed to delete Company: {companyId}", ex);
         }
     }
 
     public async Task<CompanyModel> GetCompanyByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.Company, id);
-            var cachedCompany = await cacheService.GetAsync<Company>(cacheKey);
-
-            if (cachedCompany != null)
+            var cachedEntity = await cacheService.GetAsync<Company>(cacheKey);
+            if (cachedEntity != null)
             {
-                return mapper.Map<CompanyModel>(cachedCompany);
+                return mapper.Map<CompanyModel>(cachedEntity);
             }
 
-            var company = await repository.GetByIdAsync(id);
-            if (company == null)
-            {
-                throw new KeyNotFoundException($"Company with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Company with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: company,
-                tags: CompanyTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<CompanyModel>(company); 
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<CompanyModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get Company ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve Company with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve Company with ID '{id}'", ex);
         }
     }
 
@@ -118,19 +111,13 @@ internal sealed class CompanyService(
             var entity = mapper.Map<Company>(companyModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.Company, entity.Id);
-        
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: CompanyTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update Company.", ex);
+            logger.LogError(ex, "Failed to update Company with ID {Id}", companyModel.Id);
+            throw new InvalidOperationException($"Failed to update Company with ID '{companyModel.Id}'", ex);
         }
     }
 }

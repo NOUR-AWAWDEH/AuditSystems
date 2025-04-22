@@ -19,6 +19,6 @@ internal sealed class UpdateAuditProcessCommandHandler(
         await auditProcessService.UpdateAuditProcessAsync(auditProcessModel);
         
         logger.LogInformation("Audit process updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit process updated successfully");
     }
 }

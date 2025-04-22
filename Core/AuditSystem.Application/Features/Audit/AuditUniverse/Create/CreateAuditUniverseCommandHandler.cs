@@ -19,6 +19,6 @@ internal sealed class CreateAuditUniverseCommandHandler(
         var auditUniverseId = await auditUniverseService.CreateAuditUniverseAsync(auditUniverseModel);
         logger.LogInformation("AuditUniverse with Business Objective {BusinessObjective} has been created.", command.BusinessObjective);
 
-        return Result<CreateAuditUniverseCommandResponse>.Created(new CreateAuditUniverseCommandResponse(auditUniverseId));
+        return Result<CreateAuditUniverseCommandResponse>.Created(new CreateAuditUniverseCommandResponse(auditUniverseId), "AuditUniverse has been created.");
     }
 }

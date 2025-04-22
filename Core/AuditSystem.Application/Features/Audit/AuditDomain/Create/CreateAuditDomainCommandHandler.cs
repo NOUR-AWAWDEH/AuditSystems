@@ -21,6 +21,6 @@ internal sealed class CreateAuditDomainCommandHandler(
         var DomainId = await auditDomainService.CreateAuditDomainAsync(DomainModel);
         logger.LogInformation("Audit Domain with name {Name} has been created.", request.Name);
 
-        return Result<CreateAuditDomainCommandResponse>.Created(new(DomainId), "Audit Domain has been created.");
+        return Result<CreateAuditDomainCommandResponse>.Created(new(DomainId), "Audit Domain created.");
     }
 }

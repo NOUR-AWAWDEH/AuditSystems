@@ -24,7 +24,7 @@ internal sealed class PlanningReportService(
     IPlanningReportService
 {
     private static readonly string[] PlanningReportTags = ["planning-reports", "planning-report-list"];
-    private static readonly string[] ListTags = ["planning-report-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["planning-report-list"];
 
     public async Task<Guid> CreatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
@@ -35,78 +35,71 @@ internal sealed class PlanningReportService(
             var entity = mapper.Map<PlanningReport>(planningReportModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.PlanningReport, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: PlanningReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for PlanningReportModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create PlanningReport.", ex);
+            logger.LogError(ex, "Failed to create PlanningReport");
+            throw new InvalidOperationException("Failed to create PlanningReport.", ex);
         }
     }
     
     public async Task DeletePlanningReportAsync(Guid planningReportId)
     {
+        var cacheKey = GetCacheKey(planningReportId);
+        
         try
         {
-            var entity = await repository.GetByIdAsync(planningReportId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"PlanningReport with ID {planningReportId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(planningReportId)
+                ?? throw new KeyNotFoundException($"PlanningReport with ID {planningReportId} not found.");
 
             await repository.DeleteAsync(planningReportId);
-
-            var cacheKey = string.Format(CacheKeys.PlanningReport, planningReportId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "PlanningReport with ID {ReportId} not found", planningReportId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete PlanningReport.", ex);
+            logger.LogError(ex, "Failed to delete PlanningReport ID {ReportId}", planningReportId);
+            throw new InvalidOperationException($"Failed to delete PlanningReport: {planningReportId}", ex);
         }
     }
     
     public async Task<PlanningReportModel> GetPlanningReportByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+        
         try
         {
-            var cacheKey = string.Format(CacheKeys.PlanningReport, id);
-
             var cachedEntity = await cacheService.GetAsync<PlanningReport>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<PlanningReportModel>(cachedEntity);
             }
 
-            var entity = await repository.GetByIdAsync(id);
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"PlanningReport with ID '{id}' not found.");
 
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"PlanningReport with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: PlanningReportTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+            await SetCacheAsync(cacheKey, entity);
+            
             return mapper.Map<PlanningReportModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get PlanningReport by ID {id}.", ex);
-        }  
+            logger.LogError(ex, "Failed to retrieve PlanningReport with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve PlanningReport with ID '{id}'", ex);
+        }
     }
     
     public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
@@ -118,19 +111,13 @@ internal sealed class PlanningReportService(
             var entity = mapper.Map<PlanningReport>(planningReportModel);
             await repository.UpdateAsync(entity);
             
-            var cacheKey = string.Format(CacheKeys.PlanningReport, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: PlanningReportTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update PlanningReport.", ex);
+            logger.LogError(ex, "Failed to update PlanningReport with ID {Id}", planningReportModel.Id);
+            throw new InvalidOperationException($"Failed to update PlanningReport with ID '{planningReportModel.Id}'", ex);
         }
     }
 }

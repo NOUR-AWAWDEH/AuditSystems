@@ -15,7 +15,7 @@ internal sealed class DeleteAuditPlanSummaryCommandHandler(
         {
             await auditPlanSummaryReportService.DeleteAuditPlanSummaryReportAsync(request.Id);
             logger.LogInformation("Audit Plan Summary Report deleted successfully");
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit Plan Summary Report deleted successfully");
         }
         catch (Exception ex)
         {

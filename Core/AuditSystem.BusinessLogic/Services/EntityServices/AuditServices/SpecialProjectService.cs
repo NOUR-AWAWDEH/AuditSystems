@@ -54,58 +54,52 @@ internal sealed class SpecialProjectService(
     
     public async Task DeleteSpecialProjectAsync(Guid specialProjectId)
     {
+        var cacheKey = GetCacheKey(specialProjectId);
+
         try 
         {
-            var entity = await repository.GetByIdAsync(specialProjectId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"SpecialProject with ID {specialProjectId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(specialProjectId)
+                ?? throw new KeyNotFoundException($"SpecialProject with ID {specialProjectId} not found.");    
             
             await repository.DeleteAsync(specialProjectId);
-            
-            var cacheKey = string.Format(CacheKeys.SpecialProject, specialProjectId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "SpecialProject with ID: {id} not found.",specialProjectId);
+            throw;
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete SpecialProject.", ex);
+            logger.LogError(ex, "Failed to delete SpecialProject with ID: {id}.", specialProjectId);
+            throw new InvalidOperationException("Failed to delete SpecialProject.", ex);
         }
     }
     
     public async Task<SpecialProjectModel> GetSpecialProjectByIdAsync(Guid id)
     {
-       try
-       {
-           var cacheKey = string.Format(CacheKeys.SpecialProject, id);
+        var cacheKey = GetCacheKey(id);
+        
+        try
+        {
+            var cachedEntity = await cacheService.GetAsync<SpecialProject>(cacheKey);
+            if (cachedEntity != null)
+            {
+                return mapper.Map<SpecialProjectModel>(cachedEntity);
+            }
 
-           var cachedEntity = await cacheService.GetAsync<SpecialProject>(cacheKey);
+            var entity = await repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException($"SpecialProject with ID '{id}' not found.");
 
-           if (cachedEntity != null)
-           {
-               return mapper.Map<SpecialProjectModel>(cachedEntity);
-           }
-
-           var entity = await repository.GetByIdAsync(id);
-           if (entity == null)
-           {
-               throw new KeyNotFoundException($"SpecialProject with ID {id} not found.");
-           }
-
-           await cacheService.SetAsync(
-               key: cacheKey,
-               value: entity,
-               tags: SpecialProjectTags,
-               expiration: CacheExpirations.MediumTerm  
-           );
-
-           return mapper.Map<SpecialProjectModel>(entity);
-       }
-       catch (Exception ex)
-       {
-           throw new Exception($"Failed to get SpecialProject with ID {id}.", ex);
-       }
+            await SetCacheAsync(cacheKey, entity);
+            
+            return mapper.Map<SpecialProjectModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve SpecialProject with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve SpecialProject with ID '{id}'", ex);
+        }
     }
     
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
@@ -117,19 +111,13 @@ internal sealed class SpecialProjectService(
             var entity = mapper.Map<SpecialProject>(specialProjectModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.SpecialProject, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: SpecialProjectTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update SpecialProject.", ex);
+            logger.LogError(ex, "Failed to update SpecialProject with ID {Id}", specialProjectModel.Id);
+            throw new InvalidOperationException($"Failed to update SpecialProject with ID '{specialProjectModel.Id}'", ex);
         }
     }
 }

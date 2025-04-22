@@ -19,6 +19,6 @@ internal sealed class UpdateReportingFollowUpCommandHandler(
         await reportingFollowUpService.UpdateReportingFollowUpAsync(reportingFollowUpModel);
 
         logger.LogInformation("Reporting follow-up updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Reporting follow-up updated successfully");
     }
 }

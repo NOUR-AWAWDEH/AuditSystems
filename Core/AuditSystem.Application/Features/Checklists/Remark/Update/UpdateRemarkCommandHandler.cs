@@ -19,6 +19,6 @@ internal sealed class UpdateRemarkCommandHandler(
         await remarkService.UpdateRemarkAsync(remarkModel);
 
         logger.LogInformation("Remark updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Remark updated successfully");
     }
 }

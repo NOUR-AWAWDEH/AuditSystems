@@ -16,7 +16,7 @@ internal sealed class DeleteRatingCommandHandler(
         {
             await ratingService.DeleteRatingAsync(request.Id);
             logger.LogInformation("Deleting rating with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Rating deleted successfully");
         }
         catch (Exception ex)
         {

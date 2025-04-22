@@ -16,7 +16,7 @@ internal sealed class DeleteReportingFollowUpCommandHandler(
         {
             await reportingFollowUpService.DeleteReportingFollowUpAsync(request.Id);
             logger.LogInformation("Reporting follow up with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Reporting follow up deleted");  
         }
         catch (Exception ex)
         {

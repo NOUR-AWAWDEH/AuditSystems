@@ -1,4 +1,5 @@
 ﻿using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 
@@ -8,4 +9,5 @@ public interface IAuditUniverseObjectiveService
     public Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel);
     public Task DeleteAuditUniverseObjectiveAsync(Guid auditUniverseObjectiveId);
     public Task<AuditUniverseObjectiveModel> GetAuditUniverseObjectiveByIdAsync(Guid id);
+    public Task<PaginationResult<AuditUniverseObjectiveModel>> Search(string? Name, Page page);
 }

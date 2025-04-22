@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -102,6 +103,11 @@ internal sealed class AuditUniverseObjectiveService(
             logger.LogError(ex, "Failed to retrieve AuditUniverseObjective with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve AuditUniverseObjective with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<AuditUniverseObjectiveModel>> Search(string? Name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)

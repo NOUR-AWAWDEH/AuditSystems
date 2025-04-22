@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -99,6 +100,11 @@ internal class ObjectiveService(
             logger.LogError(ex, "Failed to retrieve Objective with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve Objective with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<ObjectiveModel>> Search(string? Name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)

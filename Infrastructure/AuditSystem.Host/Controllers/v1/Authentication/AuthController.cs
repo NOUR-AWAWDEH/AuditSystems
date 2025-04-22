@@ -5,8 +5,8 @@ using AuditSystem.Auth.Services.Authentication;
 using AuditSystem.Host.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
+using AuditSystem.BusinessLogic.Attributes;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
@@ -19,7 +19,7 @@ public sealed class AuthController(
 {
 
     [HttpPost("login")]
-    [EnableRateLimiting("loginPolicy")]
+    [PreventLoginBruteForce]
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> LoginAsync([FromBody] LoginRequestDto request)
     {
         if (!ModelState.IsValid)

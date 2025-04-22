@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -100,6 +101,11 @@ internal sealed class AuditDomainService(
             logger.LogError(ex, "Failed to retrieve AuditDomain with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve AuditDomain with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<AuditDomainModel>> Search(string? Name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomainModel)

@@ -30,6 +30,7 @@ public static class AuthDependencies
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddMemoryCache();
 
         // Configure SMTP settings
         ConfigureSmtpSettings(services, configuration);
@@ -63,44 +64,6 @@ public static class AuthDependencies
                     ClockSkew = TimeSpan.Zero
                 };
             });
-
-        // Rate Limiting
-        services.AddRateLimiter(options =>
-        {
-            options.RejectionStatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status429TooManyRequests;
-
-            // Optional: Global rate limit (e.g., 1000 requests per minute across all IPs)
-            options.GlobalLimiter = PartitionedRateLimiter.Create<Microsoft.AspNetCore.Http.HttpContext, string>(httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: "global",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 1000,
-                        Window = TimeSpan.FromMinutes(1),
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        QueueLimit = 0
-                    }));
-
-            // Per-IP rate limit for login endpoints
-            options.AddPolicy("loginPolicy", httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 8,              // 8 requests allowed
-                        Window = TimeSpan.FromMinutes(1), // Per minute
-                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        QueueLimit = 0                // Reject immediately if limit exceeded
-                    }));
-
-            // Optional: Custom response for rate limit exceeded
-            options.OnRejected = async (context, cancellationToken) =>
-            {
-                context.HttpContext.Response.StatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status429TooManyRequests;
-                await context.HttpContext.Response.WriteAsync(
-                    "Too many requests. Please try again later.", cancellationToken);
-            };
-        });
 
         return services;
     }

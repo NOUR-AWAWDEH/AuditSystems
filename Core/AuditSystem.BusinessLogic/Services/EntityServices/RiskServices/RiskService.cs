@@ -2,6 +2,7 @@ using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
 using AutoMapper;
@@ -100,6 +101,11 @@ internal sealed class RiskService(
             logger.LogError(ex, "Failed to retrieve Risk with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve Risk with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<RiskModel>> Search(string? Name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateRiskAsync(RiskModel riskModel)

@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 
 internal sealed class RiskProgramService(
     IRepository<Guid, RiskProgram> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskProgramService
+    ICacheService cacheService,
+    ILogger<RiskProgramService> logger) : 
+    BaseEntityCacheService<RiskProgram>(
+        cacheService,
+        logger,
+        CacheKeys.RiskProgram,
+        RiskProgramTags,
+        ListTags
+    ),
+    IRiskProgramService
 {
     private static readonly string[] RiskProgramTags = ["risk-programs", "risk-program-list"];
     private static readonly string[] ListTags = ["risk-program-list"]; // Tags for collections only

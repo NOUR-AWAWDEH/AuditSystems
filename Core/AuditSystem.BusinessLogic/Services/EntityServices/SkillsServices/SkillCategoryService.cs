@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Skills;
 using AuditSystem.Domain.Entities.Skills;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;
 
 internal sealed class SkillCategoryService(
     IRepository<Guid, SkillCategory> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISkillCategoryService
+    ICacheService cacheService,
+    ILogger<SkillCategoryService> logger) : 
+    BaseEntityCacheService<SkillCategory>(
+        cacheService,
+        logger,
+        CacheKeys.SkillCategory,
+        SkillCategoryTags,
+        ListTags
+    ),
+    ISkillCategoryService
 {
     private static readonly string[] SkillCategoryTags = ["skill-categorys", "skill-Category-list"];
-    private static readonly string[] ListTags = ["skill-category-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["skill-category-list"];
 
     public async Task<Guid> CreateSkillCategoryAsync(SkillCategoryModel skillCategoryModel)
     {

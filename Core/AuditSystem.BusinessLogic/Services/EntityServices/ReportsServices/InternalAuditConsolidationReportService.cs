@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class InternalAuditConsolidationReportService(
     IRepository<Guid, InternalAuditConsolidationReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IInternalAuditConsolidationReportService
+    ICacheService cacheService,
+    ILogger<InternalAuditConsolidationReportService> logger) : 
+    BaseEntityCacheService<InternalAuditConsolidationReport>(
+        cacheService,
+        logger,
+        CacheKeys.InternalAuditConsolidationReport,
+        InternalAuditConsolidationReportTags,
+        ListTags
+    ),
+    IInternalAuditConsolidationReportService
 {
     private static readonly string[] InternalAuditConsolidationReportTags = ["internal-audit-consolidation-reports", "internal-audit-consolidation-report-list"];
-    private static readonly string[] ListTags = ["internal-audit-consolidation-report-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["internal-audit-consolidation-report-list"];
 
     public async Task<Guid> CreateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
@@ -43,6 +52,7 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception("Failed to create InternalAuditConsolidationReport.", ex);
         }
     }
+    
     public async Task DeleteInternalAuditConsolidationReportAsync(Guid internalAuditConsolidationReportId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception("Failed to delete InternalAuditConsolidationReport.", ex);
         }
     }
+    
     public async Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid id)
     {
         try
@@ -98,6 +109,7 @@ internal sealed class InternalAuditConsolidationReportService(
             throw new Exception($"Failed to get InternalAuditConsolidationReport by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));

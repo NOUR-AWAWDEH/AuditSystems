@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Create;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Delete;
+using AuditSystem.Application.Features.Audit.BusinessObjective.Get;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class BusinessObjectiveController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateBusinessObjective([FromBody] UpdateBusinessObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Get Business Objective
+    [HttpGet("get-business-objective")]
+    [ProducesResponseType(typeof(ApiResponse<GetBusinessObjectiveByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetBusinessObjective([FromQuery] GetBusinessObjectiveByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Business Objective
     [HttpDelete("delete-business-objective")]

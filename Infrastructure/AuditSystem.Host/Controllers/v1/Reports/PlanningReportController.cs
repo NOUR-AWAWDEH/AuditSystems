@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Reports.PlanningReport.Create;
 using AuditSystem.Application.Features.Reports.PlanningReport.Delete;
+using AuditSystem.Application.Features.Reports.PlanningReport.Get;
 using AuditSystem.Application.Features.Reports.PlanningReport.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class PlanningReportController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdatePlanningReport([FromBody] UpdatePlanningReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Planning Report
+    [HttpGet("get-planning-report")]
+    [ProducesResponseType(typeof(ApiResponse<GetPlanningReportByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPlanningReport([FromQuery] GetPlanningReportByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Planning Report
     [HttpDelete("delete-planning-report")]

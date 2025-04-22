@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Jobs.JobPrioritization.Create;
 using AuditSystem.Application.Features.Jobs.JobPrioritization.Delete;
+using AuditSystem.Application.Features.Jobs.JobPrioritization.Get;
 using AuditSystem.Application.Features.Jobs.JobPrioritization.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class JobPrioritizationController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateJobPrioritization([FromBody] UpdateJobPrioritizationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Job Prioritization
+    [HttpGet("get-job-prioritization")]
+    [ProducesResponseType(typeof(ApiResponse<GetJobPrioritizationByIdQuery>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetJobPrioritization([FromQuery] GetJobPrioritizationByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Job Prioritization
     [HttpDelete("delete-job-prioritization")]

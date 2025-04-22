@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal sealed class AuditUniverseService(
     IRepository<Guid, AuditUniverse> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditUniverseService
+    ICacheService cacheService,
+    ILogger<AuditUniverseService> logger):
+    BaseEntityCacheService<AuditUniverse>(
+        cacheService,
+        logger,
+        CacheKeys.AuditUniverse,
+        AuditUniverseTags,
+        ListTags
+    ), 
+    IAuditUniverseService
 {
     private static readonly string[] AuditUniverseTags = ["audit-universes", "audit-universe-list"];
-    private static readonly string[] ListTags = ["audit-universe-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-universe-list"];
 
     public async Task<Guid> CreateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
@@ -26,23 +35,24 @@ internal sealed class AuditUniverseService(
             var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, createdEntity.Id);
+            var cacheKey = GetCacheKey(createdEntity.Id);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for AuditUniverseModel");
+            throw new ArgumentException("Mapping failed for AuditUniverseModel.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create AuditUniverse.", ex);
+            logger.LogError(ex, "Failed to create AuditUniverse.");
+            throw new InvalidCastException("Failed to create AuditUniverse.", ex);
         }
     }
+    
     public async Task DeleteAuditUniverseAsync(Guid auditUniverseId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class AuditUniverseService(
            throw new Exception("Failed to delete AuditUniverse.", ex);
         }
     }
+    
     public async Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class AuditUniverseService(
             throw new Exception($"Failed to get AuditUniverse by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));

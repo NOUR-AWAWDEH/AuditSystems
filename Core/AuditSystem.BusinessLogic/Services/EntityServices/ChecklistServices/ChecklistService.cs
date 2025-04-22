@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Domain.Entities.Checklists;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
 
 internal sealed class ChecklistService(
     IRepository<Guid, Checklist> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IChecklistService
+    ICacheService cacheService,
+    ILogger<ChecklistService> logger) :
+    BaseEntityCacheService<Checklist>(
+        cacheService,
+        logger,
+        CacheKeys.Checklist,
+        ChecklistTags,
+        ListTags
+    ),
+    IChecklistService
 {
     private static readonly string[] ChecklistTags = ["checklists", "checklist-list"];
-    private static readonly string[] ListTags = ["checklist-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["checklist-list"];
+    
     public async Task<Guid> CreateCheckListAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));
@@ -25,24 +35,23 @@ internal sealed class ChecklistService(
             var entity = mapper.Map<Checklist>(checklistModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Checklist, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: ChecklistTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
-
+        }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for ChecklistModel");
+            throw new ArgumentException("Mapping failed for ChecklistModel", ex);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Checklist.", ex);
+            logger.LogError(ex, "An error occurred while creating Checklist.");
+            throw new InvalidOperationException("An error occurred while creating Checklist.", ex);
         }
     }
+    
     public async Task DeleteChecklistAsync(Guid checklistId)
     {
         try 
@@ -64,6 +73,7 @@ internal sealed class ChecklistService(
             throw new Exception("Failed to delete Checklist.", ex);
         }
     }
+    
     public async Task<ChecklistModel> GetChecklistByIdAsync(Guid id)
     {
         try
@@ -96,6 +106,7 @@ internal sealed class ChecklistService(
             throw new Exception($"Failed to get Checklist with ID {id}.", ex);
         }
     }
+    
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));

@@ -13,12 +13,12 @@ internal sealed class UpdateAuditDomainCommandHandler(
     ILogger<UpdateAuditDomainCommandHandler> logger)
     : IRequestHandler<UpdateAuditDomainCommand, Result>
 {
-    public async Task<Result> Handle(UpdateAuditDomainCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpdateAuditDomainCommand request, CancellationToken cancellationToken)
     {
         var auditDomainModel = mapper.Map<AuditDomainModel>(request);
         await auditDomainService.UpdateAuditDomainAsync(auditDomainModel);
 
-        logger.LogInformation("Audit domain updated successfully");
-        return Result.Success();
+        logger.LogInformation("Audit domain has been updated successfully");
+        return Result.SuccessWithMessage("Audit Domain has been updated successfully");
     }
 }

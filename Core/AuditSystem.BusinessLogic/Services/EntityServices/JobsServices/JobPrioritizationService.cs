@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.JobsServices;
 
 internal sealed class JobPrioritizationService(
     IRepository<Guid, JobPrioritization> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IJobPrioritizationService
+    ICacheService cacheService,
+    ILogger<JobPrioritizationService> logger) :
+    BaseEntityCacheService<JobPrioritization>(
+        cacheService,
+        logger,
+        CacheKeys.JobPrioritization,
+        JobPrioritizationTags,
+        ListTags
+    ),
+    IJobPrioritizationService
 {
     private static readonly string[] JobPrioritizationTags = ["job-prioritizations", "job-prioritization-list"];
     private static readonly string[] ListTags = ["job-prioritization-list"]; // Tags for collections only
+    
     public async Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
@@ -42,6 +52,7 @@ internal sealed class JobPrioritizationService(
             throw new Exception("Failed to create JobPrioritization.", ex);
         }
     }
+    
     public async Task DeleteJobPrioritizationAsync(Guid jobPrioritizationId)
     {
         try 
@@ -63,6 +74,7 @@ internal sealed class JobPrioritizationService(
             throw new Exception("Failed to delete JobPrioritization.", ex);
         }
     }
+    
     public async Task<JobPrioritizationModel> GetJobPrioritizationByIdAsync(Guid id)
     {
         try
@@ -95,6 +107,7 @@ internal sealed class JobPrioritizationService(
             throw new Exception($"Failed to retrieve JobPrioritization by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));

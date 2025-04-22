@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class AuditPlanSummaryReportService(
     IRepository<Guid, AuditPlanSummaryReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditPlanSummaryReportService
+    ICacheService cacheService,
+    ILogger<AuditPlanSummaryReportService> logger) : 
+    BaseEntityCacheService<AuditPlanSummaryReport>(
+        cacheService,
+        logger,
+        CacheKeys.AuditPlanSummaryReport,
+        AuditPlanSummaryReportTags,
+        ListTags
+    ),
+    IAuditPlanSummaryReportService
 {
     private static readonly string[] AuditPlanSummaryReportTags = ["audit-plan-summary-reports", "audit-plan-summary-report-list"];
     private static readonly string[] ListTags = ["audit-plan-summary-report-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception("Failed to create AuditPlanSummaryReport.", ex);
         }
     }
+    
     public async Task DeleteAuditPlanSummaryReportAsync(Guid auditPlanSummaryReportId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception("Failed to delete AuditPlanSummaryReport.", ex);
         }
     }
+    
     public async Task<AuditPlanSummaryReportModel> GetAuditPlanSummaryReportByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class AuditPlanSummaryReportService(
             throw new Exception($"Failed to get AuditPlanSummaryReport by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateAuditPlanSummaryReportAsync(AuditPlanSummaryReportModel auditPlanSummaryReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryReportModel, nameof(auditPlanSummaryReportModel));

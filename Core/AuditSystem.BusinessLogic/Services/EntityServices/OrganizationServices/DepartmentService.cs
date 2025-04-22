@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class DepartmentService(
     IRepository<Guid, Department> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IDepartmentService
+    ICacheService cacheService,
+    ILogger<DepartmentService> logger) : 
+    BaseEntityCacheService<Department>(
+        cacheService,
+        logger,
+        CacheKeys.Department,
+        DepartmentTags,
+        ListTags
+    ),
+    IDepartmentService
 {
     private static readonly string[] DepartmentTags = ["departments", "department-list"];
-    private static readonly string[] ListTags = ["department-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["department-list"];
 
     public async Task<Guid> CreateDepartmentAsync(DepartmentModel departmentModel)
     {
@@ -43,6 +52,7 @@ internal sealed class DepartmentService(
             throw new Exception("Failed to create Department.", ex);
         }
     }
+    
     public async Task DeleteDepartmentAsync(Guid departmentId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class DepartmentService(
             throw new Exception("Failed to delete Department.", ex);
         }
     }
+    
     public async Task<DepartmentModel> GetDepartmentByIdAsync(Guid id)
     {
         try
@@ -97,6 +108,7 @@ internal sealed class DepartmentService(
             throw new Exception($"Failed to get Department ID {id}.", ex);
         }
     }
+    
     public async Task UpdateDepartmentAsync(DepartmentModel departmentModel)
     {
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));

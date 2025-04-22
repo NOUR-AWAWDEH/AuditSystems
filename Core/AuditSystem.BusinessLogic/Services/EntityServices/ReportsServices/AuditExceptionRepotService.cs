@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class AuditExceptionRepotService(
     IRepository<Guid, AuditExceptionReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditExceptionReportService
+    ICacheService cacheService,
+    ILogger<AuditExceptionRepotService> logger) : 
+    BaseEntityCacheService<AuditExceptionReport>(
+        cacheService,
+        logger,
+        CacheKeys.AuditExceptionReport,
+        AuditExceptionReportTags,
+        ListTags
+    ),
+    IAuditExceptionReportService
 {
     private static readonly string[] AuditExceptionReportTags = ["audit-exception-reports", "audit-exception-report-list"];
     private static readonly string[] ListTags = ["audit-exception-report-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception("Failed to create AuditExceptionReport.", ex);
         }
     }
+    
     public async Task DeleteAuditExceptionReportAsync(Guid auditExceptionReportId)
     {
         try 
@@ -64,6 +74,7 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception("Failed to delete AuditExceptionReport.", ex);
         }
     }
+    
     public async Task<AuditExceptionReportModel> GetAuditExceptionReportByIdAsync(Guid id)
     {
         try
@@ -97,6 +108,7 @@ internal sealed class AuditExceptionRepotService(
             throw new Exception($"Failed to get AuditExceptionReport by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));

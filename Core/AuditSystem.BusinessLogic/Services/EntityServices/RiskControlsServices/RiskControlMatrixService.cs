@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 
 internal sealed class RiskControlMatrixService(
     IRepository<Guid, RiskControlMatrix> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskControlMatrixService
+    ICacheService cacheService,
+    ILogger<RiskControlMatrixService> logger) : 
+    BaseEntityCacheService<RiskControlMatrix>(
+        cacheService,
+        logger,
+        CacheKeys.RiskControlMatrix,
+        RiskControlMatrixTags,
+        ListTags
+    ),
+    IRiskControlMatrixService
 {
     private static readonly string[] RiskControlMatrixTags = ["risk-control-matrices", "risk-control-matrix-list"];
     private static readonly string[] ListTags = ["risk-control-matrix-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class RiskControlMatrixService(
             throw new Exception("Failed to create RiskControlMatrix.", ex);
         }
     }
+    
     public async Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class RiskControlMatrixService(
             throw new Exception("Failed to delete RiskControlMatrix.", ex);
         }
     }
+    
     public async Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class RiskControlMatrixService(
             throw new Exception($"Failed to get RiskControlMatrix by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));

@@ -5,14 +5,16 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Processes;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
 
 internal sealed class SubProcessService(
     IRepository<Guid, SubProcess> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISubProcessService
+    ICacheService cacheService,
+    ILogger<SubProcessService> logger) : 
+    ISubProcessService
 {
     private static readonly string[] SubProcessTags = ["sub-processes", "sub-process-list"];
     private static readonly string[] ListTags = ["sub-process-list"]; // Tags for collections only
@@ -43,6 +45,7 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to create SubProcess.", ex);
         }
     }
+    
     public async Task DeleteSubProcessAsync(Guid subProcessId)
     {
         try 
@@ -64,6 +67,7 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to delete SubProcess.", ex);
         }
     }
+    
     public async Task<SubProcessModel> GetSubProcessByIdAsync(Guid id)
     {
         try
@@ -97,6 +101,7 @@ internal sealed class SubProcessService(
             throw new Exception($"Failed to get SubProcess by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)
     {
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
@@ -122,4 +127,10 @@ internal sealed class SubProcessService(
             throw new Exception("Failed to update SubProcess.", ex);
         }
     }
+
+    #region Private Helpers
+    private static string GetCacheKey(Guid id) => 
+        string.Format(CacheKeys.CacheKey, CacheKeys.SubProcess, id, "en");
+    
+    #endregion
 }

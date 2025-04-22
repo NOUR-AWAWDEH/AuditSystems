@@ -6,6 +6,7 @@ using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AuditSystem.Application.Features.Organization.Company.Get;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -27,6 +28,14 @@ public sealed class CompanyController(IMediator mediator) : ApiControllerBase(me
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Company
+    [HttpGet("get-company")]
+    [ProducesResponseType(typeof(ApiResponse<GetCompanyByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCompany([FromQuery] GetCompanyByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Company
     [HttpDelete("delete-company")]

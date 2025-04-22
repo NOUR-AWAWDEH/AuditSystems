@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Skills;
 using AuditSystem.Domain.Entities.Skills;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;
 
 internal sealed class SkillSetService(
     IRepository<Guid, SkillSet> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISkillSetService
+    ICacheService cacheService,
+    ILogger<SkillSetService> logger) : 
+    BaseEntityCacheService<SkillSet>(
+        cacheService,
+        logger,
+        CacheKeys.SkillSet,
+        SkillSetTags,
+        ListTags
+    ),
+    ISkillSetService
 {
     private static readonly string[] SkillSetTags = ["skill-sets", "skill-set-list"];
-    private static readonly string[] ListTags = ["skill-set-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["skill-set-list"];
 
     public async Task<Guid> CreateSkillSetAsync(SkillSetModel skillSetModel)
     {

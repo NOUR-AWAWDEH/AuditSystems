@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.SupportingDocs;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 
 internal sealed class SupportingDocService(
     IRepository<Guid, SupportingDoc> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISupportingDocService
+    ICacheService cacheService,
+    ILogger<SupportingDocService> logger) : 
+    BaseEntityCacheService<SupportingDoc>(
+        cacheService,
+        logger,
+        CacheKeys.SupportingDoc,
+        SupportingDocTags,
+        ListTags
+    ),
+    ISupportingDocService
 {
     private static readonly string[] SupportingDocTags = ["supporting-docs", "supporting-doc-list"];
     private static readonly string[] ListTags = ["supporting-doc-list"]; // Tags for collections only

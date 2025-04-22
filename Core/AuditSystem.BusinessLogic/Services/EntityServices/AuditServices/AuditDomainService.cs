@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal sealed class AuditDomainService(
     IRepository<Guid, AuditDomain> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditDomainService
+    ICacheService cacheService,
+    ILogger<AuditDomainService> logger
+) : BaseEntityCacheService<AuditDomain>(
+        cacheService,
+        logger,
+        CacheKeys.AuditDomain,
+        AuditDomainTags,
+        ListTags
+    ),
+    IAuditDomainService
 {
     private static readonly string[] AuditDomainTags = ["audit-domains", "audit-domain-list"];
-    private static readonly string[] ListTags = ["audit-domain-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-domain-list"];
 
     public async Task<Guid> CreateAuditDomainAsync(AuditDomainModel auditDomainModel)
     {
@@ -26,106 +35,84 @@ internal sealed class AuditDomainService(
             var entity = mapper.Map<AuditDomain>(auditDomainModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditDomain, createdEntity.Id);
-
-            await cacheService.SetAsync(
-               key: cacheKey,
-               value: createdEntity,
-               tags: AuditDomainTags,
-               expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, createdEntity);
 
             return createdEntity.Id;
-
+        }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for AuditDomainModel");
+            throw new ArgumentException("Invalid data mapping occurred.", ex);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create AuditDomain.", ex);
+            logger.LogError(ex, "Failed to create AuditDomain");
+            throw new InvalidOperationException("Failed to create AuditDomain.", ex);
         }
     }
-    
+
     public async Task DeleteAuditDomainAsync(Guid auditDomainId)
     {
+        var cacheKey = GetCacheKey(auditDomainId);
+
         try
         {
-            var entity = await repository.GetByIdAsync(auditDomainId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditEngagement with ID {auditDomainId} not found.");
-            }
+            var entity = await repository.GetByIdAsync(auditDomainId)
+                         ?? throw new KeyNotFoundException($"AuditDomain with ID {auditDomainId} not found.");
 
             await repository.DeleteAsync(auditDomainId);
-            
-            var cacheKey = string.Format(CacheKeys.AuditDomain, auditDomainId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            await ClearCacheAsync(cacheKey);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to delete AuditDomain.", ex);
+            logger.LogError(ex, "Failed to delete AuditDomain with ID {AuditDomainId}", auditDomainId);
+            throw new InvalidOperationException($"Failed to delete AuditDomain with ID {auditDomainId}", ex);
         }
     }
-    
+
     public async Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid id)
     {
+        var cacheKey = GetCacheKey(id);
+
         try
         {
-            var cacheKey = string.Format(CacheKeys.AuditDomain, id);
-            
-            // Try to get from cache first
             var cachedEntity = await cacheService.GetAsync<AuditDomain>(cacheKey);
             if (cachedEntity != null)
             {
                 return mapper.Map<AuditDomainModel>(cachedEntity);
             }
 
-            // Cache miss - get from repository
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditDomain with ID {id} not found.");
-            }
+            var entity = await repository.GetByIdAsync(id)
+                         ?? throw new KeyNotFoundException($"AuditDomain with ID '{id}' not found.");
 
-            // Store entity in cache
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditDomainTags,
-                expiration: CacheExpirations.MediumTerm
-            );
+            await SetCacheAsync(cacheKey, entity);
 
-            // Map to model and return
             return mapper.Map<AuditDomainModel>(entity);
         }
         catch (Exception ex)
         {
-            throw new Exception($"Failed to get AuditDomain with ID {id}.", ex);
+            logger.LogError(ex, "Failed to retrieve AuditDomain with ID {Id}", id);
+            throw new InvalidOperationException($"Failed to retrieve AuditDomain with ID '{id}'", ex);
         }
     }
-    public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel)
+
+    public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomainModel)
     {
-        ArgumentNullException.ThrowIfNull(auditDomianModel, nameof(auditDomianModel));
-        
-        try 
+        ArgumentNullException.ThrowIfNull(auditDomainModel, nameof(auditDomainModel));
+
+        try
         {
-            var entity = mapper.Map<AuditDomain>(auditDomianModel);
+            var entity = mapper.Map<AuditDomain>(auditDomainModel);
             await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditDomain, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditDomainTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
+            var cacheKey = GetCacheKey(entity.Id);
+            await SetCacheAsync(cacheKey, entity);
         }
         catch (Exception ex)
         {
-            throw new Exception("Failed to update AuditDomain.", ex);
+            logger.LogError(ex, "Failed to update AuditDomain with ID {Id}", auditDomainModel.Id);
+            throw new InvalidOperationException("Failed to update AuditDomain.", ex);
         }
     }
 }

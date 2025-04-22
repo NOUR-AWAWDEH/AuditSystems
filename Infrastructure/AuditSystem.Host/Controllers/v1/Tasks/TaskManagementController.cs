@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Tasks.Create;
 using AuditSystem.Application.Features.Tasks.Delete;
+using AuditSystem.Application.Features.Tasks.Get;
 using AuditSystem.Application.Features.Tasks.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class TaskManagementController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateTaskManagement([FromBody] UpdateTaskManagementCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get TaskManagement
+    [HttpGet("get-task-management")]
+    [ProducesResponseType(typeof(ApiResponse<GetTaskManagementByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetTaskManagement([FromQuery] GetTaskManagementByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete TaskManagement
     [HttpDelete("delete-task-management")]

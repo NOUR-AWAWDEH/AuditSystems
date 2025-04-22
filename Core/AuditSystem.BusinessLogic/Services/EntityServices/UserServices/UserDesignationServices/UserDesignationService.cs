@@ -4,6 +4,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Domain.Entities.Users;
+using Microsoft.Extensions.Logging;
 using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServices;
@@ -11,8 +12,16 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDes
 internal sealed class UserDesignationService(
     IRepository<Guid, UserDesignation> repository,
     IMapper mapper,
-    ICacheService cacheService
-    ) : IUserDesignationService
+    ICacheService cacheService,
+    ILogger<UserDesignationService> logger) : 
+    BaseEntityCacheService<UserDesignation>(
+        cacheService,
+        logger,
+        CacheKeys.UserDesignation,
+        UserDesignationTags,
+        ListTags
+    ),
+    IUserDesignationService
 {
     private static readonly string[] UserDesignationTags = ["user-designations", "user-designation-list"];
     private static readonly string[] ListTags = ["user-designation-list"];

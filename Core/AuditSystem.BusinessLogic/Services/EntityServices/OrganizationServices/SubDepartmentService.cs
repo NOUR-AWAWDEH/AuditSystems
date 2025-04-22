@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class SubDepartmentService(
     IRepository<Guid, SubDepartment> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISubDepartmentService
+    ICacheService cacheService,
+    ILogger<SubDepartmentService> logger) : 
+    BaseEntityCacheService<SubDepartment>(
+        cacheService,
+        logger,
+        CacheKeys.SubDepartment,
+        SubDepartmentTags,
+        ListTags
+    ),
+    ISubDepartmentService
 {
     private static readonly string[] SubDepartmentTags = ["sub-departments", "sub-department-list"];
     private static readonly string[] ListTags = ["sub-department-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class SubDepartmentService(
             throw new Exception("Failed to create SubDepartment.", ex);
         }
     }
+    
     public async Task DeleteSubDepartmentAsync(Guid subDepartmentId)
     {
         try 
@@ -64,6 +74,7 @@ internal sealed class SubDepartmentService(
             throw new Exception("Failed to delete SubDepartment.", ex);
         }
     }
+    
     public async Task<SubDepartmentModel> GetSubDepartmentByIdAsync(Guid id)
     {
         try
@@ -98,6 +109,7 @@ internal sealed class SubDepartmentService(
             throw new Exception($"Failed to get SubDepartment by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)
     {
         ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));

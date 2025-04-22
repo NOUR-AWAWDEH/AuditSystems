@@ -6,6 +6,7 @@ using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AuditSystem.Application.Features.Organization.SubDepartment.Get;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -27,6 +28,14 @@ public sealed class SubDepartmentController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSubDepartment([FromBody] UpdateSubDepartmentCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Sub Department
+    [HttpGet("get-sub-department")]
+    [ProducesResponseType(typeof(ApiResponse<GetSubDepartmentByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSubDepartment([FromQuery] GetSubDepartmentByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Sub Department
     [HttpDelete("delete-sub-department")]

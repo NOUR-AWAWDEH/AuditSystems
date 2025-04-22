@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class SubLocationService(
     IRepository<Guid, SubLocation> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ISubLocationService
+    ICacheService cacheService,
+    ILogger<SubLocationService> logger) : 
+    BaseEntityCacheService<SubLocation>(
+        cacheService,
+        logger,
+        CacheKeys.SubLocation,
+        SubLocationTags,
+        ListTags
+    ),
+    ISubLocationService
 {
     private static readonly string[] SubLocationTags = ["sub-locations", "sub-location-list"];
     private static readonly string[] ListTags = ["sub-location-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class SubLocationService(
             throw new Exception("Failed to create SubLocation.", ex);
         }
     }
+    
     public async Task DeleteSubLocationAsync(Guid subLocationId)
     {
         try 
@@ -64,6 +74,7 @@ internal sealed class SubLocationService(
             throw new Exception("Failed to delete SubLocation.", ex);
         }
     }
+    
     public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class SubLocationService(
             throw new Exception($"Failed to get SubLocation by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));

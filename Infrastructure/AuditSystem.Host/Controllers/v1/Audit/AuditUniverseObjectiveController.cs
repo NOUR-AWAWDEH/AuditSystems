@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Delete;
+using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Get;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -28,12 +29,19 @@ public sealed class AuditUniverseObjectiveController(IMediator mediator) : ApiCo
     public async Task<IActionResult> UpdateAuditUniverseObjective([FromBody] UpdateAuditUniverseObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
+    //Get Audit Universe Objective
+    [HttpGet("get-audit-universe-objective")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditUniverseObjectiveByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditUniverseObjective([FromQuery] GetAuditUniverseObjectiveByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Audit Universe Objective
     [HttpDelete("delete-audit-universe-objective")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-
     public async Task<IActionResult> DeleteAuditUniverseObjective([FromBody] DeleteAuditUniverseObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

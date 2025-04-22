@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Common;
 using AuditSystem.Domain.Entities.Common;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
 
 internal sealed class RatingService(
     IRepository<Guid, Rating> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRatingService
+    ICacheService cacheService,
+    ILogger<RatingService> logger) :
+    BaseEntityCacheService<Rating>
+    (
+        cacheService,
+        logger,
+        CacheKeys.Rating,
+        RatingTags,
+        ListTags
+    ), 
+    IRatingService
 {
     private static readonly string[] RatingTags = ["ratings", "rating-list"];
-    private static readonly string[] ListTags = ["rating-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["rating-list"];
 
     public async Task<Guid> CreateRatingAsync(RatingModel ratingModel)
     {
@@ -26,23 +36,23 @@ internal sealed class RatingService(
             var entity = mapper.Map<Rating>(ratingModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Rating, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RatingTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RatingModel");
+            throw new ArgumentException("Mapping failed for RatingModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Rating.", ex);
+            logger.LogError(ex, "Failed to create Rating.");
+            throw new InvalidOperationException("Failed to create Rating.", ex);
         }
     }
+    
     public async Task DeleteRatingAsync(Guid ratingId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class RatingService(
             throw new Exception("Failed to delete Rating.", ex);
         }
     }
+    
     public async Task<RatingModel> GetRatingByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class RatingService(
             throw new Exception($"Failed to get Rating by ID.{id}", ex);
         }
     }
+
     public async Task UpdateRatingAsync(RatingModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));

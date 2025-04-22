@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Risks.RiskFactor.Create;
 using AuditSystem.Application.Features.Risks.RiskFactor.Delete;
+using AuditSystem.Application.Features.Risks.RiskFactor.Get;
 using AuditSystem.Application.Features.Risks.RiskFactor.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class RiskFactorController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskFactor([FromBody] UpdateRiskFactorCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Risk Factor
+    [HttpGet("get-risk-factor")]
+    [ProducesResponseType(typeof(ApiResponse<GetRiskFactorByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRiskFactor([FromQuery] GetRiskFactorByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Risk Factor
     [HttpDelete("delete-risk-factor")]

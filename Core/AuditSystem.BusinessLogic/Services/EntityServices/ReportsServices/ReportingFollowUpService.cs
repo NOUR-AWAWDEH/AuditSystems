@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class ReportingFollowUpService(
     IRepository<Guid, ReportingFollowUp> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IReportingFollowUpService
+    ICacheService cacheService,
+    ILogger<ReportingFollowUpService> logger) : 
+    BaseEntityCacheService<ReportingFollowUp>(
+        cacheService,
+        logger,
+        CacheKeys.ReportingFollowUp,
+        ReportingFollowUpTags,
+        ListTags
+    ),
+    IReportingFollowUpService
 {
     private static readonly string[] ReportingFollowUpTags = ["reporting-follow-ups", "reporting-follow-up-list"];
     private static readonly string[] ListTags = ["reporting-follow-up-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class ReportingFollowUpService(
             throw new Exception("Failed to create ReportingFollowUp.", ex);
         }
     }
+    
     public async Task DeleteReportingFollowUpAsync(Guid reportingFollowUpId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class ReportingFollowUpService(
             throw new Exception("Failed to delete ReportingFollowUp.", ex);
         }
     }
+    
     public async Task<ReportingFollowUpModel> GetReportingFollowUpByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class ReportingFollowUpService(
             throw new Exception($"Failed to get ReportingFollowUp by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));

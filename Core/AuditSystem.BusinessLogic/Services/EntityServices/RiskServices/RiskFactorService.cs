@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 
 internal sealed class RiskFactorService(
     IRepository<Guid, RiskFactor> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskFactorService
+    ICacheService cacheService,
+    ILogger<RiskFactorService> logger) : 
+    BaseEntityCacheService<RiskFactor>(
+        cacheService,
+        logger,
+        CacheKeys.RiskFactor,
+        RiskFactorTags,
+        ListTags
+    ),
+    IRiskFactorService
 {
     private static readonly string[] RiskFactorTags = ["risk-factors", "risk-factor-list"];
     private static readonly string[] ListTags = ["risk-factor-list"]; // Tags for collections only

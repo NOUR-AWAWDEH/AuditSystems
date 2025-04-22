@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class LocationService(
     IRepository<Guid, Location> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ILocationService
+    ICacheService cacheService,
+    ILogger<LocationService> logger) : 
+    BaseEntityCacheService<Location>(
+        cacheService,
+        logger,
+        CacheKeys.Location,
+        LocationTags,
+        ListTags
+    ),
+    ILocationService
 {
     private static readonly string[] LocationTags = ["locations", "location-list"];
     private static readonly string[] ListTags = ["location-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class LocationService(
             throw new Exception("Failed to create Location.", ex);
         }
     }
+    
     public async Task DeleteLocationAsync(Guid locationId)
     {
         try 
@@ -64,6 +74,7 @@ internal sealed class LocationService(
             throw new Exception("Failed to delete Location.", ex);
         }
     }
+    
     public async Task<LocationModel> GetLocationByIdAsync(Guid id)
     {
         try
@@ -96,6 +107,7 @@ internal sealed class LocationService(
             throw new Exception($"Failed to get Location by ID {id}.", ex);
         }  
     }
+    
     public async Task UpdateLocationAsync(LocationModel locationModel)
     {
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));

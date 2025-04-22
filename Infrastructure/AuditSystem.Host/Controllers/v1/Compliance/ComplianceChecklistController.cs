@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Delete;
+using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Get;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class ComplianceChecklistController(IMediator mediator) : ApiContr
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompliance([FromBody] UpdateComplianceChecklistCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Compliance Checklist
+    [HttpGet("get-compliance")]
+    [ProducesResponseType(typeof(ApiResponse<GetComplianceChecklistByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCompliance([FromQuery] GetComplianceChecklistByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Compliance Checklist
     [HttpDelete("delete-compliance")]

@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Domain.Entities.Checklists;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
 
 internal sealed class RemarkService(
     IRepository<Guid, Remark> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRemarkService
+    ICacheService cacheService,
+    ILogger<RemarkService> logger) :
+    BaseEntityCacheService<Remark>(
+        cacheService,
+        logger,
+        CacheKeys.Remark,
+        RemarkTags,
+        ListTags
+    ),
+    IRemarkService
 {
     private static readonly string[] RemarkTags = ["remarks", "remark-list"];
-    private static readonly string[] ListTags = ["remark-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["remark-list"];
+    
     public async Task<Guid> CreateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));
@@ -25,23 +35,23 @@ internal sealed class RemarkService(
             var entity = mapper.Map<Remark>(remarkModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Remark, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RemarkTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for RemarkModel");
+            throw new ArgumentException("Mapping failed for RemarkModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Remark.", ex);
+            logger.LogError(ex, "An unexpected error occurred while creating Remark.");
+            throw new InvalidOperationException("An unexpected error occurred while creating Remark.", ex);
         }
     }
+    
     public async Task DeleteRemarkAsync(Guid remarkId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class RemarkService(
         }
 
     }
+    
     public async Task<RemarkModel> GetRemarkByIdAsync(Guid id)
     {
        try
@@ -96,6 +107,7 @@ internal sealed class RemarkService(
             throw new Exception($"Failed to get Remark ID {id}.", ex);
        }
     }
+    
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));

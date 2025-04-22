@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.JobsServices;
 
 internal sealed class AuditJobService(
     IRepository<Guid, AuditJob> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditJobService
+    ICacheService cacheService,
+    ILogger<AuditJobService> logger) :
+    BaseEntityCacheService<AuditJob>(
+        cacheService,
+        logger,
+        CacheKeys.AuditJob,
+        AuditJobTags,
+        ListTags
+    ), 
+    IAuditJobService
 {
     private static readonly string[] AuditJobTags = ["audit-jobs", "audit-job-list"];
-    private static readonly string[] ListTags = ["audit-job-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-job-list"];
 
     public async Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel)
     {
@@ -26,23 +35,23 @@ internal sealed class AuditJobService(
             var entity = mapper.Map<AuditJob>(auditJobModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditJob, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for AuditJobModel");
+            throw new ArgumentException("Mapping failed for AuditJobModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create AuditJob.", ex);
-        }
+            logger.LogError(ex, "An error occurred while creating the AuditJob.");
+            throw new InvalidOperationException("An error occurred while creating the AuditJob.", ex);
+        } 
     }
+    
     public async Task DeleteAuditJobAsync(Guid auditJobId)
     {
         try 
@@ -64,6 +73,7 @@ internal sealed class AuditJobService(
             throw new Exception("Failed to delete AuditJob.", ex);
         }
     }
+    
     public async Task<AuditJobModel> GetAuditJobByIdAsync(Guid id)
     {
         try
@@ -96,6 +106,7 @@ internal sealed class AuditJobService(
             throw new Exception($"Failed to get AuditJob by ID {id}.", ex);
         }
     }
+    
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));

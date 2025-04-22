@@ -16,7 +16,7 @@ internal sealed class DeleteAuditDomainCommandHandler(
         {
             await auditDomainService.DeleteAuditDomainAsync(request.Id);
             logger.LogInformation("Audit domain with ID {Id} deleted successfully.", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit domain deleted successfully.");
         }
         catch (Exception ex)
         {

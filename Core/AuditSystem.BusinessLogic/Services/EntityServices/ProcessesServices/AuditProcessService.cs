@@ -5,14 +5,16 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Processes;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
 
 internal sealed class AuditProcessService(
     IRepository<Guid, AuditProcess> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditProcessService
+    ICacheService cacheService,
+    ILogger<AuditProcessService> logger) : 
+    IAuditProcessService
 {
     private static readonly string[] AuditProcessTags = ["audit-processes", "audit-process-list"];
     private static readonly string[] ListTags = ["audit-process-list"]; // Tags for collections only
@@ -43,6 +45,7 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to create AuditProcess.", ex);
         }
     }
+    
     public async Task DeleteAuditProcessAsync(Guid auditProcessId)
     {
         try 
@@ -64,6 +67,7 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to delete AuditProcess.", ex);
         }
     }
+    
     public async Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid id)
     {
         try
@@ -96,6 +100,7 @@ internal sealed class AuditProcessService(
             throw new Exception($"Failed to get AuditProcess ID {id}.", ex);
         }
     }
+    
     public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
     {
         ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));
@@ -120,4 +125,10 @@ internal sealed class AuditProcessService(
             throw new Exception("Failed to update AuditProcess.", ex);
         }
     }
+
+    #region Private Helpers
+    private static string GetCacheKey(Guid id) => 
+        string.Format(CacheKeys.CacheKey, CacheKeys.AuditProcess, id, "en");
+    
+    #endregion
 }

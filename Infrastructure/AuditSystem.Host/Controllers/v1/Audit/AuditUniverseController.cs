@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Audit.AuditDomain.Get;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Delete;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Update;
@@ -27,6 +28,14 @@ public sealed class AuditUniverseController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditUniverse([FromBody] UpdateAuditUniverseCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Audit Universe
+    [HttpGet("get-audit-universe")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditDomainByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditUniverse([FromQuery] GetAuditDomainByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Audit Universe
     [HttpDelete("delete-audit-universe")]

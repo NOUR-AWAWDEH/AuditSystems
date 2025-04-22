@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Tasks;
 using AuditSystem.Domain.Entities.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
 
 internal sealed class TaskManagementService(
     IRepository<Guid, TaskManagement> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ITaskManagementService
+    ICacheService cacheService,
+    ILogger<TaskManagementService> logger) :
+    BaseEntityCacheService<TaskManagement>(
+        cacheService,
+        logger,
+        CacheKeys.TaskManagement,
+        TaskManagementTags,
+        ListTags
+    ), 
+    ITaskManagementService
 {
     private static readonly string[] TaskManagementTags = ["task-managements", "task-management-list"];
-    private static readonly string[] ListTags = ["task-management-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["task-management-list"];
 
     public async Task<Guid> CreateTaskAsync(TaskManagementModel taskManagementModel)
     {

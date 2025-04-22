@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Jobs.AuditJob.Create;
 using AuditSystem.Application.Features.Jobs.AuditJob.Delete;
+using AuditSystem.Application.Features.Jobs.AuditJob.Get;
 using AuditSystem.Application.Features.Jobs.AuditJob.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class AuditJobController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditJob([FromBody] UpdateAuditJobCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Audit Job
+    [HttpGet("get-audit-job")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditJobByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditJob([FromQuery] GetAuditJobByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Audit Job
     [HttpDelete("delete-audit-job")]

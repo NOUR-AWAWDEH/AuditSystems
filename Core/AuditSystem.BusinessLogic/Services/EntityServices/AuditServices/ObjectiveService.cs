@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal class ObjectiveService(
     IRepository<Guid, Objective> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IObjectiveService
+    ICacheService cacheService,
+    ILogger<ObjectiveService> logger) :
+    BaseEntityCacheService<Objective>(
+        cacheService,
+        logger,
+        CacheKeys.Objective,
+        ObjectiveTags,
+        ListTags
+    ), 
+    IObjectiveService
 {
     private static readonly string[] ObjectiveTags = ["objectives", "objective-list"];
     private static readonly string[] ListTags = ["objective-list"];
+    
     public async Task<Guid> CreateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(ObjectiveModel));
@@ -25,23 +35,23 @@ internal class ObjectiveService(
             var entity = mapper.Map<Objective>(objectiveModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Objective, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for ObjectiveModel");
+            throw new ArgumentException("Mapping failed for ObjectiveModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create Objective.", ex);
+            logger.LogError(ex, "An error occurred while creating Objective.");
+            throw new InvalidOperationException("An error occurred while creating Objective.", ex);
         }
     }
+    
     public async Task DeleteObjectiveAsync(Guid objectiveId)
     {
         try
@@ -63,6 +73,7 @@ internal class ObjectiveService(
             throw new Exception("Failed to delete Objective.", ex);
         }
     }
+    
     public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
     {
         try
@@ -95,6 +106,7 @@ internal class ObjectiveService(
             throw new Exception("Failed to get Objective.", ex);
         }
     }
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));
@@ -119,4 +131,10 @@ internal class ObjectiveService(
             throw new Exception("Failed to update Objective.", ex);
         }
     }
+
+    #region Private Helpers
+    private static string GetCacheKey(Guid id) => 
+        string.Format(CacheKeys.CacheKey, CacheKeys.Objective, id, "en");
+    
+    #endregion
 }

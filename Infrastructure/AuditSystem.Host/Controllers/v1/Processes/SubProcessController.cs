@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Processes.SubProcess.Create;
 using AuditSystem.Application.Features.Processes.SubProcess.Delete;
+using AuditSystem.Application.Features.Processes.SubProcess.Get;
 using AuditSystem.Application.Features.Processes.SubProcess.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class SubProcessController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditSubProcess([FromBody] UpdateSubProcessCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Sub Process
+    [HttpGet("get-sub-process")]
+    [ProducesResponseType(typeof(ApiResponse<GetSubProcessByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditSubProcess([FromQuery] GetSubProcessByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Sub Process
     [HttpDelete("delete-sub-process")]

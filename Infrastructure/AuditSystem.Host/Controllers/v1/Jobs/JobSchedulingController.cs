@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Create;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Delete;
+using AuditSystem.Application.Features.Jobs.JobScheduling.Get;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class JobSchedulingController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateJobScheduling([FromBody] UpdateJobSchedulingCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Job Scheduling
+    [HttpGet("get-job-scheduling")]
+    [ProducesResponseType(typeof(ApiResponse<GetJobSchedulingByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetJobScheduling([FromQuery] GetJobSchedulingByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Job Scheduling
     [HttpDelete("delete-job-scheduling")]

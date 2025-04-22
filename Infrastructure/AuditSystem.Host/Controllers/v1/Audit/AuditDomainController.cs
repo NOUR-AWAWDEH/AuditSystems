@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ardalis.Result;
+using AuditSystem.Application.Features.Audit.AuditDomain.Get;
 
 namespace AuditSystem.Host.Controllers.v1.Audit;
 
@@ -25,14 +26,22 @@ public sealed class AuditDomainController(IMediator mediator) : ApiControllerBas
     [HttpPut("update-audit-domain")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateTenant([FromBody] UpdateAuditDomainCommand command) =>
+    public async Task<IActionResult> UpdateAuditDomain([FromBody] UpdateAuditDomainCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Get Audit Domain By Id
+    [HttpGet("get-audit-domain-by-id")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditDomainByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditDomainById([FromQuery] GetAuditDomainByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 
     //Delete Audit Domain
     [HttpDelete("delete-audit-domain")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteTenant([FromBody] DeleteAuditDomainCommand command) =>
+    public async Task<IActionResult> DeleteAuditDomain([FromBody] DeleteAuditDomainCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

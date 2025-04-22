@@ -5,17 +5,27 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal sealed class BusinessObjectiveService(
     IRepository<Guid, BusinessObjective> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IBusinessObjectiveService
+    ICacheService cacheService,
+    ILogger<BusinessObjectiveService> logger) : 
+    BaseEntityCacheService<BusinessObjective>(
+        cacheService,
+        logger,
+        CacheKeys.BusinessObjective,
+        BusinessObjectiveTags,
+        ListTags
+    ),
+    IBusinessObjectiveService
 {
     private static readonly string[] BusinessObjectiveTags = ["business-objectives", "business-objective-list"];
-    private static readonly string[] ListTags = ["business-objective-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["business-objective-list"];
+    
     public async Task<Guid> CreateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
@@ -25,23 +35,23 @@ internal sealed class BusinessObjectiveService(
             var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.BusinessObjective, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: BusinessObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey,entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "AutoMapper mapping exception occurred while creating BusinessObjectiveModel.");
+            throw new ArgumentException("AutoMapper mapping exception occurred while creating BusinessObjectiveModel.", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create BusinessObjective.", ex);
+            logger.LogError(ex, "An error occurred while creating BusinessObjectiveModel.");
+            throw new InvalidOperationException("An error occurred while creating BusinessObjectiveModel.", ex);
         }
     }
+    
     public async Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId)
     {
         try 
@@ -63,6 +73,7 @@ internal sealed class BusinessObjectiveService(
             throw new Exception("Failed to delete BusinessObjective.", ex);
         }
     }
+    
     public async Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid id)
     {
         try

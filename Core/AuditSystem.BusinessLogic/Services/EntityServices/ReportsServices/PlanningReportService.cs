@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class PlanningReportService(
     IRepository<Guid, PlanningReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IPlanningReportService
+    ICacheService cacheService,
+    ILogger<PlanningReportService> logger) : 
+    BaseEntityCacheService<PlanningReport>(
+        cacheService,
+        logger,
+        CacheKeys.PlanningReport,
+        PlanningReportTags,
+        ListTags
+    ),
+    IPlanningReportService
 {
     private static readonly string[] PlanningReportTags = ["planning-reports", "planning-report-list"];
     private static readonly string[] ListTags = ["planning-report-list"]; // Tags for collections only
@@ -43,6 +52,7 @@ internal sealed class PlanningReportService(
             throw new Exception("Failed to create PlanningReport.", ex);
         }
     }
+    
     public async Task DeletePlanningReportAsync(Guid planningReportId)
     {
         try
@@ -64,6 +74,7 @@ internal sealed class PlanningReportService(
             throw new Exception("Failed to delete PlanningReport.", ex);
         }
     }
+    
     public async Task<PlanningReportModel> GetPlanningReportByIdAsync(Guid id)
     {
         try
@@ -97,6 +108,7 @@ internal sealed class PlanningReportService(
             throw new Exception($"Failed to get PlanningReport by ID {id}.", ex);
         }  
     }
+    
     public async Task UpdatePlanningReportAsync(PlanningReportModel planningReportModel)
     {
         ArgumentNullException.ThrowIfNull(planningReportModel, nameof(planningReportModel));

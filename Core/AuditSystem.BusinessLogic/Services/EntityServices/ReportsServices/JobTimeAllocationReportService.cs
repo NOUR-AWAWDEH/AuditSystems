@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class JobTimeAllocationReportService(
     IRepository<Guid, JobTimeAllocationReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IJobTimeAllocationReportService
+    ICacheService cacheService,
+    ILogger<JobTimeAllocationReportService> logger) : 
+    BaseEntityCacheService<JobTimeAllocationReport>(
+        cacheService,
+        logger,
+        CacheKeys.JobTimeAllocationReport,
+        JobTimeAllocationReportTags,
+        ListTags
+    ),
+    IJobTimeAllocationReportService
 {
     private static readonly string[] JobTimeAllocationReportTags = ["job-time-allocation-reports", "job-time-allocation-report-list"];
-    private static readonly string[] ListTags = ["job-time-allocation-report-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["job-time-allocation-report-list"];
 
     public async Task<Guid> CreateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
@@ -43,6 +52,7 @@ internal sealed class JobTimeAllocationReportService(
             throw new Exception("Failed to create JobTimeAllocationReport.", ex);
         }
     }
+    
     public async Task DeleteJobTimeAllocationReportAsync(Guid jobTimeAllocationReportId)
     {
         try 
@@ -65,6 +75,7 @@ internal sealed class JobTimeAllocationReportService(
         }
         
     }
+    
     public async Task<JobTimeAllocationReportModel> GetJobTimeAllocationReportByIdAsync(Guid id)
     {
         try
@@ -97,6 +108,7 @@ internal sealed class JobTimeAllocationReportService(
             throw new Exception("Failed to get JobTimeAllocationReport by ID.", ex);
         }
     }
+    
     public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)
     {
         ArgumentNullException.ThrowIfNull(jobTimeAllocationReportModel, nameof(jobTimeAllocationReportModel));

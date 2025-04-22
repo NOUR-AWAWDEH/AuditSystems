@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditEngagement.Create;
 using AuditSystem.Application.Features.Audit.AuditEngagement.Delete;
+using AuditSystem.Application.Features.Audit.AuditEngagement.Get;
 using AuditSystem.Application.Features.Audit.AuditEngagement.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class AuditEngagementController(IMediator mediator) : ApiControlle
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditEngagement([FromBody] UpdateAuditEngagementCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Audit Engagement
+    [HttpGet("get-audit-engagement")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditEngagementByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditEngagement([FromQuery] GetAuditEngagementByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Audit Engagement
     [HttpDelete("delete-audit-engagement")]

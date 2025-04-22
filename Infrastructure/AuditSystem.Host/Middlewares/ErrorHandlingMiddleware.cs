@@ -2,35 +2,55 @@ using Newtonsoft.Json;
 using System.Net.Mime;
 
 namespace AuditSystem.Host.Middlewares;
+
 public class ErrorHandlingMiddleware
 {
-    public ErrorHandlingMiddleware(RequestDelegate next,
-    ILogger<ErrorHandlingMiddleware> logger,
-    IHostEnvironment hostEnvironment)
-    {
-        Next = next;
-        Logger = logger;
-        HostEnvironment = hostEnvironment;
-    }
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly IHostEnvironment _hostEnvironment;
 
-    private RequestDelegate Next { get; }
-    private ILogger<ErrorHandlingMiddleware> Logger { get; }
-    private IHostEnvironment HostEnvironment { get; }
+    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IHostEnvironment hostEnvironment)
+    {
+        _next = next;
+        _logger = logger;
+        _hostEnvironment = hostEnvironment;
+    }
 
     public async Task Invoke(HttpContext httpContext)
     {
         try
         {
-            await Next(httpContext);
+            await _next(httpContext);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "An unexpected exception was thrown: {Message}", ex.Message);
+            // Log the error
+            _logger.LogError(ex, "An unexpected exception was thrown: {Message}", ex.Message);
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            // Set response status code based on exception type
+            httpContext.Response.StatusCode = ex switch
+            {
+                KeyNotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedAccessException => StatusCodes.Status404NotFound,
+                InvalidOperationException => StatusCodes.Status400BadRequest,
+                ArgumentNullException => StatusCodes.Status400BadRequest,
+                ArgumentException => StatusCodes.Status400BadRequest,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
+            // Set JSON response content type
             httpContext.Response.ContentType = MediaTypeNames.Application.Json;
-            var serializedException = JsonConvert.SerializeObject(ex);
-            await httpContext.Response.WriteAsync(serializedException);
+
+            // Create structured error response
+            var errorResponse = new
+            {
+                status = httpContext.Response.StatusCode,
+                message = _hostEnvironment.IsDevelopment() ? ex.Message : "An unexpected error occurred.",
+                details = _hostEnvironment.IsDevelopment() ? ex.StackTrace : null
+            };
+
+            var serialized = JsonConvert.SerializeObject(errorResponse);
+            await httpContext.Response.WriteAsync(serialized);
         }
     }
 }

@@ -5,18 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Compliance;
 using AuditSystem.Domain.Entities.Compliance;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ComplianceServices;
 
 internal sealed class ComplianceChecklistService(
     IRepository<Guid, ComplianceChecklist> repository,
     IMapper mapper,
-    ICacheService cacheService
-    )
-    : IComplianceChecklistService
+    ICacheService cacheService,
+    ILogger<ComplianceChecklistService> logger) :
+    BaseEntityCacheService<ComplianceChecklist>(
+        cacheService,
+        logger,
+        CacheKeys.ComplianceChecklist,
+        ComplianceChecklistTags,
+        ListTags
+    ),
+    IComplianceChecklistService
 {
     private static readonly string[] ComplianceChecklistTags = ["compliance-checklists", "compliance-checklist-list"];
-    private static readonly string[] ListTags = ["compliance-checklist-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["compliance-checklist-list"];
 
     public async Task<Guid> CreateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
@@ -27,23 +35,23 @@ internal sealed class ComplianceChecklistService(
             var entity = mapper.Map<ComplianceChecklist>(complianceChecklistModel);
             var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.ComplianceChecklist, createdEntity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: ComplianceChecklistTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
+            var cacheKey = GetCacheKey(createdEntity.Id);
+            await SetCacheAsync(cacheKey, entity);
 
             return createdEntity.Id;
         }
+        catch (AutoMapperMappingException ex)
+        {
+            logger.LogError(ex, "Mapping failed for ComplianceChecklistModel");
+            throw new ArgumentException("Mapping failed for ComplianceChecklistModel", ex);
+        }
         catch (Exception ex)
         {
-            throw new Exception("Failed to create ComplianceChecklist.", ex);
+            logger.LogError(ex, "An error occurred while creating ComplianceChecklist.");
+            throw new InvalidOperationException("An error occurred while creating ComplianceChecklist.", ex);
         }
     }
+    
     public async Task DeleteComplianceChecklistAsync(Guid complianceChecklistId)
     {
         try
@@ -65,6 +73,7 @@ internal sealed class ComplianceChecklistService(
             throw new Exception("Failed to delete ComplianceChecklist.", ex);
         }
     }
+    
     public async Task<ComplianceChecklistModel> GetComplianceChecklistByIdAsync(Guid id)
     {
         try
@@ -98,6 +107,7 @@ internal sealed class ComplianceChecklistService(
             throw new Exception($"Failed to get ComplianceChecklist ID {id}.", ex);
         }
     }
+    
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));

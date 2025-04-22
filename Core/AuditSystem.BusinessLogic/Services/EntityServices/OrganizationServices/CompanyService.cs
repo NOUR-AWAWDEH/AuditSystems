@@ -5,14 +5,23 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class CompanyService(
     IRepository<Guid, Company> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : ICompanyService
+    ICacheService cacheService,
+    ILogger<CompanyService> logger) : 
+    BaseEntityCacheService<Company>(
+        cacheService,
+        logger,
+        CacheKeys.Company,
+        CompanyTags,
+        ListTags
+    ),
+    ICompanyService
 {
     private static readonly string[] CompanyTags = ["companies", "company-list"];
     private static readonly string[] ListTags = ["company-list"]; // Tags for collections only

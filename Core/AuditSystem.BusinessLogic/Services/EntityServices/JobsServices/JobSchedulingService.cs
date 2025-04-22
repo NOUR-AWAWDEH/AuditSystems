@@ -5,17 +5,26 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.JobsServices;
 
 internal sealed class JobSchedulingService(
     IRepository<Guid, JobScheduling> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IJobSchedulingService
+    ICacheService cacheService,
+    ILogger<JobSchedulingService> logger) : 
+    BaseEntityCacheService<JobScheduling>(
+        cacheService,
+        logger,
+        CacheKeys.JobScheduling,
+        JobSchedulingTags,
+        ListTags
+    ),
+    IJobSchedulingService
 {
     private static readonly string[] JobSchedulingTags = ["job-schedulings", "job-scheduling-list"];
-    private static readonly string[] ListTags = ["job-scheduling-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["job-scheduling-list"];
 
     public async Task<Guid> CreateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)
     {

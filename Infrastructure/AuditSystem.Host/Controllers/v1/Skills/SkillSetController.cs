@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.Skills.SkillSet.Delete;
+using AuditSystem.Application.Features.Skills.SkillSet.Get;
 using AuditSystem.Application.Features.Skills.SkillSet.Update;
 using AuditSystem.Host.Responses;
 using MediatR;
@@ -27,6 +28,14 @@ public sealed class SkillSetController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSkillSet([FromBody] UpdateSkillSetCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Get Skill Set
+    [HttpGet("get-skill-set")]
+    [ProducesResponseType(typeof(ApiResponse<GetSkillSetByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetSkillSet([FromQuery] GetSkillSetByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
     
     //Delete Skill Set
     [HttpDelete("delete-skill-set")]

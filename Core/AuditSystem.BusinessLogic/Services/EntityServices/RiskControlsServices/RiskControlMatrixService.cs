@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
@@ -101,7 +102,12 @@ internal sealed class RiskControlMatrixService(
             throw new InvalidOperationException($"Failed to retrieve RiskControlMatrix with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<RiskControlMatrixModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));

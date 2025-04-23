@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Common;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Common;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,6 +102,11 @@ internal sealed class RatingService(
             logger.LogError(ex, "Failed to retrieve Rating with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve Rating with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<RatingModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateRatingAsync(RatingModel ratingModel)

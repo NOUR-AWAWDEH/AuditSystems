@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ComplianceServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Compliance;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Compliance;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,7 +102,12 @@ internal sealed class ComplianceChecklistService(
             throw new InvalidOperationException($"Failed to retrieve ComplianceChecklist with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<ComplianceChecklistModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)
     {
         ArgumentNullException.ThrowIfNull(complianceChecklistModel, nameof(complianceChecklistModel));

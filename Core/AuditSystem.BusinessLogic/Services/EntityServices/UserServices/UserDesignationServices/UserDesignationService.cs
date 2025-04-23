@@ -6,6 +6,7 @@ using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using AuditSystem.Contract.Models.Pagination;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServices;
 
@@ -100,6 +101,11 @@ internal sealed class UserDesignationService(
             logger.LogError(ex, "Failed to retrieve User Designation with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve User Designation with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<UserDesignationModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)

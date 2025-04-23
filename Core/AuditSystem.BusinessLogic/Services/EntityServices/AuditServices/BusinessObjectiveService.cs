@@ -108,6 +108,11 @@ internal sealed class BusinessObjectiveService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<BusinessObjectiveModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));

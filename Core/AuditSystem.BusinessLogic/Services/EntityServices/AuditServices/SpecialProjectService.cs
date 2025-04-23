@@ -108,6 +108,11 @@ internal sealed class SpecialProjectService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<SpecialProjectModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)
     {
         ArgumentNullException.ThrowIfNull(specialProjectModel, nameof(specialProjectModel));

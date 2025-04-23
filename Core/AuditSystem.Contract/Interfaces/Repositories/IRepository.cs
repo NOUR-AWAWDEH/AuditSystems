@@ -15,4 +15,6 @@ public interface IRepository<TId, TEntity>
     ValueTask DeleteRangeAsync(ICollection<TEntity> entities);
     IQueryable<TEntity> GetAll();
     Task<ICollection<TResponse>> GetByQueryAsync<TResponse>(IQueryable<TResponse> query);
+    Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+    Task<ICollection<TResponse>> ProjectToAsync<TResponse>(IQueryable<TEntity> query);
 }

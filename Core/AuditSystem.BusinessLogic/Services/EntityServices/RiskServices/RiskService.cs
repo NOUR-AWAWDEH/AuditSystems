@@ -108,6 +108,11 @@ internal sealed class RiskService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRiskAsync(RiskModel riskModel)
     {
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));

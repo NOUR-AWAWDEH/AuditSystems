@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,7 +102,12 @@ internal sealed class SubLocationService(
             throw new InvalidOperationException($"Failed to retrieve SubLocation with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));

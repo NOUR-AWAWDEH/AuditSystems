@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Checklists;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Checklists;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,7 +102,12 @@ internal sealed class ChecklistService(
             throw new InvalidOperationException($"Failed to retrieve Checklist with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<ChecklistModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)
     {
         ArgumentNullException.ThrowIfNull(checklistModel, nameof(checklistModel));

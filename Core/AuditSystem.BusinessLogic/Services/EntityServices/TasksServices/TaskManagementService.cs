@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.TasksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Tasks;
 using AuditSystem.Domain.Entities.Tasks;
 using AutoMapper;
@@ -100,6 +101,11 @@ internal sealed class TaskManagementService(
             logger.LogError(ex, "Failed to retrieve TaskManagement with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve TaskManagement with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<TaskManagementModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateTaskAsync(TaskManagementModel taskManagementModel)

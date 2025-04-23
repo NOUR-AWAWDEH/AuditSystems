@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,7 +102,12 @@ internal sealed class AuditJobService(
             throw new InvalidOperationException($"Failed to retrieve AuditJob with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<AuditJobModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));

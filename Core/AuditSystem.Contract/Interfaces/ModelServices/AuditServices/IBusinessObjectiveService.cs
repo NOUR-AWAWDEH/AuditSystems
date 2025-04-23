@@ -9,5 +9,5 @@ public interface IBusinessObjectiveService
     public Task UpdateBusinessObjectiveAsync(BusinessObjectiveModel businessObjectiveModel);
     public Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId);
     public Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid id);
-    public Task<PaginationResult<BusinessObjectiveModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<BusinessObjectiveModel>> SearchAsync(string? name, Page page);
 }

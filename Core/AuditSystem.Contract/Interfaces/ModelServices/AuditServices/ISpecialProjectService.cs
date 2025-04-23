@@ -8,5 +8,5 @@ public interface ISpecialProjectService
     public Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel);
     public Task DeleteSpecialProjectAsync(Guid specialProjectId);
     public Task<SpecialProjectModel> GetSpecialProjectByIdAsync(Guid id);
-    public Task<PaginationResult<SpecialProjectModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<SpecialProjectModel>> SearchAsync(string? name, Page page);
 }

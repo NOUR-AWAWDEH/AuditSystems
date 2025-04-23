@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -100,6 +101,11 @@ internal sealed class CompanyService(
             logger.LogError(ex, "Failed to retrieve Company with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve Company with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<CompanyModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateCompanyAsync(CompanyModel companyModel)

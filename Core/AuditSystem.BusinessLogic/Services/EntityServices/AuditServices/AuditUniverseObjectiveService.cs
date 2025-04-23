@@ -110,6 +110,11 @@ internal sealed class AuditUniverseObjectiveService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<AuditUniverseObjectiveModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseObjectiveModel, nameof(auditUniverseObjectiveModel));

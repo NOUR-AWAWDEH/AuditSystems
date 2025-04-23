@@ -9,5 +9,5 @@ public interface IAuditUniverseObjectiveService
     public Task UpdateAuditUniverseObjectiveAsync(AuditUniverseObjectiveModel auditUniverseObjectiveModel);
     public Task DeleteAuditUniverseObjectiveAsync(Guid auditUniverseObjectiveId);
     public Task<AuditUniverseObjectiveModel> GetAuditUniverseObjectiveByIdAsync(Guid id);
-    public Task<PaginationResult<AuditUniverseObjectiveModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<AuditUniverseObjectiveModel>> SearchAsync(string? name, Page page);
 }

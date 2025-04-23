@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Checklists;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Checklists;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -101,7 +102,12 @@ internal sealed class RemarkService(
             throw new InvalidOperationException($"Failed to retrieve Remark with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<RemarkModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)
     {
         ArgumentNullException.ThrowIfNull(remarkModel, nameof(remarkModel));

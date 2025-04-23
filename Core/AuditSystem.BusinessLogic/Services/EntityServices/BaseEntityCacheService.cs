@@ -1,5 +1,6 @@
 using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Models.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices;
@@ -57,5 +58,96 @@ public abstract class BaseEntityCacheService<TEntity>(
     {
         var prop = typeof(TEntity).GetProperty("Id");
         return prop != null ? (Guid)prop.GetValue(entity)! : Guid.Empty;
+    }
+
+    protected string GetSearchCountCacheKey(string? searchTerm) =>
+        string.Format(CacheKeys.SearchCountCacheKey,
+            _cacheKeyPrefix,
+            searchTerm?.Trim().ToLowerInvariant() ?? "all");
+
+    protected string GetSearchCacheKey(string? searchTerm, Page page) =>
+        string.Format(CacheKeys.SearchCacheKey,
+            _cacheKeyPrefix,
+            searchTerm?.Trim().ToLowerInvariant() ?? "all",
+            page.Number,
+            page.Size);
+
+    protected async Task<int?> TryGetCachedSearchCountAsync(string countCacheKey)
+    {
+        try
+        {
+            return await _cacheService.GetAsync<int?>(countCacheKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve cached count for key {CacheKey}", countCacheKey);
+            return null;
+        }
+    }
+
+    protected async Task CacheSearchCountAsync(string countCacheKey, int count)
+    {
+        try
+        {
+            await _cacheService.SetAsync(
+                key: countCacheKey,
+                value: count,
+                tags: _listTags,
+                expiration: CacheExpirations.MediumTerm);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to cache count for key {CacheKey}", countCacheKey);
+        }
+    }
+
+    protected async Task<List<TEntity>?> TryGetCachedSearchResults(string cacheKey)
+    {
+        try
+        {
+            var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
+            if (cachedResults != null)
+            {
+                _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
+                    cachedResults.Count, typeof(TEntity).Name, cacheKey);
+            }
+            return cachedResults;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve cached search results for key {CacheKey}", cacheKey);
+            return null;
+        }
+    }
+
+    protected async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TEntity> entities)
+    {
+        if (string.IsNullOrEmpty(cacheKey))
+            throw new ArgumentNullException(nameof(cacheKey));
+
+        if (entities == null)
+            throw new ArgumentNullException(nameof(entities));
+
+        try
+        {
+            var entityList = entities.ToList();
+
+            _logger.LogDebug("Caching {EntityCount} {EntityType} items with key {CacheKey}",
+                entityList.Count, typeof(TEntity).Name, cacheKey);
+
+            await _cacheService.SetAsync(
+                key: cacheKey,
+                value: entityList,
+                tags: _listTags,
+                expiration: CacheExpirations.ShortTerm);
+
+            _logger.LogDebug("Successfully cached {EntityCount} items with key {CacheKey}",
+                entityList.Count, cacheKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to cache search results for key {CacheKey}. Entities: {EntityCount} items",
+                cacheKey, entities.Count());
+        }
     }
 }

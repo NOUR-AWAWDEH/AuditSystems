@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Models.Skills;
+﻿using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.Skills;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 
@@ -8,4 +9,5 @@ public interface ISkillSetService
     public Task UpdateSkillSetAsync(SkillSetModel skillSetModel);
     public Task DeleteSkillSetAsync(Guid skillSetId);
     public Task<SkillSetModel> GetSkillSetByIdAsync(Guid id);
+    public Task<PaginationResult<SkillSetModel>> SearchAsync(string? name, Page page);
 }

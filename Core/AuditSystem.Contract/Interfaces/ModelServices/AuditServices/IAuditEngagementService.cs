@@ -9,5 +9,5 @@ public interface IAuditEngagementService
     public Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel);
     public Task DeleteAuditEngagementAsync(Guid auditEngagementId);
     public Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid id);
-    public Task<PaginationResult<AuditEngagementModel>> GetAllAuditEngagementsAsync(string? Name, Page page);
+    public Task<PaginationResult<AuditEngagementModel>> SearchAsync(string? name, Page page);
 }

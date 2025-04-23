@@ -9,5 +9,5 @@ public interface IAuditDomainService
     public Task UpdateAuditDomainAsync(AuditDomainModel auditDomianModel);
     public Task DeleteAuditDomainAsync(Guid auditDomainId);
     public Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid id);
-    public Task<PaginationResult<AuditDomainModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<AuditDomainModel>> SearchAsync(string? name, Page page);
 }

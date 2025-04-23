@@ -108,6 +108,11 @@ internal sealed class AuditPlanSummaryService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<AuditPlanSummaryModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditPlanSummaryAsync(AuditPlanSummaryModel auditPlanSummaryModel)
     {
         ArgumentNullException.ThrowIfNull(auditPlanSummaryModel, nameof(auditPlanSummaryModel));

@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Processes;
 using AutoMapper;
@@ -101,7 +102,12 @@ internal sealed class AuditProcessService(
             throw new InvalidOperationException($"Failed to retrieve AuditProcess with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<AuditProcessModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel)
     {
         ArgumentNullException.ThrowIfNull(auditProcessModel, nameof(auditProcessModel));

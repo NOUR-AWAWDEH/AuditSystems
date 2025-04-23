@@ -9,5 +9,5 @@ public interface IAuditUniverseService
     public Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel);
     public Task DeleteAuditUniverseAsync(Guid auditUniverseId);
     public Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id);
-    public Task<PaginationResult<AuditUniverseModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<AuditUniverseModel>> SearchAsync(string? name, Page page);
 }

@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -100,6 +101,11 @@ internal sealed class JobSchedulingService(
             logger.LogError(ex, "Failed to retrieve JobScheduling with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve JobScheduling with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<JobSchedulingModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)

@@ -9,5 +9,5 @@ public interface IRiskService
     public Task UpdateRiskAsync(RiskModel riskModel);
     public Task DeleteRiskAsync(Guid riskId);
     public Task<RiskModel> GetRiskByIdAsync(Guid id);
-    public Task<PaginationResult<RiskModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page);
 }

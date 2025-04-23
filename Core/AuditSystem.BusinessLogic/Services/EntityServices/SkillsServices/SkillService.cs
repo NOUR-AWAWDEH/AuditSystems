@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Skills;
 using AuditSystem.Domain.Entities.Skills;
 using AutoMapper;
@@ -100,6 +101,11 @@ internal sealed class SkillService(
             logger.LogError(ex, "Failed to retrieve Skill with ID {Id}", id);
             throw new InvalidOperationException($"Failed to retrieve Skill with ID '{id}'", ex);
         }
+    }
+
+    public Task<PaginationResult<SkillModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpdateSkillAsync(SkillModel skillModel)

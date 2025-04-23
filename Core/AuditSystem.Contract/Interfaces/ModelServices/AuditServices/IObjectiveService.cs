@@ -8,5 +8,5 @@ public interface IObjectiveService
     public Task UpdateObjectiveAsync(ObjectiveModel objectiveModel);
     public Task DeleteObjectiveAsync(Guid objectiveId);
     public Task<ObjectiveModel> GetObjectiveByIdAsync(Guid id);
-    public Task<PaginationResult<ObjectiveModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page);
 }

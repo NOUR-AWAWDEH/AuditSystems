@@ -2,6 +2,7 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
@@ -101,7 +102,12 @@ internal sealed class ReportingFollowUpService(
             throw new InvalidOperationException($"Failed to retrieve ReportingFollowUp with ID '{id}'", ex);
         }
     }
-    
+
+    public Task<PaginationResult<ReportingFollowUpModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));

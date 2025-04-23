@@ -108,6 +108,11 @@ internal sealed class AuditEngagementService(
         }
     }
 
+    public Task<PaginationResult<AuditEngagementModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateAuditEngagementAsync(AuditEngagementModel auditEngagementModel)
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));

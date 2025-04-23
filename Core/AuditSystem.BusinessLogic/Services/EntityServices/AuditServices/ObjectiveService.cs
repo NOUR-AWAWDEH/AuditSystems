@@ -107,6 +107,11 @@ internal class ObjectiveService(
         throw new NotImplementedException();
     }
 
+    public Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));

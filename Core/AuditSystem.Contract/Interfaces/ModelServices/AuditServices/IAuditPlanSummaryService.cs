@@ -9,5 +9,5 @@ public interface IAuditPlanSummaryService
     public Task UpdateAuditPlanSummaryAsync(AuditPlanSummaryModel auditPlanSummaryModel);
     public Task DeleteAuditPlanSummaryAsync(Guid auditPlanSummaryId);
     public Task<AuditPlanSummaryModel> GetAuditPlanSummaryByIdAsync(Guid id);
-    public Task<PaginationResult<AuditPlanSummaryModel>> Search(string? Name, Page page);
+    public Task<PaginationResult<AuditPlanSummaryModel>> SearchAsync(string? name, Page page);
 }

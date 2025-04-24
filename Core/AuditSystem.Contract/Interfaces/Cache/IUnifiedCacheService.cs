@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Contract.Interfaces.Cache;
 
-public interface IUnifiedCacheService<TId, TEntity>
+public interface IUnifiedCacheService<TId, TEntity, TModel>
     where TEntity : Entity<TId>
     where TId : IComparable<TId>
 {

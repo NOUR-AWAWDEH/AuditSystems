@@ -1,4 +1,5 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -15,7 +16,9 @@ internal sealed class AuditEngagementService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<AuditEngagementService> logger
-) : BaseEntityCacheService<AuditEngagement>(
+) : UnifiedCacheService<Guid, AuditEngagement, AuditEngagementModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.AuditEngagement,
@@ -31,81 +34,40 @@ internal sealed class AuditEngagementService(
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey, createdEntity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for AuditEngagementModel");
-            throw new ArgumentException("Invalid data mapping occurred.", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create AuditEngagement");
-            throw new InvalidOperationException("Failed to create AuditEngagement.", ex);
-        }
+        return createdEntity.Id;
     }
 
     public async Task DeleteAuditEngagementAsync(Guid auditEngagementId)
     {
         var cacheKey = GetCacheKey(auditEngagementId);
 
-        try
-        {
-            var entity = await repository.GetByIdAsync(auditEngagementId)
-                    ?? throw new KeyNotFoundException($"AuditEngagement with ID '{auditEngagementId}' not found.");
-            
-            await repository.DeleteAsync(auditEngagementId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException)
-        {
-            logger.LogWarning("AuditEngagement with ID {AuditEngagementId} not found", auditEngagementId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete AuditEngagement with ID {AuditEngagementId}", auditEngagementId);
-            throw new InvalidOperationException($"Failed to delete AuditEngagement with ID {auditEngagementId}", ex);
-        }
-    }
-
-    public Task<PaginationResult<AuditEngagementModel>> GetAllAuditEngagementsAsync(string? Name, Page page)
-    {
-        throw new NotImplementedException();
+        var entity = await repository.GetByIdAsync(auditEngagementId)
+                ?? throw new KeyNotFoundException($"AuditEngagement with ID '{auditEngagementId}' not found.");
+        
+        await repository.DeleteAsync(auditEngagementId);
+        await ClearCacheAsync(cacheKey);
     }
 
     public async Task<AuditEngagementModel> GetAuditEngagementByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
 
-        try
-        {
-            var cachedEntity = await cacheService.GetAsync<AuditEngagement>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<AuditEngagementModel>(cachedEntity);
-            }
+        var cachedEntity = await cacheService.GetAsync<AuditEngagement>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<AuditEngagementModel>(cachedEntity);
 
-            var entity = await repository.GetByIdAsync(id)
-                         ?? throw new KeyNotFoundException($"AuditEngagement with ID '{id}' not found.");
+        var entity = await repository.GetByIdAsync(id)
+                        ?? throw new KeyNotFoundException($"AuditEngagement with ID '{id}' not found.");
 
-            await SetCacheAsync(cacheKey, entity);
+        await SetCacheAsync(cacheKey, entity);
 
-            return mapper.Map<AuditEngagementModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve AuditEngagement with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve AuditEngagement with ID '{id}'", ex);
-        }
+        return mapper.Map<AuditEngagementModel>(entity);
     }
 
     public Task<PaginationResult<AuditEngagementModel>> SearchAsync(string? name, Page page)
@@ -117,18 +79,10 @@ internal sealed class AuditEngagementService(
     {
         ArgumentNullException.ThrowIfNull(auditEngagementModel, nameof(auditEngagementModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<AuditEngagement>(auditEngagementModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update AuditEngagement with ID {Id}", auditEngagementModel.Id);
-            throw new InvalidOperationException("Failed to update AuditEngagement.", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

@@ -7,6 +7,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.JobsServices;
 
@@ -15,7 +16,9 @@ internal sealed class JobPrioritizationService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<JobPrioritizationService> logger) :
-    BaseEntityCacheService<JobPrioritization>(
+    UnifiedCacheService<Guid, JobPrioritization, JobPrioritizationModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.JobPrioritization,
@@ -25,82 +28,46 @@ internal sealed class JobPrioritizationService(
     IJobPrioritizationService
 {
     private static readonly string[] JobPrioritizationTags = ["job-prioritizations", "job-prioritization-list"];
-    private static readonly string[] ListTags = ["job-prioritization-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["job-prioritization-list"];
     
     public async Task<Guid> CreateJobPrioritizationAsync(JobPrioritizationModel jobPrioritizationModel)
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
 
-        try
-        {
-            var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey, createdEntity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for JobPrioritizationModel");
-            throw new ArgumentException("Mapping failed for JobPrioritizationModel", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while creating the JobPrioritization.");
-            throw new InvalidOperationException("An error occurred while creating the JobPrioritization.", ex);
-        }
+        return createdEntity.Id;
     }
     
     public async Task DeleteJobPrioritizationAsync(Guid jobPrioritizationId)
     {
         var cacheKey = GetCacheKey(jobPrioritizationId);
         
-        try
-        {
-            var entity = await repository.GetByIdAsync(jobPrioritizationId)
-                ?? throw new KeyNotFoundException($"JobPrioritization with ID {jobPrioritizationId} not found.");
+        var entity = await repository.GetByIdAsync(jobPrioritizationId)
+            ?? throw new KeyNotFoundException($"JobPrioritization with ID {jobPrioritizationId} not found.");
 
-            await repository.DeleteAsync(jobPrioritizationId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex, "JobPrioritization with ID {JobPrioritizationId} not found", jobPrioritizationId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete JobPrioritization ID {JobPrioritizationId}", jobPrioritizationId);
-            throw new InvalidOperationException($"Failed to delete JobPrioritization: {jobPrioritizationId}", ex);
-        }
+        await repository.DeleteAsync(jobPrioritizationId);
+        await ClearCacheAsync(cacheKey);
     }
     
     public async Task<JobPrioritizationModel> GetJobPrioritizationByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
+       
+        var cachedEntity = await cacheService.GetAsync<JobPrioritization>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<JobPrioritizationModel>(cachedEntity);
+
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"JobPrioritization with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
         
-        try
-        {
-            var cachedEntity = await cacheService.GetAsync<JobPrioritization>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<JobPrioritizationModel>(cachedEntity);
-            }
-
-            var entity = await repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"JobPrioritization with ID '{id}' not found.");
-
-            await SetCacheAsync(cacheKey, entity);
-            
-            return mapper.Map<JobPrioritizationModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve JobPrioritization with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve JobPrioritization with ID '{id}'", ex);
-        }
+        return mapper.Map<JobPrioritizationModel>(entity);
     }
 
     public Task<PaginationResult<JobPrioritizationModel>> SearchAsync(string? name, Page page)
@@ -112,18 +79,10 @@ internal sealed class JobPrioritizationService(
     {
         ArgumentNullException.ThrowIfNull(jobPrioritizationModel, nameof(jobPrioritizationModel));
 
-        try
-        {
-            var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update JobPrioritization with ID {Id}", jobPrioritizationModel.Id);
-            throw new InvalidOperationException($"Failed to update JobPrioritization with ID '{jobPrioritizationModel.Id}'", ex);
-        }
+        var entity = mapper.Map<JobPrioritization>(jobPrioritizationModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

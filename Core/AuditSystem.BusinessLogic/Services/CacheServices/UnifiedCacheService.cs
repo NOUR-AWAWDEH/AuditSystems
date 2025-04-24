@@ -19,7 +19,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     string cacheKeyPrefix,
     string[] entityTags,
     string[] listTags)
-    : IUnifiedCacheService<TId, TEntity>
+    : IUnifiedCacheService<TId, TEntity, TModel>
     where TEntity : Entity<TId>
     where TId : IComparable<TId>
 {

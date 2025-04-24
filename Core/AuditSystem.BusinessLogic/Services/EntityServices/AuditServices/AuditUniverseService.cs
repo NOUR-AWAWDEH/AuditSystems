@@ -7,6 +7,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
@@ -15,13 +16,15 @@ internal sealed class AuditUniverseService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<AuditUniverseService> logger):
-    BaseEntityCacheService<AuditUniverse>(
+    UnifiedCacheService<Guid, AuditUniverse, AuditUniverseModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.AuditUniverse,
         AuditUniverseTags,
         ListTags
-    ), 
+    ),
     IAuditUniverseService
 {
     private static readonly string[] AuditUniverseTags = ["audit-universes", "audit-universe-list"];
@@ -31,82 +34,41 @@ internal sealed class AuditUniverseService(
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
 
-            await SetCacheAsync(cacheKey, createdEntity);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for AuditUniverseModel");
-            throw new ArgumentException("Mapping failed for AuditUniverseModel.", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create AuditUniverse.");
-            throw new InvalidCastException("Failed to create AuditUniverse.", ex);
-        }
+        return createdEntity.Id;
     }
     
     public async Task DeleteAuditUniverseAsync(Guid auditUniverseId)
     {
         var cacheKey = GetCacheKey(auditUniverseId);
+       
+        var entity = await repository.GetByIdAsync(auditUniverseId)
+                        ?? throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
 
-        try
-        {
-            var entity = await repository.GetByIdAsync(auditUniverseId)
-                         ?? throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
-
-            await repository.DeleteAsync(auditUniverseId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogWarning(ex, "AuditUniverse with ID {Id} not found", auditUniverseId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete AuditUniverse with ID {Id}", auditUniverseId);
-            throw new InvalidOperationException($"Failed to delete AuditUniverse with ID {auditUniverseId}", ex);
-        }
+        await repository.DeleteAsync(auditUniverseId);
+        await ClearCacheAsync(cacheKey);
     }
     
     public async Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
+       
+        var cachedEntity = await cacheService.GetAsync<AuditUniverse>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<AuditUniverseModel>(cachedEntity);
 
-        try
-        {
-            var cachedEntity = await cacheService.GetAsync<AuditUniverse>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<AuditUniverseModel>(cachedEntity);
-            }
+        var entity = await repository.GetByIdAsync(id)
+                        ?? throw new KeyNotFoundException($"AuditUniverse with ID '{id}' not found.");
 
-            var entity = await repository.GetByIdAsync(id)
-                         ?? throw new KeyNotFoundException($"AuditUniverse with ID '{id}' not found.");
+        await SetCacheAsync(cacheKey, entity);
 
-            await SetCacheAsync(cacheKey, entity);
-
-            return mapper.Map<AuditUniverseModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve AuditUniverse with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve AuditUniverse with ID '{id}'", ex);
-        }
-    }
-
-    public Task<PaginationResult<AuditUniverseModel>> Search(string? Name, Page page)
-    {
-        throw new NotImplementedException();
+        return mapper.Map<AuditUniverseModel>(entity);
     }
 
     public Task<PaginationResult<AuditUniverseModel>> SearchAsync(string? name, Page page)
@@ -118,18 +80,10 @@ internal sealed class AuditUniverseService(
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
 
-        try 
-        {
-            var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update AuditUniverse with ID {Id}", auditUniverseModel.Id);
-            throw new InvalidOperationException($"Failed to update AuditUniverse with ID '{auditUniverseModel.Id}'", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

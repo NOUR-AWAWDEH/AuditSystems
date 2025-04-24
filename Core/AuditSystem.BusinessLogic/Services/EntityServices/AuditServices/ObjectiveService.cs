@@ -7,6 +7,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
@@ -15,13 +16,15 @@ internal class ObjectiveService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<ObjectiveService> logger) :
-    BaseEntityCacheService<Objective>(
+    UnifiedCacheService<Guid, Objective, ObjectiveModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.Objective,
         ObjectiveTags,
         ListTags
-    ), 
+    ),
     IObjectiveService
 {
     private static readonly string[] ObjectiveTags = ["objectives", "objective-list"];
@@ -31,80 +34,42 @@ internal class ObjectiveService(
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(ObjectiveModel));
 
-        try
-        {
-            var entity = mapper.Map<Objective>(objectiveModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<Objective>(objectiveModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey, entity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, entity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for ObjectiveModel");
-            throw new ArgumentException("Mapping failed for ObjectiveModel", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while creating Objective.");
-            throw new InvalidOperationException("An error occurred while creating Objective.", ex);
-        }
+        return createdEntity.Id;
     }
     
     public async Task DeleteObjectiveAsync(Guid objectiveId)
     {
         var cacheKey = GetCacheKey(objectiveId);
-        try
-        {
-            var entity = await repository.GetByIdAsync(objectiveId)
-                    ?? throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
-            
-            await repository.DeleteAsync(objectiveId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex, "Objective with ID: {id} not found.", objectiveId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete Objective.");
-            throw new InvalidOperationException("Failed to delete Objective.", ex);
-        }
+       
+        var entity = await repository.GetByIdAsync(objectiveId)
+                ?? throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
+        
+        await repository.DeleteAsync(objectiveId);
+        await ClearCacheAsync(cacheKey);
     }
     
     public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
         
-        try
+        var cachedEntity = await cacheService.GetAsync<Objective>(cacheKey);
+        if (cachedEntity != null)
         {
-            var cachedEntity = await cacheService.GetAsync<Objective>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<ObjectiveModel>(cachedEntity);
-            }
-
-            var entity = await repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Objective with ID '{id}' not found.");
-
-            await SetCacheAsync(cacheKey, entity);
-            
-            return mapper.Map<ObjectiveModel>(entity);
+            return mapper.Map<ObjectiveModel>(cachedEntity);
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve Objective with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve Objective with ID '{id}'", ex);
-        }
-    }
 
-    public Task<PaginationResult<ObjectiveModel>> Search(string? Name, Page page)
-    {
-        throw new NotImplementedException();
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"Objective with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<ObjectiveModel>(entity);
     }
 
     public Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page)
@@ -116,18 +81,10 @@ internal class ObjectiveService(
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));
         
-        try 
-        {
-            var entity = mapper.Map<Objective>(objectiveModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<Objective>(objectiveModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update Objective with ID {Id}", objectiveModel.Id);
-            throw new InvalidOperationException($"Failed to update Objective with ID '{objectiveModel.Id}'", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

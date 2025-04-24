@@ -7,6 +7,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
@@ -15,7 +16,9 @@ internal sealed class DepartmentService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<DepartmentService> logger) : 
-    BaseEntityCacheService<Department>(
+    UnifiedCacheService<Guid, Department, DepartmentModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.Department,
@@ -31,76 +34,40 @@ internal sealed class DepartmentService(
     {
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));
 
-        try
-        {
-            var entity = mapper.Map<Department>(departmentModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<Department>(departmentModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey, entity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, entity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for DepartmentModel");
-            throw new ArgumentException("Invalid data mapping occurred", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create Department");
-            throw new InvalidOperationException("Failed to create Department.", ex);
-        }
+        return createdEntity.Id;
     }
     
     public async Task DeleteDepartmentAsync(Guid departmentId)
     {
         var cacheKey = GetCacheKey(departmentId);
         
-        try
-        {
-            var entity = await repository.GetByIdAsync(departmentId)
-                ?? throw new KeyNotFoundException($"Department with ID {departmentId} not found.");
+        var entity = await repository.GetByIdAsync(departmentId)
+            ?? throw new KeyNotFoundException($"Department with ID {departmentId} not found.");
 
-            await repository.DeleteAsync(departmentId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex, "Department with ID {DepartmentId} not found", departmentId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete Department ID {DepartmentId}", departmentId);
-            throw new InvalidOperationException($"Failed to delete Department: {departmentId}", ex);
-        }
+        await repository.DeleteAsync(departmentId);
+        await ClearCacheAsync(cacheKey);
     }
     
     public async Task<DepartmentModel> GetDepartmentByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
+       
+        var cachedEntity = await cacheService.GetAsync<Department>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<DepartmentModel>(cachedEntity);
+
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"Department with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
         
-        try
-        {
-            var cachedEntity = await cacheService.GetAsync<Department>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<DepartmentModel>(cachedEntity);
-            }
-
-            var entity = await repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Department with ID '{id}' not found.");
-
-            await SetCacheAsync(cacheKey, entity);
-            
-            return mapper.Map<DepartmentModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve Department with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve Department with ID '{id}'", ex);
-        }
+        return mapper.Map<DepartmentModel>(entity);
     }
 
     public Task<PaginationResult<DepartmentModel>> SearchAsync(string? name, Page page)
@@ -112,18 +79,10 @@ internal sealed class DepartmentService(
     {
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));
 
-        try
-        {
-            var entity = mapper.Map<Department>(departmentModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update Department with ID {Id}", departmentModel.Id);
-            throw new InvalidOperationException($"Failed to update Department with ID '{departmentModel.Id}'", ex);
-        }
+        var entity = mapper.Map<Department>(departmentModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

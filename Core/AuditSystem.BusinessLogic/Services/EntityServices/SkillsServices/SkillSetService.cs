@@ -1,4 +1,5 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.SkillsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -15,7 +16,9 @@ internal sealed class SkillSetService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<SkillSetService> logger) : 
-    BaseEntityCacheService<SkillSet>(
+    UnifiedCacheService<Guid, SkillSet, SkillSetModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.SkillSet,
@@ -31,80 +34,45 @@ internal sealed class SkillSetService(
     {
         ArgumentNullException.ThrowIfNull(skillSetModel, nameof(skillSetModel));
 
-        try
-        {
-            var entity = mapper.Map<SkillSet>(skillSetModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<SkillSet>(skillSetModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey, createdEntity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "Mapping failed for SkillSetModel");
-            throw new ArgumentException("Invalid data mapping occurred.", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create SkillSet");
-            throw new InvalidOperationException("Failed to create SkillSet.", ex);
-        }
+        return createdEntity.Id;
     }
 
     public async Task DeleteSkillSetAsync(Guid skillSetId)
     {
         var cacheKey = GetCacheKey(skillSetId);
         
-        try
-        {
-            var entity = await repository.GetByIdAsync(skillSetId)
-                ?? throw new KeyNotFoundException($"SkillSet with ID {skillSetId} not found.");
+        var entity = await repository.GetByIdAsync(skillSetId)
+            ?? throw new KeyNotFoundException($"SkillSet with ID {skillSetId} not found.");
 
-            await repository.DeleteAsync(skillSetId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex, "SkillSet with ID {SkillSetId} not found", skillSetId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete SkillSet ID {SkillSetId}", skillSetId);
-            throw new InvalidOperationException($"Failed to delete SkillSet: {skillSetId}", ex);
-        }
+        await repository.DeleteAsync(skillSetId);
+        await ClearCacheAsync(cacheKey);
     }
 
     public async Task<SkillSetModel> GetSkillSetByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
         
-        try
-        {
-            var entity = await cacheService.GetAsync<SkillSet>(cacheKey);
-            if (entity != null)
-            {
-                return mapper.Map<SkillSetModel>(entity);
-            }
-
-            entity = await repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"SkillSet with ID '{id}' not found.");
-
-            await SetCacheAsync(cacheKey, entity);
-            
+        var entity = await cacheService.GetAsync<SkillSet>(cacheKey);
+        if (entity != null)
             return mapper.Map<SkillSetModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve SkillSet with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve SkillSet with ID '{id}'", ex);
-        }
+
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"SkillSet with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<SkillSetModel>(entity);
     }
 
     public Task<PaginationResult<SkillSetModel>> SearchAsync(string? name, Page page)
     {
+        
         throw new NotImplementedException();
     }
 
@@ -112,18 +80,10 @@ internal sealed class SkillSetService(
     {
         ArgumentNullException.ThrowIfNull(skillSetModel, nameof(skillSetModel));
         
-        try
-        {
-            var entity = mapper.Map<SkillSet>(skillSetModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update SkillSet with ID {Id}", skillSetModel.Id);
-            throw new InvalidOperationException($"Failed to update SkillSet with ID '{skillSetModel.Id}'", ex);
-        }
+        var entity = mapper.Map<SkillSet>(skillSetModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

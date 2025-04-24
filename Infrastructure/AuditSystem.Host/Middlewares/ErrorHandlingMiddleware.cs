@@ -1,3 +1,4 @@
+using FluentValidation;
 using Newtonsoft.Json;
 using System.Net.Mime;
 
@@ -35,6 +36,7 @@ public class ErrorHandlingMiddleware
                 InvalidOperationException => StatusCodes.Status400BadRequest,
                 ArgumentNullException => StatusCodes.Status400BadRequest,
                 ArgumentException => StatusCodes.Status400BadRequest,
+                ValidationException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
 

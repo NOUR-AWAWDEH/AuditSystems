@@ -7,6 +7,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
@@ -15,13 +16,14 @@ internal sealed class BusinessObjectiveService(
     IMapper mapper,
     ICacheService cacheService,
     ILogger<BusinessObjectiveService> logger) : 
-    BaseEntityCacheService<BusinessObjective>(
+    UnifiedCacheService<Guid, BusinessObjective, BusinessObjectiveModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.BusinessObjective,
         BusinessObjectiveTags,
-        ListTags
-    ),
+        ListTags),
     IBusinessObjectiveService
 {
     private static readonly string[] BusinessObjectiveTags = ["business-objectives", "business-objective-list"];
@@ -31,83 +33,44 @@ internal sealed class BusinessObjectiveService(
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
 
-        try
-        {
-            var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = GetCacheKey(createdEntity.Id);
-            await SetCacheAsync(cacheKey,entity);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey,entity);
 
-            return createdEntity.Id;
-        }
-        catch (AutoMapperMappingException ex)
-        {
-            logger.LogError(ex, "AutoMapper mapping exception occurred while creating BusinessObjectiveModel.");
-            throw new ArgumentException("AutoMapper mapping exception occurred while creating BusinessObjectiveModel.", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while creating BusinessObjectiveModel.");
-            throw new InvalidOperationException("An error occurred while creating BusinessObjectiveModel.", ex);
-        }
+        return createdEntity.Id;
     }
     
     public async Task DeleteBusinessObjectiveAsync(Guid businessObjectiveId)
     {
         var cacheKey = GetCacheKey(businessObjectiveId);
-        try 
-        {
-            var entity = await repository.GetByIdAsync(businessObjectiveId)
-                    ?? throw new KeyNotFoundException($"BusinessObjective with ID {businessObjectiveId} not found.");
-            
-            
-            await repository.DeleteAsync(businessObjectiveId);
-            await ClearCacheAsync(cacheKey);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex,"BusinessObjective with ID : {id} not found.",businessObjectiveId);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete BusinessObjective.");
-            throw new InvalidOperationException("Failed to delete BusinessObjective.", ex);
-        }
+       
+        var entity = await repository.GetByIdAsync(businessObjectiveId)
+                ?? throw new KeyNotFoundException($"BusinessObjective with ID {businessObjectiveId} not found.");
+        
+        await repository.DeleteAsync(businessObjectiveId);
+        await ClearCacheAsync(cacheKey);
     }
     
     public async Task<BusinessObjectiveModel> GetBusinessObjectiveByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
+      
+        var cachedEntity = await cacheService.GetAsync<BusinessObjective>(cacheKey);
+        if (cachedEntity != null)
+        {
+            return mapper.Map<BusinessObjectiveModel>(cachedEntity);
+        }
+
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"BusinessObjective with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
         
-        try
-        {
-            var cachedEntity = await cacheService.GetAsync<BusinessObjective>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<BusinessObjectiveModel>(cachedEntity);
-            }
-
-            var entity = await repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"BusinessObjective with ID '{id}' not found.");
-
-            await SetCacheAsync(cacheKey, entity);
-            
-            return mapper.Map<BusinessObjectiveModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve BusinessObjective with ID {Id}", id);
-            throw new InvalidOperationException($"Failed to retrieve BusinessObjective with ID '{id}'", ex);
-        }
+        return mapper.Map<BusinessObjectiveModel>(entity);
     }
-
-    public Task<PaginationResult<BusinessObjectiveModel>> Search(string? Name, Page page)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public Task<PaginationResult<BusinessObjectiveModel>> SearchAsync(string? name, Page page)
     {
         throw new NotImplementedException();
@@ -117,18 +80,10 @@ internal sealed class BusinessObjectiveService(
     {
         ArgumentNullException.ThrowIfNull(businessObjectiveModel, nameof(businessObjectiveModel));
         
-        try 
-        {
-            var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<BusinessObjective>(businessObjectiveModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = GetCacheKey(entity.Id);
-            await SetCacheAsync(cacheKey, entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update BusinessObjective with ID {Id}", businessObjectiveModel.Id);
-            throw new InvalidOperationException($"Failed to update BusinessObjective with ID '{businessObjectiveModel.Id}'", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

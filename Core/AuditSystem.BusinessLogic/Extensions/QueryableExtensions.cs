@@ -4,7 +4,7 @@ using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.BusinessLogic.Extensions;
 
-public static class IQueryableExtensions
+public static class QueryableExtensions
 {
     public static async ValueTask<PaginationResult<TModel>> PaginateAsync<TId, TEntity, TModel>(
         this IQueryable<TModel> query,

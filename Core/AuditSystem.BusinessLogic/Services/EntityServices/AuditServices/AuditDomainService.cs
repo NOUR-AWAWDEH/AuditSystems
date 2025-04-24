@@ -1,5 +1,5 @@
 ﻿using AuditSystem.Application.Constants;
-using AuditSystem.BusinessLogic.Extensions;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -7,24 +7,26 @@ using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
-internal sealed class AuditDomainService(
+public sealed class AuditDomainService(
     IRepository<Guid, AuditDomain> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<AuditDomainService> logger
-) : BaseEntityCacheService<AuditDomain>(
+    ILogger<AuditDomainService> logger)
+    :
+    UnifiedCacheService<Guid, AuditDomain, AuditDomainModel>(
+        repository,
+        mapper,
         cacheService,
         logger,
         CacheKeys.AuditDomain,
         AuditDomainTags,
         ListTags
-    ),
-    IAuditDomainService
+    )
+    , IAuditDomainService
 {
     private static readonly string[] AuditDomainTags = ["audit-domains", "audit-domain-list"];
     private static readonly string[] ListTags = ["audit-domain-list"];
@@ -54,6 +56,7 @@ internal sealed class AuditDomainService(
             throw new InvalidOperationException("Failed to create AuditDomain.", ex);
         }
     }
+
     public async Task DeleteAuditDomainAsync(Guid auditDomainId)
     {
         var cacheKey = GetCacheKey(auditDomainId);
@@ -77,6 +80,7 @@ internal sealed class AuditDomainService(
             throw new InvalidOperationException($"Failed to delete AuditDomain with ID {auditDomainId}", ex);
         }
     }
+
     public async Task<AuditDomainModel> GetAuditDomainByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
@@ -105,63 +109,26 @@ internal sealed class AuditDomainService(
 
     public async Task<PaginationResult<AuditDomainModel>> SearchAsync(string? name, Page page)
     {
-        var cacheKey = GetSearchCacheKey(name, page);
-        var countCacheKey = GetSearchCountCacheKey(name);
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         try
         {
-            var cachedResults = await TryGetCachedSearchResults(cacheKey);
-            if (cachedResults != null)
+            var cachedResult = await GetFromCacheAsync<AuditDomainModel>(cacheKey, countCacheKey, page);
+            if (cachedResult != null)
             {
-                var cachedModels = mapper.Map<List<AuditDomainModel>>(cachedResults);
-                var cachedCount = await TryGetCachedSearchCountAsync(countCacheKey);
-
-                int totalCount;
-                if (cachedCount.HasValue)
-                {
-                    totalCount = cachedCount.Value;
-                }
-                else
-                {
-                    totalCount = await repository.CountAsync(
-                        auditDomain => string.IsNullOrEmpty(name) || auditDomain.Name.Contains(name!, StringComparison.OrdinalIgnoreCase));
-                    await CacheSearchCountAsync(countCacheKey, totalCount);
-                }
-
-                return new PaginationResult<AuditDomainModel>
-                {
-                    Items = cachedModels,
-                    TotalCount = totalCount,
-                    PageNumber = page.Number,
-                    PageSize = page.Size
-                };
+                return cachedResult;
             }
 
-            var query = repository.GetAll()
-                .Where(auditDomain => string.IsNullOrEmpty(name) || auditDomain.Name.Contains(name!, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(x => x.Id);
-
-            var modelQuery = query.ProjectTo<AuditDomainModel>(mapper.ConfigurationProvider);
-            var result = await modelQuery.PaginateAsync(page, repository);
-
-            var entities = mapper.Map<List<AuditDomain>>(result.Items);
-            await CacheSearchResultsAsync(cacheKey, entities);
-            await CacheSearchCountAsync(countCacheKey, result.TotalCount);
-
-            return new PaginationResult<AuditDomainModel>
-            {
-                Items = result.Items,
-                TotalCount = result.TotalCount,
-                PageNumber = page.Number,
-                PageSize = page.Size
-            };
+            return await GetFromRepositoryAsync<AuditDomainModel>(cacheKey, countCacheKey, page, name);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to search AuditDomains with search term {SearchTerm}", name);
-            throw new InvalidOperationException("Failed to search AuditDomains", ex);
+            logger.LogError(ex, "Failed to search AuditDomains with name {Name}", name);
+            throw new InvalidOperationException($"Failed to search AuditDomains with name '{name}'", ex);
         }
     }
+
+ 
 
     public async Task UpdateAuditDomainAsync(AuditDomainModel auditDomainModel)
     {

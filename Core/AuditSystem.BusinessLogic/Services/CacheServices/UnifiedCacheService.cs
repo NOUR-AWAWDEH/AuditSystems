@@ -1,0 +1,246 @@
+﻿using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Domain.Entities.Common;
+using AuditSystem.Contract.Models.Pagination;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using AuditSystem.BusinessLogic.Extensions;
+using Microsoft.EntityFrameworkCore;
+using AuditSystem.Application.Constants;
+using Microsoft.Extensions.Logging;
+
+namespace AuditSystem.BusinessLogic.Services.CacheServices;
+
+public class UnifiedCacheService<TId, TEntity, TModel>(
+    IRepository<TId, TEntity> repository,
+    IMapper mapper,
+    ICacheService cacheService,
+    ILogger<UnifiedCacheService<TId, TEntity, TModel>> logger,
+    string cacheKeyPrefix,
+    string[] entityTags,
+    string[] listTags)
+    : IUnifiedCacheService<TId, TEntity>
+    where TEntity : Entity<TId>
+    where TId : IComparable<TId>
+{
+    private readonly ICacheService _cacheService = cacheService;
+    private readonly ILogger<UnifiedCacheService<TId, TEntity, TModel>> _logger = logger;
+    private readonly string _cacheKeyPrefix = cacheKeyPrefix;
+    private readonly string[] _entityTags = entityTags;
+    private readonly string[] _listTags = listTags;
+
+    public async Task<PaginationResult<TModel>?> GetFromCacheAsync(string cacheKey, string countCacheKey, Page page)
+    {
+        var cachedEntities = await TryGetCachedSearchResults(cacheKey);
+        if (cachedEntities == null)
+        {
+            return null;
+        }
+
+        var cachedCount = await TryGetCachedSearchCountAsync(countCacheKey);
+        if (!cachedCount.HasValue)
+        {
+            return null;
+        }
+
+        var models = mapper.Map<List<TModel>>(cachedEntities);
+        return new PaginationResult<TModel>
+        {
+            Items = models,
+            TotalCount = cachedCount.Value,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    }
+
+    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? name)
+    {
+        var query = repository.GetAll()
+            .Where(entity => string.IsNullOrEmpty(name) || EF.Property<string>(entity, "Name").Contains(name, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Id);
+
+        var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
+        var result = await modelQuery.PaginateAsync(page, repository);
+
+        var entities = mapper.Map<List<TEntity>>(result.Items);
+        await CacheSearchResultsAsync(cacheKey, entities);
+        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
+
+        return new PaginationResult<TModel>
+        {
+            Items = result.Items,
+            TotalCount = result.TotalCount,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    }
+
+    public async Task<PaginationResult<TModel>?> GetFromCacheAsync<TModel>(string cacheKey, string countCacheKey, Page page)
+    {
+        var cachedEntities = await TryGetCachedSearchResults(cacheKey);
+        if (cachedEntities == null)
+        {
+            return null;
+        }
+
+        var cachedCount = await TryGetCachedSearchCountAsync(countCacheKey);
+        if (!cachedCount.HasValue)
+        {
+            return null;
+        }
+
+        return new PaginationResult<TModel>
+        {
+            Items = mapper.Map<List<TModel>>(cachedEntities),
+            TotalCount = cachedCount.Value,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    }
+
+    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync<TModel>(string cacheKey, string countCacheKey, Page page, string? name)
+    {
+        var query = repository.GetAll()
+            .Where(entity => string.IsNullOrEmpty(name) || EF.Property<string>(entity, "Name").Contains(name, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Id);
+
+        var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
+        var result = await modelQuery.PaginateAsync(page, repository);
+
+        var entities = mapper.Map<List<TEntity>>(result.Items);
+        await CacheSearchResultsAsync(cacheKey, entities);
+        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
+
+        return new PaginationResult<TModel>
+        {
+            Items = result.Items,
+            TotalCount = result.TotalCount,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    }
+
+    public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
+    {
+        var cacheKey = GetSearchCacheKey(searchTerm, page);
+        var countCacheKey = GetSearchCountCacheKey(searchTerm);
+        return (cacheKey, countCacheKey);
+    }
+
+    public string GetCacheKey(TId id, string lang = "en") =>
+        string.Format(CacheKeys.CacheKey, _cacheKeyPrefix, id, lang);
+
+    public async Task SetCacheAsync(string cacheKey, TEntity entity)
+    {
+        try
+        {
+            await _cacheService.SetAsync(
+                key: cacheKey,
+                value: entity,
+                tags: _entityTags,
+                expiration: CacheExpirations.MediumTerm);
+
+            await _cacheService.RemoveCacheByTagAsync(_listTags);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to update cache for {EntityType} with ID {Id}",
+                typeof(TEntity).Name, GetEntityId(entity));
+        }
+    }
+
+    public async Task ClearCacheAsync(string cacheKey)
+    {
+        try
+        {
+            await _cacheService.RemoveAsync(cacheKey);
+            await _cacheService.RemoveCacheByTagAsync(_listTags);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to clear cache for key {CacheKey}", cacheKey);
+        }
+    }
+
+    private Guid GetEntityId(TEntity entity)
+    {
+        var prop = typeof(TEntity).GetProperty("Id");
+        return prop != null ? (Guid)prop.GetValue(entity)! : Guid.Empty;
+    }
+
+    public string GetSearchCountCacheKey(string? searchTerm) =>
+        string.Format(CacheKeys.SearchCountCacheKey,
+            _cacheKeyPrefix,
+            searchTerm?.Trim().ToLowerInvariant() ?? "all");
+
+    public string GetSearchCacheKey(string? searchTerm, Page page) =>
+        string.Format(CacheKeys.SearchCacheKey,
+            _cacheKeyPrefix,
+            searchTerm?.Trim().ToLowerInvariant() ?? "all",
+            page.Number,
+            page.Size);
+
+    public async Task<int?> TryGetCachedSearchCountAsync(string countCacheKey)
+    {
+        try
+        {
+            return await _cacheService.GetAsync<int?>(countCacheKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve cached count for key {CacheKey}", countCacheKey);
+            return null;
+        }
+    }
+
+    public async Task CacheSearchCountAsync(string countCacheKey, int count)
+    {
+        try
+        {
+            await _cacheService.SetAsync(
+                key: countCacheKey,
+                value: count,
+                tags: _listTags,
+                expiration: CacheExpirations.MediumTerm);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to cache count for key {CacheKey}", countCacheKey);
+        }
+    }
+
+    public async Task<List<TEntity>?> TryGetCachedSearchResults(string cacheKey)
+    {
+        try
+        {
+            var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
+            if (cachedResults != null)
+            {
+                _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
+                    cachedResults.Count, typeof(TEntity).Name, cacheKey);
+            }
+            return cachedResults;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to retrieve cached search results for key {CacheKey}", cacheKey);
+            return null;
+        }
+    }
+
+    public async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TEntity> entities)
+    {
+        try
+        {
+            await _cacheService.SetAsync(
+                key: cacheKey,
+                value: entities.ToList(),
+                tags: _listTags,
+                expiration: CacheExpirations.MediumTerm);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to cache search results for key {CacheKey}", cacheKey);
+        }
+    }
+}

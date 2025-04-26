@@ -8,6 +8,7 @@ using AuditSystem.BusinessLogic.Extensions;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.Application.Constants;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace AuditSystem.BusinessLogic.Services.CacheServices;
 
@@ -53,10 +54,12 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         };
     }
 
-    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? name)
+    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? searchTerm, string propertyName)
     {
+        var predicate = BuildSearchPredicate<TEntity>(propertyName, searchTerm);
+
         var query = repository.GetAll()
-            .Where(entity => string.IsNullOrEmpty(name) || EF.Property<string>(entity, "Name").Contains(name, StringComparison.OrdinalIgnoreCase))
+            .Where(predicate)
             .OrderBy(x => x.Id);
 
         var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
@@ -74,6 +77,36 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             PageSize = page.Size
         };
     }
+
+    public static Expression<Func<TEntity, bool>> BuildSearchPredicate<TEntity>(string propertyName, string? searchTerm)
+    {
+        var parameter = Expression.Parameter(typeof(TEntity), "entity");
+        var property = Expression.Property(parameter, propertyName);
+
+        if (property.Type != typeof(string))
+            throw new InvalidOperationException($"Property '{propertyName}' is not of type string.");
+
+        if (string.IsNullOrEmpty(searchTerm))
+            return Expression.Lambda<Func<TEntity, bool>>(Expression.Constant(true), parameter);
+
+        // Build: entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
+
+        var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+
+        // entity.PropertyName.ToLower()
+        var propertyToLower = Expression.Call(property, toLowerMethod);
+
+        // searchTerm.ToLower()
+        var searchTermToLower = Expression.Constant(searchTerm.ToLower(), typeof(string));
+
+        // entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
+        var containsCall = Expression.Call(propertyToLower, containsMethod, searchTermToLower);
+
+        return Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+    }
+
+
 
     public async Task<PaginationResult<TModel>?> GetFromCacheAsync<TModel>(string cacheKey, string countCacheKey, Page page)
     {
@@ -100,14 +133,18 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
 
     public async Task<PaginationResult<TModel>> GetFromRepositoryAsync<TModel>(string cacheKey, string countCacheKey, Page page, string? name)
     {
+        var predicate = BuildSearchPredicate<TEntity>("Name", name);
+
         var query = repository.GetAll()
-            .Where(entity => string.IsNullOrEmpty(name) || EF.Property<string>(entity, "Name").Contains(name, StringComparison.OrdinalIgnoreCase))
+            .Where(predicate)
             .OrderBy(x => x.Id);
 
         var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
+
         var result = await modelQuery.PaginateAsync(page, repository);
 
         var entities = mapper.Map<List<TEntity>>(result.Items);
+
         await CacheSearchResultsAsync(cacheKey, entities);
         await CacheSearchCountAsync(countCacheKey, result.TotalCount);
 
@@ -119,6 +156,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             PageSize = page.Size
         };
     }
+
 
     public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
     {
@@ -177,10 +215,9 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     {
         var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
         if (cachedResults != null)
-        {
             _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
                 cachedResults.Count, typeof(TEntity).Name, cacheKey);
-        }
+        
         return cachedResults;
     }
 

@@ -70,9 +70,17 @@ internal sealed class AuditJobService(
         return mapper.Map<AuditJobModel>(entity);
     }
 
-    public Task<PaginationResult<AuditJobModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<AuditJobModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditJobModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<AuditJobModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)

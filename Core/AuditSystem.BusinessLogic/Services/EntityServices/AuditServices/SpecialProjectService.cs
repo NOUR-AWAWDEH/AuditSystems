@@ -70,9 +70,17 @@ internal sealed class SpecialProjectService(
         return mapper.Map<SpecialProjectModel>(entity);
     }
 
-    public Task<PaginationResult<SpecialProjectModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SpecialProjectModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SpecialProjectModel>(cacheKey, countCacheKey, page);
+        if (cachedResult!= null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SpecialProjectModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSpecialProjectAsync(SpecialProjectModel specialProjectModel)

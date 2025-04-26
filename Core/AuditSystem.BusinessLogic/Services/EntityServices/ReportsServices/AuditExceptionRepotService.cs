@@ -71,9 +71,17 @@ internal sealed class AuditExceptionRepotService(
         return mapper.Map<AuditExceptionReportModel>(entity);
     }
 
-    public Task<PaginationResult<AuditExceptionReportModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<AuditExceptionReportModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditExceptionReportModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<AuditExceptionReportModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)

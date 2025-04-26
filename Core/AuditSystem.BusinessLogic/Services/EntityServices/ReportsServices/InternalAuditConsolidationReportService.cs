@@ -70,9 +70,17 @@ internal sealed class InternalAuditConsolidationReportService(
         return mapper.Map<InternalAuditConsolidationReportModel>(entity);
     }
 
-    public Task<PaginationResult<InternalAuditConsolidationReportModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<InternalAuditConsolidationReportModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<InternalAuditConsolidationReportModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<InternalAuditConsolidationReportModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)

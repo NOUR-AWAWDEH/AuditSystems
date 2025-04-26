@@ -70,9 +70,17 @@ internal sealed class JobTimeAllocationReportService(
         return mapper.Map<JobTimeAllocationReportModel>(entity);
     }
 
-    public Task<PaginationResult<JobTimeAllocationReportModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<JobTimeAllocationReportModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<JobTimeAllocationReportModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<JobTimeAllocationReportModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateJobTimeAllocationReportAsync(JobTimeAllocationReportModel jobTimeAllocationReportModel)

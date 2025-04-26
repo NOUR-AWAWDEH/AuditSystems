@@ -70,9 +70,17 @@ internal sealed class JobSchedulingService(
         return mapper.Map<JobSchedulingModel>(entity);
     }
 
-    public Task<PaginationResult<JobSchedulingModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<JobSchedulingModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<JobSchedulingModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<JobSchedulingModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateJobSchedulingAsync(JobSchedulingModel jobSchedulingModel)

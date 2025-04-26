@@ -70,9 +70,17 @@ internal sealed class ChecklistService(
         return mapper.Map<ChecklistModel>(entity);
     }
 
-    public Task<PaginationResult<ChecklistModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<ChecklistModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, cacheCountKey) = GetSearchCacheKeys(name, page);
+        
+        var cachedResult = await GetFromCacheAsync<ChecklistModel>(cacheKey, cacheCountKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+        
+        return await GetFromRepositoryAsync<ChecklistModel>(cacheKey, cacheCountKey, page, name);
     }
 
     public async Task UpdateChecklistAsync(ChecklistModel checklistModel)

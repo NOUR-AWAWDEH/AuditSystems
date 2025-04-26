@@ -71,9 +71,17 @@ internal sealed class UserDesignationService(
         return mapper.Map<UserDesignationModel>(entity);
     }
 
-    public Task<PaginationResult<UserDesignationModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<UserDesignationModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<UserDesignationModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<UserDesignationModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel)

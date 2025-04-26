@@ -70,9 +70,17 @@ internal sealed class CompanyService(
         return mapper.Map<CompanyModel>(entity);
     }
 
-    public Task<PaginationResult<CompanyModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<CompanyModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<CompanyModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<CompanyModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateCompanyAsync(CompanyModel companyModel)

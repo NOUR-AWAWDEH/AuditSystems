@@ -70,9 +70,17 @@ internal sealed class SkillService(
         return mapper.Map<SkillModel>(entity);
     }
 
-    public Task<PaginationResult<SkillModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SkillModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SkillModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SkillModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSkillAsync(SkillModel skillModel)

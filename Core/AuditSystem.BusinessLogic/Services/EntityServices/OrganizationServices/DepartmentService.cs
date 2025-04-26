@@ -70,9 +70,17 @@ internal sealed class DepartmentService(
         return mapper.Map<DepartmentModel>(entity);
     }
 
-    public Task<PaginationResult<DepartmentModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<DepartmentModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<DepartmentModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<DepartmentModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateDepartmentAsync(DepartmentModel departmentModel)

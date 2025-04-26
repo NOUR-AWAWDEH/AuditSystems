@@ -132,40 +132,19 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
 
     public async Task SetCacheAsync(string cacheKey, TEntity entity)
     {
-        try
-        {
-            await _cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: _entityTags,
-                expiration: CacheExpirations.MediumTerm);
+        await _cacheService.SetAsync(
+            key: cacheKey,
+            value: entity,
+            tags: _entityTags,
+            expiration: CacheExpirations.MediumTerm);
 
-            await _cacheService.RemoveCacheByTagAsync(_listTags);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to update cache for {EntityType} with ID {Id}",
-                typeof(TEntity).Name, GetEntityId(entity));
-        }
+        await _cacheService.RemoveCacheByTagAsync(_listTags);
     }
 
     public async Task ClearCacheAsync(string cacheKey)
     {
-        try
-        {
-            await _cacheService.RemoveAsync(cacheKey);
-            await _cacheService.RemoveCacheByTagAsync(_listTags);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to clear cache for key {CacheKey}", cacheKey);
-        }
-    }
-
-    private Guid GetEntityId(TEntity entity)
-    {
-        var prop = typeof(TEntity).GetProperty("Id");
-        return prop != null ? (Guid)prop.GetValue(entity)! : Guid.Empty;
+        await _cacheService.RemoveAsync(cacheKey);
+        await _cacheService.RemoveCacheByTagAsync(_listTags);
     }
 
     public string GetSearchCountCacheKey(string? searchTerm) =>
@@ -182,65 +161,35 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
 
     public async Task<int?> TryGetCachedSearchCountAsync(string countCacheKey)
     {
-        try
-        {
-            return await _cacheService.GetAsync<int?>(countCacheKey);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to retrieve cached count for key {CacheKey}", countCacheKey);
-            return null;
-        }
+        return await _cacheService.GetAsync<int?>(countCacheKey);
     }
 
     public async Task CacheSearchCountAsync(string countCacheKey, int count)
     {
-        try
-        {
-            await _cacheService.SetAsync(
-                key: countCacheKey,
-                value: count,
-                tags: _listTags,
-                expiration: CacheExpirations.MediumTerm);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to cache count for key {CacheKey}", countCacheKey);
-        }
+        await _cacheService.SetAsync(
+            key: countCacheKey,
+            value: count,
+            tags: _listTags,
+            expiration: CacheExpirations.MediumTerm);
     }
 
     public async Task<List<TEntity>?> TryGetCachedSearchResults(string cacheKey)
     {
-        try
+        var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
+        if (cachedResults != null)
         {
-            var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
-            if (cachedResults != null)
-            {
-                _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
-                    cachedResults.Count, typeof(TEntity).Name, cacheKey);
-            }
-            return cachedResults;
+            _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
+                cachedResults.Count, typeof(TEntity).Name, cacheKey);
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to retrieve cached search results for key {CacheKey}", cacheKey);
-            return null;
-        }
+        return cachedResults;
     }
 
     public async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TEntity> entities)
     {
-        try
-        {
-            await _cacheService.SetAsync(
-                key: cacheKey,
-                value: entities.ToList(),
-                tags: _listTags,
-                expiration: CacheExpirations.MediumTerm);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to cache search results for key {CacheKey}", cacheKey);
-        }
+        await _cacheService.SetAsync(
+            key: cacheKey,
+            value: entities.ToList(),
+            tags: _listTags,
+            expiration: CacheExpirations.MediumTerm);
     }
 }

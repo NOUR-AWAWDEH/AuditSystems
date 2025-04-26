@@ -70,9 +70,17 @@ internal sealed class ComplianceChecklistService(
         return mapper.Map<ComplianceChecklistModel>(entity);
     }
 
-    public Task<PaginationResult<ComplianceChecklistModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<ComplianceChecklistModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<ComplianceChecklistModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<ComplianceChecklistModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateComplianceChecklistAsync(ComplianceChecklistModel complianceChecklistModel)

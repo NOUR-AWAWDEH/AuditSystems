@@ -70,9 +70,17 @@ internal sealed class SupportingDocService(
         return mapper.Map<SupportingDocModel>(entity);
     }
 
-    public Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SupportingDocModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SupportingDocModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel)

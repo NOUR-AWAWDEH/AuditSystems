@@ -72,9 +72,17 @@ internal class ObjectiveService(
         return mapper.Map<ObjectiveModel>(entity);
     }
 
-    public Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<ObjectiveModel>(cacheKey, countCacheKey, page);
+        if(cachedResult!= null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<ObjectiveModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)

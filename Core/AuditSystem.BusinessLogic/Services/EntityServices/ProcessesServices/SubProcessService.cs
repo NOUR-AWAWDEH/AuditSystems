@@ -70,9 +70,17 @@ internal sealed class SubProcessService(
         return mapper.Map<SubProcessModel>(entity);
     }
 
-    public Task<PaginationResult<SubProcessModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SubProcessModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SubProcessModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SubProcessModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel)

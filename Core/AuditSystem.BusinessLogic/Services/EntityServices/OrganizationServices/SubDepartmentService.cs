@@ -72,9 +72,17 @@ internal sealed class SubDepartmentService(
         return mapper.Map<SubDepartmentModel>(entity);
     }
 
-    public Task<PaginationResult<SubDepartmentModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SubDepartmentModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SubDepartmentModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SubDepartmentModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel)

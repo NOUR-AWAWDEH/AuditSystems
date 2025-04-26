@@ -70,9 +70,17 @@ internal sealed class ReportingFollowUpService(
         return mapper.Map<ReportingFollowUpModel>(entity); 
     }
 
-    public Task<PaginationResult<ReportingFollowUpModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<ReportingFollowUpModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<ReportingFollowUpModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<ReportingFollowUpModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)

@@ -70,9 +70,17 @@ internal sealed class RemarkService(
         return mapper.Map<RemarkModel>(entity);
     }
 
-    public Task<PaginationResult<RemarkModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<RemarkModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, cacheCountKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RemarkModel>(cacheKey, cacheCountKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+        
+        return await GetFromRepositoryAsync<RemarkModel>(cacheKey, cacheCountKey, page, name);
     }
 
     public async Task UpdateRemarkAsync(RemarkModel remarkModel)

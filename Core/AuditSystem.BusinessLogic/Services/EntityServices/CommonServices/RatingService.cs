@@ -70,9 +70,17 @@ internal sealed class RatingService(
         return mapper.Map<RatingModel>(entity);
     }
 
-    public Task<PaginationResult<RatingModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<RatingModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RatingModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<RatingModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateRatingAsync(RatingModel ratingModel)

@@ -70,9 +70,17 @@ internal sealed class SubLocationService(
         return mapper.Map<SubLocationModel>(entity);
     }
 
-    public Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<SubLocationModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)

@@ -70,9 +70,17 @@ internal sealed class LocationService(
         return mapper.Map<LocationModel>(entity);
     }
 
-    public Task<PaginationResult<LocationModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<LocationModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<LocationModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<LocationModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateLocationAsync(LocationModel locationModel)

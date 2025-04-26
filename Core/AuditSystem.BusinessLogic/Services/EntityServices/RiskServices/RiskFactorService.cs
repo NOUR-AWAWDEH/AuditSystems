@@ -70,9 +70,17 @@ internal sealed class RiskFactorService(
         return mapper.Map<RiskFactorModel>(entity);
     }
 
-    public Task<PaginationResult<RiskFactorModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<RiskFactorModel>> SearchAsync(string? name, Page page)
     {
-        throw new NotImplementedException();
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RiskFactorModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<RiskFactorModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateRiskFactorAsync(RiskFactorModel riskFactorModel)

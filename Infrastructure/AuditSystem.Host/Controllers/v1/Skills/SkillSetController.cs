@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Skills.SkillSet.Create;
 using AuditSystem.Application.Features.Skills.SkillSet.Delete;
 using AuditSystem.Application.Features.Skills.SkillSet.Get;
+using AuditSystem.Application.Features.Skills.SkillSet.Search;
 using AuditSystem.Application.Features.Skills.SkillSet.Update;
+using AuditSystem.Contract.Models.Skills;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class SkillSetController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSkillSet([FromQuery] DeleteSkillSetCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Skill Set
+    [HttpGet("search-skill-set")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SkillSetModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchSkillSet([FromQuery] SearchSkillSetQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

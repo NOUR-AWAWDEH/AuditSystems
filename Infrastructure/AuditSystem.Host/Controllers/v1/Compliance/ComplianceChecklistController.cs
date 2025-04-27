@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Create;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Delete;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Get;
+using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Update;
+using AuditSystem.Contract.Models.Compliance;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class ComplianceChecklistController(IMediator mediator) : ApiContr
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteCompliance([FromBody] DeleteComplianceChecklistCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Compliance Checklist
+    [HttpGet("search-compliance")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<ComplianceChecklistModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchCompliance([FromQuery] SearchComplianceChecklistQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

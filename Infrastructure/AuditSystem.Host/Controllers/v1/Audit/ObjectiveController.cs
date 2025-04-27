@@ -2,7 +2,10 @@ using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.Objective.Create;
 using AuditSystem.Application.Features.Audit.Objective.Delete;
 using AuditSystem.Application.Features.Audit.Objective.Get;
+using AuditSystem.Application.Features.Audit.Objective.Search;
 using AuditSystem.Application.Features.Audit.Objective.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,5 +47,12 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteObjective([FromQuery] DeleteObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Objective
+    [HttpGet("search-objective")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<ObjectiveModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchObjective([FromQuery] SearchObjectiveQuery query) =>
+        await ProcessRequestToActionResultAsync(query);  
 
 }

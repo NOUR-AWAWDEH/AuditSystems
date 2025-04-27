@@ -2,7 +2,10 @@ using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Delete;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Get;
+using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Search;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class AuditUniverseObjectiveController(IMediator mediator) : ApiCo
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditUniverseObjective([FromBody] DeleteAuditUniverseObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Audit Universe Objective
+    [HttpGet("search-audit-universe-objective")]
+    [ProducesResponseType( StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditUniverseObjectiveModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAuditUniverseObjective([FromQuery] SearchAuditUniverseObjectiveQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

@@ -2,7 +2,10 @@ using Ardalis.Result;
 using AuditSystem.Application.Features.Checklists.Remark.Create;
 using AuditSystem.Application.Features.Checklists.Remark.Delete;
 using AuditSystem.Application.Features.Checklists.Remark.Get;
+using AuditSystem.Application.Features.Checklists.Remark.Search;
 using AuditSystem.Application.Features.Checklists.Remark.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Checklists;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class RemarkController(IMediator mediator) : ApiControllerBase(med
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRemark([FromBody] DeleteRemarkCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Remark
+    [HttpGet("search-remark")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RemarkModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchRemark([FromQuery] SearchRemarkQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

@@ -2,7 +2,10 @@ using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.SpecialProject.Create;
 using AuditSystem.Application.Features.Audit.SpecialProject.Delete;
 using AuditSystem.Application.Features.Audit.SpecialProject.Get;
+using AuditSystem.Application.Features.Audit.SpecialProject.Search;
 using AuditSystem.Application.Features.Audit.SpecialProject.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -32,8 +35,6 @@ public sealed class SpecialProjectController(IMediator mediator) : ApiController
     //Get Special Project
     [HttpGet("get-special-project")]
     [ProducesResponseType(typeof(ApiResponse<GetSpecialProjectByIdQueryResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSpecialProject([FromQuery] GetSpecialProjectByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
     
@@ -44,4 +45,11 @@ public sealed class SpecialProjectController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSpecialProject([FromBody] DeleteSpecialProjectCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Special Project
+    [HttpGet("search-special-project")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SpecialProjectModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchSpecialProject([FromQuery] SearchSpecialProjectQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Processes.AuditProcess.Create;
 using AuditSystem.Application.Features.Processes.AuditProcess.Delete;
 using AuditSystem.Application.Features.Processes.AuditProcess.Get;
+using AuditSystem.Application.Features.Processes.AuditProcess.Search;
 using AuditSystem.Application.Features.Processes.AuditProcess.Update;
+using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditProcess([FromBody] DeleteAuditProcessCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Audit Process
+    [HttpGet("search-audit-process")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditProcessModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAuditProcess([FromQuery] SearchAuditProcessQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

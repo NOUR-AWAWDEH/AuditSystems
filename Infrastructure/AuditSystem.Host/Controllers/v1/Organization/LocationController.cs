@@ -7,6 +7,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuditSystem.Application.Features.Organization.Location.Get;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Application.Features.Organization.Location.Search;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -44,4 +47,11 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteLocation([FromBody] DeleteLocationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Location
+    [HttpGet("search-location")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<LocationModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchLocation([FromQuery] SearchLocationQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

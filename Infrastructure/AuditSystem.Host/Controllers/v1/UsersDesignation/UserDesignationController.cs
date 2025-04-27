@@ -1,8 +1,11 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Audit.AuditDomain.Get;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.UserDesignation.Create;
 using AuditSystem.Application.Features.UserDesignation.Delete;
+using AuditSystem.Application.Features.UserDesignation.Get;
+using AuditSystem.Application.Features.UserDesignation.Search;
 using AuditSystem.Application.Features.UserDesignation.Update;
+using AuditSystem.Contract.Models.UserDesignation;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,15 +31,15 @@ public sealed class UserDesignationController(IMediator mediator) : ApiControlle
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateUserDesignation([FromBody] UpdateUserDesignationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Get User Designation
     [HttpGet("get-user-designation")]
-    [ProducesResponseType(typeof(ApiResponse<GetAuditDomainByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetUserDesignationByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserDesignation([FromQuery] GetAuditDomainByIdQuery query) =>
+    public async Task<IActionResult> GetUserDesignation([FromQuery] GetUserDesignationByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
-    
+
     //Delete User Designation
     [HttpDelete("delete-user-designation")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -44,4 +47,11 @@ public sealed class UserDesignationController(IMediator mediator) : ApiControlle
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUserDesignation([FromBody] DeleteUserDesignationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search User Designation
+    [HttpGet("search-user-designation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<UserDesignationModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchUserDesignation([FromQuery] SearchUserDesignationQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

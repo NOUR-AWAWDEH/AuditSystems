@@ -7,6 +7,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuditSystem.Application.Features.Organization.SubLocation.Get;
+using AuditSystem.Application.Features.Organization.SubLocation.Search;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Application.Features.Common.Pagination;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -44,4 +47,11 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSubLocation([FromBody] DeleteSubLocationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Sub Location
+    [HttpGet("search-sub-location")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SubLocationModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchSubLocation([FromQuery] SearchSubLocationQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

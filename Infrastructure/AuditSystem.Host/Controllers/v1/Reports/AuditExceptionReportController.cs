@@ -1,13 +1,15 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Create;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Delete;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Get;
+using AuditSystem.Application.Features.Reports.AuditExceptionReport.Search;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Update;
+using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.X509.Qualified;
 
 namespace AuditSystem.Host.Controllers.v1.Reports;
 
@@ -29,7 +31,7 @@ public sealed class AuditExceptionReportController(IMediator mediator) : ApiCont
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateReport([FromBody] UpdateAuditExceptionReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Get Report
     [HttpGet("get-audit-exception-report")]
     [ProducesResponseType(typeof(ApiResponse<GetAuditExceptionReportByIdQueryResponse>), StatusCodes.Status200OK)]
@@ -37,7 +39,7 @@ public sealed class AuditExceptionReportController(IMediator mediator) : ApiCont
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetReport([FromQuery] GetAuditExceptionReportByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
-    
+
     //Delete Report
     [HttpDelete("delete-audit-exception-report")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -45,4 +47,11 @@ public sealed class AuditExceptionReportController(IMediator mediator) : ApiCont
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteReport([FromBody] DeleteAuditExceptionReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Report
+    [HttpGet("search-audit-exception-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditExceptionReportModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchReport([FromQuery] SearchAuditExceptionReportQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

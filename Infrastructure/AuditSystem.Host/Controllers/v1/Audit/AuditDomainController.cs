@@ -1,15 +1,15 @@
+using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.AuditDomain.Create;
 using AuditSystem.Application.Features.Audit.AuditDomain.Delete;
+using AuditSystem.Application.Features.Audit.AuditDomain.Get;
+using AuditSystem.Application.Features.Audit.AuditDomain.Search;
 using AuditSystem.Application.Features.Audit.AuditDomain.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ardalis.Result;
-using AuditSystem.Application.Features.Audit.AuditDomain.Get;
-using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Contract.Models.Audit;
-using AuditSystem.Application.Features.Audit.AuditDomain.Search;
 
 namespace AuditSystem.Host.Controllers.v1.Audit;
 
@@ -47,7 +47,7 @@ public sealed class AuditDomainController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditDomain([FromBody] DeleteAuditDomainCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Search Audit Domain
     [HttpGet("search-audit-domain")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Create;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Delete;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Get;
+using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Search;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Update;
+using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class InternalAuditConsolidationReportController(IMediator mediato
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteInternalAuditConsolidatedReport([FromBody] DeleteInternalAuditConsolidationReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Internal Audit Consolidated Report
+    [HttpGet("search-internal-audit-consolidated-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<InternalAuditConsolidationReportModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchInternalAuditConsolidatedReport([FromQuery] SearchInternalAuditConsolidationReportQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

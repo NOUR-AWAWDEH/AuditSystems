@@ -1,8 +1,11 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Audit.AuditDomain.Get;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Delete;
+using AuditSystem.Application.Features.Audit.AuditUniverse.Get;
+using AuditSystem.Application.Features.Audit.AuditUniverse.Search;
 using AuditSystem.Application.Features.Audit.AuditUniverse.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,13 +31,13 @@ public sealed class AuditUniverseController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAuditUniverse([FromBody] UpdateAuditUniverseCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Get Audit Universe
     [HttpGet("get-audit-universe")]
-    [ProducesResponseType(typeof(ApiResponse<GetAuditDomainByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditUniverseByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAuditUniverse([FromQuery] GetAuditDomainByIdQuery query) =>
+    public async Task<IActionResult> GetAuditUniverse([FromQuery] GetAuditUniverseByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
 
     //Delete Audit Universe
@@ -44,4 +47,11 @@ public sealed class AuditUniverseController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditUniverse([FromBody] DeleteAuditUniverseCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Audit Universe
+    [HttpGet("search-audit-universe")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditUniverseModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAuditUniverse([FromQuery] SearchAuditUniverseQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

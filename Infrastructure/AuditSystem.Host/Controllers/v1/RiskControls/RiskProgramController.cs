@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Create;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Delete;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Get;
+using AuditSystem.Application.Features.RiskControls.RiskProgram.Search;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Update;
+using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class RiskProgramController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRiskProgram([FromBody] DeleteRiskProgramCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Risk Program
+    [HttpGet("search-risk-program")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RiskProgramModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchRiskProgram([FromQuery] SearchRiskProgramQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

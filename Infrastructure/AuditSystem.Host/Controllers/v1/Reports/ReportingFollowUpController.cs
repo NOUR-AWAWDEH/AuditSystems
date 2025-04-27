@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Create;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Delete;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Get;
+using AuditSystem.Application.Features.Reports.ReportingFollowUp.Search;
 using AuditSystem.Application.Features.Reports.ReportingFollowUp.Update;
+using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class ReportingFollowUpController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteReportingFollowUp([FromBody] DeleteReportingFollowUpCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Reporting Follow Up
+    [HttpGet("search-reporting-follow-up")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<ReportingFollowUpModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchReportingFollowUp([FromQuery] SearchReportingFollowUpQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

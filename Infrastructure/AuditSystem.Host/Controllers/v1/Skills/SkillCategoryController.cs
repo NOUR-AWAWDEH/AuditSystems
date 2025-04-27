@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Skills.SkillCategory.Create;
 using AuditSystem.Application.Features.Skills.SkillCategory.Delete;
 using AuditSystem.Application.Features.Skills.SkillCategory.Get;
+using AuditSystem.Application.Features.Skills.SkillCategory.Search;
 using AuditSystem.Application.Features.Skills.SkillCategory.Update;
+using AuditSystem.Contract.Models.Skills;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class SkillCategoryController(IMediator mediator) : ApiControllerB
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSkillCategory([FromBody] DeleteSkillCategoryCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Skill Category
+    [HttpGet("search-skill-category")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SkillCategoryModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchSkillCategory([FromQuery] SearchSkillCategoryQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

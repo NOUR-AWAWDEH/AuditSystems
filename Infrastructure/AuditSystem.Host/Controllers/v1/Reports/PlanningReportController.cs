@@ -1,8 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Reports.PlanningReport.Create;
 using AuditSystem.Application.Features.Reports.PlanningReport.Delete;
 using AuditSystem.Application.Features.Reports.PlanningReport.Get;
+using AuditSystem.Application.Features.Reports.PlanningReport.Search;
 using AuditSystem.Application.Features.Reports.PlanningReport.Update;
+using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -44,4 +47,11 @@ public sealed class PlanningReportController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePlanningReport([FromBody] DeletePlanningReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Planning Report
+    [HttpGet("search-planning-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<PlanningReportModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchPlanningReport([FromQuery] SearchPlanningReportQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

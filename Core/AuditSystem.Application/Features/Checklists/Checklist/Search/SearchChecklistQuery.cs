@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Checklists.Checklist.Search;
 
 public sealed record class SearchChecklistQuery : PaginationRequest<ChecklistModel>
 {
-    public string? SearchTearm { get; set; } = string.Empty;
+    public string? SearchTerm { get; set; } = string.Empty;
 }

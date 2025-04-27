@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Reports;
 
 namespace AuditSystem.Application.Features.Reports.PlanningReport.Search;
 
-public class SearchPlanningReportQueryValidator : PaginationRequestValidator<PlanningReportModel, SearchPlanningReportQuery>;
+public class SearchPlanningReportQueryValidator 
+    : PaginationRequestValidator<PlanningReportModel, SearchPlanningReportQuery>;

@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Organization;
 
 namespace AuditSystem.Application.Features.Organization.Company.Search;
 
-public class SearchCompanyQueryValidator : PaginationRequestValidator<CompanyModel, SearchCompanyQuery>;
+public class SearchCompanyQueryValidator
+    : PaginationRequestValidator<CompanyModel, SearchCompanyQuery>;

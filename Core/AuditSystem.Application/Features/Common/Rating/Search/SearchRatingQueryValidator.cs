@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Common;
 
 namespace AuditSystem.Application.Features.Common.Rating.Search;
 
-public class SearchRatingQueryValidator : PaginationRequestValidator<RatingModel, SearchRatingQuery>;
+public class SearchRatingQueryValidator
+    : PaginationRequestValidator<RatingModel, SearchRatingQuery>;

@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Skills;
 
 namespace AuditSystem.Application.Features.Skills.SkillCategory.Search;
 
-public class SearchSkillCategoryQueryValidator : PaginationRequestValidator<SkillCategoryModel, SearchSkillCategoryQuery>;
+public class SearchSkillCategoryQueryValidator 
+    : PaginationRequestValidator<SkillCategoryModel, SearchSkillCategoryQuery>;

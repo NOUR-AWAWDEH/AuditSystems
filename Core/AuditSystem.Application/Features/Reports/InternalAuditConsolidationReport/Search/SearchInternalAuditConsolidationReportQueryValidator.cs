@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Reports;
 
 namespace AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Search;
 
-public class SearchInternalAuditConsolidationReportQueryValidator : PaginationRequestValidator<InternalAuditConsolidationReportModel, SearchInternalAuditConsolidationReportQuery>;
+public class SearchInternalAuditConsolidationReportQueryValidator 
+    : PaginationRequestValidator<InternalAuditConsolidationReportModel, SearchInternalAuditConsolidationReportQuery>;

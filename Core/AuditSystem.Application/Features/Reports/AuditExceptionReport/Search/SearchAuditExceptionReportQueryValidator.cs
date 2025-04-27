@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Reports;
 
 namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Search;
 
-public class SearchAuditExceptionReportQueryValidator : PaginationRequestValidator<AuditExceptionReportModel, SearchAuditExceptionReportQuery>;
+public class SearchAuditExceptionReportQueryValidator
+    : PaginationRequestValidator<AuditExceptionReportModel, SearchAuditExceptionReportQuery>;

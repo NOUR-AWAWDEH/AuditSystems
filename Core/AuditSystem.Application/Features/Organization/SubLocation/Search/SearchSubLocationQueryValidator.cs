@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Organization;
 
 namespace AuditSystem.Application.Features.Organization.SubLocation.Search;
 
-public class SearchSubLocationQueryValidator : PaginationRequestValidator<SubLocationModel, SearchSubLocationQuery>;
+public class SearchSubLocationQueryValidator
+    : PaginationRequestValidator<SubLocationModel, SearchSubLocationQuery>;

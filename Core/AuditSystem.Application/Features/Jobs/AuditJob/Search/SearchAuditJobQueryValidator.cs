@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Jobs;
 
 namespace AuditSystem.Application.Features.Jobs.AuditJob.Search;
 
-public class SearchAuditJobQueryValidator : PaginationRequestValidator<AuditJobModel, SearchAuditJobQuery>;
+public class SearchAuditJobQueryValidator
+    : PaginationRequestValidator<AuditJobModel, SearchAuditJobQuery>;

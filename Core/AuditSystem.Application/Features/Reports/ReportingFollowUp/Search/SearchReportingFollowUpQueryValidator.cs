@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Reports;
 
 namespace AuditSystem.Application.Features.Reports.ReportingFollowUp.Search;
 
-public class SearchReportingFollowUpQueryValidator : PaginationRequestValidator<ReportingFollowUpModel, SearchReportingFollowUpQuery>;
+public class SearchReportingFollowUpQueryValidator 
+    : PaginationRequestValidator<ReportingFollowUpModel, SearchReportingFollowUpQuery>;

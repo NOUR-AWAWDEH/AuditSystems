@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Audit.AuditUniverse.Search;
 
 public sealed record class SearchAuditUniverseQuery : PaginationRequest<AuditUniverseModel>
 {
-    public string? SearchTearm { get; set; } = string.Empty;
+    public string? SearchTerm { get; set; } = string.Empty;
 }

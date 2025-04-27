@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.SupportingDocs;
 
 namespace AuditSystem.Application.Features.SupportingDocs.Search;
 
-public class SearchSupportingDocsQueryValidator : PaginationRequestValidator<SupportingDocModel, SearchSupportingDocsQuery>;
+public class SearchSupportingDocsQueryValidator 
+    : PaginationRequestValidator<SupportingDocModel, SearchSupportingDocsQuery>;

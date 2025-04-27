@@ -3,4 +3,5 @@ using AuditSystem.Contract.Models.Checklists;
 
 namespace AuditSystem.Application.Features.Checklists.Checklist.Search;
 
-public class SearchChecklistQueryValidator : PaginationRequestValidator<ChecklistModel, SearchChecklistQuery>;
+public class SearchChecklistQueryValidator
+    : PaginationRequestValidator<ChecklistModel, SearchChecklistQuery>;

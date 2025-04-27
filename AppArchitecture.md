@@ -12,5 +12,7 @@ graph TD
     B --> F[AuditSystem.Contract]
     B --> G[AuditSystem.BusinessLogic]
 
+    C --> J[AuditSystem.Auth]
     C --> H[AuditSystem.DataAccess]
     C --> I[AuditSystem.Host]
+    

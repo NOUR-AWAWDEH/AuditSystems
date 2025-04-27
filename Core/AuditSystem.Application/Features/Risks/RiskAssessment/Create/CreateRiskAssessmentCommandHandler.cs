@@ -19,6 +19,6 @@ internal sealed class CreateRiskAssessmentCommandHandler(
         var riskAssessmentId = await riskAssessmentService.CreateRiskAssessmentAsync(riskAssessmentModel);
         logger.LogInformation("Risk Assessment with Business Objective {RiskAssessmentBusinessObjective} has been created.", request.BusinessObjective);
 
-        return Result<CreateRiskAssessmentCommandResponse>.Created(new CreateRiskAssessmentCommandResponse(riskAssessmentId));
+        return Result<CreateRiskAssessmentCommandResponse>.Created(new CreateRiskAssessmentCommandResponse(riskAssessmentId), "Risk Assessment has been created.");
     }
 }

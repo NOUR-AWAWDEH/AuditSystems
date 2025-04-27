@@ -1,7 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Create;
 using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Delete;
+using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Get;
+using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Search;
 using AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Update;
+using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +32,14 @@ public sealed class AuditPlanSummaryReportController(IMediator mediator) : ApiCo
     public async Task<IActionResult> UpdateAuditPlanSummaryReport([FromBody] UpdateAuditPlanSummaryReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
+    //Get Audit Plan Summary Report
+    [HttpGet("get-audit-plan-summary-report")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditPlanSummaryReportByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditPlanSummaryReport([FromQuery] GetAuditPlanSummaryReportByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Audit Plan Summary Report
     [HttpDelete("delete-audit-plan-summary-report")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class AuditPlanSummaryReportController(IMediator mediator) : ApiCo
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditPlanSummaryReport([FromBody] DeleteAuditPlanSummaryReportCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Audit Plan Summary Report
+    [HttpGet("search-audit-plan-summary-report")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditPlanSummaryReportModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAuditPlanSummaryReport([FromQuery] SearchAuditPlanSummaryReportQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

@@ -19,6 +19,6 @@ internal sealed class CreateSubDepartmentCommandHandler(
         var subDepartmentId = await subDepartmentService.CreateSubDepartmentAsync(subDepartmentModel);
         logger.LogInformation("SubDepartment with Name {SubDepartmentName} has been created.", request.Name);
 
-        return Result<CreateSubDepartmentCommandResponse>.Created(new(subDepartmentId));
+        return Result<CreateSubDepartmentCommandResponse>.Created(new(subDepartmentId), "SubDepartment created.");
     }
 }

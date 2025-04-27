@@ -19,6 +19,6 @@ internal sealed class CreateRiskControlsCommandHandler(
         var riskControlId = await riskControlMatrixService.CreateRiskControlMatrixAsync(riskControlMatrixModel);
         logger.LogInformation("Risk Control with  RiskId {RiskControlRiskId} has been created.", request.RiskId);
 
-        return Result<CreateRiskControlsCommandResponse>.Created(new CreateRiskControlsCommandResponse(riskControlId));
+        return Result<CreateRiskControlsCommandResponse>.Created(new CreateRiskControlsCommandResponse(riskControlId), "Risk Control created.");
     }
 }

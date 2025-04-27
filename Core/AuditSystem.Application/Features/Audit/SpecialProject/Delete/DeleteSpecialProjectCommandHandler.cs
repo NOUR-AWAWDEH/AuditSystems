@@ -16,7 +16,7 @@ internal sealed class DeleteSpecialProjectCommandHandler(
         {
             await specialProjectService.DeleteSpecialProjectAsync(request.Id);
             logger.LogInformation("Deleting special project with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Special project deleted successfully.");
         }
         catch (Exception ex)
         {

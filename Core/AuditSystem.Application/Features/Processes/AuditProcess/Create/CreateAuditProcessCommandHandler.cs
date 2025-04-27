@@ -19,6 +19,6 @@ internal sealed class CreateAuditProcessCommandHandler(
         var auditProcessId = await auditProcessService.CreateAuditProcessAsync(auditProcessModel);
         logger.LogInformation("Audit Process with Process Name {AuditProcessName} has been created.", request.ProcessName);
 
-        return Result<CreateAuditProcessCommandResponse>.Created(new CreateAuditProcessCommandResponse(auditProcessId));
+        return Result<CreateAuditProcessCommandResponse>.Created(new CreateAuditProcessCommandResponse(auditProcessId), "Audit Process created.");
     }
 }

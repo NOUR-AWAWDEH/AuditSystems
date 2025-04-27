@@ -19,6 +19,6 @@ internal sealed class UpdateRatingCommandHandler(
         await ratingService.UpdateRatingAsync(ratingModel);
 
         logger.LogInformation("Rating updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Rating updated successfully");
     }
 }

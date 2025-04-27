@@ -19,6 +19,6 @@ internal sealed class CreateReportingFollowUpCommandHandler(
         var reportingFollowUpId = await reportingFollowUpService.CreateReportingFollowUpAsync(reportingFollowUpModel);
         logger.LogInformation("Reporting Follow Up with Reporting {ReportingFollowUpReporting} has been created.", request.Reporting);
 
-        return Result<CreateReportingFollowUpCommandResponse>.Created(new CreateReportingFollowUpCommandResponse(reportingFollowUpId));
+        return Result<CreateReportingFollowUpCommandResponse>.Created(new CreateReportingFollowUpCommandResponse(reportingFollowUpId), "Reporting Follow Up created.");
     }
 }

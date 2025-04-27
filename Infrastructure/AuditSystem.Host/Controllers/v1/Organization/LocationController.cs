@@ -6,6 +6,10 @@ using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AuditSystem.Application.Features.Organization.Location.Get;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Application.Features.Organization.Location.Search;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -28,6 +32,14 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
+    //Get Location
+    [HttpGet("get-location")]
+    [ProducesResponseType(typeof(ApiResponse<GetLocationByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetLocation([FromQuery] GetLocationByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+    
     //Delete Location
     [HttpDelete("delete-location")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteLocation([FromBody] DeleteLocationCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Location
+    [HttpGet("search-location")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<LocationModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchLocation([FromQuery] SearchLocationQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

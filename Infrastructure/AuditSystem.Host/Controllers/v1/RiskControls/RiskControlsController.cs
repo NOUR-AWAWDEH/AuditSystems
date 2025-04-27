@@ -1,7 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.RiskControls.RiskControls.Create;
 using AuditSystem.Application.Features.RiskControls.RiskControls.Delete;
+using AuditSystem.Application.Features.RiskControls.RiskControls.Get;
+using AuditSystem.Application.Features.RiskControls.RiskControls.Search;
 using AuditSystem.Application.Features.RiskControls.RiskControls.Update;
+using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +32,14 @@ public sealed class RiskControlsController(IMediator mediator) : ApiControllerBa
     public async Task<IActionResult> UpdateRiskControls([FromBody] UpdateRiskControlsCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
+    //Get Risk Controls
+    [HttpGet("get-risk-controls")]  
+    [ProducesResponseType(typeof(ApiResponse<GetRiskControlsByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRiskControls([FromQuery] GetRiskControlsByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+    
     //Delete Risk Controls
     [HttpDelete("delete-risk-controls")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class RiskControlsController(IMediator mediator) : ApiControllerBa
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRiskControls([FromBody] DeleteRiskControlsCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Risk Controls
+    [HttpGet("search-risk-controls")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RiskControlsModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchRiskControls([FromQuery] SearchRiskControlsQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

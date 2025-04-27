@@ -19,6 +19,6 @@ internal sealed class CreateJobSchedulingCommandHandler(
         var jobSchedulingId = await jobSchedulingService.CreateJobSchedulingAsync(jobSchedulingModel);
         logger.LogInformation("Job Scheduling with Auditable Unit {JobSchedulingAuditableUnit} has been created.", request.AuditableUnit);
 
-        return Result<CreateJobSchedulingCommandResponse>.Created(new CreateJobSchedulingCommandResponse(jobSchedulingId));
+        return Result<CreateJobSchedulingCommandResponse>.Created(new CreateJobSchedulingCommandResponse(jobSchedulingId), "Job Scheduling created.");
     }
 }

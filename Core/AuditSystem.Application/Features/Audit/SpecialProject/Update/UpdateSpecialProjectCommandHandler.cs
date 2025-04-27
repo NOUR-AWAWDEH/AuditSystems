@@ -19,6 +19,6 @@ internal sealed class UpdateSpecialProjectCommandHandler(
         await specialProjectService.UpdateSpecialProjectAsync(specialProjectModel);
 
         logger.LogInformation("Special project updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Special project updated successfully");
     }
 }

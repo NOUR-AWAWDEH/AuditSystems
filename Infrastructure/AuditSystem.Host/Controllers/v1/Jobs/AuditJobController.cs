@@ -1,7 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Jobs.AuditJob.Create;
 using AuditSystem.Application.Features.Jobs.AuditJob.Delete;
+using AuditSystem.Application.Features.Jobs.AuditJob.Get;
+using AuditSystem.Application.Features.Jobs.AuditJob.Search;
 using AuditSystem.Application.Features.Jobs.AuditJob.Update;
+using AuditSystem.Contract.Models.Jobs;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +32,14 @@ public sealed class AuditJobController(IMediator mediator) : ApiControllerBase(m
     public async Task<IActionResult> UpdateAuditJob([FromBody] UpdateAuditJobCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
+    //Get Audit Job
+    [HttpGet("get-audit-job")]
+    [ProducesResponseType(typeof(ApiResponse<GetAuditJobByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAuditJob([FromQuery] GetAuditJobByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+    
     //Delete Audit Job
     [HttpDelete("delete-audit-job")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class AuditJobController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteAuditJob([FromBody] DeleteAuditJobCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Audit Job
+    [HttpGet("search-audit-job")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditJobModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchAuditJob([FromQuery] SearchAuditJobQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

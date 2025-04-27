@@ -15,7 +15,7 @@ internal sealed class DeleteSupportingDocCommandHandler(
         {
             await supportingDocService.DeleteSupportingDocAsync(request.Id);
             logger.LogInformation("Supporting doc with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Supporting doc deleted.");  
         }
         catch (Exception ex)
         {

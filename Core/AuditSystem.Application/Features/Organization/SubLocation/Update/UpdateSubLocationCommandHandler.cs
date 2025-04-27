@@ -19,6 +19,6 @@ internal sealed class UpdateSubLocationCommandHandler(
         await subLocationService.UpdateSubLocationAsync(subLocationModel);
 
         logger.LogInformation("Sub-location updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Sub-location updated successfully");
     }
 }

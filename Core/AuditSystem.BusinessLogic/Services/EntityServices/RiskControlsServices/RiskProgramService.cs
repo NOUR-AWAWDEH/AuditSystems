@@ -1,126 +1,99 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
+
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 
 internal sealed class RiskProgramService(
     IRepository<Guid, RiskProgram> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskProgramService
+    ICacheService cacheService,
+    ILogger<RiskProgramService> logger) : 
+    UnifiedCacheService<Guid, RiskProgram, RiskProgramModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.RiskProgram,
+        RiskProgramTags,
+        ListTags
+    ),
+    IRiskProgramService
 {
     private static readonly string[] RiskProgramTags = ["risk-programs", "risk-program-list"];
-    private static readonly string[] ListTags = ["risk-program-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["risk-program-list"];
 
     public async Task<Guid> CreateRiskProgramAsync(RiskProgramModel riskProgramModel)
     {
         ArgumentNullException.ThrowIfNull(riskProgramModel, nameof(riskProgramModel));
 
-        try
-        {
-            var entity = mapper.Map<RiskProgram>(riskProgramModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<RiskProgram>(riskProgramModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskProgram, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create RiskProgram.", ex);
-        }
+        return createdEntity.Id;
     }
 
     public async Task DeleteRiskProgramAsync(Guid riskProgramId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(riskProgramId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskProgram with ID {riskProgramId} not found.");
-            }
+        var cacheKey = GetCacheKey(riskProgramId);
+        
+        var entity = await repository.GetByIdAsync(riskProgramId)
+            ?? throw new KeyNotFoundException($"RiskProgram with ID {riskProgramId} not found.");
 
-            await repository.DeleteAsync(riskProgramId);
-
-            var cacheKey = string.Format(CacheKeys.RiskProgram, riskProgramId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete RiskProgram.", ex);
-        }
+        await repository.DeleteAsync(riskProgramId);
+        await ClearCacheAsync(cacheKey);
     }
 
     public async Task<RiskProgramModel> GetRiskProgramByIdAsync(Guid id)
     {
-       try
-       {
-            var cacheKey = string.Format(CacheKeys.RiskProgram, id);
+        var cacheKey = GetCacheKey(id);
+        
+        var entity = await cacheService.GetAsync<RiskProgram>(cacheKey);
+        if (entity != null)
+        {
+            return mapper.Map<RiskProgramModel>(entity);
+        }
 
-            var cachedRiskProgram = await cacheService.GetAsync<RiskProgram>(cacheKey);
-            if (cachedRiskProgram != null)
-            {
-                return mapper.Map<RiskProgramModel>(cachedRiskProgram);
-            }
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"RiskProgram with ID '{id}' not found.");
 
-            var riskProgram = await repository.GetByIdAsync(id);
-            if (riskProgram == null)
-            {
-                throw new KeyNotFoundException($"RiskProgram with ID {id} not found."); 
-            }
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<RiskProgramModel>(entity);
+    }
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: riskProgram,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
-            
-            return mapper.Map<RiskProgramModel>(riskProgram);
-       }
-       catch (Exception ex)
-       {
-           throw new Exception($"Failed to get RiskProgram by ID {id}.", ex);
-       }
+    public async Task<PaginationResult<RiskProgramModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RiskProgramModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<RiskProgramModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateRiskProgramAsync(RiskProgramModel riskProgramModel)
     {
         ArgumentNullException.ThrowIfNull(riskProgramModel, nameof(riskProgramModel));
 
-        try
-        {
-            var entity = mapper.Map<RiskProgram>(riskProgramModel);
-            await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskProgram, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskProgramTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update RiskProgram.", ex);
-        }
+        var entity = mapper.Map<RiskProgram>(riskProgramModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

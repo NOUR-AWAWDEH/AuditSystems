@@ -19,7 +19,7 @@ internal sealed class UpdateBusinessObjectiveCommandHandler(
         await businessObjectiveService.UpdateBusinessObjectiveAsync(businessObjectiveModel);
 
         logger.LogInformation("Business objective updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Business objective updated successfully");
     }
 }
 

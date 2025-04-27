@@ -5,7 +5,7 @@ public sealed class CreateAuditDomainValidator : AbstractValidator<CreateAuditDo
 {
     public CreateAuditDomainValidator()
     {
-        RuleFor(x => x.DomainName)
+        RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("The Domain name field is required.")
             .MinimumLength(2)

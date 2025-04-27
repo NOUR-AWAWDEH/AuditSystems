@@ -19,6 +19,6 @@ internal sealed class CreateAuditPlanSummaryReportCommandHandler(
         var auditPlanSummaryReportId = await auditPlanSummaryReportService.CreateAuditPlanSummaryReportAsync(auditPlanSummaryReportModel);
         logger.LogInformation("Audit Plan Summary Report with Name {AuditPlanSummaryReportName} has been created.", request.ReportName);
 
-        return Result<CreateAuditPlanSummaryReportCommandResponse>.Created(new CreateAuditPlanSummaryReportCommandResponse(auditPlanSummaryReportId));
+        return Result<CreateAuditPlanSummaryReportCommandResponse>.Created(new CreateAuditPlanSummaryReportCommandResponse(auditPlanSummaryReportId), "Audit Plan Summary Report created.");
     }
 }

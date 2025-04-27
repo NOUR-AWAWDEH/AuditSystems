@@ -1,7 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Common.Rating.Create;
 using AuditSystem.Application.Features.Common.Rating.Delete;
+using AuditSystem.Application.Features.Common.Rating.Get;
+using AuditSystem.Application.Features.Common.Rating.Search;
 using AuditSystem.Application.Features.Common.Rating.Update;
+using AuditSystem.Contract.Models.Common;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +32,14 @@ public sealed class RatingController(IMediator mediator) : ApiControllerBase(med
     public async Task<IActionResult> UpdateRating([FromBody] UpdateRatingCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
+    //Get Rating
+    [HttpGet("get-rating")]
+    [ProducesResponseType(typeof(ApiResponse<GetRatingByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRating([FromQuery] GetRatingByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Rating
     [HttpDelete("delete-rating")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class RatingController(IMediator mediator) : ApiControllerBase(med
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRating([FromBody] DeleteRatingCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Rating
+    [HttpGet("search-rating")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RatingModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchRating([FromQuery] SearchRatingQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

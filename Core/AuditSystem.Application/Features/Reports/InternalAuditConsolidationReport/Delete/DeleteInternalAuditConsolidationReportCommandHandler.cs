@@ -16,7 +16,7 @@ internal sealed class DeleteInternalAuditConsolidationReportCommandHandler(
         {
             await internalAuditConsolidationReportService.DeleteInternalAuditConsolidationReportAsync(request.Id);
             logger.LogInformation("Internal audit consolidation report with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Internal audit consolidation report was deleted");
         }
         catch (Exception ex)
         {

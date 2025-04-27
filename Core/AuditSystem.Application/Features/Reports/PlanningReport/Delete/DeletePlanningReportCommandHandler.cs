@@ -16,7 +16,7 @@ internal sealed class DeletePlanningReportCommandHandler(
         {
             await planningReportService.DeletePlanningReportAsync(request.Id);
             logger.LogInformation("Planning report with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Planning report was deleted");
         }
         catch (Exception ex)
         {

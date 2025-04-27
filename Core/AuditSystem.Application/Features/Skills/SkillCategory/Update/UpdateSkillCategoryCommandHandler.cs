@@ -19,6 +19,6 @@ internal sealed class UpdateSkillCategoryCommandHandler(
         await skillCategoryService.UpdateSkillCategoryAsync(skillCategoryModel);
         
         logger.LogInformation("Skill category with ID {Id} updated successfully.", request.Id);
-        return Result.Success();
+        return Result.SuccessWithMessage("Skill category updated successfully.");
     }
 }

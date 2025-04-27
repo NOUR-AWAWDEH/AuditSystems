@@ -16,7 +16,7 @@ internal sealed class DeleteJobSchedulingCommandHandler(
         {
             await jobSchedulingService.DeleteJobSchedulingAsync(request.Id);
             logger.LogInformation("Deleting job scheduling with ID {Id}", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Job scheduling deleted successfully.");  
         }
         catch (Exception ex)
         {

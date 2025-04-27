@@ -19,6 +19,6 @@ internal sealed class CreateSubProcessCommandHandler(
         var subProcessId = await subProcessService.CreateSubProcessAsync(subProcessModel);
         logger.LogInformation("SubProcess with  Particular {SubProcessParticular} has been created.", request.Particular);
 
-        return Result<CreateSubProcessCommandResponse>.Created(new CreateSubProcessCommandResponse(subProcessId));
+        return Result<CreateSubProcessCommandResponse>.Created(new CreateSubProcessCommandResponse(subProcessId), "SubProcess created.");
     }
 }

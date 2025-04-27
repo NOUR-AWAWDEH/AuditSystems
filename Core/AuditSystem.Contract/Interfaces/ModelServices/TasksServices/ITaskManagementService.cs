@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Models.Tasks;
+﻿using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.Tasks;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.TasksServices;
 
@@ -8,4 +9,5 @@ public interface ITaskManagementService
     public Task UpdateTaskAsync(TaskManagementModel taskManagementModel);
     public Task DeleteTaskAsync(Guid taskManagementId);
     public Task<TaskManagementModel> GetTaskByIdAsync(Guid id);
+    public Task<PaginationResult<TaskManagementModel>> SearchAsync(string? name, Page page);
 }

@@ -3,120 +3,96 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal class ObjectiveService(
     IRepository<Guid, Objective> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IObjectiveService
+    ICacheService cacheService,
+    ILogger<ObjectiveService> logger) :
+    UnifiedCacheService<Guid, Objective, ObjectiveModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.Objective,
+        ObjectiveTags,
+        ListTags
+    ),
+    IObjectiveService
 {
     private static readonly string[] ObjectiveTags = ["objectives", "objective-list"];
     private static readonly string[] ListTags = ["objective-list"];
+    
     public async Task<Guid> CreateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(ObjectiveModel));
 
-        try
-        {
-            var entity = mapper.Map<Objective>(objectiveModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<Objective>(objectiveModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Objective, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, entity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create Objective.", ex);
-        }
+        return createdEntity.Id;
     }
+    
     public async Task DeleteObjectiveAsync(Guid objectiveId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(objectiveId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
-            }
-            
-            await repository.DeleteAsync(objectiveId);
-            
-            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete Objective.", ex);
-        }
+        var cacheKey = GetCacheKey(objectiveId);
+       
+        var entity = await repository.GetByIdAsync(objectiveId)
+                ?? throw new KeyNotFoundException($"Objective with ID {objectiveId} not found.");
+        
+        await repository.DeleteAsync(objectiveId);
+        await ClearCacheAsync(cacheKey);
     }
-    public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid Id)
+    
+    public async Task<ObjectiveModel> GetObjectiveByIdAsync(Guid id)
     {
-        try
+        var cacheKey = GetCacheKey(id);
+        
+        var cachedEntity = await cacheService.GetAsync<Objective>(cacheKey);
+        if (cachedEntity != null)
         {
-            var cacheKey = string.Format(CacheKeys.Objective, Id);
-
-            var cachedObjectiveModel = await cacheService.GetAsync<Objective>(cacheKey);
-            if (cachedObjectiveModel != null)
-            {
-                return mapper.Map<ObjectiveModel>(cachedObjectiveModel);
-            }
-
-            var entity = await repository.GetByIdAsync(Id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Objective with ID {Id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm  
-            );
-
-            return mapper.Map<ObjectiveModel>(entity);
+            return mapper.Map<ObjectiveModel>(cachedEntity);
         }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to get Objective.", ex);
-        }
+
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"Objective with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<ObjectiveModel>(entity);
     }
+
+    public async Task<PaginationResult<ObjectiveModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<ObjectiveModel>(cacheKey, countCacheKey, page);
+        if(cachedResult!= null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<ObjectiveModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));
         
-        try 
-        {
-            var entity = mapper.Map<Objective>(objectiveModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<Objective>(objectiveModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Objective, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ObjectiveTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update Objective.", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

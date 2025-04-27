@@ -19,6 +19,6 @@ internal sealed class UpdateInternalAuditConsolidationReportCommandHandler(
         await internalAuditConsolidationReportService.UpdateInternalAuditConsolidationReportAsync(internalAuditConsolidationReportModel);
         
         logger.LogInformation("Internal audit consolidation report updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Internal audit consolidation report updated successfully");
     }
 }

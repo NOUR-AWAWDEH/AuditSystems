@@ -16,7 +16,7 @@ namespace AuditSystem.Application.Features.Risks.RiskFactor.Delete
             {
                 await riskProgramService.DeleteRiskProgramAsync(request.Id);
                 logger.LogInformation("Risk program with id: {Id} was deleted", request.Id);
-                return Result.Success();
+                return Result.SuccessWithMessage("Risk program was deleted");
             }
             catch (Exception ex)
             {

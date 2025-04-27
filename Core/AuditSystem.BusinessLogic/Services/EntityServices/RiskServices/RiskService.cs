@@ -1,125 +1,96 @@
 using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 
 internal sealed class RiskService(
     IRepository<Guid, Risk> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskService
+    ICacheService cacheService,
+    ILogger<RiskService> logger) : 
+    UnifiedCacheService<Guid, Risk, RiskModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.Risk,
+        RiskTags,
+        ListTags
+    ),
+    IRiskService
 {
     private static readonly string[] RiskTags = ["risks", "risk-list"];
-    private static readonly string[] ListTags = ["risk-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["risk-list"];
 
     public async Task<Guid> CreateRiskAsync(RiskModel riskModel)
     {
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
 
-        try
-        {
-            var entity = mapper.Map<Risk>(riskModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<Risk>(riskModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.Risk, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create risk.", ex);
-        }
+        return createdEntity.Id;
     }
 
     public async Task DeleteRiskAsync(Guid riskId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(riskId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Risk with ID {riskId} not found.");
-            }
-            
-            await repository.DeleteAsync(riskId);
-            
-            var cacheKey = string.Format(CacheKeys.Risk, riskId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete risk.", ex);
-        }
+        var cacheKey = GetCacheKey(riskId);
+
+        var entity = await repository.GetByIdAsync(riskId)
+            ?? throw new KeyNotFoundException($"Risk with ID {riskId} not found.");
+
+        await repository.DeleteAsync(riskId);
+        await ClearCacheAsync(cacheKey);
     }
 
     public async Task<RiskModel> GetRiskByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.Risk, id);
-
-            var cachedRisk = await cacheService.GetAsync<Risk>(cacheKey);
-            if (cachedRisk != null)
-            {
-                return mapper.Map<RiskModel>(cachedRisk);
-            }
-
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"Risk with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+        var cacheKey = GetCacheKey(id);
+        
+        var entity = await cacheService.GetAsync<Risk>(cacheKey);
+        if (entity != null)
             return mapper.Map<RiskModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get risk by ID {id}.", ex);
-        }   
+
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"Risk with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<RiskModel>(entity);
+    }
+
+    public async Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RiskModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<RiskModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateRiskAsync(RiskModel riskModel)
     {
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
-        try
-        {
-            var entity = mapper.Map<Risk>(riskModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = string.Format(CacheKeys.Risk, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update risk.", ex);
-        }
+        
+        var entity = mapper.Map<Risk>(riskModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

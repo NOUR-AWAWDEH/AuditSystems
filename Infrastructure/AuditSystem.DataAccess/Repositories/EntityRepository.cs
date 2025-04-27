@@ -1,16 +1,20 @@
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Common;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace AuditSystem.DataAccess.Repositories;
 
-internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext context) : IRepository<TId, TEntity>
+internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext context, IMapper mapper)
+    : IRepository<TId, TEntity>
     where TId : IComparable<TId>
     where TEntity : Entity<TId>
 {
     private readonly DbSet<TEntity> _entities = context.Set<TEntity>();
+    private readonly IMapper _mapper = mapper;
 
     public async Task<TEntity> CreateAsync(TEntity entity)
     {
@@ -35,7 +39,7 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     public async Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null)
     {
         _entities.Update(entity);
-        
+
         if (ignoreProperties != null)
         {
             foreach (var property in ignoreProperties)
@@ -43,7 +47,7 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
                 context.Entry(entity).Property(property).IsModified = false;
             }
         }
-        
+
         await context.SaveChangesAsync();
         context.Entry(entity).State = EntityState.Detached;
     }
@@ -72,5 +76,15 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     public async Task<ICollection<TResponse>> GetByQueryAsync<TResponse>(IQueryable<TResponse> query)
     {
         return await query.ToListAsync();
+    }
+
+    public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _entities.AsNoTracking().CountAsync(predicate);
+    }
+
+    public async Task<ICollection<TResponse>> ProjectToAsync<TResponse>(IQueryable<TEntity> query)
+    {
+        return await query.ProjectTo<TResponse>(_mapper.ConfigurationProvider).ToListAsync();
     }
 }

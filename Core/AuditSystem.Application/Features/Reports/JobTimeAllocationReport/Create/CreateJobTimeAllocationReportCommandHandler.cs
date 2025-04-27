@@ -19,6 +19,6 @@ internal sealed class CreateJobTimeAllocationReportCommandHandler(
         var jobTimeAllocationReportId = await jobTimeAllocationReportService.CreateJobTimeAllocationReportAsync(jobTimeAllocationReportModel);
         logger.LogInformation("Job Time Allocation Report with Name {JobTimeAllocationReportName} has been created.", request.ReportName);
 
-        return Result<CreateJobTimeAllocationReportCommandResponse>.Created(new CreateJobTimeAllocationReportCommandResponse(jobTimeAllocationReportId));
+        return Result<CreateJobTimeAllocationReportCommandResponse>.Created(new CreateJobTimeAllocationReportCommandResponse(jobTimeAllocationReportId), "Job Time Allocation Report created.");
     }
 }

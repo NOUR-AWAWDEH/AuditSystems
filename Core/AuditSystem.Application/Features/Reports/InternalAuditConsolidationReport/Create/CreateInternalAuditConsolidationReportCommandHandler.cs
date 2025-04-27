@@ -19,6 +19,6 @@ internal sealed class CreateInternalAuditConsolidationReportCommandHandler(
         var internalAuditConsolidationReportId = await internalAuditConsolidationReportService.CreateInternalAuditConsolidationReportAsync(internalAuditConsolidationReportModel);
         logger.LogInformation("Internal Audit Consolidation Report with Job Name {InternalAuditConsolidationReportJobName} has been created.", request.JobName);
 
-        return Result<CreateInternalAuditConsolidationReportCommandResponse>.Created(new CreateInternalAuditConsolidationReportCommandResponse(internalAuditConsolidationReportId));
+        return Result<CreateInternalAuditConsolidationReportCommandResponse>.Created(new CreateInternalAuditConsolidationReportCommandResponse(internalAuditConsolidationReportId), "Internal Audit Consolidation Report created.");
     }
 }

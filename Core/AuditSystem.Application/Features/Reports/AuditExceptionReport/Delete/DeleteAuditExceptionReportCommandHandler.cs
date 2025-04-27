@@ -16,7 +16,7 @@ internal sealed class DeleteAuditExceptionReportCommandHandler(
         {
             await auditExceptionReportService.DeleteAuditExceptionReportAsync(request.Id);
             logger.LogInformation("Audit exception report with id: {Id} was deleted", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Audit exception report was deleted");  
         }
         catch (Exception ex)
         {

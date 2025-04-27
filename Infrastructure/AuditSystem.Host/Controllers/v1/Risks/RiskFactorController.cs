@@ -1,7 +1,11 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Risks.RiskFactor.Create;
 using AuditSystem.Application.Features.Risks.RiskFactor.Delete;
+using AuditSystem.Application.Features.Risks.RiskFactor.Get;
+using AuditSystem.Application.Features.Risks.RiskFactor.Search;
 using AuditSystem.Application.Features.Risks.RiskFactor.Update;
+using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +31,15 @@ public sealed class RiskFactorController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRiskFactor([FromBody] UpdateRiskFactorCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
+    //Get Risk Factor
+    [HttpGet("get-risk-factor")]
+    [ProducesResponseType(typeof(ApiResponse<GetRiskFactorByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRiskFactor([FromQuery] GetRiskFactorByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Risk Factor
     [HttpDelete("delete-risk-factor")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class RiskFactorController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRiskFactor([FromBody] DeleteRiskFactorCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Risk Factor
+    [HttpGet("search-risk-factor")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RiskFactorModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchRiskFactor([FromQuery] SearchRiskFactorQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

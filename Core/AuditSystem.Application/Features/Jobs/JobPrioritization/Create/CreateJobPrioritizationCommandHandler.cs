@@ -19,6 +19,6 @@ internal sealed class CreateJobPrioritizationCommandHandler(
         var jobPrioritizationId = await jobPrioritizationService.CreateJobPrioritizationAsync(jobPrioritizationModel);
         logger.LogInformation("Job Prioritization with Auditable Unit {AuditableUnit} has been created.", request.AuditableUnit);
 
-        return Result<CreateJobPrioritizationCommandResponse>.Created(new CreateJobPrioritizationCommandResponse(jobPrioritizationId));
+        return Result<CreateJobPrioritizationCommandResponse>.Created(new CreateJobPrioritizationCommandResponse(jobPrioritizationId), "Job Prioritization created.");
     }
 }

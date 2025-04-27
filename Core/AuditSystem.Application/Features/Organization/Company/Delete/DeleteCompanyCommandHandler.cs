@@ -16,7 +16,7 @@ internal sealed class DeleteCompanyCommandHandler(
         {
             await companyService.DeleteCompanyAsync(request.Id);
             logger.LogInformation("Deleting company with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Company deleted.");
         }
         catch (Exception ex)
         {

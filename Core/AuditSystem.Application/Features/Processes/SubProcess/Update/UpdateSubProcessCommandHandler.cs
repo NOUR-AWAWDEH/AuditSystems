@@ -19,6 +19,6 @@ internal sealed class UpdateSubProcessCommandHandler(
         await subProcessService.UpdateSubProcessAsync(subProcessModel);
 
         logger.LogInformation("SubProcess updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("SubProcess updated successfully");
     }
 }

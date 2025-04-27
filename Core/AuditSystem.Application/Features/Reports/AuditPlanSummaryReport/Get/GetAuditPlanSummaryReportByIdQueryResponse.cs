@@ -1,0 +1,5 @@
+using AuditSystem.Contract.Models.Reports;
+
+namespace AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Get;
+
+public sealed record class GetAuditPlanSummaryReportByIdQueryResponse(AuditPlanSummaryReportModel AuditPlanSummaryReportModel);

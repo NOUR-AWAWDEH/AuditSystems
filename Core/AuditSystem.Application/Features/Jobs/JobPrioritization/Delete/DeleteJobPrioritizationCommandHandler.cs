@@ -16,7 +16,7 @@ internal sealed class DeleteJobPrioritizationCommandHandler(
         {
             await jobPrioritizationService.DeleteJobPrioritizationAsync(request.Id);
             logger.LogInformation("Deleting job prioritization with ID {Id}", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Job prioritization deleted successfully");  
         }
         catch (Exception ex)
         {

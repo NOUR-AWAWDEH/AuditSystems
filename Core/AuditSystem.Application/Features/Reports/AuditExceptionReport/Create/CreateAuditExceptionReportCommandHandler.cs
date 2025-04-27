@@ -19,6 +19,6 @@ internal sealed class CreateAuditExceptionReportCommandHandler(
         var auditExceptionReportId = await auditExceptionRepotService.CreateAuditExceptionReportAsync(auditExceptionReportModel);
         logger.LogInformation("Audit Exception Report with Report Name {AuditExceptionReportName} has been created.", request.ReportName);
 
-        return Result<CreateAuditExceptionReportCommandResponse>.Created(new CreateAuditExceptionReportCommandResponse(auditExceptionReportId));
+        return Result<CreateAuditExceptionReportCommandResponse>.Created(new CreateAuditExceptionReportCommandResponse(auditExceptionReportId), "Audit Exception Report created.");
     }
 }

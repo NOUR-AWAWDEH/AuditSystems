@@ -3,121 +3,95 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 
 internal sealed class AuditUniverseService(
     IRepository<Guid, AuditUniverse> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditUniverseService
+    ICacheService cacheService,
+    ILogger<AuditUniverseService> logger):
+    UnifiedCacheService<Guid, AuditUniverse, AuditUniverseModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.AuditUniverse,
+        AuditUniverseTags,
+        ListTags
+    ),
+    IAuditUniverseService
 {
     private static readonly string[] AuditUniverseTags = ["audit-universes", "audit-universe-list"];
-    private static readonly string[] ListTags = ["audit-universe-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-universe-list"];
 
     public async Task<Guid> CreateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create AuditUniverse.", ex);
-        }
+        return createdEntity.Id;
     }
+    
     public async Task DeleteAuditUniverseAsync(Guid auditUniverseId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(auditUniverseId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
-            }
+        var cacheKey = GetCacheKey(auditUniverseId);
+       
+        var entity = await repository.GetByIdAsync(auditUniverseId)
+                        ?? throw new KeyNotFoundException($"AuditUniverse with ID {auditUniverseId} not found.");
 
-            await repository.DeleteAsync(auditUniverseId);
-
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, auditUniverseId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-           throw new Exception("Failed to delete AuditUniverse.", ex);
-        }
+        await repository.DeleteAsync(auditUniverseId);
+        await ClearCacheAsync(cacheKey);
     }
+    
     public async Task<AuditUniverseModel> GetAuditUniverseByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, id);
-            
-            var cachedAuditUniverseModel = await cacheService.GetAsync<AuditUniverse>(cacheKey);
-            if (cachedAuditUniverseModel != null)
-            { 
-                return mapper.Map<AuditUniverseModel>(cachedAuditUniverseModel);
-            }
+        var cacheKey = GetCacheKey(id);
+       
+        var cachedEntity = await cacheService.GetAsync<AuditUniverse>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<AuditUniverseModel>(cachedEntity);
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null) 
-            {
-                throw new KeyNotFoundException($"AuditUniverse with ID {id} not found.");    
-            }
+        var entity = await repository.GetByIdAsync(id)
+                        ?? throw new KeyNotFoundException($"AuditUniverse with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm
-            );
+        await SetCacheAsync(cacheKey, entity);
 
-            return mapper.Map<AuditUniverseModel>(entity);  
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get AuditUniverse by ID {id}.", ex);
-        }
+        return mapper.Map<AuditUniverseModel>(entity);
     }
+
+    public async Task<PaginationResult<AuditUniverseModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditUniverseModel>(cacheKey, countCacheKey, page);
+        if (cachedResult!= null)
+            return cachedResult;
+        
+        return await GetFromRepositoryAsync<AuditUniverseModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateAuditUniverseAsync(AuditUniverseModel auditUniverseModel)
     {
         ArgumentNullException.ThrowIfNull(auditUniverseModel, nameof(auditUniverseModel));
 
-        try 
-        {
-            var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
-            await repository.UpdateAsync(entity);
+        var entity = mapper.Map<AuditUniverse>(auditUniverseModel);
+        await repository.UpdateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditUniverse, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditUniverseTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update AuditUniverse.", ex);
-        }
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

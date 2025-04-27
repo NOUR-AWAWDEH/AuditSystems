@@ -16,7 +16,7 @@ internal sealed class DeleteLocationCommandHandler(
         {
             await locationService.DeleteLocationAsync(request.Id);
             logger.LogInformation("Deleting location with ID {Id}", request.Id);
-            return Result.Success();  
+            return Result.SuccessWithMessage("Location deleted.");  
         }
         catch (Exception ex)
         {

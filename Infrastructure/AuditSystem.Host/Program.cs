@@ -65,7 +65,6 @@ app.UseSwagger(options =>
     options.RouteTemplate = "/openapi/{documentName}.json";
 });
 app.MapScalarApiReference();
-
 app.UseScopedLogging();
 app.UseErrorHandling();
 app.UseValidation();

@@ -1,5 +1,6 @@
 ﻿using AuditSystem.Auth.Dtos.Register;
 using AuditSystem.Auth.Services.Registration;
+using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Host.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ public sealed class RegistrationController(
 {
 
     [HttpPost("register")]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterDto model)
     {
         try
@@ -32,14 +34,26 @@ public sealed class RegistrationController(
             await _registrationService.RegisterAsync(model, Request.Scheme, Url);
             return Ok(ApiResponse.Ok("User registered successfully. Please check your email for verification"));
         }
+        catch (InvalidOperationException ex) when (
+            ex.Message.Contains("already exists") ||
+            ex.Message.Contains("does not exist")
+        )
+        {
+            return BadRequest(ApiResponse.BadRequest(ex.Message));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ApiResponse.BadRequest(ex.Message));
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during user registration for {Email}", model.Email);
+            _logger.LogError(ex, "Unexpected error during registration for {Email}", model.Email);
             return StatusCode(500, ApiResponse.InternalServerError("An unexpected error occurred"));
         }
     }
 
     [HttpGet("confirm-email")]
+    [PreventBruteForce]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string uid, [FromQuery] string token)
     {
         if (string.IsNullOrEmpty(uid) || string.IsNullOrEmpty(token))
@@ -75,6 +89,7 @@ public sealed class RegistrationController(
     }
 
     [HttpPost("send-verification-email")]
+    [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> SendVerificationEmail([FromBody] VerificationEmailDto request)
     {
         try

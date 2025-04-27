@@ -2,124 +2,96 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class AuditExceptionRepotService(
     IRepository<Guid, AuditExceptionReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditExceptionReportService
+    ICacheService cacheService,
+    ILogger<AuditExceptionRepotService> logger) : 
+    UnifiedCacheService<Guid, AuditExceptionReport, AuditExceptionReportModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.AuditExceptionReport,
+        AuditExceptionReportTags,
+        ListTags
+    ),
+    IAuditExceptionReportService
 {
     private static readonly string[] AuditExceptionReportTags = ["audit-exception-reports", "audit-exception-report-list"];
-    private static readonly string[] ListTags = ["audit-exception-report-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-exception-report-list"];
 
     public async Task<Guid> CreateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditExceptionReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create AuditExceptionReport.", ex);
-        }
+        return createdEntity.Id;
     }
+    
     public async Task DeleteAuditExceptionReportAsync(Guid auditExceptionReportId)
     {
-        try 
-        {
-            var entity = await repository.GetByIdAsync(auditExceptionReportId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditExceptionReport with ID {auditExceptionReportId} not found.");
-            }
+        var cacheKey = GetCacheKey(auditExceptionReportId);
+        
+        var entity = await repository.GetByIdAsync(auditExceptionReportId)
+            ?? throw new KeyNotFoundException($"AuditExceptionReport with ID {auditExceptionReportId} not found.");
 
-            await repository.DeleteAsync(auditExceptionReportId);
-
-            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, auditExceptionReportId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete AuditExceptionReport.", ex);
-        }
+        await repository.DeleteAsync(auditExceptionReportId);
+        await ClearCacheAsync(cacheKey);
     }
+    
     public async Task<AuditExceptionReportModel> GetAuditExceptionReportByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, id);
+        var cacheKey = GetCacheKey(id);
+        
+        var cachedEntity = await cacheService.GetAsync<AuditExceptionReport>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<AuditExceptionReportModel>(cachedEntity);
+        
 
-            var cachedEntity = await cacheService.GetAsync<AuditExceptionReport>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<AuditExceptionReportModel>(cachedEntity);
-            }
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"AuditExceptionReport with ID '{id}' not found.");
 
-            var entity = await repository.GetByIdAsync(id);
-
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditExceptionReport with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditExceptionReportTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
-
-            return mapper.Map<AuditExceptionReportModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get AuditExceptionReport by ID {id}.", ex);
-        }
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<AuditExceptionReportModel>(entity);
     }
+
+    public async Task<PaginationResult<AuditExceptionReportModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditExceptionReportModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<AuditExceptionReportModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateAuditExceptionReportAsync(AuditExceptionReportModel auditExceptionReportModel)
     {
         ArgumentNullException.ThrowIfNull(auditExceptionReportModel, nameof(auditExceptionReportModel));
-
-        try
-        {
-            var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
-
-            await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.AuditExceptionReport, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditExceptionReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update AuditExceptionReport.", ex);
-        }
+        
+        var entity = mapper.Map<AuditExceptionReport>(auditExceptionReportModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

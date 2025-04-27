@@ -19,6 +19,6 @@ internal sealed class UpdateRiskControlMatrixCommandHandler(
         await riskControlMatrixService.UpdateRiskControlMatrixAsync(riskControlMatrixModel);
 
         logger.LogInformation("Risk control matrix updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Risk control matrix updated successfully");
     }
 }

@@ -16,7 +16,7 @@ internal sealed class DeleteRiskProgramCommandHandler(
         {
             await riskProgramService.DeleteRiskProgramAsync(request.Id);
             logger.LogInformation("Risk program with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Risk program deleted");
         }
         catch (Exception ex)
         {

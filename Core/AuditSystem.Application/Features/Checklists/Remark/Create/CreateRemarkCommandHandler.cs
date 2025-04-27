@@ -19,6 +19,6 @@ internal sealed class CreateRemarkCommandHandler(
         var remarkId = await remarkService.CreateRemarkAsync(remarkModel);
         logger.LogInformation("Remark with Remark Commants {RemarkCommants} has been created.", request.RemarkCommants);
 
-        return Result<CreateRemarkCommandResponse>.Created(new CreateRemarkCommandResponse(remarkId));
+        return Result<CreateRemarkCommandResponse>.Created(new CreateRemarkCommandResponse(remarkId), "Remark created.");
     }
 }

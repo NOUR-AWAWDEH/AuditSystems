@@ -1,4 +1,5 @@
-﻿using AuditSystem.Contract.Models.UserDesignation;
+﻿using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.UserDesignation;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.UserDesignationServices;
 
@@ -8,4 +9,5 @@ public interface IUserDesignationService
     public Task UpdateUserDesignationAsync(UserDesignationModel userDesignationModel);
     public Task DeleteUserDesignationAsync(Guid userDesignationId);
     public Task<UserDesignationModel> GetUserDesignationByIdAsync(Guid id);
+    public Task<PaginationResult<UserDesignationModel>> SearchAsync(string? name, Page page);
 }

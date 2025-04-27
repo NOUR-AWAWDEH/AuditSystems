@@ -19,6 +19,6 @@ internal sealed class UpdateObjectiveCommandHandler(
         await objectiveService.UpdateObjectiveAsync(objectiveModel);
 
         logger.LogInformation("Objective updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Objective updated successfully");
     }
 }

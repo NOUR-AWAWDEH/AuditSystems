@@ -19,6 +19,6 @@ internal sealed class UpdateAuditUniverseObjectiveCommandHandler(
         await auditUniverseObjectiveService.UpdateAuditUniverseObjectiveAsync(auditUniverseObjectiveModel);
 
         logger.LogInformation("Audit universe objective updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit universe objective updated successfully");
     }
 }

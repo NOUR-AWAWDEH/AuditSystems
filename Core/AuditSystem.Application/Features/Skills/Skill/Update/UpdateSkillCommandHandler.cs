@@ -19,6 +19,6 @@ internal sealed class UpdateSkillCommandHandler(
         await skillService.UpdateSkillAsync(skillModel);
 
         logger.LogInformation("Skill with ID {Id} updated successfully.", request.Id);
-        return Result.Success();
+        return Result.SuccessWithMessage("Skill updated.");
     }
 }

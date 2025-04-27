@@ -1,4 +1,4 @@
-﻿using AuditSystem.Application.Common;
+﻿using AuditSystem.Application.Common.Validators;
 using FluentValidation;
 
 namespace AuditSystem.Application.Features.Common.Rating.Create;

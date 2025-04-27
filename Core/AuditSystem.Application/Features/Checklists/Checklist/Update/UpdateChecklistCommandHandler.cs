@@ -19,6 +19,6 @@ internal sealed class UpdateChecklistCommandHandler(
         await checklistService.UpdateChecklistAsync(checklistModel);
 
         logger.LogInformation("Checklist updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Checklist updated successfully");
     }
 }

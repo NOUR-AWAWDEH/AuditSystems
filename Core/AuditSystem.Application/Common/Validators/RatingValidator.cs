@@ -1,4 +1,4 @@
-namespace AuditSystem.Application.Common;
+namespace AuditSystem.Application.Common.Validators;
 
 public static class RatingValidator
 {

@@ -19,6 +19,6 @@ internal sealed class UpdateAuditEngagementCommandHandler(
         await auditEngagementService.UpdateAuditEngagementAsync(auditEngagementModel);
 
         logger.LogInformation("Audit engagement updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Audit engagement updated successfully");
     }
 }

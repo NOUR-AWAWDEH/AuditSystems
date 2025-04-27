@@ -1,126 +1,97 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 
 internal sealed class RiskControlService(
     IRepository<Guid, RiskControls> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IRiskControlService
+    ICacheService cacheService,
+    ILogger<RiskControlService> logger) : 
+    UnifiedCacheService<Guid, RiskControls, RiskControlsModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.RiskControl,
+        RiskControlTags,
+        ListTags
+    ),
+    IRiskControlService
 {
     private static readonly string[] RiskControlTags = ["risk-controls", "risk-control-list"];
-    private static readonly string[] ListTags = ["risk-control-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["risk-control-list"];
 
     public async Task<Guid> CreateRiskControlAsync(RiskControlsModel riskControlModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
 
-        try
-        {
-            var entity = mapper.Map<RiskControls>(riskControlModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<RiskControls>(riskControlModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.RiskControl, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
+        await cacheService.RemoveCacheByTagAsync(ListTags);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create RiskControl.", ex);
-        }
+        return createdEntity.Id;
     }
 
     public async Task DeleteRiskControlAsync(Guid riskControlId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(riskControlId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControl with ID {riskControlId} not found.");
-            }
+        var cacheKey = GetCacheKey(riskControlId);
+       
+        var entity = await repository.GetByIdAsync(riskControlId)
+            ?? throw new KeyNotFoundException($"RiskControl with ID {riskControlId} not found.");
 
-            await repository.DeleteAsync(riskControlId);
-
-            var cacheKey = string.Format(CacheKeys.RiskControl, riskControlId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete RiskControl.", ex);
-        }
+        await repository.DeleteAsync(riskControlId);
+        await ClearCacheAsync(cacheKey);
     }
 
     public async Task<RiskControlsModel> GetRiskControlByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.RiskControl, id);
-
-            var cachedRiskControl = await cacheService.GetAsync<RiskControls>(cacheKey);
-            if (cachedRiskControl != null)
-            {
-                return mapper.Map<RiskControlsModel>(cachedRiskControl);
-            }
-
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"RiskControl with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm
-            ); 
-            
+        var cacheKey = GetCacheKey(id);
+        
+        var entity = await cacheService.GetAsync<RiskControls>(cacheKey);
+        if (entity != null)
             return mapper.Map<RiskControlsModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get RiskControl by ID {id}.", ex);
-        }
+
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"RiskControl with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<RiskControlsModel>(entity);
+    }
+
+    public async Task<PaginationResult<RiskControlsModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<RiskControlsModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<RiskControlsModel>(cacheKey, countCacheKey, page, name);
     }
 
     public async Task UpdateRiskControlAsync(RiskControlsModel riskControlModel)
     {
         ArgumentNullException.ThrowIfNull(riskControlModel, nameof(riskControlModel));
 
-        try
-        {
-            var entity = mapper.Map<RiskControls>(riskControlModel);
-            await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.RiskControl, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: RiskControlTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update RiskControl.", ex);
-        }
+        var entity = mapper.Map<RiskControls>(riskControlModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

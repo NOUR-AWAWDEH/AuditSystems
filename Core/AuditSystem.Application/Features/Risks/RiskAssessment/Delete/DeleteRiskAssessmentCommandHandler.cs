@@ -16,7 +16,7 @@ internal sealed class DeleteRiskAssessmentCommandHandler(
         {
             await riskAssessmentService.DeleteRiskAssessmentAsync(request.Id);
             logger.LogInformation("Risk assessment with id: {Id} was deleted", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Risk assessment deleted");
         }
         catch (Exception ex)
         {

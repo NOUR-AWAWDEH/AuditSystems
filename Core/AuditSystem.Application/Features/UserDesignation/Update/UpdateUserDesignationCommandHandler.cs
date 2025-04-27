@@ -19,6 +19,6 @@ internal sealed class UpdateUserDesignationCommandHandler(
         await userDesignationService.UpdateUserDesignationAsync(userDesignationModel);
         
         logger.LogInformation("User designation with ID {Id} updated successfully.", request.Id);
-        return Result.Success();
+        return Result.SuccessWithMessage("User designation updated successfully.");
     }
 }

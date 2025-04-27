@@ -19,6 +19,6 @@ internal sealed class CreateUserDesignationCommandHandler(
         var userDesignationModel = _mapper.Map<UserDesignationModel>(request);
         var userDesignationId = await _userDesignationService.CreateUserDesignationAsync(userDesignationModel);
         _logger.LogInformation("User Designation with Designation {Designation} has been created.", request.Designation);
-        return Result<CreateUserDesignationCommandResponse>.Created(new CreateUserDesignationCommandResponse(userDesignationId));
+        return Result<CreateUserDesignationCommandResponse>.Created(new CreateUserDesignationCommandResponse(userDesignationId), "User Designation created.");
     }
 }

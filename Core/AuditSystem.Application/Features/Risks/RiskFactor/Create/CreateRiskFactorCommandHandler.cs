@@ -19,6 +19,6 @@ internal sealed class CreateRiskFactorCommandHandler(
         var riskFactorId = await riskFactorService.CreateRiskFactorAsync(riskFactorModel);
         logger.LogInformation("Risk Factor with Factor {RiskFactor}", request.Factor);
 
-        return Result<CreateRiskFactorCommandResponse>.Created(new CreateRiskFactorCommandResponse(riskFactorId));
+        return Result<CreateRiskFactorCommandResponse>.Created(new CreateRiskFactorCommandResponse(riskFactorId), "Risk Factor created.");
     }
 }

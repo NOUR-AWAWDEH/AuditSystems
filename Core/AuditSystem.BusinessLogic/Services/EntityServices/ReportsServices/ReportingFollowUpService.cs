@@ -1,123 +1,96 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class ReportingFollowUpService(
     IRepository<Guid, ReportingFollowUp> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IReportingFollowUpService
+    ICacheService cacheService,
+    ILogger<ReportingFollowUpService> logger) : 
+    UnifiedCacheService<Guid, ReportingFollowUp, ReportingFollowUpModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.ReportingFollowUp,
+        ReportingFollowUpTags,
+        ListTags
+    ),
+    IReportingFollowUpService
 {
     private static readonly string[] ReportingFollowUpTags = ["reporting-follow-ups", "reporting-follow-up-list"];
-    private static readonly string[] ListTags = ["reporting-follow-up-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["reporting-follow-up-list"];
 
     public async Task<Guid> CreateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
 
-        try
-        {
-            var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: ReportingFollowUpTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create ReportingFollowUp.", ex);
-        }
+        return createdEntity.Id;
     }
+    
     public async Task DeleteReportingFollowUpAsync(Guid reportingFollowUpId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(reportingFollowUpId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"ReportingFollowUp with ID {reportingFollowUpId} not found.");
-            }
+        var cacheKey = GetCacheKey(reportingFollowUpId);
+       
+        var entity = await repository.GetByIdAsync(reportingFollowUpId)
+            ?? throw new KeyNotFoundException($"ReportingFollowUp with ID {reportingFollowUpId} not found.");
 
-            await repository.DeleteAsync(reportingFollowUpId);
-            
-            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, reportingFollowUpId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete ReportingFollowUp.", ex);
-        }
+        await repository.DeleteAsync(reportingFollowUpId);
+        await ClearCacheAsync(cacheKey);
     }
+    
     public async Task<ReportingFollowUpModel> GetReportingFollowUpByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, id);
-            
-            var cachedEntity = await cacheService.GetAsync<ReportingFollowUp>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<ReportingFollowUpModel>(cachedEntity);
-            }
-
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"ReportingFollowUp with ID {id} not found."); 
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ReportingFollowUpTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
+        var cacheKey = GetCacheKey(id);
+        
+        var entity = await cacheService.GetAsync<ReportingFollowUp>(cacheKey);
+        if (entity != null)
             return mapper.Map<ReportingFollowUpModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get ReportingFollowUp by ID {id}.", ex);
-        }
+
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"ReportingFollowUp with ID '{id}' not found.");
+
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<ReportingFollowUpModel>(entity); 
     }
+
+    public async Task<PaginationResult<ReportingFollowUpModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<ReportingFollowUpModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<ReportingFollowUpModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateReportingFollowUpAsync(ReportingFollowUpModel reportingFollowUpModel)
     {
         ArgumentNullException.ThrowIfNull(reportingFollowUpModel, nameof(reportingFollowUpModel));
 
-        try
-        {
-            var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = string.Format(CacheKeys.ReportingFollowUp, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: ReportingFollowUpTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update ReportingFollowUp.", ex);
-        }
+        var entity = mapper.Map<ReportingFollowUp>(reportingFollowUpModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

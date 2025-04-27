@@ -2,123 +2,95 @@
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Reports;
 using AuditSystem.Domain.Entities.Reports;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportsServices;
 
 internal sealed class InternalAuditConsolidationReportService(
     IRepository<Guid, InternalAuditConsolidationReport> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IInternalAuditConsolidationReportService
+    ICacheService cacheService,
+    ILogger<InternalAuditConsolidationReportService> logger) : 
+    UnifiedCacheService<Guid, InternalAuditConsolidationReport, InternalAuditConsolidationReportModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.InternalAuditConsolidationReport,
+        InternalAuditConsolidationReportTags,
+        ListTags
+    ),
+    IInternalAuditConsolidationReportService
 {
     private static readonly string[] InternalAuditConsolidationReportTags = ["internal-audit-consolidation-reports", "internal-audit-consolidation-report-list"];
-    private static readonly string[] ListTags = ["internal-audit-consolidation-report-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["internal-audit-consolidation-report-list"];
 
     public async Task<Guid> CreateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));
 
-        try
-        {
-            var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, createdEntity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: InternalAuditConsolidationReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create InternalAuditConsolidationReport.", ex);
-        }
+        return createdEntity.Id;
     }
+    
     public async Task DeleteInternalAuditConsolidationReportAsync(Guid internalAuditConsolidationReportId)
     {
-        try
-        {
-            var entity = await repository.GetByIdAsync(internalAuditConsolidationReportId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"InternalAuditConsolidationReport with ID {internalAuditConsolidationReportId} not found.");
-            }
+        var cacheKey = GetCacheKey(internalAuditConsolidationReportId);
+        
+        var entity = await repository.GetByIdAsync(internalAuditConsolidationReportId)
+            ?? throw new KeyNotFoundException($"InternalAuditConsolidationReport with ID {internalAuditConsolidationReportId} not found.");
 
-            await repository.DeleteAsync(internalAuditConsolidationReportId);
-
-            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, internalAuditConsolidationReportId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete InternalAuditConsolidationReport.", ex);
-        }
+        await repository.DeleteAsync(internalAuditConsolidationReportId);
+        await ClearCacheAsync(cacheKey);
     }
+    
     public async Task<InternalAuditConsolidationReportModel> GetInternalAuditConsolidationReportByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, id);
+        var cacheKey = GetCacheKey(id);
+        
+        var entity = await cacheService.GetAsync<InternalAuditConsolidationReport>(cacheKey);
+        if (entity != null)
+            return mapper.Map<InternalAuditConsolidationReportModel>(entity);
 
-            var internalAuditConsolidationReport = await cacheService.GetAsync<InternalAuditConsolidationReport>(cacheKey);
+        entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"InternalAuditConsolidationReport with ID '{id}' not found.");
 
-            if (internalAuditConsolidationReport != null)
-            {
-                return mapper.Map<InternalAuditConsolidationReportModel>(internalAuditConsolidationReport);
-            }
-
-            internalAuditConsolidationReport = await repository.GetByIdAsync(id);
-
-            if (internalAuditConsolidationReport == null)
-            {
-                throw new KeyNotFoundException($"InternalAuditConsolidationReport with ID {id} not found.");
-            }
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: internalAuditConsolidationReport,
-                tags: InternalAuditConsolidationReportTags,
-                expiration: CacheExpirations.MediumTerm
-            );
-
-            return mapper.Map<InternalAuditConsolidationReportModel>(internalAuditConsolidationReport);  
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get InternalAuditConsolidationReport by ID {id}.", ex);
-        }
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<InternalAuditConsolidationReportModel>(entity);
     }
+
+    public async Task<PaginationResult<InternalAuditConsolidationReportModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<InternalAuditConsolidationReportModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<InternalAuditConsolidationReportModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateInternalAuditConsolidationReportAsync(InternalAuditConsolidationReportModel internalAuditConsolidationReportModel)
     {
         ArgumentNullException.ThrowIfNull(internalAuditConsolidationReportModel, nameof(internalAuditConsolidationReportModel));
-        try
-        {
-            var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
-            await repository.UpdateAsync(entity);
-
-            var cacheKey = string.Format(CacheKeys.InternalAuditConsolidationReport, entity.Id);
-
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: InternalAuditConsolidationReportTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update InternalAuditConsolidationReport.", ex);
-        }
+        
+        var entity = mapper.Map<InternalAuditConsolidationReport>(internalAuditConsolidationReportModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

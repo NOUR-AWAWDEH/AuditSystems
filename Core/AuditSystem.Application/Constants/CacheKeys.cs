@@ -3,6 +3,8 @@ namespace AuditSystem.Application.Constants;
 public static class CacheKeys
 {
     public const string CacheKey = "{0}-{1}-{2}"; //0 - prefix; 1 - resource id; 2 - language
+    public const string SearchCacheKey = "{0}_search_{1}_page_{2}_size_{3}"; // 0-prefix, 1-term, 2-page, 3-size
+    public const string SearchCountCacheKey = "{0}_search_count_{1}"; // NEW → 0: prefix, 1: search term
 
     //Audit
     public const string AuditDomain = "audit-domain";

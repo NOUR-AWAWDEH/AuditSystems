@@ -19,6 +19,6 @@ internal sealed class UpdateCompanyCommandHandler(
         await companyService.UpdateCompanyAsync(companyModel);
         
         logger.LogInformation("Company updated successfully");
-        return Result.Success();
+        return Result.SuccessWithMessage("Company updated successfully");
     }
 }

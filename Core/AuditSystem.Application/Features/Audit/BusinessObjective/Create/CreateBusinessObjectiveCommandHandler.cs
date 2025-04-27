@@ -19,6 +19,6 @@ internal sealed class CreateBusinessObjectiveCommandHandler(
         var businessObjectiveId = await businessObjectiveService.CreateBusinessObjectiveAsync(businessObjectiveModel);
         logger.LogInformation("Business Objective with Impact {BusinessObjectiveImpact} has been created.", request.Impact);
 
-        return Result<CreateBusinessObjectiveCommandResponse>.Created(new CreateBusinessObjectiveCommandResponse(businessObjectiveId));
+        return Result<CreateBusinessObjectiveCommandResponse>.Created(new CreateBusinessObjectiveCommandResponse(businessObjectiveId), "Business Objective created.");
     }
 }

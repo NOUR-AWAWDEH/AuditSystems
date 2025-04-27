@@ -16,7 +16,7 @@ internal sealed class DeleteBusinessObjectiveCommandHandler(
         {
             await businessObjectiveService.DeleteBusinessObjectiveAsync(request.Id);
             logger.LogInformation("Deleting business objective with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Business objective deleted");
         }
         catch (Exception ex)
         {

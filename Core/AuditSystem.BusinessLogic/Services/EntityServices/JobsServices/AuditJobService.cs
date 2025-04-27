@@ -3,121 +3,94 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Jobs;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Jobs;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.JobsServices;
 
 internal sealed class AuditJobService(
     IRepository<Guid, AuditJob> repository,
     IMapper mapper,
-    ICacheService cacheService)
-    : IAuditJobService
+    ICacheService cacheService,
+    ILogger<AuditJobService> logger) :
+    UnifiedCacheService<Guid, AuditJob, AuditJobModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.AuditJob,
+        AuditJobTags,
+        ListTags
+    ),
+    IAuditJobService
 {
     private static readonly string[] AuditJobTags = ["audit-jobs", "audit-job-list"];
-    private static readonly string[] ListTags = ["audit-job-list"]; // Tags for collections only
+    private static readonly string[] ListTags = ["audit-job-list"];
 
     public async Task<Guid> CreateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));
 
-        try
-        {
-            var entity = mapper.Map<AuditJob>(auditJobModel);
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<AuditJob>(auditJobModel);
+        var createdEntity = await repository.CreateAsync(entity);
 
-            var cacheKey = string.Format(CacheKeys.AuditJob, createdEntity.Id);
+        var cacheKey = GetCacheKey(createdEntity.Id);
+        await SetCacheAsync(cacheKey, entity);
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: createdEntity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm);
-
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to create AuditJob.", ex);
-        }
+        return createdEntity.Id; 
     }
+    
     public async Task DeleteAuditJobAsync(Guid auditJobId)
     {
-        try 
-        {
-            var entity = await repository.GetByIdAsync(auditJobId);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditJob with ID {auditJobId} not found.");
-            }
+        var cacheKey = GetCacheKey(auditJobId);
 
-            await repository.DeleteAsync(auditJobId);
+        var entity = await repository.GetByIdAsync(auditJobId)
+            ?? throw new KeyNotFoundException($"AuditJob with ID {auditJobId} not found.");
 
-            var cacheKey = string.Format(CacheKeys.AuditJob, auditJobId);
-            await cacheService.RemoveAsync(cacheKey);
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to delete AuditJob.", ex);
-        }
+        await repository.DeleteAsync(auditJobId);
+        await ClearCacheAsync(cacheKey);
     }
+    
     public async Task<AuditJobModel> GetAuditJobByIdAsync(Guid id)
     {
-        try
-        {
-            var cacheKey = string.Format(CacheKeys.AuditJob, id);
-            
-            var cachedEntity = await cacheService.GetAsync<AuditJob>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return mapper.Map<AuditJobModel>(cachedEntity);
-            }
+        var cacheKey = GetCacheKey(id);
+        
+        var cachedEntity = await cacheService.GetAsync<AuditJob>(cacheKey);
+        if (cachedEntity != null)
+            return mapper.Map<AuditJobModel>(cachedEntity);
 
-            var entity = await repository.GetByIdAsync(id);
-            if (entity == null)
-            {
-                throw new KeyNotFoundException($"AuditJob with ID {id} not found.");
-            }
+        var entity = await repository.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"AuditJob with ID '{id}' not found.");
 
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm    
-            );
-
-            return mapper.Map<AuditJobModel>(entity);  
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Failed to get AuditJob by ID {id}.", ex);
-        }
+        await SetCacheAsync(cacheKey, entity);
+        
+        return mapper.Map<AuditJobModel>(entity);
     }
+
+    public async Task<PaginationResult<AuditJobModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+        
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditJobModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<AuditJobModel>(cacheKey, countCacheKey, page, name);
+    }
+
     public async Task UpdateAuditJobAsync(AuditJobModel auditJobModel)
     {
         ArgumentNullException.ThrowIfNull(auditJobModel, nameof(auditJobModel));
 
-        try 
-        {
-            var entity = mapper.Map<AuditJob>(auditJobModel);
-            await repository.UpdateAsync(entity);
-            
-            var cacheKey = string.Format(CacheKeys.AuditJob, entity.Id);
-            
-            await cacheService.SetAsync(
-                key: cacheKey,
-                value: entity,
-                tags: AuditJobTags,
-                expiration: CacheExpirations.MediumTerm);
-            
-            await cacheService.RemoveCacheByTagAsync(ListTags);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Failed to update AuditJob.", ex);
-        }
+        var entity = mapper.Map<AuditJob>(auditJobModel);
+        await repository.UpdateAsync(entity);
+        
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
     }
 }

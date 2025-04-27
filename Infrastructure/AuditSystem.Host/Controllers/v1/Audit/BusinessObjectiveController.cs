@@ -1,7 +1,11 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Create;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Delete;
+using AuditSystem.Application.Features.Audit.BusinessObjective.Get;
+using AuditSystem.Application.Features.Audit.BusinessObjective.Search;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Update;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Host.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,6 +32,14 @@ public sealed class BusinessObjectiveController(IMediator mediator) : ApiControl
     public async Task<IActionResult> UpdateBusinessObjective([FromBody] UpdateBusinessObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
+    //Get Business Objective
+    [HttpGet("get-business-objective")]
+    [ProducesResponseType(typeof(ApiResponse<GetBusinessObjectiveByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetBusinessObjective([FromQuery] GetBusinessObjectiveByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Business Objective
     [HttpDelete("delete-business-objective")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -35,4 +47,11 @@ public sealed class BusinessObjectiveController(IMediator mediator) : ApiControl
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteBusinessObjective([FromBody] DeleteBusinessObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    
+    //Search Business Objective
+    [HttpGet("search-business-objective")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<BusinessObjectiveModel>>),StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchBusinessObjective([FromQuery] SearchBusinessObjectiveQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

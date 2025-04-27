@@ -16,7 +16,7 @@ internal sealed class DeleteAuditUniverseObjectiveCommandHandler(
         {
             await auditUniverseObjectiveService.DeleteAuditUniverseObjectiveAsync(request.Id);
             logger.LogInformation("Deleting audit universe objective with ID {Id}", request.Id);
-            return Result.Success();
+            return Result.SuccessWithMessage("Audit universe objective deleted successfully.");
         }
         catch (Exception ex)
         {

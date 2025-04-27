@@ -16,7 +16,7 @@ internal sealed class DeleteRiskCommandHandler(
        {
            await riskService.DeleteRiskAsync(request.Id);
            logger.LogInformation("Risk with id: {Id} was deleted", request.Id);
-           return Result.Success();
+           return Result.SuccessWithMessage("Risk deleted");
        }
        catch (Exception ex)
        {

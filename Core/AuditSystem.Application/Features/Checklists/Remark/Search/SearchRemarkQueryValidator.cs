@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Checklists;
 
-namespace AuditSystem.Application.Features.Checklists.Remark.Search
-{
-    public class SearchRemarkQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Checklists.Remark.Search;
+
+public class SearchRemarkQueryValidator : PaginationRequestValidator<RemarkModel, SearchRemarkQuery>;

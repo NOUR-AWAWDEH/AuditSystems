@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Reports;
 
-namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Search
-{
-    public class SearchAuditExceptionReportQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Search;
+
+public class SearchAuditExceptionReportQueryValidator : PaginationRequestValidator<AuditExceptionReportModel, SearchAuditExceptionReportQuery>;

@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.UserDesignation;
 
-namespace AuditSystem.Application.Features.UserDesignation.Search
+namespace AuditSystem.Application.Features.UserDesignation.Search;
+
+public sealed record class SearchUserDesignationQuery : PaginationRequest<UserDesignationModel>
 {
-    public class SearchUserDesignationQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

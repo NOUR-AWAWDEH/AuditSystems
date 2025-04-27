@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Organization;
 
-namespace AuditSystem.Application.Features.Organization.Company.Search
+namespace AuditSystem.Application.Features.Organization.Company.Search;
+
+public sealed record class SearchCompanyQuery : PaginationRequest<CompanyModel>
 {
-    public class SearchCompanyQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

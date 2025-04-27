@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Jobs;
 
-namespace AuditSystem.Application.Features.Jobs.AuditJob.Search
-{
-    public class SearchAuditJobQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Jobs.AuditJob.Search;
+
+public class SearchAuditJobQueryValidator : PaginationRequestValidator<AuditJobModel, SearchAuditJobQuery>;

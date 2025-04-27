@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Reports;
 
-namespace AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Search
+namespace AuditSystem.Application.Features.Reports.AuditPlanSummaryReport.Search;
+
+public sealed record class SearchAuditPlanSummaryReportQuery : PaginationRequest<AuditPlanSummaryReportModel>
 {
-    public class SearchAuditPlanSummaryReportQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

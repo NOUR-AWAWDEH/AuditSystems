@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Skills;
 
-namespace AuditSystem.Application.Features.Skills.SkillCategory.Search
+namespace AuditSystem.Application.Features.Skills.SkillCategory.Search;
+
+public sealed record class SearchSkillCategoryQuery : PaginationRequest<SkillCategoryModel>
 {
-    public class SearchSkillCategoryQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

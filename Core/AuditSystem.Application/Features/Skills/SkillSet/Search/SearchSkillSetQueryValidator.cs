@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Skills;
 
-namespace AuditSystem.Application.Features.Skills.SkillSet.Search
-{
-    public class SearchSkillSetQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Skills.SkillSet.Search;
+
+public class SearchSkillSetQueryValidator : PaginationRequestValidator<SkillSetModel, SearchSkillSetQuery>;

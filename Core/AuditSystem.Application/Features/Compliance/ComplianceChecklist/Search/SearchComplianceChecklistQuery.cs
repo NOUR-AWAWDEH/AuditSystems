@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Compliance;
 
-namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search
+namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search;
+
+public sealed record class SearchComplianceChecklistQuery : PaginationRequest<ComplianceChecklistModel>
 {
-    public class SearchComplianceChecklistQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

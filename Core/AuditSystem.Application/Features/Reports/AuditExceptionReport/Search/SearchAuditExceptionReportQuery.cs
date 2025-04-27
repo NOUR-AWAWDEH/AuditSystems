@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Reports;
 
-namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Search
+namespace AuditSystem.Application.Features.Reports.AuditExceptionReport.Search;
+
+public sealed record class SearchAuditExceptionReportQuery : PaginationRequest<AuditExceptionReportModel>
 {
-    public class SearchAuditExceptionReportQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

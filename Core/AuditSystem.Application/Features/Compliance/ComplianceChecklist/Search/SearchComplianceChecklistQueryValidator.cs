@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Compliance;
 
-namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search
-{
-    public class SearchComplianceChecklistQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search;
+
+public class SearchComplianceChecklistQueryValidator : PaginationRequestValidator<ComplianceChecklistModel, SearchComplianceChecklistQuery>;

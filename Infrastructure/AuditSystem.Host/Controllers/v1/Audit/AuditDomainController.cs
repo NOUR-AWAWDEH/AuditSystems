@@ -15,7 +15,7 @@ namespace AuditSystem.Host.Controllers.v1.Audit;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public sealed class AuditDomainController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Audit Domain

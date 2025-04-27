@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Jobs;
 
-namespace AuditSystem.Application.Features.Jobs.JobScheduling.Search
+namespace AuditSystem.Application.Features.Jobs.JobScheduling.Search;
+
+public sealed record class SearchJobSchedulingQuery : PaginationRequest<JobSchedulingModel>
 {
-    public class SearchJobSchedulingQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

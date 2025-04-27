@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.RiskControls;
 
-namespace AuditSystem.Application.Features.RiskControls.RiskProgram.Search
+namespace AuditSystem.Application.Features.RiskControls.RiskProgram.Search;
+
+public sealed record class SearchRiskProgramQuery : PaginationRequest<RiskProgramModel>
 {
-    public class SearchRiskProgramQuery
-    {
-        
-    }
+    public string? SearchTerm { get; set; } = string.Empty;
 }

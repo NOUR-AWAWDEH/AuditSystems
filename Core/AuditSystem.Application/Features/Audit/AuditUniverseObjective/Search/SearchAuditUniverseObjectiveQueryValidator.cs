@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Audit;
 
-namespace AuditSystem.Application.Features.Audit.AuditUniverseObjective.Search
-{
-    public class SearchAuditUniverseObjectiveQueryValidator
-    {
-        
-    }
-}
+namespace AuditSystem.Application.Features.Audit.AuditUniverseObjective.Search;
+
+public class SearchAuditUniverseObjectiveQueryValidator : PaginationRequestValidator<AuditUniverseObjectiveModel, SearchAuditUniverseObjectiveQuery>;

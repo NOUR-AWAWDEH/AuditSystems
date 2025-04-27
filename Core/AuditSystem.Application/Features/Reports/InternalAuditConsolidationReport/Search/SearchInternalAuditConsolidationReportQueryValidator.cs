@@ -1,0 +1,7 @@
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Reports;
+
+namespace AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Search;
+
+public class SearchInternalAuditConsolidationReportQueryValidator 
+    : PaginationRequestValidator<InternalAuditConsolidationReportModel, SearchInternalAuditConsolidationReportQuery>;

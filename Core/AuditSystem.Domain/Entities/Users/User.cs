@@ -1,25 +1,32 @@
-using AuditSystem.Domain.Entities.Common;
-using AuditSystem.Domain.Entities.Organisation;
+using AuditSystem.Domain.Entities.Auth;
+using AuditSystem.Domain.Entities.Organization;
+using AuditSystem.Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 
-namespace AuditSystem.Domain.Entities.Users
+public class User : IdentityUser<Guid>
 {
-    public class User: Entity<Guid>
-    {
-        public required string UserName { get; set; } = string.Empty;
-        public required string Password { get; set; } = string.Empty;
-        public required string Email { get; set; } = string.Empty;
-        public required int UserRoleId { get; set; }
-        public required string  FirstName { get; set; } = string.Empty; 
-        public required string LastName { get; set; } = string.Empty;
-        public Guid CompanyID { get; set; } 
-        public Guid DepartmentID { get; set; }
-        public Guid SubDepartmentID { get;set; } 
-        public DateTime LastLogin {get; set; } 
-        public bool IsActive {get; set; }
+    public required string FirstName { get; set; } = string.Empty;
+    public required string LastName { get; set; } = string.Empty;
 
-        public UserRole UserRole { get; set; } = null!;
-        public Company Company { get; set; } = null!; 
-        public Department Department { get; set; } = null!;
-        public SubDepartment SubDepartment { get; set; } = null!;
-    }
+    public required Guid RoleId { get; set; }
+    public Guid? CompanyId { get; set; }
+    public Guid? DepartmentId { get; set; }
+    public Guid? SubDepartmentId { get; set; }
+
+    public DateTime LastLogin { get; set; } = DateTime.UtcNow;
+    public bool IsActive { get; set; } = true;
+    public TimeSpan TotalSessionTime { get; set; } = TimeSpan.Zero;
+    public DateTime? CurrentSessionStart { get; set; }
+
+    public string? PasswordResetToken { get; set; }
+    public string? PasswordResetCode { get; set; }
+    public DateTime? PasswordResetCodeExpiration { get; set; }
+    public DateTime? PasswordResetTokenExpiration { get; set; }
+    public DateTime? LastLogoutTime { get; set; }
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public virtual Role Role { get; set; } = null!;
+    public virtual Company? Company { get; set; }
+    public virtual Department? Department { get; set; }
+    public virtual SubDepartment? SubDepartment { get; set; }
 }

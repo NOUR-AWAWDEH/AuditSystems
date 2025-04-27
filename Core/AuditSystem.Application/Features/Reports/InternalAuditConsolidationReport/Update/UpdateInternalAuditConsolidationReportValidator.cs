@@ -1,0 +1,51 @@
+﻿using FluentValidation;
+
+namespace AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Update;
+
+public sealed class UpdateInternalAuditConsolidationReportValidator : AbstractValidator<UpdateInternalAuditConsolidationReportCommand>
+{
+    public UpdateInternalAuditConsolidationReportValidator()
+    {
+        RuleFor(x => x.Id)
+            .NotEmpty()
+            .WithMessage("Id is required.")
+            .Must(id => id != Guid.Empty)
+            .WithMessage("Id must not be empty.");
+
+        RuleFor(x => x.JobName)
+            .NotEmpty()
+            .WithMessage("JobName is required.")
+            .MinimumLength(2)
+            .WithMessage("JobName must be at least 2 characters long.")
+            .MaximumLength(100)
+            .WithMessage("JobName must not exceed 100 characters.");
+
+        RuleFor(x => x.ReportName)
+            .NotEmpty()
+            .WithMessage("ReportName is required.")
+            .MinimumLength(2)
+            .WithMessage("ReportName must be at least 2 characters long.")
+            .MaximumLength(100)
+            .WithMessage("ReportName must not exceed 100 characters.");
+
+        RuleFor(x => x.ReportDate)
+            .NotEmpty()
+            .WithMessage("ReportDate is required.")
+            .Must(date => IsValidDate(date))
+            .WithMessage("ReportDate must be a valid date.");
+
+        RuleFor(x => x.PreparedByUserId)
+            .NotEmpty()
+            .WithMessage("PreparedByUserId is required.")
+            .Must(id => id != Guid.Empty)
+            .WithMessage("PreparedByUserId must not be empty.");
+
+        RuleFor(x => x.Status)
+            .MaximumLength(50)
+            .WithMessage("Status must not exceed 50 characters.");
+    }
+    public bool IsValidDate(DateOnly date)
+    {
+        return date != default(DateOnly);
+    }
+}

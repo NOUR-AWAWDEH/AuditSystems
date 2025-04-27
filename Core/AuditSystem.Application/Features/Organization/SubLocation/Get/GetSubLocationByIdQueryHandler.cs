@@ -1,0 +1,21 @@
+using MediatR;
+using Ardalis.Result;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+
+namespace AuditSystem.Application.Features.Organization.SubLocation.Get;
+
+internal sealed class GetSubLocationByIdQueryHandler(
+    ISubLocationService subLocationService) : 
+    IRequestHandler<GetSubLocationByIdQuery,Result<GetSubLocationByIdQueryResponse>>
+{
+    public async Task<Result<GetSubLocationByIdQueryResponse>> Handle(GetSubLocationByIdQuery request, CancellationToken cancellationToken) 
+    {
+        var result = await subLocationService.GetSubLocationByIdAsync(request.Id);
+        if (result == null)
+        {
+            return Result.NotFound();
+        }
+
+        return Result<GetSubLocationByIdQueryResponse>.Success(new GetSubLocationByIdQueryResponse(result));
+    }
+}

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AuditSystem.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -652,12 +652,11 @@ namespace AuditSystem.DataAccess.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     TotalSessionTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     CurrentSessionStart = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PasswordResetToken = table.Column<string>(type: "nvarchar(3000)", maxLength: 3000, nullable: true),
                     PasswordResetCode = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     PasswordResetCodeExpiration = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    PasswordResetToken = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     PasswordResetTokenExpiration = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastLogoutTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CompanyId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -682,11 +681,6 @@ namespace AuditSystem.DataAccess.Migrations
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Companies_CompanyId1",
-                        column: x => x.CompanyId1,
-                        principalTable: "Companies",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Departments_DepartmentId",
                         column: x => x.DepartmentId,
@@ -975,7 +969,7 @@ namespace AuditSystem.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsRevoked = table.Column<bool>(type: "bit", nullable: false),
@@ -1018,21 +1012,24 @@ namespace AuditSystem.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserManagements",
+                name: "UserDesignations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Designation = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Level = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserManagements", x => x.Id);
+                    table.PrimaryKey("PK_UserDesignations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserManagements_AspNetUsers_UserID",
-                        column: x => x.UserID,
+                        name: "FK_UserDesignations_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -1191,11 +1188,6 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "IX_AspNetUsers_CompanyId",
                 table: "AspNetUsers",
                 column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_CompanyId1",
-                table: "AspNetUsers",
-                column: "CompanyId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_DepartmentId",
@@ -1428,9 +1420,9 @@ namespace AuditSystem.DataAccess.Migrations
                 column: "AssignedById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserManagements_UserID",
-                table: "UserManagements",
-                column: "UserID");
+                name: "IX_UserDesignations_UserId",
+                table: "UserDesignations",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -1521,7 +1513,7 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "TaskManagements");
 
             migrationBuilder.DropTable(
-                name: "UserManagements");
+                name: "UserDesignations");
 
             migrationBuilder.DropTable(
                 name: "ComplianceChecklists");

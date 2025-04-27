@@ -598,11 +598,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("JobSchedulings");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Company", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Company", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -623,11 +619,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("Companies");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Department", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -653,11 +645,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("Departments");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Location", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -683,11 +671,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("Locations");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubDepartment", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.SubDepartment", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -713,11 +697,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("SubDepartments");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubLocation", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.SubLocation", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1567,12 +1547,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid?>("CompanyId")
                         .HasColumnType("uniqueidentifier");
 
-<<<<<<< HEAD
-=======
-                    b.Property<Guid?>("CompanyId1")
-                        .HasColumnType("uniqueidentifier");
-
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -1669,11 +1643,6 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-<<<<<<< HEAD
-=======
-                    b.HasIndex("CompanyId1");
-
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("IsActive");
@@ -1697,11 +1666,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditEngagement", b =>
                 {
-<<<<<<< HEAD
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Location", "Location")
-=======
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Location", "Location")
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1852,41 +1817,23 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Rating");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Company", null)
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Department", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Company", null)
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany("Departments")
                         .HasForeignKey("CompanyId");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Company", null)
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Location", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Company", null)
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany("Locations")
                         .HasForeignKey("CompanyId");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubDepartment", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Department", "Department")
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.SubDepartment", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Department", "Department")
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany("SubDepartments")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1895,15 +1842,9 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Department");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubLocation", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Location", "Location")
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.SubLocation", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Location", "Location")
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany("SubLocations")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2170,25 +2111,12 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("User", b =>
                 {
-<<<<<<< HEAD
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Company", "Company")
                         .WithMany("Users")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Department", "Department")
-=======
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Company", null)
-                        .WithMany("Users")
-                        .HasForeignKey("CompanyId1");
-
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.Department", "Department")
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2199,11 +2127,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-<<<<<<< HEAD
                     b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
-=======
-                    b.HasOne("AuditSystem.Domain.Entities.Organisation.SubDepartment", "SubDepartment")
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                         .WithMany()
                         .HasForeignKey("SubDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -2227,11 +2151,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Checklists");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Company", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Company", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Navigation("Departments");
 
@@ -2240,20 +2160,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Users");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Department", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Navigation("SubDepartments");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
-=======
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Organisation.Location", b =>
->>>>>>> a163b46df9dd1371812b7eb29bec045c41543b9c
                 {
                     b.Navigation("SubLocations");
                 });

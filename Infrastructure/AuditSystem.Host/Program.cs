@@ -9,28 +9,35 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Set up Configuration, Services
 var configuration = builder.Configuration;
 var services = builder.Services;
+var environment = builder.Environment;
 
+// Add Controllers
 services.AddControllers();
 
-var healthCheckBuilder = builder.Services.AddHealthChecks()
+// Add Health Checks
+var healthCheckBuilder = services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
+// Add Swagger for API documentation
 services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-var isProduction = builder.Environment.IsProduction();
-
-services.AddClients(configuration, isProduction);
+// Register Custom Application Services
+services.AddClients(configuration, environment.IsProduction());
 services.AddLogging();
 services.AddApplication();
 services.AddDomain();
 services.AddAuthDependencies(configuration);
-services.AddDataAccess(configuration, healthCheckBuilder, isProduction);
+services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
 
-services.AddCors((settings) =>
+// Register Cross-Origin Resource Sharing (CORS) Policy
+services.AddCors(options =>
 {
-    settings.AddDefaultPolicy(policy =>
+    options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
@@ -38,37 +45,52 @@ services.AddCors((settings) =>
     });
 });
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+// Allow access to HTTP Context
 services.AddHttpContextAccessor();
+
+// Add Caching
 services.AddDistributedMemoryCache();
 
-// Increase FormOption limits
+// Configure Form Options (for large file uploads)
 services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 1_000_000_000; // 1gb
+    options.MultipartBodyLengthLimit = 1_000_000_000; // 1 GB
 });
 
-// Increase Kestrel request body size limit
+// Configure Kestrel server limits
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 1_000_000_000; // 1gb
+    options.Limits.MaxRequestBodySize = 1_000_000_000; // 1 GB
 });
 
+// Build the application
 var app = builder.Build();
 
+// Auto-migrate database on startup
 app.MigrateDatabase();
 
-app.UseSwagger(options =>
+// Enable Swagger/OpenAPI UI
+if (environment.IsDevelopment() || environment.IsStaging())
 {
-    options.RouteTemplate = "/openapi/{documentName}.json";
-});
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "/openapi/{documentName}.json";
+    });
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "Audit System API V1");
+    });
+}
+
+// Map Scalar Reference API (Custom library)
 app.MapScalarApiReference();
+
+// Setup custom middlewares
 app.UseScopedLogging();
 app.UseErrorHandling();
 app.UseValidation();
 
+// Map Health Check Endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -83,7 +105,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description,
-                duration = e.Value.Duration.TotalMilliseconds + " ms"
+                duration = $"{e.Value.Duration.TotalMilliseconds} ms"
             }),
             timestamp = DateTime.UtcNow
         };
@@ -92,13 +114,21 @@ app.MapHealthChecks("/health", new HealthCheckOptions
     }
 });
 
+// Enable CORS
+app.UseCors();
+
+// Redirect HTTP to HTTPS
+app.UseHttpsRedirection();
+
+// Enable Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseHttpsRedirection();
-app.UseCors();
+// Enable Output Caching (if configured)
 app.UseOutputCache();
 
+// Map Controller Endpoints
 app.MapControllers();
 
+// Run the application
 await app.RunAsync();

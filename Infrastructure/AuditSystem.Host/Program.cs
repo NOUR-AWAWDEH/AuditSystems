@@ -85,10 +85,8 @@ if (environment.IsDevelopment() || environment.IsStaging())
 // Map Scalar Reference API (Custom library)
 app.MapScalarApiReference();
 
-// Setup custom middlewares
-app.UseScopedLogging();
-app.UseErrorHandling();
-app.UseValidation();
+// Correct order:
+app.UseCustomMiddlewarePipeline();
 
 // Map Health Check Endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions

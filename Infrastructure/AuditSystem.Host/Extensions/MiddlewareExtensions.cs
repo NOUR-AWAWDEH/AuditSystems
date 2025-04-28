@@ -4,12 +4,28 @@ namespace AuditSystem.Host.Extensions;
 
 public static class MiddlewareExtensions
 {
-    public static void UseErrorHandling(this IApplicationBuilder builder) =>
-        builder.UseMiddleware<ErrorHandlingMiddleware>();
+    public static IApplicationBuilder UseScopedLogging(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<LoggerScopedMiddleware>();
+    }
 
-    public static void UseValidation(this IApplicationBuilder builder) =>
-        builder.UseMiddleware<ValidationMiddleware>();
+    public static IApplicationBuilder UseValidation(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<ValidationMiddleware>();
+    }
 
-    public static void UseScopedLogging(this IApplicationBuilder builder) =>
-        builder.UseMiddleware<LoggerScopedMiddleware>();
+    public static IApplicationBuilder UseErrorHandling(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<ErrorHandlingMiddleware>();
+    }
+
+    // Recommended extension method for proper middleware ordering
+    public static IApplicationBuilder UseCustomMiddlewarePipeline(this IApplicationBuilder builder)
+    {
+        // Recommended order:
+        return builder
+            .UseScopedLogging()        // First - setup request logging
+            .UseValidation()           // Second - handle validation
+            .UseErrorHandling();      // Last - catch all exceptions
+    }
 }

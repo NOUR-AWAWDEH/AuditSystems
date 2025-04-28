@@ -1,39 +1,32 @@
+using System.Diagnostics;
 using FluentValidation;
 using MediatR;
 
 namespace AuditSystem.Application.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators) :
-    IPipelineBehavior<TRequest, ValidationResultResponse<TResponse>>
-    where TRequest : IRequest<ValidationResultResponse<TResponse>>
+[DebuggerStepThrough]
+public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
 {
-    public async Task<ValidationResultResponse<TResponse>> Handle(TRequest request,
-        RequestHandlerDelegate<ValidationResultResponse<TResponse>> next,
-        CancellationToken cancellationToken)
+    private readonly IEnumerable<IValidator<TRequest>> _validators;
+
+    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
-        var context = new ValidationContext<TRequest>(request);
-        var validationFailures = await Task.WhenAll(validators.Select(validator => validator.ValidateAsync(context)));
-        var errors = validationFailures
-            .Where(validationResult => !validationResult.IsValid)
-            .SelectMany(validationResult => validationResult.Errors)
-            .Select(error => error.ErrorMessage)
-            .ToList();
+        _validators = validators;
+    }
 
-        if (errors.Count != 0)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    {
+        if (_validators.Any())
         {
-            return new ValidationResultResponse<TResponse>
+            var context = new ValidationContext<TRequest>(request);
+            var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+            var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
+            if (failures.Count != 0)
             {
-                IsValid = false,
-                Errors = errors
-            };
+                throw new ValidationException(failures);
+            }
         }
-
-        var response = await next();
-
-        return new ValidationResultResponse<TResponse>
-        {
-            IsValid = true,
-            Response = response.Response
-        };
+        return await next();
     }
 }

@@ -12,7 +12,6 @@ internal sealed class CreateAuditDomainCommandHandler(
     IMapper mapper,
     ILogger<CreateAuditDomainCommandHandler> logger)
     : IRequestHandler<CreateAuditDomainCommand, Result<CreateAuditDomainCommandResponse>>
-
 {
 
     public async Task<Result<CreateAuditDomainCommandResponse>> Handle(CreateAuditDomainCommand request, CancellationToken cancellationToken)

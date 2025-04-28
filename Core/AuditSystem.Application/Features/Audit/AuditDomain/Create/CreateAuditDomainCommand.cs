@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Audit.AuditDomain.Create;
 
 public sealed record class CreateAuditDomainCommand : ICommand<Result<CreateAuditDomainCommandResponse>>
 {
-    public required string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 }

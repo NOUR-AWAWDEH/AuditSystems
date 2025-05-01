@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using FluentValidation;
 using MediatR;
 
 namespace AuditSystem.Application.Behaviors;
 
-[DebuggerStepThrough]
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {

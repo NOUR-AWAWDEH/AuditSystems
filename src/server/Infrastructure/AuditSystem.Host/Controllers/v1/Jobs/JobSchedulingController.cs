@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Jobs.JobScheduling.Get;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Search;
 using AuditSystem.Application.Features.Jobs.JobScheduling.Update;
 using AuditSystem.Contract.Models.Jobs;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

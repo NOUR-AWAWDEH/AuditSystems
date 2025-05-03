@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Get;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Search;
 using AuditSystem.Application.Features.Compliance.ComplianceChecklist.Update;
 using AuditSystem.Contract.Models.Compliance;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

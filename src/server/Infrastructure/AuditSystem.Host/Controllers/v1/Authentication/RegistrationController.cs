@@ -1,7 +1,7 @@
 ﻿using AuditSystem.Auth.Dtos.Register;
 using AuditSystem.Auth.Services.Registration;
 using AuditSystem.BusinessLogic.Attributes;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;

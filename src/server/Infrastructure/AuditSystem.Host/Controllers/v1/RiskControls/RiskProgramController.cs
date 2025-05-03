@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.RiskControls.RiskProgram.Get;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Search;
 using AuditSystem.Application.Features.RiskControls.RiskProgram.Update;
 using AuditSystem.Contract.Models.RiskControls;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -12,9 +12,9 @@ defineProps({
 </script>
 
 <template>
-  <img 
-    src="@/assets/icons/AuditSystem.svg" 
-    :class="[width, height]" 
-    alt="Audit System Logo" 
+  <img
+    src="@/assets/icons/AuditSystem.svg"
+    :class="[width, height]"
+    alt="Audit System Logo"
   />
 </template>

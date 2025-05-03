@@ -96,9 +96,8 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(randomNumber);
     }
 
-    public async Task SaveRefreshTokenAsync(User user, string refreshToken)
+    public async Task<bool> SaveRefreshTokenAsync(User user, string refreshToken)
     {
-        // Optional: Validate inputs
         if (user == null) throw new ArgumentNullException(nameof(user));
         if (string.IsNullOrEmpty(refreshToken)) throw new ArgumentException("Refresh token cannot be null or empty.", nameof(refreshToken));
 
@@ -107,12 +106,15 @@ public class TokenService : ITokenService
             Id = Guid.NewGuid(),
             Token = refreshToken,
             UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(7), // Adjust expiration as needed
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
             IsRevoked = false,
             CreatedAt = DateTime.UtcNow
         };
 
         _applicationDbContext.RefreshTokens.Add(refreshTokenEntity);
         await _applicationDbContext.SaveChangesAsync();
+
+        return true; 
     }
+
 }

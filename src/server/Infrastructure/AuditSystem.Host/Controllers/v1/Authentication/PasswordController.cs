@@ -5,7 +5,7 @@ using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.BusinessLogic.Attributes;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
@@ -31,7 +31,11 @@ public sealed class PasswordController(
         if (user == null)
         {
             _logger.LogWarning("Password reset attempted for non-existent email: {Email}", request.Email);
-            return NotFound(ApiResponse.NotFound("User"));
+            return NotFound(ApiResponse.NotFound(new List<ApiErrorResponse>
+            {
+                new ApiErrorResponse("User")
+            }));
+
         }
 
         var resetCode = _passwordResetService.GenerateResetCode();
@@ -72,7 +76,7 @@ public sealed class PasswordController(
 
         var user = await _accountService.FindByEmailAsync(request.Email);
         if (user == null)
-            return NotFound(ApiResponse.NotFound("User"));
+            return NotFound(ApiResponse.NotFound(new List<ApiErrorResponse> { new ApiErrorResponse("User") }));
 
         if (!_passwordTokenService.ValidateResetTokenAsync(user, request.Token))
             return BadRequest(ApiResponse.BadRequest("Invalid or expired reset token"));

@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Search;
 using AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Update;
 using AuditSystem.Contract.Models.Reports;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

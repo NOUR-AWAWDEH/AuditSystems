@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Reports.PlanningReport.Get;
 using AuditSystem.Application.Features.Reports.PlanningReport.Search;
 using AuditSystem.Application.Features.Reports.PlanningReport.Update;
 using AuditSystem.Contract.Models.Reports;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Extensions;
@@ -30,29 +30,38 @@ public static class ResultExtensions
 
     private static IActionResult ToHttpNonSuccessResult(this Ardalis.Result.IResult result)
     {
+        // Map errors to ApiErrorResponse
         var errors = result.Errors.Select(error => new ApiErrorResponse(error)).ToList();
 
         switch (result.Status)
         {
             case ResultStatus.Invalid:
-
                 var validationErrors = result
                     .ValidationErrors
-                    .Select(validation => new ApiErrorResponse(validation.ErrorMessage));
+                    .Select(validation => new ApiErrorResponse(validation.ErrorMessage))
+                    .ToList();
 
+                // Correctly pass IEnumerable<ApiErrorResponse> to the BadRequest method
                 return new BadRequestObjectResult(ApiResponse.BadRequest(validationErrors));
 
             case ResultStatus.NotFound:
-                return new NotFoundObjectResult(ApiResponse.NotFound(errors));
+                var notFoundResponse = ApiResponse.NotFound(errors);
+                return new ObjectResult(notFoundResponse) { StatusCode = notFoundResponse.StatusCode };
 
             case ResultStatus.Forbidden:
                 return new ForbidResult();
 
             case ResultStatus.Unauthorized:
-                return new UnauthorizedObjectResult(ApiResponse.Unauthorized(errors));
+                var unauthorizedResponse = ApiResponse.Unauthorized(errors); // Passing List<ApiErrorResponse>
+                return new UnauthorizedObjectResult(unauthorizedResponse);
 
             default:
-                return new BadRequestObjectResult(ApiResponse.BadRequest(errors));
+                // Default to BadRequest
+                var badRequestResponse = ApiResponse.BadRequest(errors); // Passing List<ApiErrorResponse>
+                return new BadRequestObjectResult(badRequestResponse);
         }
     }
+
+
+
 }

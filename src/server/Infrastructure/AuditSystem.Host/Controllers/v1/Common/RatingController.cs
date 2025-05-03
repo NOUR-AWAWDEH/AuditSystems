@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Common.Rating.Get;
 using AuditSystem.Application.Features.Common.Rating.Search;
 using AuditSystem.Application.Features.Common.Rating.Update;
 using AuditSystem.Contract.Models.Common;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

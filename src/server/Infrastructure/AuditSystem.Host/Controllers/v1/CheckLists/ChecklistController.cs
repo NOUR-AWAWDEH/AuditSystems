@@ -5,7 +5,7 @@ using AuditSystem.Application.Features.Checklists.Checklist.Get;
 using AuditSystem.Application.Features.Checklists.Checklist.Update;
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Contract.Models.Checklists;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

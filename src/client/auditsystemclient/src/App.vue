@@ -1,13 +1,11 @@
 <script setup>
-import { ref } from 'vue'
 import LoginForm from '@/components/features/auth/LoginForm.vue'
-import Logo from '@/components/common/Logo.vue'
+import Logo from '@/components/common/AuditLogo.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const { isAuthenticated } = useAuth()
 
 const handleLoginSuccess = () => {
-  // In a real app with router, you would redirect to dashboard
   console.log('Login successful, would redirect to dashboard')
 }
 </script>
@@ -18,11 +16,11 @@ const handleLoginSuccess = () => {
     <div class="flex justify-center mb-8 w-full">
       <Logo />
     </div>
-    
+
     <!-- Login Form -->
-    <LoginForm 
-      v-if="!isAuthenticated" 
-      :onLoginSuccess="handleLoginSuccess" 
+    <LoginForm
+      v-if="!isAuthenticated"
+      :onLoginSuccess="handleLoginSuccess"
     />
 
   </div>

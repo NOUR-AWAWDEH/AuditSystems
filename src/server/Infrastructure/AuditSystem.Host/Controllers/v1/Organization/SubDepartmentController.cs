@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Organization.SubDepartment.Get;
 using AuditSystem.Application.Features.Organization.SubDepartment.Search;
 using AuditSystem.Application.Features.Organization.SubDepartment.Update;
 using AuditSystem.Contract.Models.Organization;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

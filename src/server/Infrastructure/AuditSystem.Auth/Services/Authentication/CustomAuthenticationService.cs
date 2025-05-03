@@ -1,6 +1,7 @@
 using AuditSystem.Auth.Authentication;
 using AuditSystem.Auth.Dtos.AuthStatus;
 using AuditSystem.Auth.Dtos.Login;
+using AuditSystem.Contract.Common;
 using AuditSystem.DataAccess.Contexts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,30 +12,20 @@ using System.Security.Claims;
 
 namespace AuditSystem.Auth.Services.Authentication;
 
-public class CustomAuthenticationService : ICustomAuthenticationService
+public class CustomAuthenticationService(
+    UserManager<User> userManager,
+    ApplicationDbContext applicationDbContext,
+    SignInManager<User> signInManager,
+    IHttpContextAccessor httpContextAccessor,
+ITokenService tokenService,
+    ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ApplicationDbContext _applicationDbContext;
-    private readonly SignInManager<User> _signInManager;
-    private readonly ITokenService _tokenService;
-    private readonly ILogger<CustomAuthenticationService> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public CustomAuthenticationService(
-        UserManager<User> userManager,
-        ApplicationDbContext applicationDbContext,
-        SignInManager<User> signInManager,
-        IHttpContextAccessor httpContextAccessor,
-    ITokenService tokenService,
-        ILogger<CustomAuthenticationService> logger)
-    {
-        _applicationDbContext = applicationDbContext;
-        _httpContextAccessor = httpContextAccessor;
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _tokenService = tokenService;
-        _logger = logger;
-    }
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly ApplicationDbContext _applicationDbContext = applicationDbContext;
+    private readonly SignInManager<User> _signInManager = signInManager;
+    private readonly ITokenService _tokenService = tokenService;
+    private readonly ILogger<CustomAuthenticationService> _logger = logger;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task<AuthStatusResponseDto?> GetAuthStatusFromToken(AuthStatusRequestDto token)
     {
@@ -106,50 +97,86 @@ public class CustomAuthenticationService : ICustomAuthenticationService
     }
 
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+    public async Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginRequestDto request)
     {
-        // Fetch user with Role included
+        // 1. Validate input
+        if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            _logger.LogWarning("Login attempt with missing username or password.");
+            return ApiResponse<LoginResponseDto>.BadRequest("Username and password are required.");
+        }
+
+        // 2. Fetch user with custom Role navigation property
         var user = await _userManager.Users
-            .Include(u => u.Role)  // Explicitly load Role
+            .Include(u => u.Role) // Keep this since you're using a custom Role relationship
             .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
-        if (user == null || string.IsNullOrEmpty(user.UserName))
+        if (user == null)
         {
-            _logger.LogError("User not found with username: {Username}", request.Username);
-            return null;
+            _logger.LogWarning("User not found with username: {Username}", request.Username);
+            return ApiResponse<LoginResponseDto>.BadRequest("Invalid username or password.");
         }
 
-        // Check if the email is confirmed
+        // 3. Check if the email is confirmed
         if (!user.EmailConfirmed)
         {
-            return new LoginResponseDto
-            {
-                IsEmailVerified = false
-            };
+            _logger.LogWarning("Unverified email login attempt for user: {Username}", request.Username);
+            return ApiResponse<LoginResponseDto>.BadRequest("Email not verified. Please verify your email before logging in.");
         }
 
-        // Check password
-        var result = await _signInManager.PasswordSignInAsync(request.Username, request.Password, false, false);
+        // 4. Check password using SignInManager
+        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
         if (!result.Succeeded)
         {
-            _logger.LogError("Sign-in failed for user: {Username}", request.Username);
-            return null;
+            string errorMessage = "Invalid username or password.";
+
+            if (result.IsLockedOut)
+            {
+                errorMessage = "Account is locked. Please try again later or contact support.";
+                _logger.LogWarning("Account locked for user: {Username}", request.Username);
+            }
+            else if (result.IsNotAllowed)
+            {
+                errorMessage = "Login not allowed. Please contact support.";
+                _logger.LogWarning("Login not allowed for user: {Username}", request.Username);
+            }
+            else if (result.RequiresTwoFactor)
+            {
+                errorMessage = "Two-factor authentication required.";
+                _logger.LogWarning("Two-factor authentication required for user: {Username}", request.Username);
+            }
+            else
+            {
+                _logger.LogWarning("Invalid password for user: {Username}", request.Username);
+            }
+
+            return ApiResponse<LoginResponseDto>.BadRequest(errorMessage);
         }
 
-        // Generate tokens
+        // 5. Generate JWT and Refresh Token
         var jwtToken = _tokenService.GenerateJwtToken(user);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
-        // Save refresh token
-        await _tokenService.SaveRefreshTokenAsync(user, refreshToken);
+        // 6. Save the refresh token securely
+        var tokenSaveResult = await _tokenService.SaveRefreshTokenAsync(user, refreshToken);
+        if (!tokenSaveResult)
+        {
+            _logger.LogError("Failed to save refresh token for user: {Username}", request.Username);
+            return ApiResponse<LoginResponseDto>.InternalServerError("Failed to generate tokens. Please try again.");
+        }
 
-        return new LoginResponseDto
+        // 7. Construct the response DTO
+        var loginResponse = new LoginResponseDto
         {
             JwtToken = jwtToken,
             RefreshToken = refreshToken,
             IsEmailVerified = true
         };
+
+        _logger.LogInformation("User {Username} logged in successfully.", request.Username);
+        return ApiResponse<LoginResponseDto>.Ok(loginResponse, "Login successful.");
     }
+
 
     public async Task<bool> RevokeAllRefreshTokensAsync(string userId)
     {
@@ -164,7 +191,7 @@ public class CustomAuthenticationService : ICustomAuthenticationService
             .Where(rt => rt.UserId == userIdGuid && !rt.IsRevoked)
             .ToListAsync();
 
-        if (!tokens.Any())
+        if (tokens.Count == 0)
         {
             _logger.LogInformation("No active refresh tokens found for userId: {userId}", userId);
             return false;

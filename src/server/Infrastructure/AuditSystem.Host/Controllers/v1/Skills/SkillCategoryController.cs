@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Skills.SkillCategory.Get;
 using AuditSystem.Application.Features.Skills.SkillCategory.Search;
 using AuditSystem.Application.Features.Skills.SkillCategory.Update;
 using AuditSystem.Contract.Models.Skills;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

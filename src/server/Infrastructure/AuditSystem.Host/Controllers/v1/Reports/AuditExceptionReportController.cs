@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.Reports.AuditExceptionReport.Get;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Search;
 using AuditSystem.Application.Features.Reports.AuditExceptionReport.Update;
 using AuditSystem.Contract.Models.Reports;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

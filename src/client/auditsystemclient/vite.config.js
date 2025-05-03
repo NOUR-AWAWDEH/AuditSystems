@@ -9,20 +9,20 @@ export default defineConfig({
         vue(),
         tailwindcss(),
     ],
-    
+
     resolve: {
         alias: {
-            '@': path.resolve(__dirname, 'src')
+            '@': path.resolve('src')
         }
     },
-    
+
     server: {
-        port: 60480,
+        port: 5173, // Match the actual port Vue is running on
         proxy: {
             '/api': {
-                target: 'http://localhost:5164',
+                target: 'https://localhost:7218', // Use HTTPS
                 changeOrigin: true,
-                secure: false,
+                secure: false, // Ignore SSL certificate validation in development
             }
         }
     }

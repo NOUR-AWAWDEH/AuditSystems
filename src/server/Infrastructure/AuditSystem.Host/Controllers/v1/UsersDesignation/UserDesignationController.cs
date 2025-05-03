@@ -6,7 +6,7 @@ using AuditSystem.Application.Features.UserDesignation.Get;
 using AuditSystem.Application.Features.UserDesignation.Search;
 using AuditSystem.Application.Features.UserDesignation.Update;
 using AuditSystem.Contract.Models.UserDesignation;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

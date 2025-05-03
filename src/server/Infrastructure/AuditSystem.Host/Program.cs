@@ -39,7 +39,7 @@ services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:60480")
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -56,6 +56,7 @@ services.AddDistributedMemoryCache();
 services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 1_000_000_000; // 1 GB
+    
 });
 
 // Configure Kestrel server limits

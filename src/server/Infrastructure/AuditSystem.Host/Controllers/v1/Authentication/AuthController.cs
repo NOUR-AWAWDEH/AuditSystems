@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using AuditSystem.BusinessLogic.Attributes;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
@@ -20,44 +20,10 @@ public sealed class AuthController(
 
     [HttpPost("login")]
     [PreventBruteForce]
-    public async Task<ActionResult<ApiResponse<LoginResponseDto>>> LoginAsync([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ApiResponse<LoginResponseDto>.BadRequest("Invalid request model"));
-
         var response = await _authService.LoginAsync(request);
-        if (response == null)
-        {
-            _logger.LogWarning("Failed login attempt for user {Username}", request.Username);
-            return Unauthorized(ApiResponse<LoginResponseDto>.Unauthorized("Invalid credentials"));
-        }
-
-        if (!response.IsEmailVerified)
-        {
-            _logger.LogWarning("Login attempt for unverified email {Email}", request.Username);
-            return Unauthorized(ApiResponse<LoginResponseDto>.Unauthorized("Email not confirmed. Please verify your email."));
-        }
-
-        _logger.LogInformation("User {Username} logged in successfully", request.Username);
-        return Ok(ApiResponse<LoginResponseDto>.Ok(response));
-    }
-
-    [HttpPost("authentication-status")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse<AuthStatusResponseDto>>> AuthStatusAsync([FromBody] AuthStatusRequestDto request)
-    {
-        if (!ModelState.IsValid || string.IsNullOrEmpty(request.Token))
-            return BadRequest(ApiResponse<AuthStatusResponseDto>.BadRequest("Token is required"));
-
-        var response = await _authService.GetAuthStatusFromToken(request);
-        if (response == null || !response.IsAuthenticated)
-        {
-            _logger.LogWarning("Failed authentication attempt.");
-            return Unauthorized(ApiResponse<AuthStatusResponseDto>.Unauthorized("Authentication token is invalid or expired"));
-        }
-
-        _logger.LogInformation("User {Username} authenticated successfully", response.Username);
-        return Ok(ApiResponse<AuthStatusResponseDto>.Ok(response));
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPost("logout")]

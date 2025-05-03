@@ -1,111 +1,91 @@
 using FluentValidation;
 using System.Text.Json;
+using AuditSystem.Contract.Common;
 
-namespace AuditSystem.Host.Middlewares
+namespace AuditSystem.Host.Middlewares;
+
+public class ErrorHandlingMiddleware
 {
-    public class ErrorHandlingMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly IWebHostEnvironment _env;
+
+    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IWebHostEnvironment env)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ErrorHandlingMiddleware> _logger;
-        private readonly IWebHostEnvironment _env;
+        _next = next;
+        _logger = logger;
+        _env = env;
+    }
 
-        public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IWebHostEnvironment env)
+    public async Task InvokeAsync(HttpContext httpContext)
+    {
+        try
         {
-            _next = next;
-            _logger = logger;
-            _env = env;
+            await _next(httpContext);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionAsync(httpContext, ex);
+        }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+    {
+        _logger.LogError(ex, "An error occurred while processing request to {Path}: {Message}", context.Request.Path, ex.Message);
+
+        if (context.Response.HasStarted)
+        {
+            _logger.LogWarning("Response has already started, cannot write error response.");
+            return;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext)
+        context.Response.ContentType = "application/json";
+
+        ApiResponse response;
+
+        if (ex is ValidationException validationEx)
         {
-            try
-            {
-                await _next(httpContext);
-            }
-            catch (Exception ex)
-            {
-                await HandleExceptionAsync(httpContext, ex);
-            }
+            var errors = validationEx.Errors
+                .Select(e => new ApiErrorResponse($"{e.PropertyName}: {e.ErrorMessage}"));
+            response = ApiResponse.BadRequest(errors);
+            context.Response.StatusCode = response.StatusCode;
+
+            _logger.LogWarning("Validation errors: {Errors}", JsonSerializer.Serialize(response.Errors));
+            await WriteJsonResponse(context, response);
+            return;
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        response = ex switch
         {
-            // Log the exception with additional context
-            _logger.LogError(ex, "An error occurred while processing request to {Path}: {Message}", context.Request.Path, ex.Message);
+            KeyNotFoundException => ApiResponse.NotFound(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
+            UnauthorizedAccessException => ApiResponse.Forbidden(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
+            InvalidOperationException or ArgumentNullException or ArgumentException => ApiResponse.BadRequest(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
+            _ => ApiResponse.InternalServerError(_env.IsDevelopment() ? ex.Message : "An unexpected error occurred.")
+        };
 
-            // Prevent writing to response if it has already started
-            if (context.Response.HasStarted)
+
+
+        context.Response.StatusCode = response.StatusCode;
+        await WriteJsonResponse(context, response);
+    }
+
+    private async Task WriteJsonResponse(HttpContext context, ApiResponse response)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
             {
-                _logger.LogWarning("Response has already started, cannot write error response.");
-                return;
-            }
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = _env.IsDevelopment()
+            });
 
-            // Set content type
-            context.Response.ContentType = "application/json";
-
-            // Handle ValidationException
-            if (ex is ValidationException validationEx)
-            {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-
-                var errorResponse = new
-                {
-                    Status = context.Response.StatusCode,
-                    Message = "Validation failed.",
-                    Errors = validationEx.Errors.Select(e => new
-                    {
-                        e.PropertyName,
-                        e.ErrorMessage,
-                        e.Severity
-                    }).ToList()
-                };
-
-                // Log validation errors specifically
-                _logger.LogWarning("Validation errors: {Errors}", JsonSerializer.Serialize(errorResponse.Errors));
-
-                await WriteJsonResponse(context, errorResponse);
-                return;
-            }
-
-            // Handle other exceptions
-            context.Response.StatusCode = ex switch
-            {
-                KeyNotFoundException => StatusCodes.Status404NotFound,
-                UnauthorizedAccessException => StatusCodes.Status403Forbidden,
-                InvalidOperationException => StatusCodes.Status400BadRequest,
-                ArgumentNullException => StatusCodes.Status400BadRequest,
-                ArgumentException => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            var generalErrorResponse = new
-            {
-                Status = context.Response.StatusCode,
-                Message = _env.IsDevelopment() ? ex.Message : "An unexpected error occurred.",
-                Details = _env.IsDevelopment() ? ex.StackTrace : null
-            };
-
-            await WriteJsonResponse(context, generalErrorResponse);
+            await context.Response.WriteAsync(json);
         }
-
-        private async Task WriteJsonResponse(HttpContext context, object response)
+        catch (Exception ex)
         {
-            try
-            {
-                // Use System.Text.Json for serialization to avoid Newtonsoft.Json issues
-                var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    WriteIndented = _env.IsDevelopment()
-                });
-                await context.Response.WriteAsync(json);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to serialize error response.");
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsync("{\"status\":500,\"message\":\"Failed to process error response.\"}");
-            }
+            _logger.LogError(ex, "Failed to serialize error response.");
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("{\"status\":500,\"message\":\"Failed to process error response.\"}");
         }
     }
 }

@@ -9,7 +9,7 @@ using AuditSystem.Application.Features.Organization.SubLocation.Get;
 using AuditSystem.Application.Features.Organization.SubLocation.Search;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Host.Repositories;
+using AuditSystem.Contract.Common;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 

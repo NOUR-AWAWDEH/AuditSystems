@@ -12,7 +12,7 @@ namespace AuditSystem.BusinessLogic.Attributes;
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public sealed class PreventBruteForceAttribute : Attribute, IAsyncActionFilter
 {
-    private const int DefaultRequestLimit = 5;
+    private const int DefaultRequestLimit = 20;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private readonly int _requestLimit;

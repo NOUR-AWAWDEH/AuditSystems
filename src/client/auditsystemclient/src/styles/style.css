@@ -27,4 +27,9 @@
   /* White and Black */
   --color-white: #ffffff; /* White */
   --color-black: #000000; /* Black */
+
+  --color-soft-error: #fee2e2;  /* soft red for error background */
+  --color-error: #b91c1c; /* ref for error text */
+  --color-success: #15803d; /* ref for success text */
+  --color-soft-success: #dcfce7; /* soft green for success background */
 }

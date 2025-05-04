@@ -1,12 +1,15 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 
 const { login, error } = useAuth();
+const router = useRouter();
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const validationErrors = ref([]);
+const loginSuccessMessage = ref('');
 
 const validateUsername = (username) => {
   if (!username) return 'Username is required';
@@ -41,24 +44,27 @@ const handleLogin = async () => {
   isLoading.value = true;
   const response = await login(username.value, password.value);
   isLoading.value = false;
-
   if (response.success) {
-    window.location.href = '/logout';
+    loginSuccessMessage.value = 'Login successful!';
+    setTimeout(() => {
+      loginSuccessMessage.value = '';
+      router.push('/signout');
+    }, 1000);
   }
 };
 </script>
 
 <template>
   <div class="bg-white text-secondary-base p-8 rounded-lg w-full max-w-md mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
-    <div v-if="validationErrors.length" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+    <div v-if="validationErrors.length" class="mb-4 p-3 bg-soft-error text-error rounded">
       <ul class="error-list">
         <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
       </ul>
     </div>
 
-    <div v-if="error" class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+    <div v-if="error" class="mb-4 p-3 bg-soft-error text-error rounded">
       {{ error }}
     </div>
 
@@ -71,6 +77,7 @@ const handleLogin = async () => {
         class="text-gray-base w-full px-4 py-2 border border-grey-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
         placeholder="Enter your user name"
         :disabled="isLoading"
+         @keydown.enter="handleLogin"
       />
     </div>
 
@@ -83,6 +90,7 @@ const handleLogin = async () => {
         class="text-gray-base w-full px-4 py-2 border border-gray-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
         placeholder="Enter your password"
         :disabled="isLoading"
+        @keydown.enter="handleLogin"
       />
     </div>
 
@@ -96,7 +104,9 @@ const handleLogin = async () => {
         <span v-else>Login</span>
       </button>
     </div>
-
+    <div v-if="loginSuccessMessage" class="mt-4 mb-4 p-3 bg-soft-success text-success rounded">
+      {{ loginSuccessMessage }}
+    </div>
     <!-- Forgot Password Link -->
     <div class="text-center mt-4">
       <a

@@ -19,7 +19,6 @@ export function useAuth() {
         refreshToken.value = response.result.refreshToken;
         user.value = { username }; // Adjust based on actual user data
         isAuthenticated.value = true;
-
         localStorage.setItem('token', token.value);
         localStorage.setItem('refreshToken', refreshToken.value);
         authService.setAuthHeader(token.value);

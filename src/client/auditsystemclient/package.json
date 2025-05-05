@@ -8,7 +8,7 @@
     "dev": "vite",
     "lint": "eslint --ext .js,.vue src",
     "serve": "serve dist",
-    "start": "vite serve"
+    "start": "serve -s dist"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",

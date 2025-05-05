@@ -8,9 +8,20 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Scalar.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory()
+});
 
-// Set up Configuration, Services
+// Load .env file first
+DotNetEnv.Env.Load();
+
+// Configure environment loading explicitly
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddEnvironmentVariables();
+
 var configuration = builder.Configuration;
 var services = builder.Services;
 var environment = builder.Environment;
@@ -39,7 +50,7 @@ services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("https://auditsystem.onrender.com", "http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -72,7 +83,7 @@ var app = builder.Build();
 app.MigrateDatabase();
 
 // Enable Swagger/OpenAPI UI
-if (environment.IsDevelopment() || environment.IsStaging())
+if (environment.IsDevelopment() || environment.IsStaging() || environment.IsProduction())
 {
     app.UseSwagger(options =>
     {
@@ -118,7 +129,10 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 app.UseCors();
 
 // Redirect HTTP to HTTPS
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 // Enable Authentication & Authorization
 app.UseAuthentication();
@@ -130,5 +144,9 @@ app.UseOutputCache();
 // Map Controller Endpoints
 app.MapControllers();
 
+if (!app.Environment.IsProduction())
+{
+    app.MapGet("/", () => Results.Ok("Audit System API is live."));
+}
 // Run the application
 await app.RunAsync();

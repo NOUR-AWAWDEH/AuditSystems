@@ -32,5 +32,6 @@ RUN dotnet publish "./AuditSystem.Host.csproj" -c $BUILD_CONFIGURATION -o /app/p
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
+ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "AuditSystem.Host.dll"]

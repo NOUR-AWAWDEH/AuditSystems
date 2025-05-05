@@ -1,33 +1,34 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
 import { useAuth } from '@/composables/useAuth';
+import { useLoginValidation } from '@/services/validations/loginValidation';
 
 const { login, error } = useAuth();
-const router = useRouter();
+const { validateUsername, validatePassword } = useLoginValidation();
+
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const validationErrors = ref([]);
 const loginSuccessMessage = ref('');
+const isValidationErrorVisible = ref(false);
+const isSuccessMessageVisible = ref(false);
+const showPassword = ref(false);
+const isErrorVisible = ref(false);
 
-const validateUsername = (username) => {
-  if (!username) return 'Username is required';
-  if (username.length < 3) return 'Username must be at least 3 characters';
-  if (username.length > 50) return 'Username must be less than 50 characters';
-  if (!/^[a-zA-Z0-9_.-]+$/.test(username))
-    return 'Username can only contain letters, numbers, underscores, dots, and hyphens';
-  return null;
-};
+watch(error, (newError) => {
+  if (newError) {
+    isErrorVisible.value = true;
+    setTimeout(() => {
+      if (error.value === newError) {
+        isErrorVisible.value = false;
+      }
+    }, 2000);
+  }
+});
 
-const validatePassword = (password) => {
-  if (!password) return 'Password is required';
-  if (password.length < 8) return 'Password must be at least 8 characters';
-  if (!/[A-Z]/.test(password)) return 'Password must contain an uppercase letter';
-  if (!/[0-9]/.test(password)) return 'Password must contain a number';
-  if (!/[^A-Za-z0-9]/.test(password))
-    return 'Password must contain a special character';
-  return null;
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
 };
 
 const handleLogin = async () => {
@@ -39,18 +40,32 @@ const handleLogin = async () => {
   if (usernameError) validationErrors.value.push(usernameError);
   if (passwordError) validationErrors.value.push(passwordError);
 
-  if (validationErrors.value.length) return;
+  if (validationErrors.value.length) {
+    isValidationErrorVisible.value = true;
+    setTimeout(() => {
+      if (validationErrors.value.length === 0) {
+        isValidationErrorVisible.value = false;
+      }
+    }, 2000);
+    return;
+  }
 
   isLoading.value = true;
   const response = await login(username.value, password.value);
   isLoading.value = false;
   if (response.success) {
     loginSuccessMessage.value = 'Login successful!';
+    isSuccessMessageVisible.value = true;
     setTimeout(() => {
-      loginSuccessMessage.value = '';
-      router.push('/signout');
-    }, 1000);
+      if (loginSuccessMessage.value === 'Login successful!') {
+        isSuccessMessageVisible.value = false;
+      }
+    }, 2000);
   }
+};
+
+const handleForgotPassword = () => {
+  console.log('Forgot password clicked');
 };
 </script>
 
@@ -58,15 +73,34 @@ const handleLogin = async () => {
   <div class="bg-white text-secondary-base p-8 rounded-lg w-full max-w-md mx-auto">
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
-    <div v-if="validationErrors.length" class="mb-4 p-3 bg-soft-error text-error rounded">
-      <ul class="error-list">
-        <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
-      </ul>
-    </div>
+    <transition name="fade">
+      <div
+        v-if="validationErrors.length && isValidationErrorVisible"
+        class="mb-4 p-3 bg-soft-error text-error rounded-md"
+      >
+        <ul class="list-none pl-5">
+          <li v-for="(error, index) in validationErrors" :key="index">{{ error }}</li>
+        </ul>
+      </div>
+    </transition>
 
-    <div v-if="error" class="mb-4 p-3 bg-soft-error text-error rounded">
-      {{ error }}
-    </div>
+    <transition name="fade">
+      <div
+        v-if="error && isErrorVisible"
+        class="mb-4 p-3 bg-soft-error text-error rounded-md"
+      >
+        {{ error }}
+      </div>
+    </transition>
+
+    <transition name="fade">
+      <div
+        v-if="loginSuccessMessage && isSuccessMessageVisible"
+        class="mb-4 p-3 bg-soft-success text-success rounded-md"
+      >
+        {{ loginSuccessMessage }}
+      </div>
+    </transition>
 
     <div class="mb-4">
       <label for="username" class="block mb-2 font-medium text-left">User Name</label>
@@ -74,47 +108,84 @@ const handleLogin = async () => {
         id="username"
         v-model="username"
         type="text"
-        class="text-gray-base w-full px-4 py-2 border border-grey-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
-        placeholder="Enter your user name"
-        :disabled="isLoading"
-         @keydown.enter="handleLogin"
-      />
-    </div>
-
-    <div class="mb-6">
-      <label for="password" class="block text-grey mb-2 font-medium text-left">Password</label>
-      <input
-        id="password"
-        v-model="password"
-        type="password"
-        class="text-gray-base w-full px-4 py-2 border border-gray-light rounded focus:outline-none focus:ring-2 focus:ring-primary"
-        placeholder="Enter your password"
+        class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-base"
+        placeholder="Enter your username"
         :disabled="isLoading"
         @keydown.enter="handleLogin"
       />
     </div>
 
-    <div class="flex justify-center">
-      <button
-        @click="handleLogin"
-        class="w-full bg-secondary-base hover:bg-primary-dark text-white font-medium py-2 px-4 rounded transition-colors duration-300"
-        :disabled="isLoading"
-      >
-        <span v-if="isLoading">Logging in...</span>
-        <span v-else>Login</span>
-      </button>
+    <div class="mb-6 relative">
+      <label for="password" class="block mb-2 font-medium text-left">Password</label>
+      <div class="relative">
+        <input
+          id="password"
+          v-model="password"
+          :type="showPassword ? 'text' : 'password'"
+          class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-base pr-10"
+          placeholder="Enter your password"
+          :disabled="isLoading"
+          @keydown.enter="handleLogin"
+        />
+        <button
+          type="button"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center"
+          @click="togglePasswordVisibility"
+        >
+          <svg
+            class="h-5 w-5 text-gray-base"
+            :class="{ 'text-secondary-tint': showPassword }"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              v-if="showPassword"
+              d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+            />
+            <circle v-if="showPassword" cx="12" cy="12" r="3" />
+            <path
+              v-if="!showPassword"
+              d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+            />
+            <line v-if="!showPassword" x1="1" y1="1" x2="23" y2="23" />
+          </svg>
+        </button>
+      </div>
     </div>
-    <div v-if="loginSuccessMessage" class="mt-4 mb-4 p-3 bg-soft-success text-success rounded">
-      {{ loginSuccessMessage }}
-    </div>
-    <!-- Forgot Password Link -->
+
+    <button
+      @click="handleLogin"
+      class="w-full bg-secondary-base hover:bg-secondary-shade text-white font-medium py-2 px-4 rounded-md transition-colors duration-300 cursor-pointer"
+      :disabled="isLoading"
+    >
+      <span v-if="isLoading">Logging in...</span>
+      <span v-else>Login</span>
+    </button>
+
     <div class="text-center mt-4">
       <a
         @click="handleForgotPassword"
-        class="text-primary hover:text-primary-dark cursor-pointer text-sm"
+        class="hover:text-secondary-shade cursor-pointer text-sm"
       >
         Forgot Password?
       </a>
     </div>
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

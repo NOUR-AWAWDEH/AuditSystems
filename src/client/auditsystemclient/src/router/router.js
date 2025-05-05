@@ -1,47 +1,66 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/components/features/auth/LoginForm.vue';
-import SignOut from '@/components/features/auth/SignOut.vue';
-// Import other components you want to route to, e.g., a Dashboard
-// import Dashboard from '@/components/Dashboard.vue';
+//import SignOut from '@/components/features/auth/SignOut.vue';
+
+// Lazy-loaded components for better performance
+const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
+//const AuditReports = () => import('@/components/features/reports/AuditReports.vue');
+//const Settings = () => import('@/components/features/settings/UserSettings.vue');
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/login'
+  },
   {
     path: '/login',
     name: 'Login',
     component: LoginForm,
+    meta: { requiresAuth: false }
   },
   {
-    path: '/signout', // Use lowercase for consistency
-    name: 'SignOut',
-    component: SignOut,
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true }
   },
-  // Add other routes here, e.g.:
-  // {
-  //   path: '/dashboard',
-  //   name: 'Dashboard',
-  //   component: Dashboard,
-  //   meta: { requiresAuth: true } // Example for protected routes
-  // },
-  // Redirect root path to login or dashboard depending on auth state
   {
-    path: '/',
-    redirect: '/login', // Or '/dashboard' if authenticated
-  },
+    path: '/:pathMatch(.*)*',
+    redirect: '/login'
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition || { top: 0 }
+  }
 });
 
-// Optional: Add navigation guards for authentication checks
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = !!localStorage.getItem('token'); // Basic check
-//   if (to.meta.requiresAuth && !isAuthenticated) {
-//     next('/login');
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('token');
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+
+  // Handle root path redirect first
+  if (to.path === '/' && !isAuthenticated) {
+    next('/login');
+    return;
+  }
+
+  // Redirect authenticated users from login to dashboard
+  if (to.name === 'Login' && isAuthenticated) {
+    next('/dashboard');
+    return;
+  }
+
+  // Protect authenticated routes
+  if (requiresAuth && !isAuthenticated) {
+    next({ name: 'Login', state: { redirectTo: to.fullPath } });
+    return;
+  }
+
+  next();
+});
 
 export default router;

@@ -1,13 +1,17 @@
 <script setup>
-import Logo from '@/components/common/AuditLogo.vue'
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const transitionName = computed(() => route.meta.transition || 'fade');
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen p-4">
-    <!-- Logo -->
-    <div class="flex justify-center mb-8 w-full">
-      <Logo />
-    </div>
-    <router-view></router-view>
+    <router-view v-slot="{ Component }">
+      <transition :name="transitionName">
+        <component :is="Component" />
+      </transition>
+    </router-view>
   </div>
 </template>

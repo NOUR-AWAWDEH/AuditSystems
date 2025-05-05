@@ -2,9 +2,12 @@
 import { ref, watch } from 'vue';
 import { useAuth } from '@/composables/useAuth';
 import { useLoginValidation } from '@/services/validations/loginValidation';
+import { useRouter } from 'vue-router';
+import Logo from '@/components/common/AuditLogo.vue';
 
 const { login, error } = useAuth();
 const { validateUsername, validatePassword } = useLoginValidation();
+const router = useRouter();
 
 const username = ref('');
 const password = ref('');
@@ -60,7 +63,8 @@ const handleLogin = async () => {
       if (loginSuccessMessage.value === 'Login successful!') {
         isSuccessMessageVisible.value = false;
       }
-    }, 2000);
+    }, 1000);
+    router.replace('/dashboard');
   }
 };
 
@@ -71,6 +75,9 @@ const handleForgotPassword = () => {
 
 <template>
   <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-md mx-auto h-auto">
+    <div class="flex justify-center mb-6 w-full">
+      <Logo />
+    </div>
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
     <transition name="fade">

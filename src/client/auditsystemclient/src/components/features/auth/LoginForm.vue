@@ -70,7 +70,7 @@ const handleForgotPassword = () => {
 </script>
 
 <template>
-  <div class="bg-white text-secondary-base p-8 rounded-lg w-full max-w-md mx-auto">
+  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-md mx-auto h-auto">
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
     <transition name="fade">
@@ -108,7 +108,7 @@ const handleForgotPassword = () => {
         id="username"
         v-model="username"
         type="text"
-        class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-base"
+        class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-tint"
         placeholder="Enter your username"
         :disabled="isLoading"
         @keydown.enter="handleLogin"
@@ -122,7 +122,7 @@ const handleForgotPassword = () => {
           id="password"
           v-model="password"
           :type="showPassword ? 'text' : 'password'"
-          class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-base pr-10"
+          class="w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-tint pr-10"
           placeholder="Enter your password"
           :disabled="isLoading"
           @keydown.enter="handleLogin"

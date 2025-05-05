@@ -13,6 +13,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
     "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
     "lint": "^1.1.2",
     "serve": "^14.2.3",
     "tailwindcss": "^4.1.5",
@@ -20,7 +21,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
+    "@eslint/js": "^9.26.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "eslint": "^9.22.0",
     "eslint-plugin-vue": "~10.0.0",

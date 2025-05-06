@@ -1,12 +1,23 @@
-using AuditSystem.Application;
+﻿using AuditSystem.Application;
 using AuditSystem.Auth;
 using AuditSystem.BusinessLogic;
 using AuditSystem.DataAccess;
 using AuditSystem.Host.Extensions;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Scalar.AspNetCore;
+using Swashbuckle.AspNetCore.SwaggerGen; // Added for Swagger
+using Swashbuckle.AspNetCore.SwaggerUI; // Added for Swagger UI
+
+DotNetEnv.Env.Load();
+
+var configBuilder = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddEnvironmentVariables()
+    .AddInMemoryCollection();
+
+var configuration = configBuilder.Build();
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -14,30 +25,26 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
-// Load .env file first
-DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
 
-// Configure environment loading explicitly
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddEnvironmentVariables();
-
-var configuration = builder.Configuration;
 var services = builder.Services;
 var environment = builder.Environment;
 
-// Add Controllers
 services.AddControllers();
+services.AddEndpointsApiExplorer(); // Required for OpenAPI generation
 
-// Add Health Checks
+services.AddSwaggerGen(options => // Added for Swagger
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Audit System API V1",
+        Version = "v1"
+    });
+});
+
 var healthCheckBuilder = services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
-// Add Swagger for API documentation
-services.AddEndpointsApiExplorer();
-services.AddSwaggerGen();
-
-// Register Custom Application Services
 services.AddClients(configuration, environment.IsProduction());
 services.AddLogging();
 services.AddApplication();
@@ -45,7 +52,6 @@ services.AddDomain();
 services.AddAuthDependencies(configuration);
 services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
 
-// Register Cross-Origin Resource Sharing (CORS) Policy
 services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -57,51 +63,43 @@ services.AddCors(options =>
     });
 });
 
-// Allow access to HTTP Context
 services.AddHttpContextAccessor();
-
-// Add Caching
 services.AddDistributedMemoryCache();
 
-// Configure Form Options (for large file uploads)
+services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(environment.ContentRootPath, "keys")))
+    .SetApplicationName("AuditSystem");
+
 services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 1_000_000_000; // 1 GB
-    
+    options.MultipartBodyLengthLimit = 1_000_000_000;
 });
 
-// Configure Kestrel server limits
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 1_000_000_000; // 1 GB
+    options.Limits.MaxRequestBodySize = 1_000_000_000;
 });
 
-// Build the application
 var app = builder.Build();
 
-// Auto-migrate database on startup
 app.MigrateDatabase();
 
-// Enable Swagger/OpenAPI UI
-if (environment.IsDevelopment() || environment.IsStaging() || environment.IsProduction())
+// Configure Swagger
+app.UseSwagger(options =>
 {
-    app.UseSwagger(options =>
-    {
-        options.RouteTemplate = "/openapi/{documentName}.json";
-    });
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "Audit System API V1");
-    });
-}
+    options.SerializeAsV2 = false; // Use OpenAPI v3
+    options.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
 
-// Map Scalar Reference API (Custom library)
-app.MapScalarApiReference();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
+    options.RoutePrefix = "swagger"; // Swagger UI at /swagger
+    options.DocumentTitle = "Audit System API";
+});
 
-// Correct order:
 app.UseCustomMiddlewarePipeline();
 
-// Map Health Check Endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -125,28 +123,24 @@ app.MapHealthChecks("/health", new HealthCheckOptions
     }
 });
 
-// Enable CORS
 app.UseCors();
 
-// Redirect HTTP to HTTPS
-if (!app.Environment.IsProduction())
+if (!environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
-// Enable Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Enable Output Caching (if configured)
 app.UseOutputCache();
 
-// Map Controller Endpoints
 app.MapControllers();
 
-if (!app.Environment.IsProduction())
+// Redirect root to Swagger UI
+app.MapGet("/", context =>
 {
-    app.MapGet("/", () => Results.Ok("Audit System API is live."));
-}
-// Run the application
+    context.Response.Redirect("/swagger", permanent: false);
+    return Task.CompletedTask;
+});
+
 await app.RunAsync();

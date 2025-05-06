@@ -18,30 +18,23 @@ public class TokenService : ITokenService
 
     public TokenService(IConfiguration config, UserManager<User> userManager, ApplicationDbContext applicationDbContext)
     {
-        _jwtSettings = config.GetSection("JwtSettings").Get<JwtSettings>()
-                       ?? throw new InvalidOperationException("JwtSettings section is missing or invalid in configuration.");
+        _jwtSettings = new JwtSettings
+        {
+            Key = config["JWT_KEY"] ?? "",
+            Issuer = config["JWT_ISSUER"] ?? "",
+            Audience = config["JWT_AUDIENCE"] ?? "",
+            ExpirationMinutes = int.TryParse(config["JWT_EXPIRATION_MINUTES"], out var minutes) ? minutes : 0
+        };
 
         var missingFields = new List<string>();
-        if (string.IsNullOrEmpty(_jwtSettings.Key))
-        {
-            missingFields.Add("JwtSettings:Key");
-        }
-        if (string.IsNullOrEmpty(_jwtSettings.Issuer))
-        {
-            missingFields.Add("JwtSettings:Issuer");
-        }
-        if (string.IsNullOrEmpty(_jwtSettings.Audience))
-        {
-            missingFields.Add("JwtSettings:Audience");
-        }
-        if (_jwtSettings.ExpirationMinutes <= 0)
-        {
-            missingFields.Add("JwtSettings:ExpirationMinutes");
-        }
+        if (string.IsNullOrWhiteSpace(_jwtSettings.Key)) missingFields.Add("JWT_KEY");
+        if (string.IsNullOrWhiteSpace(_jwtSettings.Issuer)) missingFields.Add("JWT_ISSUER");
+        if (string.IsNullOrWhiteSpace(_jwtSettings.Audience)) missingFields.Add("JWT_AUDIENCE");
+        if (_jwtSettings.ExpirationMinutes <= 0) missingFields.Add("JWT_EXPIRATION_MINUTES");
 
         if (missingFields.Any())
         {
-            throw new InvalidOperationException($"Missing JwtSettings fields: {string.Join(", ", missingFields)}");
+            throw new InvalidOperationException($"Missing JWT config values: {string.Join(", ", missingFields)}");
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
@@ -49,6 +42,7 @@ public class TokenService : ITokenService
 
         _applicationDbContext = applicationDbContext;
     }
+
 
 
     public string GenerateJwtToken(User request)

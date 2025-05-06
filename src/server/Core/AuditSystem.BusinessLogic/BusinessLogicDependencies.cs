@@ -71,25 +71,23 @@ public static class BusinessLogicDependencies
             .AddServices();
 
     private static IServiceCollection AddMappers(this IServiceCollection services) =>
-        services
-            .AddAutoMapper(typeof(BusinessLogicDependencies).Assembly)
-            .AddAutoMapper(typeof(AuditMappingProfile).Assembly)
-            .AddAutoMapper(typeof(ChecklistMappingProfile).Assembly)
-            .AddAutoMapper(typeof(CommonMappingProfile).Assembly)
-            .AddAutoMapper(typeof(ComplianceMappingProfile).Assembly)
-            .AddAutoMapper(typeof(JobsMappingProfile).Assembly)
-            .AddAutoMapper(typeof(OrganizationMappingProfile).Assembly)
-            .AddAutoMapper(typeof(ProcessMappingProfile).Assembly)
-            .AddAutoMapper(typeof(ReportsMappingProfile).Assembly)
-            .AddAutoMapper(typeof(RiskControlsMappingProfile).Assembly)
-            .AddAutoMapper(typeof(RisksMappingProfile).Assembly)
-            .AddAutoMapper(typeof(SkillsMappingProfile).Assembly)
-            .AddAutoMapper(typeof(SupportingDocsMappingProfile).Assembly)
-            .AddAutoMapper(typeof(TaskManagementMappingProfile).Assembly)
-            .AddAutoMapper(typeof(UserDesignationMappingProfile).Assembly);
-
-    // Fix: Ensure that BaseEntityCacheService<T> implements IBaseEntityCacheService<T> explicitly
-    // or use a concrete implementation that satisfies the interface constraint.
+    services.AddAutoMapper(
+        typeof(BusinessLogicDependencies).Assembly,
+        typeof(AuditMappingProfile).Assembly,
+        typeof(ChecklistMappingProfile).Assembly,
+        typeof(CommonMappingProfile).Assembly,
+        typeof(ComplianceMappingProfile).Assembly,
+        typeof(JobsMappingProfile).Assembly,
+        typeof(OrganizationMappingProfile).Assembly,
+        typeof(ProcessMappingProfile).Assembly,
+        typeof(ReportsMappingProfile).Assembly,
+        typeof(RiskControlsMappingProfile).Assembly,
+        typeof(RisksMappingProfile).Assembly,
+        typeof(SkillsMappingProfile).Assembly,
+        typeof(SupportingDocsMappingProfile).Assembly,
+        typeof(TaskManagementMappingProfile).Assembly,
+        typeof(UserDesignationMappingProfile).Assembly
+    );
 
     private static IServiceCollection AddServices(this IServiceCollection services) =>
     services

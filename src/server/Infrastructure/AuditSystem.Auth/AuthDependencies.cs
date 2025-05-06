@@ -38,12 +38,12 @@ public static class AuthDependencies
         // JWT Settings
         var jwtSettings = new JwtSettings
         {
-            Key = configuration["JwtSettings:Key"] ?? throw new ArgumentNullException("JwtSettings:Key", "JwtSettings:Key is missing in configuration"),
-            Issuer = configuration["JwtSettings:Issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer", "JwtSettings:Issuer is missing in configuration"),
-            Audience = configuration["JwtSettings:Audience"] ?? throw new ArgumentNullException("JwtSettings:Audience", "JwtSettings:Audience is missing in configuration"),
-            ExpirationMinutes = int.TryParse(configuration["JwtSettings:ExpirationMinutes"], out int expirationMinutes)
+            Key = configuration["JWT_KEY"] ?? throw new ArgumentNullException("JWT_KEY", "JWT_KEY is missing in configuration"),
+            Issuer = configuration["JWT_ISSUER"] ?? throw new ArgumentNullException("JWT_ISSUER", "JWT_ISSUER is missing in configuration"),
+            Audience = configuration["JWT_AUDIENCE"] ?? throw new ArgumentNullException("JWT_AUDIENCE", "JWT_AUDIENCE is missing in configuration"),
+            ExpirationMinutes = int.TryParse(configuration["JWT_EXPIRATION_MINUTES"], out int expirationMinutes)
         ? expirationMinutes
-        : throw new ArgumentException("Invalid or missing JwtSettings:ExpirationMinutes in configuration", "JwtSettings:ExpirationMinutes")
+        : throw new ArgumentException("Invalid or missing JWT_EXPIRATION_MINUTES in configuration", "JWT_EXPIRATION_MINUTES")
         };
 
         services.AddSingleton(jwtSettings);

@@ -61,11 +61,14 @@ public static class InfrastructureDependencies
         return services;
     }
 
-    private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration, bool isProduction) =>
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString(ConfigurationKeys.DefaultConnectionString))
-                   .EnableSensitiveDataLogging(!isProduction)  // Disable sensitive data logging in production
-                   .LogTo(Console.WriteLine, LogLevel.Information));  // Optional query logging for debugging
+    private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration, bool isProduction)
+    {
+        var connectionString = configuration[ConfigurationKeys.DefaultConnectionString] ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
+        return services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString)
+                   .EnableSensitiveDataLogging(!isProduction)
+                   .LogTo(Console.WriteLine, LogLevel.Information));
+    }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
     services

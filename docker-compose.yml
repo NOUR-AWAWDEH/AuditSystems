@@ -2,14 +2,17 @@ version: '3.8'
 
 services:
   api:
+    image: nourawawdeh/auditsystem
     build:
-      context: ./src/server
+      context: .
       dockerfile: Dockerfile
     ports:
       - "8080:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Server=db;Database=AuditSystem;User=sa;Password=Havana123%100;
+      - ConnectionStrings__Default="Server=db;Database=AuditSystem;User=sa;Password=Havana123%100;Encrypt=True;TrustServerCertificate=True;"
+    env_file:
+      - ./src/server/Infrastructure/AuditSystem.Host/.env
     depends_on:
       - db
 

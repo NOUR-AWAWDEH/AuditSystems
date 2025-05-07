@@ -93,6 +93,8 @@ public static class BusinessLogicDependencies
     services
         .AddScoped<ITransaction, Transaction>()
         .AddScoped<IRiskService, RiskService>()
+        // Add MemoryCache here
+        .AddMemoryCache()
 
         // Audit Services
         .AddScoped<IAuditDomainService, AuditDomainService>()
@@ -224,5 +226,5 @@ public static class BusinessLogicDependencies
         // User Designation Services
         .AddScoped<IUserDesignationService, UserDesignationService>()
         .AddScoped<IUnifiedCacheService<Guid, UserDesignation, UserDesignationModel>, UserDesignationService>();
-            
+    
 }

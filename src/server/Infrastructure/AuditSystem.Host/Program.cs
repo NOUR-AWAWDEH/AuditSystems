@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Swashbuckle.AspNetCore.SwaggerGen; // Added for Swagger
-using Swashbuckle.AspNetCore.SwaggerUI; // Added for Swagger UI
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
+// Load environment variables from .env file
 DotNetEnv.Env.Load();
 
+// Create configuration builder with environment variables
 var configBuilder = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddEnvironmentVariables()
@@ -19,32 +21,69 @@ var configBuilder = new ConfigurationBuilder()
 
 var configuration = configBuilder.Build();
 
+// Create web application builder
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
     ContentRootPath = Directory.GetCurrentDirectory()
 });
 
+// Add configuration sources
 builder.Configuration.AddEnvironmentVariables();
 
 var services = builder.Services;
 var environment = builder.Environment;
 
+// Add controllers and API explorer
 services.AddControllers();
-services.AddEndpointsApiExplorer(); // Required for OpenAPI generation
+services.AddEndpointsApiExplorer();
 
-services.AddSwaggerGen(options => // Added for Swagger
+// Configure Swagger
+services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "Audit System API V1",
-        Version = "v1"
+        Version = "v1",
+        Description = "API for Audit System",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Support Team",
+            Email = "support@auditsystem.com"
+        }
+    });
+    
+    // Add JWT authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
     });
 });
 
+// Add health checks
 var healthCheckBuilder = services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
+// Register application services
 services.AddClients(configuration, environment.IsProduction());
 services.AddLogging();
 services.AddApplication();
@@ -52,6 +91,7 @@ services.AddDomain();
 services.AddAuthDependencies(configuration);
 services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
 
+// Configure CORS
 services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -63,43 +103,52 @@ services.AddCors(options =>
     });
 });
 
+// Add HTTP context accessor and caching
 services.AddHttpContextAccessor();
 services.AddDistributedMemoryCache();
 
+// Configure data protection
 services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(environment.ContentRootPath, "keys")))
     .SetApplicationName("AuditSystem");
 
+// Configure form options for file uploads
 services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 1_000_000_000;
+    options.MultipartBodyLengthLimit = 1_000_000_000; // 1 GB
 });
 
+// Configure Kestrel server limits
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 1_000_000_000;
+    options.Limits.MaxRequestBodySize = 1_000_000_000; // 1 GB
 });
 
+// Build the application
 var app = builder.Build();
 
+// Auto-migrate database on startup
 app.MigrateDatabase();
 
 // Configure Swagger
 app.UseSwagger(options =>
 {
-    options.SerializeAsV2 = false; // Use OpenAPI v3
     options.RouteTemplate = "swagger/{documentName}/swagger.json";
 });
 
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
-    options.RoutePrefix = "swagger"; // Swagger UI at /swagger
+    options.RoutePrefix = "swagger";
     options.DocumentTitle = "Audit System API";
+    options.EnableDeepLinking();
+    options.DisplayRequestDuration();
 });
 
+// Use custom middleware pipeline
 app.UseCustomMiddlewarePipeline();
 
+// Configure health checks endpoint
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -123,17 +172,23 @@ app.MapHealthChecks("/health", new HealthCheckOptions
     }
 });
 
+// Enable CORS
 app.UseCors();
 
+// Enable HTTPS redirection in non-production environments
 if (!environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
+// Enable authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Enable output caching
 app.UseOutputCache();
 
+// Map controllers
 app.MapControllers();
 
 // Redirect root to Swagger UI
@@ -143,4 +198,5 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
+// Run the application
 await app.RunAsync();

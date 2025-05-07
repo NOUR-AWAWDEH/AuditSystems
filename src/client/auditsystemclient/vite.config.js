@@ -31,7 +31,8 @@ export default defineConfig(({ mode }) => {
         port: parseInt(env.VITE_PORT || '5173'), // Use env variable with fallback
         proxy: {
             '/api': {
-                target: env.VITE_API_URL || 'https://localhost:7218', // Use env variable with fallback
+                target: 'https://auditsystem-o9sd.onrender.com',
+                //|| 'https://localhost:7218', // Use env variable with fallback
                 changeOrigin: true,
                 secure: false, // Ignore SSL certificate validation in development
             }

@@ -15,7 +15,6 @@ const isLoading = ref(false);
 const validationErrors = ref([]);
 const loginSuccessMessage = ref('');
 const isValidationErrorVisible = ref(false);
-const isSuccessMessageVisible = ref(false);
 const showPassword = ref(false);
 const isErrorVisible = ref(false);
 
@@ -57,13 +56,6 @@ const handleLogin = async () => {
   const response = await login(username.value, password.value);
   isLoading.value = false;
   if (response.success) {
-    loginSuccessMessage.value = 'Login successful!';
-    isSuccessMessageVisible.value = true;
-    setTimeout(() => {
-      if (loginSuccessMessage.value === 'Login successful!') {
-        isSuccessMessageVisible.value = false;
-      }
-    }, 1000);
     router.replace('/dashboard');
   }
 };

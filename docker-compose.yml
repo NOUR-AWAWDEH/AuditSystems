@@ -1,5 +1,6 @@
 services:
   auditsystem.host:
+    image: nourawawdeh/auditsystemsauditsystemhost:latest
     build:
       context: .
       dockerfile: .\src\server\Infrastructure\AuditSystem.Host\Dockerfile

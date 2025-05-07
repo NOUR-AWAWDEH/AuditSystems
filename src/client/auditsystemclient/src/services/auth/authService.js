@@ -24,8 +24,7 @@ export const authService = {
         username,
         password,
       });
-
-      if (!response.data.success) {
+      console.log("API URL:", api.defaults.baseURL + '/Auth/login');      if (!response.data.success) {
         // Ensure errors is an array, even if backend sends something else
         const errors = Array.isArray(response.data.errors)
           ? response.data.errors

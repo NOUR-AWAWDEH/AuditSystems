@@ -6,13 +6,11 @@ using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Threading.RateLimiting;
 
 namespace AuditSystem.Auth;
 
@@ -70,6 +68,19 @@ public static class AuthDependencies
 
     private static void ConfigureSmtpSettings(IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<SMTPConfigModel>(configuration.GetSection("SMTPConfig"));
+        var smtpConfig = new SMTPConfigModel
+        {
+            SenderAddress = Environment.GetEnvironmentVariable("SMTP_SENDER_ADDRESS") ?? "",
+            SenderDisplayName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? "",
+            UserName = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? "",
+            Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? "",
+            Host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? "",
+            Port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 25,
+            EnableSSL = bool.TryParse(Environment.GetEnvironmentVariable("SMTP_ENABLE_SSL"), out var ssl) && ssl,
+            UseDefaultCredentials = false,
+            IsBodyHtml = true
+        };
+
+        services.AddSingleton<IOptions<SMTPConfigModel>>(Options.Create(smtpConfig));
     }
 }

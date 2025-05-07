@@ -1,6 +1,6 @@
 services:
   auditsystem.host:
-    image: ${DOCKER_REGISTRY-}auditsystemhost
+    image: ${DOCKER_REGISTRY-}nourawawdeh/auditsystemhost
     build:
       context: .
       dockerfile: src/server/Infrastructure/AuditSystem.Host/Dockerfile

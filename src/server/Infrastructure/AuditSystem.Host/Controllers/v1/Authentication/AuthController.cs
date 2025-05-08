@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
+using AuditSystem.Auth.Dtos.RefreshToken;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
@@ -58,4 +59,15 @@ public sealed class AuthController(
 
         return Ok(ApiResponse.Ok("Logged out from all sessions successfully"));
     }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<ApiResponse<AuthResultDto>>> RefreshToken([FromBody] RefreshTokenRequestDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            return BadRequest(ApiResponse<AuthResultDto>.BadRequest("Refresh token is required"));
+
+        var response = await _authService.RefreshTokenAsync(request.RefreshToken);
+        return StatusCode(response.StatusCode, response);
+    }
+
 }

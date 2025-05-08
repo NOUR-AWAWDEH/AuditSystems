@@ -17,7 +17,7 @@ public class CustomAuthenticationService(
     ApplicationDbContext applicationDbContext,
     SignInManager<User> signInManager,
     IHttpContextAccessor httpContextAccessor,
-ITokenService tokenService,
+    ITokenService tokenService,
     ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
 {
     private readonly UserManager<User> _userManager = userManager;
@@ -177,7 +177,6 @@ ITokenService tokenService,
         return ApiResponse<LoginResponseDto>.Ok(loginResponse, "Login successful.");
     }
 
-
     public async Task<bool> RevokeAllRefreshTokensAsync(string userId)
     {
         _logger.LogInformation("RevokeAllRefreshTokensAsync called with userId: {userId}", userId);
@@ -245,5 +244,41 @@ ITokenService tokenService,
         {
             return false;
         }
+    }
+
+    public async Task<ApiResponse<AuthResultDto>> RefreshTokenAsync(string refreshToken)
+    {
+        var token = await _applicationDbContext.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt =>
+                rt.Token == refreshToken &&
+                !rt.IsRevoked &&
+                rt.ExpiresAt > DateTime.UtcNow);
+
+        if (token == null || token.User == null)
+            return ApiResponse<AuthResultDto>.BadRequest("Invalid or expired refresh token");
+
+        var user = token.User;
+
+        // Optionally: Revoke the old token
+        token.IsRevoked = true;
+
+        // Generate new tokens
+        var newJwt = _tokenService.GenerateJwtToken(user);
+        var newRefresh = _tokenService.GenerateRefreshToken();
+
+        var saveResult = await _tokenService.SaveRefreshTokenAsync(user, newRefresh);
+        if (!saveResult)
+            return ApiResponse<AuthResultDto>.InternalServerError("Failed to persist refresh token");
+
+        await _applicationDbContext.SaveChangesAsync();
+
+        var result = new AuthResultDto
+        {
+            JwtToken = newJwt,
+            RefreshToken = newRefresh
+        };
+
+        return ApiResponse<AuthResultDto>.Ok(result, "Token refreshed successfully");
     }
 }

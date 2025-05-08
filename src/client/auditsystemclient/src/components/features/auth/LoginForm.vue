@@ -1,23 +1,28 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useAuth } from '@/composables/useAuth';
+import {  useLogin} from '@/composables/useLogin';
 import { useLoginValidation } from '@/services/validations/loginValidation';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';
 
-const { login, error } = useAuth();
+// Composables
+const { login, error } = useLogin();
 const { validateUsername, validatePassword } = useLoginValidation();
 const router = useRouter();
 
+// Refs
 const username = ref('');
 const password = ref('');
 const isLoading = ref(false);
 const validationErrors = ref([]);
-const loginSuccessMessage = ref('');
 const isValidationErrorVisible = ref(false);
 const showPassword = ref(false);
 const isErrorVisible = ref(false);
 
+// Constants
+const ERROR_DISPLAY_DURATION = 2000;
+
+// Watchers
 watch(error, (newError) => {
   if (newError) {
     isErrorVisible.value = true;
@@ -25,37 +30,42 @@ watch(error, (newError) => {
       if (error.value === newError) {
         isErrorVisible.value = false;
       }
-    }, 2000);
+    }, ERROR_DISPLAY_DURATION);
   }
 });
 
+// Methods
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
-const handleLogin = async () => {
+const validateForm = () => {
   validationErrors.value = [];
-
   const usernameError = validateUsername(username.value);
   const passwordError = validatePassword(password.value);
 
   if (usernameError) validationErrors.value.push(usernameError);
   if (passwordError) validationErrors.value.push(passwordError);
 
-  if (validationErrors.value.length) {
-    isValidationErrorVisible.value = true;
+  isValidationErrorVisible.value = validationErrors.value.length > 0;
+  if (isValidationErrorVisible.value) {
     setTimeout(() => {
-      if (validationErrors.value.length === 0) {
-        isValidationErrorVisible.value = false;
-      }
-    }, 2000);
+      isValidationErrorVisible.value = false;
+    }, ERROR_DISPLAY_DURATION);
+  }
+  return validationErrors.value.length === 0;
+};
+
+const handleLogin = async () => {
+  if (!validateForm()) {
     return;
   }
 
   isLoading.value = true;
   const response = await login(username.value, password.value);
   isLoading.value = false;
-  if (response.success) {
+
+  if (response?.success) {
     router.replace('/dashboard');
   }
 };
@@ -89,15 +99,6 @@ const handleForgotPassword = () => {
         class="mb-4 p-3 bg-soft-error text-error rounded-md"
       >
         {{ error }}
-      </div>
-    </transition>
-
-    <transition name="fade">
-      <div
-        v-if="loginSuccessMessage && isSuccessMessageVisible"
-        class="mb-4 p-3 bg-soft-success text-success rounded-md"
-      >
-        {{ loginSuccessMessage }}
       </div>
     </transition>
 

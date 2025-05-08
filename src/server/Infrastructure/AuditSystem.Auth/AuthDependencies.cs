@@ -5,11 +5,14 @@ using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
+using Microsoft.AspNetCore.Authentication.Cookies; // Added for cookie authentication
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http; // Added for StatusCodes
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using DotNetEnv; // Importing DotNetEnv for .env loading
 
@@ -38,22 +41,55 @@ public static class AuthDependencies
         // Register JWT settings as singleton
         services.AddSingleton(jwtSettings);
 
-        // Add Authentication services
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        // Add Authentication services with both JWT and Cookie schemes
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default to JWT for APIs
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Default challenge to JWT
+            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Use cookies for web sign-in
+        })
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                options.TokenValidationParameters = new TokenValidationParameters
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtSettings.Audience,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+        })
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            // Prevent redirect to login page for APIs
+            options.Events.OnRedirectToLogin = context =>
+            {
+                // Check if the request is for an API route (e.g., starts with /api)
+                if (context.Request.Path.StartsWithSegments("/api"))
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings.Audience,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+                // Default redirect for non-API routes
+                context.Response.Redirect(context.RedirectUri);
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                // Check if the request is for an API route
+                if (context.Request.Path.StartsWithSegments("/api"))
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                }
+                context.Response.Redirect(context.RedirectUri);
+                return Task.CompletedTask;
+            };
+        });
 
         // Additional services for authentication
         services.AddScoped<ICustomAuthenticationService, CustomAuthenticationService>();

@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
       port: parseInt(env.VITE_PORT),
     },
     define: {
-      __VITE_API_URL__: JSON.stringify(env.VITE_API_URL || ''),
+      __VITE_API_URL__: JSON.stringify(env.VITE_API_URL || 'https://localhost:7218'),
       __VITE_PORT__: JSON.stringify(env.VITE_PORT || '80'),
     },
   };

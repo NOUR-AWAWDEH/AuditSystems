@@ -15,6 +15,8 @@ public class TokenService : ITokenService
     private readonly JwtSettings _jwtSettings;
     private readonly SigningCredentials _signingCredentials;
     private readonly ApplicationDbContext _applicationDbContext;
+    private readonly UserManager<User> _userManager;
+
 
     public TokenService(IConfiguration config, UserManager<User> userManager, ApplicationDbContext applicationDbContext)
     {
@@ -41,28 +43,33 @@ public class TokenService : ITokenService
         _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         _applicationDbContext = applicationDbContext;
+        _userManager = userManager;
     }
 
 
 
-    public string GenerateJwtToken(User request)
+    public async Task<string> GenerateJwtTokenAsync(User user)
     {
-        if (request.Role == null)
-        {
-            throw new InvalidOperationException("User must have an assigned role.");
-        }
+        if (user == null)
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        if (roles == null || !roles.Any())
+            throw new InvalidOperationException("User must have at least one assigned role.");
 
         var claims = new List<Claim>
-{
-            new Claim(ClaimTypes.NameIdentifier, request.Id.ToString()),
-            new Claim(ClaimTypes.Name, request.UserName ?? ""),
-            new Claim(ClaimTypes.Email, request.Email ?? ""),
-            new Claim(ClaimTypes.Role, request.Role.Name),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64), // Issued At (login time)
-            new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64), // Not Before
-            new Claim("login_time", DateTimeOffset.UtcNow.ToString("o")), // Custom login time claim (ISO 8601 format)
-            new Claim("auth_type", "Bearer") // To fix authenticationType: null
-        };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.UserName ?? ""),
+        new Claim(ClaimTypes.Email, user.Email ?? ""),
+        new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+        new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+        new Claim("login_time", DateTimeOffset.UtcNow.ToString("o")),
+        new Claim("auth_type", "Bearer")
+    };
+
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var token = new JwtSecurityToken(
             _jwtSettings.Issuer,
@@ -75,9 +82,10 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateAccessToken(User user)
+
+    public async Task<string> GenerateAccessTokenAsync(User user)
     {
-        return GenerateJwtToken(user);
+        return await GenerateJwtTokenAsync(user);
     }
 
     public string GenerateRefreshToken()

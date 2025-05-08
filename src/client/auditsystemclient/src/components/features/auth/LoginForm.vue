@@ -71,7 +71,7 @@ const handleLogin = async () => {
 };
 
 const handleForgotPassword = () => {
-  console.log('Forgot password clicked');
+  router.push('/forgot-password');
 };
 </script>
 

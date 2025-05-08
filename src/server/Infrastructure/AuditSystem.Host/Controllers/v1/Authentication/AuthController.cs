@@ -61,6 +61,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("refresh-token")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse<AuthResultDto>>> RefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         if (string.IsNullOrWhiteSpace(request.RefreshToken))

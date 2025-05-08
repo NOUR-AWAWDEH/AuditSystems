@@ -3,6 +3,7 @@ using AuditSystem.Auth.Dtos.AuthStatus;
 using AuditSystem.Auth.Dtos.Login;
 using AuditSystem.Contract.Common;
 using AuditSystem.DataAccess.Contexts;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,8 @@ public class CustomAuthenticationService(
     SignInManager<User> signInManager,
     IHttpContextAccessor httpContextAccessor,
     ITokenService tokenService,
-    ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
+    RoleManager<Role> roleManager,
+ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
 {
     private readonly UserManager<User> _userManager = userManager;
     private readonly ApplicationDbContext _applicationDbContext = applicationDbContext;
@@ -154,7 +156,7 @@ public class CustomAuthenticationService(
         }
 
         // 5. Generate JWT and Refresh Token
-        var jwtToken = _tokenService.GenerateJwtToken(user);
+        var jwtToken = await _tokenService.GenerateJwtTokenAsync(user);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
         // 6. Save the refresh token securely
@@ -258,13 +260,20 @@ public class CustomAuthenticationService(
         if (token == null || token.User == null)
             return ApiResponse<AuthResultDto>.BadRequest("Invalid or expired refresh token");
 
-        var user = token.User;
+        var user = await _userManager.FindByIdAsync(token.UserId.ToString());
+        if (user == null)
+            return ApiResponse<AuthResultDto>.BadRequest("User not found");
 
-        // Optionally: Revoke the old token
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles == null || roles.Count == 0)
+            return ApiResponse<AuthResultDto>.BadRequest("User must have an assigned role");
+
+
+        // Revoke old token
         token.IsRevoked = true;
 
         // Generate new tokens
-        var newJwt = _tokenService.GenerateJwtToken(user);
+        var newJwt = await _tokenService.GenerateJwtTokenAsync(user);
         var newRefresh = _tokenService.GenerateRefreshToken();
 
         var saveResult = await _tokenService.SaveRefreshTokenAsync(user, newRefresh);
@@ -281,4 +290,5 @@ public class CustomAuthenticationService(
 
         return ApiResponse<AuthResultDto>.Ok(result, "Token refreshed successfully");
     }
+
 }

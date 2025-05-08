@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/components/features/auth/LoginForm.vue';
 
 const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
-
+const ForgotPassword = () => import('@/components/features/auth/ForgotPassword.vue'); // Import the ForgotPassword component
 
 const routes = [
   {
@@ -20,6 +20,12 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/forgot-password', // Add the new route for forgot password
+    name: 'ForgotPassword',
+    component: ForgotPassword,
+    meta: { requiresAuth: false }
   },
   {
     path: '/logout',

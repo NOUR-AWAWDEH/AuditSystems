@@ -63,7 +63,7 @@ public class ErrorHandlingMiddleware
             _ => ApiResponse.InternalServerError(_env.IsDevelopment() ? ex.Message : "An unexpected error occurred.")
         };
 
-
+ 
 
         context.Response.StatusCode = response.StatusCode;
         await WriteJsonResponse(context, response);

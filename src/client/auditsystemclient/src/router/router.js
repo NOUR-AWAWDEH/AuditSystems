@@ -1,11 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/components/features/auth/LoginForm.vue';
-//import SignOut from '@/components/features/auth/SignOut.vue';
 
-// Lazy-loaded components for better performance
 const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
-//const AuditReports = () => import('@/components/features/reports/AuditReports.vue');
-//const Settings = () => import('@/components/features/settings/UserSettings.vue');
+
 
 const routes = [
   {
@@ -23,6 +20,14 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    beforeEnter: (to, from, next) => {
+      localStorage.removeItem('token'); // Clear token
+      next('/login'); // Redirect to login
+    }
   },
   {
     path: '/:pathMatch(.*)*',

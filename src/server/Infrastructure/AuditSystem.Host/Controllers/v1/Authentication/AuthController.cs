@@ -70,5 +70,4 @@ public sealed class AuthController(
         var response = await _authService.RefreshTokenAsync(request.RefreshToken);
         return StatusCode(response.StatusCode, response);
     }
-
 }

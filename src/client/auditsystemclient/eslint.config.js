@@ -15,6 +15,8 @@ export default defineConfig([
     languageOptions: {
       globals: {
         ...globals.browser,
+        __VITE_API_URL__: 'readonly',
+        __VITE_PORT__: 'readonly',
       },
     },
   },

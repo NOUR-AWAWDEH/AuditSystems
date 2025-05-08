@@ -1,30 +1,18 @@
 // src/services/auth/authService.js
 import { ApiResponseT } from '@/utils/ApiResponse';
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import api from '@/services/api/api';
 
 export const authService = {
-  setAuthHeader(token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  },
-
-  clearAuthHeader() {
-    delete api.defaults.headers.common['Authorization'];
-  },
-
   async login(username, password) {
     try {
-      const response = await api.post('/Auth/login', {
+      const response = await api.post('api/auth/login', {
         username,
         password,
       });
-      console.log("API URL:", api.defaults.baseURL + '/Auth/login');      if (!response.data.success) {
+
+      console.log("API URL:", api.defaults.baseURL + 'api/auth/login');
+
+      if (!response.data.success) {
         // Ensure errors is an array, even if backend sends something else
         const errors = Array.isArray(response.data.errors)
           ? response.data.errors
@@ -38,7 +26,8 @@ export const authService = {
         isEmailVerified: response.data.result.isEmailVerified,
       };
 
-      this.setAuthHeader(result.jwtToken);
+      // Store token in localStorage
+      localStorage.setItem('token', result.jwtToken);
 
       return ApiResponseT.ok(result, response.data.successMessage);
     } catch (error) {
@@ -58,11 +47,20 @@ export const authService = {
     }
   },
 
-  async logout(token) {
+  setAuthHeader(token) {
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  },
+
+  clearAuthHeader() {
+    delete api.defaults.headers.common['Authorization'];
+  },
+
+  async logout() {
     try {
-      await api.post('/Auth/logout', null, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.post('/Auth/logout');
+      localStorage.removeItem('token');
       return ApiResponseT.ok(null, 'Logout successful');
     } catch (error) {
       console.error('Logout error:', error);

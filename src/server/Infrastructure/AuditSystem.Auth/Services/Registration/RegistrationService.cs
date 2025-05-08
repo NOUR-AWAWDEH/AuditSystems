@@ -132,6 +132,7 @@ namespace AuditSystem.Auth.Services.Registration
 
                 // Save refresh token manually
                 _dbContext.RefreshTokens.Add(refreshToken);
+                await _userManager.AddToRoleAsync(newUser, role.Name);
                 await _dbContext.SaveChangesAsync();
 
                 return newUser;

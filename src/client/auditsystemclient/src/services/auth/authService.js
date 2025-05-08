@@ -10,8 +10,6 @@ export const authService = {
         password,
       });
 
-      console.log("API URL:", api.defaults.baseURL + 'api/auth/login');
-
       if (!response.data.success) {
         // Ensure errors is an array, even if backend sends something else
         const errors = Array.isArray(response.data.errors)
@@ -59,7 +57,7 @@ export const authService = {
 
   async logout() {
     try {
-      await api.post('/Auth/logout');
+      await api.post('api/Auth/logout');
       localStorage.removeItem('token');
       return ApiResponseT.ok(null, 'Logout successful');
     } catch (error) {

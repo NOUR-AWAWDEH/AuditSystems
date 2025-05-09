@@ -18,11 +18,8 @@ const removeLocalTokens = () => {
 };
 
 const refreshToken = async () => {
-    console.log('refreshToken called');
     const refreshTokenValue = getLocalRefreshToken();
     const currentToken = getLocalToken();
-    console.log('refreshTokenValue:', refreshTokenValue);
-    console.log('currentToken:', currentToken);
     if (!refreshTokenValue) {
         console.error('No refresh token available.');
         redirectToLogin();
@@ -39,12 +36,10 @@ const refreshToken = async () => {
                 },
             }
         );
-        console.log('refreshToken response:', response); // Add this
         if (response.data.success && response.data.result) {
             const { jwtToken, refreshToken: newRefreshToken } = response.data.result;
             setLocalToken(jwtToken);
             setLocalRefreshToken(newRefreshToken);
-            console.log('Token refreshed successfully:', response.data);
             scheduleRefreshToken();
             return true;
         } else {
@@ -70,11 +65,9 @@ const redirectToLogin = () => {
 };
 
 const initializeTokenRefresh = () => {
-    console.log('initializeTokenRefresh called');
     const initialToken = getLocalToken();
     if (initialToken) {
         scheduleRefreshToken();
-        console.log('Token refresh initialized. im working fine');
     }
 };
 

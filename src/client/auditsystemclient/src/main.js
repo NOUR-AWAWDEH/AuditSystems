@@ -8,8 +8,6 @@ const app = createApp(App);
 app.use(router);
 
 router.isReady().then(() => {
-  console.log("Router is ready");
   app.mount('#app');
-  console.log("App mounted");
   authService.initializeTokenRefresh();
 });

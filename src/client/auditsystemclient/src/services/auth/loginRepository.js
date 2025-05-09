@@ -52,8 +52,4 @@ export const loginRepository = {
       delete api.defaults.headers.common[AUTHORIZATION_HEADER];
     }
   },
-
-  clearAuthHeader() {
-    delete api.defaults.headers.common[AUTHORIZATION_HEADER];
-  },
 };

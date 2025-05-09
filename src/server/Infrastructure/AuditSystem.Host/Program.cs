@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Swashbuckle.AspNetCore.SwaggerUI;
 
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
@@ -37,6 +35,7 @@ var environment = builder.Environment;
 // Add controllers and API explorer
 services.AddControllers();
 services.AddEndpointsApiExplorer();
+services.AddAuthDependencies();
 
 // Configure Swagger
 services.AddSwaggerGen(options =>
@@ -52,8 +51,7 @@ services.AddSwaggerGen(options =>
             Email = "support@auditsystem.com"
         }
     });
-    
-    // Add JWT authentication to Swagger
+
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -62,7 +60,7 @@ services.AddSwaggerGen(options =>
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    
+
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -88,8 +86,36 @@ services.AddClients(configuration, environment.IsProduction());
 services.AddLogging();
 services.AddApplication();
 services.AddDomain();
-services.AddAuthDependencies(configuration);
+services.AddAuthentication();
 services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
+
+// ⚠️ This is the CRITICAL FIX for API redirect issues
+services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+});
 
 // Configure CORS
 services.AddCors(options =>

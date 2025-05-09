@@ -19,7 +19,6 @@ public class CustomAuthenticationService(
     SignInManager<User> signInManager,
     IHttpContextAccessor httpContextAccessor,
     ITokenService tokenService,
-    RoleManager<Role> roleManager,
 ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
 {
     private readonly UserManager<User> _userManager = userManager;

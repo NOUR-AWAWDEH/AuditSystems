@@ -8,14 +8,14 @@ using System.Security.Claims;
 using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
 using AuditSystem.Auth.Dtos.RefreshToken;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]
 public sealed class AuthController(
-        ICustomAuthenticationService _authService,
-        ILogger<AuthController> _logger) :
+        ICustomAuthenticationService _authService) :
         ControllerBase
 {
 
@@ -28,7 +28,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("logout")]
-    [Authorize]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApiResponse>> LogOut([FromBody] LogoutRequest request)
     {
         if (string.IsNullOrEmpty(request.RefreshToken))
@@ -46,7 +46,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("logout-all")]
-    [Authorize]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApiResponse>> LogOutAll()
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -61,7 +61,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("refresh-token")]
-    [Authorize]
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApiResponse<AuthResultDto>>> RefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         if (string.IsNullOrWhiteSpace(request.RefreshToken))

@@ -5,133 +5,103 @@ using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
-using Microsoft.AspNetCore.Authentication.Cookies; // Added for cookie authentication
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http; // Added for StatusCodes
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
-using DotNetEnv; // Importing DotNetEnv for .env loading
+using DotNetEnv;
 
-namespace AuditSystem.Auth;
-
-public static class AuthDependencies
+namespace AuditSystem.Auth
 {
-    public static IServiceCollection AddAuthDependencies(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static class AuthDependencies
     {
-        // Load .env file using DotNetEnv (This should happen early in the program)
-        Env.Load(); // Ensure this is done before accessing the configuration
-
-        // JWT Settings
-        var jwtSettings = new JwtSettings
+        public static IServiceCollection AddAuthDependencies(this IServiceCollection services)
         {
-            Key = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new ArgumentNullException("JWT_KEY", "JWT_KEY is missing in configuration"),
-            Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new ArgumentNullException("JWT_ISSUER", "JWT_ISSUER is missing in configuration"),
-            Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new ArgumentNullException("JWT_AUDIENCE", "JWT_AUDIENCE is missing in configuration"),
-            ExpirationMinutes = int.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_MINUTES"), out int expirationMinutes)
-                ? expirationMinutes
-                : throw new ArgumentException("Invalid or missing JWT_EXPIRATION_MINUTES in configuration", "JWT_EXPIRATION_MINUTES")
-        };
-
-        // Register JWT settings as singleton
-        services.AddSingleton(jwtSettings);
-
-        // Add Authentication services with both JWT and Cookie schemes
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default to JWT for APIs
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; // Default challenge to JWT
-            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Use cookies for web sign-in
-        })
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
+            // Load environment variables
+            try
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
-                ValidateIssuer = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidateAudience = true,
-                ValidAudience = jwtSettings.Audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                Env.Load(); // Must be early
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to load .env file", ex);
+            }
+
+            // Load JWT settings from env
+            var jwtSettings = new JwtSettings
+            {
+                Key = Environment.GetEnvironmentVariable("JWT_KEY") ?? throw  new ArgumentNullException("JWT_KEY", "Missing JWT_KEY"),
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new  ArgumentNullException("JWT_ISSUER", "Missing JWT_ISSUER"),
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new ArgumentNullException("JWT_AUDIENCE", "Missing JWT_AUDIENCE"),
+                ExpirationMinutes = int.TryParse(Environment.GetEnvironmentVariable("JWT_EXPIRATION_MINUTES"), out int exp)
+                    ? exp
+                    : throw new ArgumentException("Invalid JWT_EXPIRATION_MINUTES")
             };
-        })
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-        {
-            // Prevent redirect to login page for APIs
-            options.Events.OnRedirectToLogin = context =>
+
+            services.AddSingleton(jwtSettings);
+
+            // ✅ Explicitly configure JWT as the default authentication scheme
+            services.AddAuthentication(options =>
             {
-                // Check if the request is for an API route (e.g., starts with /api)
-                if (context.Request.Path.StartsWithSegments("/api"))
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                }
-                // Default redirect for non-API routes
-                context.Response.Redirect(context.RedirectUri);
-                return Task.CompletedTask;
-            };
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
-            options.Events.OnRedirectToAccessDenied = context =>
-            {
-                // Check if the request is for an API route
-                if (context.Request.Path.StartsWithSegments("/api"))
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                }
-                context.Response.Redirect(context.RedirectUri);
-                return Task.CompletedTask;
-            };
-        });
+            // Register core auth-related services
+            services.AddScoped<ICustomAuthenticationService, CustomAuthenticationService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
+            services.AddScoped<IPasswordResetService, PasswordResetService>();
+            services.AddScoped<IPasswordTokenService, PasswordTokenService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IAccountService, AccountService>();
 
-        // Additional services for authentication
-        services.AddScoped<ICustomAuthenticationService, CustomAuthenticationService>();
-        services.AddScoped<IRegistrationService, RegistrationService>();
-        services.AddScoped<IPasswordResetService, PasswordResetService>();
-        services.AddScoped<IPasswordTokenService, PasswordTokenService>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IAccountService, AccountService>();
+            // SMTP
+            ConfigureSmtpSettings(services);
 
-        // Configure SMTP settings (to send emails)
-        ConfigureSmtpSettings(services);
-
-        return services;
-    }
-
-    // Configure SMTP settings from environment variables
-    private static void ConfigureSmtpSettings(IServiceCollection services)
-    {
-        var smtpConfig = new SMTPConfigModel
-        {
-            SenderAddress = Environment.GetEnvironmentVariable("SMTP_SENDER_ADDRESS") ?? string.Empty,
-            SenderDisplayName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? string.Empty,
-            UserName = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? string.Empty,
-            Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? string.Empty,
-            Host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty,
-            Port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 25,
-            EnableSSL = bool.TryParse(Environment.GetEnvironmentVariable("SMTP_ENABLE_SSL"), out var ssl) && ssl,
-            UseDefaultCredentials = false,
-            IsBodyHtml = true
-        };
-
-        // Ensure the SMTP settings are correctly configured
-        if (string.IsNullOrWhiteSpace(smtpConfig.SenderAddress) ||
-            string.IsNullOrWhiteSpace(smtpConfig.UserName) ||
-            string.IsNullOrWhiteSpace(smtpConfig.Password) ||
-            string.IsNullOrWhiteSpace(smtpConfig.Host))
-        {
-            throw new InvalidOperationException("SMTP configuration is incomplete or missing environment variables.");
+            return services;
         }
 
-        // Register SMTP settings as a singleton
-        services.AddSingleton<IOptions<SMTPConfigModel>>(Options.Create(smtpConfig));
+        private static void ConfigureSmtpSettings(IServiceCollection services)
+        {
+            var smtpConfig = new SMTPConfigModel
+            {
+                SenderAddress = Environment.GetEnvironmentVariable("SMTP_SENDER_ADDRESS") ?? string.Empty,
+                SenderDisplayName = Environment.GetEnvironmentVariable("SMTP_SENDER_NAME") ?? string.Empty,
+                UserName = Environment.GetEnvironmentVariable("SMTP_USERNAME") ?? string.Empty,
+                Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD") ?? string.Empty,
+                Host = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty,
+                Port = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 25,
+                EnableSSL = bool.TryParse(Environment.GetEnvironmentVariable("SMTP_ENABLE_SSL"), out var ssl) && ssl,
+                UseDefaultCredentials = false,
+                IsBodyHtml = true
+            };
+
+            if (string.IsNullOrWhiteSpace(smtpConfig.SenderAddress) ||
+                string.IsNullOrWhiteSpace(smtpConfig.UserName) ||
+                string.IsNullOrWhiteSpace(smtpConfig.Password) ||
+                string.IsNullOrWhiteSpace(smtpConfig.Host))
+            {
+                throw new InvalidOperationException("SMTP configuration is incomplete.");
+            }
+
+            services.AddSingleton<IOptions<SMTPConfigModel>>(Options.Create(smtpConfig));
+        }
     }
 }

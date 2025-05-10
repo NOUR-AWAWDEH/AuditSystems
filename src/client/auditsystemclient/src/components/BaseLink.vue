@@ -24,7 +24,7 @@ const linkClasses = computed(() => {
 
   switch (props.variant) {
     case 'logo':
-      classes += ' text-lg font-bold hover:text-secondary-tint';
+      classes += ' logo-small font-bold hover:text-secondary-tint';
       break;
     case 'primary':
       classes += ' bg-primary-base hover:bg-primary-shade text-white px-4 py-2 rounded';
@@ -37,3 +37,9 @@ const linkClasses = computed(() => {
   return classes;
 });
 </script>
+
+<style scoped>
+.logo-small {
+  font-size: 1rem; /* Adjust the font size as needed */
+}
+</style>

@@ -5,6 +5,7 @@ import BaseButton from '@/components/BaseButton.vue';
 import BaseInput from '@/components/BaseInput.vue';
 import BaseLink from '@/components/BaseLink.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
+import ErrorDisplay from '@/components/ErrorDisplay.vue';
 import { useLoginValidation } from '@/services/validations/loginValidation';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';
@@ -20,6 +21,8 @@ const password = ref('');
 const isLoading = ref(false);
 const validationErrors = ref([]);
 const isValidationErrorVisible = ref(false);
+
+const errorMassage = ref('')
 const isErrorVisible = ref(false);
 
 // Constants
@@ -29,6 +32,7 @@ let errorTimeout = null;
 // Watchers
 watch(error, (newError) => {
   if (newError) {
+    errorMassage.value = newError
     isErrorVisible.value = true;
     clearTimeout(errorTimeout);
     errorTimeout = setTimeout(() => {
@@ -76,26 +80,18 @@ const handleLogin = async () => {
     </div>
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
-    <transition name="fade">
-      <div
-        v-if="validationErrors.length && isValidationErrorVisible"
-        class="mb-4 p-3 bg-soft-error text-error rounded-md"
-      >
-        <ul class="list-none pl-5">
-          <li v-for="(err, index) in validationErrors" :key="index">{{ err }}</li>
-        </ul>
-      </div>
-    </transition>
 
-    <transition name="fade">
-      <div
-        v-if="error && isErrorVisible"
-        class="mb-4 p-3 bg-soft-error text-error rounded-md"
-      >
-        {{ error }}
-      </div>
-    </transition>
+      <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
 
+
+        <transition name="fade">
+          <div
+            v-if="errorMassage && isErrorVisible"
+            class="mb-4 p-3 bg-soft-error text-error rounded-md"
+          >
+            {{ errorMassage }}
+          </div>
+        </transition>
     <div class="mb-4">
       <label for="username" class="block mb-2 font-medium text-left">User Name</label>
       <BaseInput
@@ -125,7 +121,7 @@ const handleLogin = async () => {
   <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
 </BaseButton>
 
-    <div class="text-center mt-4">
+    <div class="text-center mt-4 text-secondary-base">
       <BaseLink to="/forgot-password">
         Forgot Password?
       </BaseLink>

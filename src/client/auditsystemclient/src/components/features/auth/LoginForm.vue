@@ -59,7 +59,6 @@ const validateForm = () => {
 
 const handleLogin = async () => {
   if (!validateForm()) return;
-
   isLoading.value = true;
   const response = await login(username.value, password.value);
   isLoading.value = false;
@@ -122,9 +121,9 @@ const handleLogin = async () => {
     </div>
 
     <BaseButton @click="handleLogin" :disabled="isLoading">
-      <template #loading>Logging in...</template>
-      Login
-    </BaseButton>
+  <template #loading>Logging in...</template>
+  <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
+</BaseButton>
 
     <div class="text-center mt-4">
       <BaseLink to="/forgot-password">

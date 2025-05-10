@@ -36,6 +36,10 @@ const routes = [
     }
   },
   {
+    path : '/forgot-password',
+    redirect: '/login'
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/login'
   }

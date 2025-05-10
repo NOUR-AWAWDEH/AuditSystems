@@ -2,6 +2,7 @@
 import { useLogout } from '@/composables/useLogout';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import BaseLink from '@/components/BaseLink.vue';
 
 const { isAuthenticated, user, logout } = useLogout();
 const router = useRouter();
@@ -25,34 +26,27 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <nav class="bg-secondary-base text-white p-2 fixed  w-full">
-    <div class="container mx-auto flex justify-between items-center">
+  <nav class="bg-secondary-base text-white py-4 fixed w-full z-10">
+    <div class="container mx-auto flex justify-between items-center px-4">
       <!-- Logo or Brand -->
-      <div class="text-lg font-bold">
-        <router-link to="/">Audit System</router-link>
-      </div>
+      <BaseLink to="/" variant="logo">Audit System</BaseLink>
 
       <!-- Navigation Links -->
-      <div class="space-x-4">
-        <router-link to="/" class="hover:text-gray-300">Home</router-link>
-        <router-link v-if="isAuthenticated" to="/dashboard" class="hover:text-gray-300">Dashboard</router-link>
-      </div>
+      <div class="flex items-center space-x-6">
+        <BaseLink to="/">Home</BaseLink>
+        <BaseLink v-if="isAuthenticated" to="/dashboard">Dashboard</BaseLink>
 
-      <!-- Logout Button -->
-      <div v-if="isAuthenticated" class="flex items-center space-x-4">
-        <span v-if="user?.username" class="text-sm">Welcome, {{ user.username }}</span>
-        <button
-          @click="handleLogout"
-          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-          :disabled="isLoggingOut"
-        >
-          {{ isLoggingOut ? 'Logging out...' : 'Logout' }}
-        </button>
-      </div>
-      <div v-else>
-        <router-link to="/login" class="bg-primary-base hover:bg-primary-shade text-white px-4 py-2 rounded transition">
+        <!-- Logout Button -->
+        <div v-if="isAuthenticated" class="flex items-center space-x-4">
+          <span v-if="user?.username" class="text-sm">Welcome, {{ user.username }}</span>
+          <BaseButton class="cursor-pointer" @click="handleLogout" :disabled="isLoggingOut">
+            <template v-if="isLoggingOut" #loading>Logging out...</template>
+            Logout
+          </BaseButton>
+        </div>
+        <BaseLink v-else to="/login" variant="primary">
           Login
-        </router-link>
+        </BaseLink>
       </div>
     </div>
   </nav>
@@ -65,6 +59,6 @@ nav {
   top: 0; /* Align it to the top */
   width: 100%; /* Make it span the full width */
   z-index: 1000; /* Ensure it stays above other elements */
-  background-color: --color-secandary-base; /* Maintain the background color */
+  background-color: --color-secondary-base; /* Maintain the background color */
 }
 </style>

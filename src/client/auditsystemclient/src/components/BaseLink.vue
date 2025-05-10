@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="to" :class="linkClasses">
+  <router-link class="text-secondary-base" :to="to" :class="linkClasses">
     <slot />
   </router-link>
 </template>

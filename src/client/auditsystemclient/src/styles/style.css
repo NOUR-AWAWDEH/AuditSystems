@@ -1,8 +1,15 @@
+@font-face {
+  font-family: 'Poppins';
+  src: url('../assets/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @import 'tailwindcss';
 
 @theme {
     /* Font Family */
-    --font-display: 'Poppins', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
 
     /* Primary */
   --color-primary-base: #339af0; /* Sky Blue */

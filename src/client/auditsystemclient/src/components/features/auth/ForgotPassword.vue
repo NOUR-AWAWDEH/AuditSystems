@@ -11,7 +11,7 @@
       @blur="validate"
     />
     <BaseButton @click="validate">Submit</BaseButton>
-    <div class="text-center mt-4">
+    <div class="text-center mt-4 text-secondary-base">
       <BaseLink to="/login">Back To Login</BaseLink>
     </div>
 

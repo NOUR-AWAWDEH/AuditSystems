@@ -121,7 +121,7 @@ const handleLogin = async () => {
   <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
 </BaseButton>
 
-    <div class="text-center mt-4">
+    <div class="text-center mt-4 text-secondary-base">
       <BaseLink to="/forgot-password">
         Forgot Password?
       </BaseLink>

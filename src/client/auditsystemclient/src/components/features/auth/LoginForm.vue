@@ -74,24 +74,22 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-md mx-auto h-auto">
+  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg">
     <div class="flex justify-center mb-6 w-full">
       <Logo />
     </div>
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
+    <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
 
-      <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
-
-
-        <transition name="fade">
-          <div
-            v-if="errorMassage && isErrorVisible"
-            class="mb-4 p-3 bg-soft-error text-error rounded-md"
-          >
-            {{ errorMassage }}
-          </div>
-        </transition>
+    <transition name="fade">
+      <div
+        v-if="errorMassage && isErrorVisible"
+        class="mb-4 p-3 bg-soft-error text-error rounded-md"
+      >
+        {{ errorMassage }}
+      </div>
+    </transition>
     <div class="mb-4">
       <label for="username" class="block mb-2 font-medium text-left">User Name</label>
       <BaseInput
@@ -116,10 +114,10 @@ const handleLogin = async () => {
         @keydown.enter="handleLogin"/>
     </div>
 
-    <BaseButton @click="handleLogin" :disabled="isLoading">
-  <template #loading>Logging in...</template>
-  <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
-</BaseButton>
+    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full">
+      <template #loading>Logging in...</template>
+      <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
+    </BaseButton>
 
     <div class="text-center mt-4 text-secondary-base">
       <BaseLink to="/forgot-password">

@@ -1,20 +1,19 @@
 <template>
-  <div class="flex flex-col items-center justify-center max-w-md mx-auto py-8">
-    <AuditLogo class="mb-4" />
+  <div class="flex flex-col items-center justify-center max-w-xs sm:max-w-sm md:max-w-md mt-1 sm:my-2 mx-auto py-8">
+    <AuditLogo />
     <H2Heading class="mt-5">Forgot Password</H2Heading>
     <BaseParagraph>Please enter your email to reset your password.</BaseParagraph>
     <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible" />
     <BaseInput
       placeholder="Enter your email"
-      class="mb-4"
+      class="mb-4 w-full"
       v-model="email"
       @blur="validate"
     />
-    <BaseButton @click="validate">Submit</BaseButton>
-    <div class="text-center mt-4 text-secondary-base">
-      <BaseLink to="/login">Back To Login</BaseLink>
+    <div class="flex items-center gap-25 w-full">
+      <BaseButton class="self-start" @click="validate">Submit</BaseButton>
+      <BaseLink class="text-secondary-shade whitespace-nowrap" to="/login">Back To Login</BaseLink>
     </div>
-
   </div>
 </template>
 

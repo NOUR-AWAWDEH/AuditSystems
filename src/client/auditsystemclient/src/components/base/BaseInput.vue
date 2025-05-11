@@ -35,7 +35,7 @@ defineProps({
   },
   inputClass: {
     type: String,
-    default: 'w-full px-4 py-2 text-secondary-shade border border-secondary-tint rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-tint',
+    default: 'w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md focus:outline-none focus:ring-2 disabled:bg-gray-tint',
   },
 });
 

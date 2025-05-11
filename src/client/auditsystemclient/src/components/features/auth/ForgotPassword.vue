@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import BaseButton from '../../common/base/BaseButton.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/common/base/BaseInput.vue';
 import H2Heading from '@/components/common/base/H2Heading.vue';
 import AuditLogo from '@/components/common/AuditLogo.vue';

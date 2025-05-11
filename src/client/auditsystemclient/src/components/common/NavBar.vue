@@ -2,7 +2,7 @@
 import { useLogout } from '@/composables/useLogout';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import BaseLink from '@/components/BaseLink.vue';
+import BaseLink from '@/components/base/BaseLink.vue';
 import Logo from './AuditLogo.vue';
 
 const { isAuthenticated, logout } = useLogout();
@@ -27,11 +27,11 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <nav class="bg-white w-full fixed text-secondary-shade ">
+  <nav class="bg-secondary-tint w-full fixed text-secondary-shade text-xl border-b border-secondary-base ">
     <div class="container flex justify-between items-center">
       <!-- Logo or Brand -->
       <BaseLink to="/" variant="logo">
-        <div class="w-20 px-2 py-2">
+        <div class="w-25  h-16 pl-2 py-3 ">
           <Logo/>
         </div>
       </BaseLink>
@@ -41,10 +41,10 @@ const handleLogout = async () => {
         <BaseLink to="/dashboard">Home</BaseLink>
         <!-- Logout Button -->
         <div v-if="isAuthenticated" class="flex items-center space-x-4">
-          <BaseButton class="cursor-pointer pr-5 " @click="handleLogout" :disabled="isLoggingOut">
+          <BaseLink to="#" class="cursor-pointer pr-5" @click.prevent="handleLogout" :disabled="isLoggingOut">
             <template v-if="isLoggingOut" #loading>Logging out...</template>
             Logout
-          </BaseButton>
+          </BaseLink>
         </div>
         <BaseLink v-else to="/login" variant="primary">
           Login

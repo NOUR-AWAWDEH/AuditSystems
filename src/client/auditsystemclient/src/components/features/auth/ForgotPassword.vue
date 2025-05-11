@@ -19,15 +19,15 @@
 </template>
 
 <script setup>
-import BaseButton from '../../BaseButton.vue';
-import BaseInput from '@/components/BaseInput.vue';
-import H2Heading from '@/components/H2Heading.vue';
+import BaseButton from '../../common/base/BaseButton.vue';
+import BaseInput from '@/components/common/base/BaseInput.vue';
+import H2Heading from '@/components/common/base/H2Heading.vue';
 import AuditLogo from '@/components/common/AuditLogo.vue';
-import BaseParagraph from '@/components/BaseParagraph.vue';
-import ErrorDisplay from '@/components/ErrorDisplay.vue';
+import BaseParagraph from '@/components/common/base/BaseParagraph.vue';
+import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
 import { ref } from 'vue';
 import { validateEmail } from '@/services/validations/emailValidation';
-import BaseLink from '@/components/BaseLink.vue';
+import BaseLink from '@/components/common/base/BaseLink.vue';
 
 const email = ref('');
 const validationErrors = ref([]);

@@ -1,11 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useLogin } from '@/composables/useLogin';
-import BaseButton from '@/components/BaseButton.vue';
-import BaseInput from '@/components/BaseInput.vue';
-import BaseLink from '@/components/BaseLink.vue';
-import PasswordInput from '@/components/PasswordInput.vue';
-import ErrorDisplay from '@/components/ErrorDisplay.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import BaseLink from '@/components/base/BaseLink.vue';
+import PasswordInput from '@/components/base/PasswordInput.vue';
+import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
 import { useLoginValidation } from '@/services/validations/loginValidation';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';

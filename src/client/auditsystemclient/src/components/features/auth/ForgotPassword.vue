@@ -20,14 +20,14 @@
 
 <script setup>
 import BaseButton from '@/components/base/BaseButton.vue';
-import BaseInput from '@/components/common/base/BaseInput.vue';
-import H2Heading from '@/components/common/base/H2Heading.vue';
+import BaseInput from '@/components/base/BaseInput.vue';
+import H2Heading from '@/components/base/H2Heading.vue';
 import AuditLogo from '@/components/common/AuditLogo.vue';
-import BaseParagraph from '@/components/common/base/BaseParagraph.vue';
-import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
+import BaseParagraph from '@/components/base/BaseParagraph.vue';
+import ErrorDisplay from '@/components/ErrorDisplay.vue';
 import { ref } from 'vue';
 import { validateEmail } from '@/services/validations/emailValidation';
-import BaseLink from '@/components/common/base/BaseLink.vue';
+import BaseLink from '@/components/base/BaseLink.vue';
 
 const email = ref('');
 const validationErrors = ref([]);

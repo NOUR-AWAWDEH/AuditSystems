@@ -1,6 +1,6 @@
 // src/composables/useLogin.js
 import { ref } from 'vue';
-import { loginRepository } from '@/services/auth/loginRepository';
+import { loginRepository } from '@/services/auth/authRepos/loginRepository';
 
 // Constants for localStorage keys
 const TOKEN_KEY = 'token';

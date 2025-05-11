@@ -1,6 +1,6 @@
 // src/api.js
 import axios from 'axios';
-import authService from '@/services/auth/authService';
+import authService from '@/services/auth/authRepos/authService';
 
 const apiUrl =  __VITE_API_URL__;
 

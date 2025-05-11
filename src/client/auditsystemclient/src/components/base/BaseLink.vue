@@ -30,7 +30,7 @@ const linkClasses = computed(() => {
       classes += ' bg-primary-base hover:bg-primary-shade text-white px-4 py-2 rounded';
       break;
     default:
-      classes += ' hover:text-secondary-tint';
+      classes += ' hover:text-primary-shade text-secondary-shade';
       break;
   }
 
@@ -41,5 +41,6 @@ const linkClasses = computed(() => {
 <style scoped>
 .logo-small {
   font-size: 1rem; /* Adjust the font size as needed */
+  cursor: pointer;
 }
 </style>

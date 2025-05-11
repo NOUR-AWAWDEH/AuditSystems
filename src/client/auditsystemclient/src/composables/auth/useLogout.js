@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { logoutRepository } from '@/services/auth/logoutRepository';
+import { logoutRepository } from '@/services/auth/authRepos/logoutRepository';
 
 // Constants for localStorage keys
 const TOKEN_KEY = 'token';

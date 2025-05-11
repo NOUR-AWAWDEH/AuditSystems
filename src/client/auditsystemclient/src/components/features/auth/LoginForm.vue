@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { useLogin } from '@/composables/useLogin';
+import { useLogin } from '@/composables/auth/useLogin';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseLink from '@/components/base/BaseLink.vue';
@@ -119,7 +119,7 @@ const handleLogin = async () => {
       <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
     </BaseButton>
 
-    <div class="text-center mt-4 text-secondary-base">
+    <div class="text-center mt-4">
       <BaseLink to="/forgot-password">
         Forgot Password?
       </BaseLink>

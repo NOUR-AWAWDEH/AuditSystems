@@ -1,5 +1,5 @@
 <script setup>
-import { useLogout } from '@/composables/useLogout';
+import { useLogout } from '@/composables/auth/useLogout';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import BaseLink from '@/components/base/BaseLink.vue';

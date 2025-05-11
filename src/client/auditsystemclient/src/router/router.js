@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '@/components/features/auth/LoginForm.vue';
 
 const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
-const ForgotPassword = () => import('@/components/features/auth/ForgotPassword.vue'); // Import the ForgotPassword component
+const ForgotPassword = () => import('@/components/features/auth/ForgotPassword.vue');
+const ResetPassword = () => import('@/components/features/auth/ResetPassword.vue');
 
 const routes = [
   {
@@ -22,22 +23,24 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/forgot-password', // Add the new route for forgot password
+    path: '/forgot-password',
     name: 'ForgotPassword',
     component: ForgotPassword,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
     meta: { requiresAuth: false }
   },
   {
     path: '/logout',
     name: 'Logout',
     beforeEnter: (to, from, next) => {
-      localStorage.removeItem('token'); // Clear token
-      next('/login'); // Redirect to login
+      localStorage.removeItem('token');
+      next('/login');
     }
-  },
-  {
-    path : '/forgot-password',
-    redirect: '/login'
   },
   {
     path: '/:pathMatch(.*)*',
@@ -57,19 +60,16 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('token');
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 
-  // Handle root path redirect first
   if (to.path === '/' && !isAuthenticated) {
     next('/login');
     return;
   }
 
-  // Redirect authenticated users from login to dashboard
   if (to.name === 'Login' && isAuthenticated) {
     next('/dashboard');
     return;
   }
 
-  // Protect authenticated routes
   if (requiresAuth && !isAuthenticated) {
     next({ name: 'Login', state: { redirectTo: to.fullPath } });
     return;

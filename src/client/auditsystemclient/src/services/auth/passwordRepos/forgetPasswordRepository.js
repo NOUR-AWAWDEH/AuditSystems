@@ -2,7 +2,7 @@
 import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 
-const FORGOT_PASSWORD_ENDPOINT = 'api/Password/forgot-password';
+const FORGOT_PASSWORD_ENDPOINT = 'api/password/forgot-password';
 
 export const forgetPasswordRepository = {
   async forgetPasswordRequest(email) {

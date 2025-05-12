@@ -3,7 +3,7 @@
     :id="id"
     :type="type"
     :value="modelValue"
-    @input="$emit('update:modelValue', $event.target.value)"
+    @input="onInput"
     :class="inputClass"
     :placeholder="placeholder"
     :disabled="disabled"
@@ -39,5 +39,15 @@ defineProps({
   },
 });
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+import {  } from 'vue';
+
+function onInput(event) {
+  try {
+    emit('update:modelValue', event.target.value);
+  } catch (error) {
+    console.error("Error in BaseInput onInput handler:", error);
+  }
+}
 </script>

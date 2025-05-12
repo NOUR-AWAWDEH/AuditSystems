@@ -11,7 +11,7 @@
       id = "email"
       placeholder="Enter your email"
       class="mb-4 w-full"
-      v-model="email"
+      v-model="resetEmail"
       @blur="validateEmailField"
       :disabled="isCodeInputVisible || isLoading"
     />
@@ -21,7 +21,7 @@
       v-if="isCodeInputVisible"
       placeholder="Enter the code"
       class="mb-4 w-full"
-      v-model="resetToken"
+      v-model="resetCode"
       :disabled="isLoading"
     />
 
@@ -55,7 +55,8 @@ import { useVerifyResetCode } from '@/composables/password/useVerifyResetCode';
 import { useRouter } from 'vue-router';
 
 // --- State ---
-const email = ref('');
+const resetEmail = ref('');
+const resetCode = ref('');
 const resetToken = ref('');
 const validationErrors = ref([]);
 const isValidationErrorVisible = ref(false);
@@ -63,6 +64,8 @@ const successMessage = ref('');
 const isSuccessVisible = ref(false);
 const isCodeInputVisible = ref(false);
 const isLoading = ref(false);
+
+const resetCodeExpirationTime = 15 * 60 * 1000; // 15 minutes
 
 // --- Composables ---
 const { forgetPassword } = useForgetPassword();
@@ -79,9 +82,8 @@ const computedButtonText = computed(() => {
 
 const isFormValid = computed(() => {
   const valid = isCodeInputVisible.value
-    ? !!resetToken.value
-    : validationErrors.value.length === 0 && !!email.value;
-  console.log('isFormValid:', valid, 'resetToken:', resetToken.value);
+    ? !!resetCode.value
+    : validationErrors.value.length === 0 && validateEmail(resetEmail.value);
   return valid;
 });
 
@@ -95,11 +97,9 @@ const showMessage = (isVisibleRef, duration = 5000) => {
 
 const validateEmailField = () => {
   validationErrors.value = [];
-  if (!validateEmail(email.value)) {
+  if (!validateEmail(resetEmail.value)) {
     validationErrors.value.push('Please enter a valid email address.');
     showMessage(isValidationErrorVisible, 5000);
-  } else {
-    isValidationErrorVisible.value = false;
   }
 };
 
@@ -110,7 +110,7 @@ const handleSubmit = async () => {
 
   if (!isCodeInputVisible.value) {
     // --- Step 1: Request Reset Code ---
-    if (!validateEmail(email.value)) {
+    if (!validateEmail(resetEmail.value)) {
       validationErrors.value.push('Please enter a valid email address.');
       showMessage(isValidationErrorVisible, 5000);
       return;
@@ -118,7 +118,7 @@ const handleSubmit = async () => {
 
     isLoading.value = true;
     try {
-      const response = await forgetPassword(email.value);
+      const response = await forgetPassword(resetEmail.value);
       isLoading.value = false;
 
       if (response.success) {
@@ -126,13 +126,10 @@ const handleSubmit = async () => {
         showMessage(isSuccessVisible, 5000);
         isCodeInputVisible.value = true;
 
+        // Set a timer to expire the reset code input after 15 minutes
         setTimeout(() => {
           isCodeInputVisible.value = false;
-          resetToken.value = '';
-          successMessage.value = '';
-          validationErrors.value.push('The reset code has expired. Please request a new one.');
-          showMessage(isValidationErrorVisible, 6000);
-        }, 15 * 60 * 1000); // 15 minutes
+        }, resetCodeExpirationTime);
       } else {
         validationErrors.value.push(response.message || 'Failed to send reset code. Please try again.');
         showMessage(isValidationErrorVisible, 6000);
@@ -145,7 +142,7 @@ const handleSubmit = async () => {
     }
   } else {
     // --- Step 2: Verify Reset Code ---
-    if (!resetToken.value) {
+    if (!resetCode.value) {
       validationErrors.value.push('Please enter the verification code.');
       showMessage(isValidationErrorVisible, 5000);
       return;
@@ -153,8 +150,8 @@ const handleSubmit = async () => {
 
     isLoading.value = true;
     try {
-      const trimmedToken = resetToken.value.trim();
-      const response = await verifyCode(email.value, trimmedToken);
+      const trimmedCode = resetCode.value.trim();
+      const response = await verifyCode(resetEmail.value, trimmedCode);
       isLoading.value = false;
 
       if (response.success) {
@@ -166,7 +163,8 @@ const handleSubmit = async () => {
         }
 
         localStorage.setItem('resetToken', resetTokenValue);
-        localStorage.setItem('email', email.value);
+        resetToken.value = resetTokenValue;
+        localStorage.setItem('resetEmail', resetEmail.value);
         router.push('/reset-password').catch((err) => {
           console.error('Navigation error:', err);
           validationErrors.value.push('Failed to navigate to reset password page.');

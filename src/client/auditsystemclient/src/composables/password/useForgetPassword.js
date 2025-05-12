@@ -5,16 +5,15 @@ export function useForgetPassword() {
   const error = ref(null);
   const successMessage = ref(null);
 
-  const handleForgetPasswordSuccess = (response) => {
-    successMessage.value = response?.message || 'Password reset email sent successfully';
-    return { success: true };
-  };
+  const handleForgetPasswordSuccess = (response) => ({
+    success: true,
+    message: response?.message || 'Password reset email sent successfully',
+  });
 
   const handleForgetPasswordFailure = (response, defaultErrorMessage = 'Forgot password failed') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : defaultErrorMessage;
-    error.value = errorMessage;
     return {
       success: false,
       message: errorMessage,

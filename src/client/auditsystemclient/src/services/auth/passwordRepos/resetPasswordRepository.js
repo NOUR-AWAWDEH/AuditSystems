@@ -1,7 +1,7 @@
 import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
 
-const AUTH_ENDPOINT = '/api/Password/reset-password';
+const AUTH_ENDPOINT = '/api/password/reset-password';
 
 const resetPassword = async (email, token, newPassword, confirmNewPassword) => {
   try {

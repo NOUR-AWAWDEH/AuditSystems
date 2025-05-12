@@ -71,6 +71,10 @@ const handleLogin = async () => {
     router.replace('/dashboard');
   }
 };
+
+const clearLocalStorage = () => {
+  localStorage.clear();
+};
 </script>
 
 <template>
@@ -120,7 +124,7 @@ const handleLogin = async () => {
     </BaseButton>
 
     <div class="text-center mt-4">
-      <BaseLink to="/forgot-password">
+      <BaseLink @click="clearLocalStorage" to="/forgot-password">
         Forgot Password?
       </BaseLink>
     </div>

@@ -5,19 +5,17 @@
     <BaseParagraph>Please enter your new password.</BaseParagraph>
     <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible" />
     <SuccessDisplay :messages="[successMessage]" :isVisible="isSuccessVisible" />
-    <BaseInput
+    <PasswordInput
       id="newPassword"
       placeholder="Enter new password"
       class="mb-4 w-full"
       v-model="newPassword"
-      type="password"
     />
-    <BaseInput
+    <PasswordInput
       id="confirmPassword"
       placeholder="Confirm new password"
       class="mb-4 w-full"
       v-model="confirmPassword"
-      type="password"
     />
     <div class="flex items-center gap-25 w-full">
       <BaseButton class="self-start" @click="handleResetPassword">Reset Password</BaseButton>
@@ -28,7 +26,7 @@
 
 <script setup>
 import BaseButton from '@/components/base/BaseButton.vue';
-import BaseInput from '@/components/base/BaseInput.vue';
+import PasswordInput from '@/components/base/PasswordInput.vue';
 import H2Heading from '@/components/base/H2Heading.vue';
 import AuditLogo from '@/components/common/AuditLogo.vue';
 import BaseParagraph from '@/components/base/BaseParagraph.vue';
@@ -37,6 +35,7 @@ import SuccessDisplay from '@/components/common/SuccessDisplay.vue';
 import BaseLink from '@/components/base/BaseLink.vue';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useResetPassword } from '@/composables/password/useResetPassword';
 
 const router = useRouter();
 const newPassword = ref('');
@@ -46,15 +45,22 @@ const isValidationErrorVisible = ref(false);
 const isSuccessVisible = ref(false);
 const successMessage = ref('');
 
+const { error, resetPassword: resetPasswordAction } = useResetPassword();
+
 onMounted(() => {
   const resetToken = localStorage.getItem('resetToken');
-  if (!resetToken) {
-    router.push('/login'); // Redirect to login if token is not present
+  const email = localStorage.getItem('resetEmail');
+  if (!resetToken || !email) {
+    alert('Missing reset token or email. Please request a password reset.');
+    router.push('/login'); // Redirect to login if token or email is not present
   }
 });
 
-const handleResetPassword = () => {
+const handleResetPassword = async () => {
   validationErrors.value = [];
+  isValidationErrorVisible.value = false;
+  isSuccessVisible.value = false;
+
   if (newPassword.value !== confirmPassword.value) {
     validationErrors.value.push('Passwords do not match.');
     isValidationErrorVisible.value = true;
@@ -63,11 +69,25 @@ const handleResetPassword = () => {
     }, 6000);
     return;
   }
-  // Add logic to handle password reset
-  successMessage.value = 'Password reset successfully.';
-  isSuccessVisible.value = true;
-  setTimeout(() => {
-    isSuccessVisible.value = false;
-  }, 6000);
+
+  const resetToken = localStorage.getItem('resetToken');
+  const email = localStorage.getItem('resetEmail');
+
+  const response = await resetPasswordAction(email, resetToken, newPassword.value, confirmPassword.value);
+
+  if (response?.success) {
+    successMessage.value = response.message || 'Password reset successfully!';
+    isSuccessVisible.value = true;
+    setTimeout(() => {
+      isSuccessVisible.value = false;
+      router.push('/login');
+    }, 5000);
+  } else {
+    validationErrors.value.push(error.value || 'Password reset failed.');
+    isValidationErrorVisible.value = true;
+    setTimeout(() => {
+      isValidationErrorVisible.value = false;
+    }, 6000);
+  }
 };
 </script>

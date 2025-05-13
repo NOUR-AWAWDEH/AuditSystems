@@ -7,7 +7,7 @@ const transitionName = computed(() => route.meta.transition || 'fade');
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen font-poppins">
+  <div class="flex flex-col min-h-screen font-poppins">
     <router-view v-slot="{ Component }">
       <transition :name="transitionName">
         <component :is="Component" />

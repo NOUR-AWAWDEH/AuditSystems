@@ -43,6 +43,12 @@ const routes = [
     }
   },
   {
+    path: '/sidebar',
+    name: 'Sidebar',
+    component: () => import('@/components/common/SideBar.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/login'
   }
@@ -66,7 +72,7 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.name === 'Login' && isAuthenticated) {
-    next('/dashboard');
+    next('/sidebar');
     return;
   }
 

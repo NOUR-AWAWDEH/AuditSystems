@@ -1,18 +1,18 @@
 <script setup>
 import { ref, watch } from 'vue';
+import { validateUsername } from '@/services/validations/userValidation';
+import validatePassword from '@/services/validations/passwordValidation';
 import { useLogin } from '@/composables/auth/useLogin';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseLink from '@/components/base/BaseLink.vue';
 import PasswordInput from '@/components/base/PasswordInput.vue';
 import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
-import { useLoginValidation } from '@/services/validations/loginValidation';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';
 
 // Composables
 const { login, error } = useLogin();
-const { validateUsername, validatePassword } = useLoginValidation();
 const router = useRouter();
 
 // Refs
@@ -68,7 +68,7 @@ const handleLogin = async () => {
   isLoading.value = false;
 
   if (response?.success) {
-    router.replace('/dashboard');
+    router.replace('/sidebar');
   }
 };
 
@@ -118,7 +118,7 @@ const clearLocalStorage = () => {
         @keydown.enter="handleLogin"/>
     </div>
 
-    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full">
+    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full py-2 px-4 rounded-md">
       <template #loading>Logging in...</template>
       <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
     </BaseButton>

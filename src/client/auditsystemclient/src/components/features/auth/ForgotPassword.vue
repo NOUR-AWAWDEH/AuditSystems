@@ -27,7 +27,7 @@
 
     <div class="flex items-center gap-25 w-full">
       <BaseButton
-        class="self-start"
+        class="self-start py-2 px-4 rounded-md"
         @click="handleSubmit"
         :disabled="isLoading || !isFormValid"
       >

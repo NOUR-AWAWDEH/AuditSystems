@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+import validatePassword from '@/services/validations/passwordValidation';
 import BaseButton from '@/components/base/BaseButton.vue';
 import PasswordInput from '@/components/base/PasswordInput.vue';
 import H2Heading from '@/components/base/H2Heading.vue';
@@ -60,6 +61,26 @@ const handleResetPassword = async () => {
   validationErrors.value = [];
   isValidationErrorVisible.value = false;
   isSuccessVisible.value = false;
+
+  const newPasswordError = validatePassword(newPassword.value);
+  if (newPasswordError) {
+    validationErrors.value.push(newPasswordError);
+    isValidationErrorVisible.value = true;
+    setTimeout(() => {
+      isValidationErrorVisible.value = false;
+    }, 6000);
+    return;
+  }
+
+  const confirmPasswordError = validatePassword(confirmPassword.value);
+  if (confirmPasswordError) {
+    validationErrors.value.push(confirmPasswordError);
+    isValidationErrorVisible.value = true;
+    setTimeout(() => {
+      isValidationErrorVisible.value = false;
+    }, 6000);
+    return;
+  }
 
   if (newPassword.value !== confirmPassword.value) {
     validationErrors.value.push('Passwords do not match.');

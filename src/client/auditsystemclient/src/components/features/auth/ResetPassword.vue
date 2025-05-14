@@ -8,7 +8,7 @@
     <PasswordInput
       id="newPassword"
       placeholder="Enter new password"
-      class="mb-4 w-full"
+      class="mb-4 w-full "
       v-model="newPassword"
     />
     <PasswordInput
@@ -18,7 +18,7 @@
       v-model="confirmPassword"
     />
     <div class="flex items-center gap-25 w-full">
-      <BaseButton class="self-start" @click="handleResetPassword">Reset Password</BaseButton>
+      <BaseButton class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade" @click="handleResetPassword">Reset Password</BaseButton>
       <BaseLink class=" whitespace-nowrap " to="/login">Back To Login</BaseLink>
     </div>
   </div>
@@ -53,7 +53,7 @@ onMounted(() => {
   const email = localStorage.getItem('resetEmail');
   if (!resetToken || !email) {
     alert('Missing reset token or email. Please request a password reset.');
-    router.push('/login'); // Redirect to login if token or email is not present
+    router.push('/login');
   }
 });
 

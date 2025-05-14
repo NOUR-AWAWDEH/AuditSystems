@@ -7,4 +7,3 @@ public class EmailRequest
     public virtual string TemplateName { get; set; } = string.Empty; // Added string type
     public Dictionary<string, PlaceholderValue> Placeholders { get; set; } = new Dictionary<string, PlaceholderValue>();
 }
-

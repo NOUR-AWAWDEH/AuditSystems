@@ -118,7 +118,7 @@ const clearLocalStorage = () => {
         @keydown.enter="handleLogin"/>
     </div>
 
-    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full py-2 px-4 rounded-md">
+    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full py-2 px-4 rounded-md hover:bg-secondary-shade">
       <template #loading>Logging in...</template>
       <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
     </BaseButton>

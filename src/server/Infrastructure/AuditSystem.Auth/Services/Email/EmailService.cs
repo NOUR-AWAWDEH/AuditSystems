@@ -9,10 +9,10 @@ namespace AuditSystem.Auth.Services.Email;
 
 public class EmailService : IEmailService
 {
-    private readonly SMTPConfigModel _config;
+    private readonly SmtpSettings _config;
     private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IOptions<SMTPConfigModel> smtpConfig, ILogger<EmailService> logger)
+    public EmailService(IOptions<SmtpSettings> smtpConfig, ILogger<EmailService> logger)
     {
         _config = smtpConfig.Value ?? throw new ArgumentNullException(nameof(smtpConfig));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -65,7 +65,7 @@ public class EmailService : IEmailService
 
         using var mailMessage = new MailMessage
         {
-            From = new MailAddress(_config.SenderAddress, _config.SenderDisplayName),
+            From = new MailAddress(_config.SenderAddress, _config.SenderName),
             IsBodyHtml = isHtml,
             Subject = subject,
             Body = body,
@@ -84,9 +84,9 @@ public class EmailService : IEmailService
         {
             Host = _config.Host,
             Port = _config.Port,
-            EnableSsl = _config.EnableSSL,
+            EnableSsl = _config.EnableSsl,
             UseDefaultCredentials = false,
-            Credentials = new NetworkCredential(_config.UserName, _config.Password),
+            Credentials = new NetworkCredential(_config.SenderAddress, _config.Password),
             DeliveryMethod = SmtpDeliveryMethod.Network
         };
 
@@ -97,11 +97,11 @@ public class EmailService : IEmailService
         }
         catch (SmtpException ex)
         {
-            throw new EmailSendException("Failed to send email", ex);
+            throw new Exception("Failed to send email", ex);
         }
     }
 
-    private string GetEmailBody(string templateName, Dictionary<string, PlaceholderValue> placeholders = null)
+    private string GetEmailBody(string templateName, Dictionary<string, PlaceholderValue> placeholders = null!)
     {
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = $"AuditSystem.Auth.Services.Email.EmailTemplates.{templateName}.html";

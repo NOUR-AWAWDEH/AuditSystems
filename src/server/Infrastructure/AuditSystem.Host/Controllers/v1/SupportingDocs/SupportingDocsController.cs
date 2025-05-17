@@ -1,11 +1,4 @@
-using Ardalis.Result;
-using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Application.Features.SupportingDocs.Create;
-using AuditSystem.Application.Features.SupportingDocs.Delete;
-using AuditSystem.Application.Features.SupportingDocs.Get;
-using AuditSystem.Application.Features.SupportingDocs.Search;
-using AuditSystem.Application.Features.SupportingDocs.Update;
-using AuditSystem.Contract.Models.SupportingDocs;
+using AuditSystem.Application.Features.SupportingDocs.Uplode;
 using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,40 +11,11 @@ namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 [Authorize]
 public sealed class SupportingDocsController(IMediator mediator) : ApiControllerBase(mediator)
 {
-    //Create Supporting Document
-    [HttpPost("create-supporting-document")]
+
+    //Upload Supporting Document
+    [HttpPost("upload-supporting-document")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<CreateSupportingDocCommandResponse>), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateSupportingDocument([FromBody] CreateSupportingDocCommand command) =>
+    [ProducesResponseType(typeof(ApiResponse<UploadSupportingDocCommandResponse>), StatusCodes.Status201Created)]
+    public async Task<IActionResult> UploadSupportingDocument([FromForm] UploadSupportingDocCommand command) =>
         await ProcessRequestToActionResultAsync(command);
-
-    //Update Supporting Document
-    [HttpPut("update-supporting-document")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateSupportingDocument([FromBody] UpdateSupportingDocCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync<Result>(command);
-
-    //Get Supporting Document
-    [HttpGet("get-supporting-document")]
-    [ProducesResponseType(typeof(ApiResponse<GetSupportingDocsByIdQueryResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSupportingDocument([FromQuery] GetSupportingDocsByIdQuery query) =>
-        await ProcessRequestToActionResultAsync(query);
-
-    //Delete Supporting Document
-    [HttpDelete("delete-supporting-document")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSupportingDocument([FromBody] DeleteSupportingDocCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync<Result>(command);
-
-    //Search Supporting Document
-    [HttpGet("search-supporting-document")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SupportingDocModel>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchSupportingDocument([FromQuery] SearchSupportingDocsQuery query) =>
-        await ProcessRequestToActionResultAsync(query);
 }

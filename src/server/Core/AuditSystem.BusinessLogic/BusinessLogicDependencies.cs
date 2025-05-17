@@ -1,5 +1,4 @@
 using AuditSystem.BusinessLogic.Mappings;
-using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
@@ -14,8 +13,10 @@ using AuditSystem.BusinessLogic.Services.EntityServices.SkillsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServices;
+using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
@@ -65,166 +66,149 @@ namespace AuditSystem.BusinessLogic;
 
 public static class BusinessLogicDependencies
 {
-    public static IServiceCollection AddDomain(this IServiceCollection services) =>
+    public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
+    {
+        var fileStorageSettings = new FileStorageSettings
+        {
+            UploadPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
+                ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH"),
+            PublicBaseUrl = Environment.GetEnvironmentVariable("FILESTORAGE_PUBLICBASEURL")
+                ?? throw new InvalidOperationException("Missing FILESTORAGE_PUBLICBASEURL")
+        };
+
         services
             .AddMappers()
-            .AddServices();
+            .AddSingleton(fileStorageSettings)
+            .AddScoped<IFileStorage, LocalFileStorage>()
+            .AddScoped<ITransaction, Transaction>()
+            .AddScoped<IRiskService, RiskService>()
+            .AddMemoryCache()
+
+            // Audit
+            .AddScoped<IAuditDomainService, AuditDomainService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditDomain, AuditDomainModel>, AuditDomainService>()
+            .AddScoped<IAuditEngagementService, AuditEngagementService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditEngagement, AuditEngagementModel>, AuditEngagementService>()
+            .AddScoped<IAuditPlanSummaryService, AuditPlanSummaryService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditPlanSummary, AuditPlanSummaryModel>, AuditPlanSummaryService>()
+            .AddScoped<IAuditUniverseObjectiveService, AuditUniverseObjectiveService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditUniverseObjective, AuditUniverseObjectiveModel>, AuditUniverseObjectiveService>()
+            .AddScoped<IAuditUniverseService, AuditUniverseService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditUniverse, AuditUniverseModel>, AuditUniverseService>()
+            .AddScoped<IBusinessObjectiveService, BusinessObjectiveService>()
+            .AddScoped<IUnifiedCacheService<Guid, BusinessObjective, BusinessObjectiveModel>, BusinessObjectiveService>()
+            .AddScoped<ISpecialProjectService, SpecialProjectService>()
+            .AddScoped<IUnifiedCacheService<Guid, SpecialProject, SpecialProjectModel>, SpecialProjectService>()
+            .AddScoped<IObjectiveService, ObjectiveService>()
+            .AddScoped<IUnifiedCacheService<Guid, Objective, ObjectiveModel>, ObjectiveService>()
+
+            // Checklist
+            .AddScoped<IChecklistService, ChecklistService>()
+            .AddScoped<IUnifiedCacheService<Guid, Checklist, ChecklistModel>, ChecklistService>()
+            .AddScoped<IRemarkService, RemarkService>()
+            .AddScoped<IUnifiedCacheService<Guid, Remark, RemarkModel>, RemarkService>()
+
+            // Common
+            .AddScoped<IRatingService, RatingService>()
+            .AddScoped<IUnifiedCacheService<Guid, Rating, RatingModel>, RatingService>()
+
+            // Compliance
+            .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()
+            .AddScoped<IUnifiedCacheService<Guid, ComplianceChecklist, ComplianceChecklistModel>, ComplianceChecklistService>()
+
+            // Jobs
+            .AddScoped<IAuditJobService, AuditJobService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditJob, AuditJobModel>, AuditJobService>()
+            .AddScoped<IJobPrioritizationService, JobPrioritizationService>()
+            .AddScoped<IUnifiedCacheService<Guid, JobPrioritization, JobPrioritizationModel>, JobPrioritizationService>()
+            .AddScoped<IJobSchedulingService, JobSchedulingService>()
+            .AddScoped<IUnifiedCacheService<Guid, JobScheduling, JobSchedulingModel>, JobSchedulingService>()
+
+            // Organization
+            .AddScoped<ICompanyService, CompanyService>()
+            .AddScoped<IUnifiedCacheService<Guid, Company, CompanyModel>, CompanyService>()
+            .AddScoped<IDepartmentService, DepartmentService>()
+            .AddScoped<IUnifiedCacheService<Guid, Department, DepartmentModel>, DepartmentService>()
+            .AddScoped<ILocationService, LocationService>()
+            .AddScoped<IUnifiedCacheService<Guid, Location, LocationModel>, LocationService>()
+            .AddScoped<ISubDepartmentService, SubDepartmentService>()
+            .AddScoped<IUnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>, SubDepartmentService>()
+            .AddScoped<ISubLocationService, SubLocationService>()
+            .AddScoped<IUnifiedCacheService<Guid, SubLocation, SubLocationModel>, SubLocationService>()
+
+            // Processes
+            .AddScoped<IAuditProcessService, AuditProcessService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditProcess, AuditProcessModel>, AuditProcessService>()
+            .AddScoped<ISubProcessService, SubProcessService>()
+            .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
+
+            // Reports
+            .AddScoped<IAuditExceptionReportService, AuditExceptionRepotService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditExceptionReport, AuditExceptionReportModel>, AuditExceptionRepotService>()
+            .AddScoped<IAuditPlanSummaryReportService, AuditPlanSummaryReportService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditPlanSummaryReport, AuditPlanSummaryReportModel>, AuditPlanSummaryReportService>()
+            .AddScoped<IInternalAuditConsolidationReportService, InternalAuditConsolidationReportService>()
+            .AddScoped<IUnifiedCacheService<Guid, InternalAuditConsolidationReport, InternalAuditConsolidationReportModel>, InternalAuditConsolidationReportService>()
+            .AddScoped<IJobTimeAllocationReportService, JobTimeAllocationReportService>()
+            .AddScoped<IUnifiedCacheService<Guid, JobTimeAllocationReport, JobTimeAllocationReportModel>, JobTimeAllocationReportService>()
+            .AddScoped<IPlanningReportService, PlanningReportService>()
+            .AddScoped<IUnifiedCacheService<Guid, PlanningReport, PlanningReportModel>, PlanningReportService>()
+            .AddScoped<IReportingFollowUpService, ReportingFollowUpService>()
+            .AddScoped<IUnifiedCacheService<Guid, ReportingFollowUp, ReportingFollowUpModel>, ReportingFollowUpService>()
+
+            // Risk Controls
+            .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()
+            .AddScoped<IUnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>, RiskControlMatrixService>()
+            .AddScoped<IRiskControlService, RiskControlService>()
+            .AddScoped<IUnifiedCacheService<Guid, RiskControls, RiskControlsModel>, RiskControlService>()
+            .AddScoped<IRiskProgramService, RiskProgramService>()
+            .AddScoped<IUnifiedCacheService<Guid, RiskProgram, RiskProgramModel>, RiskProgramService>()
+
+            // Risks
+            .AddScoped<IRiskAssessmentService, RiskAssessmentService>()
+            .AddScoped<IUnifiedCacheService<Guid, RiskAssessment, RiskAssessmentModel>, RiskAssessmentService>()
+            .AddScoped<IRiskFactorService, RiskFactorService>()
+            .AddScoped<IUnifiedCacheService<Guid, RiskFactor, RiskFactorModel>, RiskFactorService>()
+
+            // Skills
+            .AddScoped<ISkillService, SkillService>()
+            .AddScoped<IUnifiedCacheService<Guid, Skill, SkillModel>, SkillService>()
+            .AddScoped<ISkillSetService, SkillSetService>()
+            .AddScoped<IUnifiedCacheService<Guid, SkillSet, SkillSetModel>, SkillSetService>()
+            .AddScoped<ISkillCategoryService, SkillCategoryService>()
+            .AddScoped<IUnifiedCacheService<Guid, SkillCategory, SkillCategoryModel>, SkillCategoryService>()
+
+            // Supporting Docs
+            .AddScoped<ISupportingDocService, SupportingDocService>()
+            .AddScoped<IUnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>, SupportingDocService>()
+
+            // Tasks
+            .AddScoped<ITaskManagementService, TaskManagementService>()
+            .AddScoped<IUnifiedCacheService<Guid, TaskManagement, TaskManagementModel>, TaskManagementService>()
+
+            // User Designation
+            .AddScoped<IUserDesignationService, UserDesignationService>()
+            .AddScoped<IUnifiedCacheService<Guid, UserDesignation, UserDesignationModel>, UserDesignationService>();
+
+        return services;
+    }
 
     private static IServiceCollection AddMappers(this IServiceCollection services) =>
-    services.AddAutoMapper(
-        typeof(BusinessLogicDependencies).Assembly,
-        typeof(AuditMappingProfile).Assembly,
-        typeof(ChecklistMappingProfile).Assembly,
-        typeof(CommonMappingProfile).Assembly,
-        typeof(ComplianceMappingProfile).Assembly,
-        typeof(JobsMappingProfile).Assembly,
-        typeof(OrganizationMappingProfile).Assembly,
-        typeof(ProcessMappingProfile).Assembly,
-        typeof(ReportsMappingProfile).Assembly,
-        typeof(RiskControlsMappingProfile).Assembly,
-        typeof(RisksMappingProfile).Assembly,
-        typeof(SkillsMappingProfile).Assembly,
-        typeof(SupportingDocsMappingProfile).Assembly,
-        typeof(TaskManagementMappingProfile).Assembly,
-        typeof(UserDesignationMappingProfile).Assembly
-    );
-
-    private static IServiceCollection AddServices(this IServiceCollection services) =>
-    services
-        .AddScoped<ITransaction, Transaction>()
-        .AddScoped<IRiskService, RiskService>()
-        // Add MemoryCache here
-        .AddMemoryCache()
-
-        // Audit Services
-        .AddScoped<IAuditDomainService, AuditDomainService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditDomain, AuditDomainModel>, AuditDomainService>()
-
-        .AddScoped<IAuditEngagementService, AuditEngagementService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditEngagement, AuditEngagementModel>, AuditEngagementService>()
-        
-        .AddScoped<IAuditPlanSummaryService, AuditPlanSummaryService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditPlanSummary, AuditPlanSummaryModel>, AuditPlanSummaryService>()
-        
-        .AddScoped<IAuditUniverseObjectiveService, AuditUniverseObjectiveService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditUniverseObjective, AuditUniverseObjectiveModel>, AuditUniverseObjectiveService>()
-        
-        .AddScoped<IAuditUniverseService, AuditUniverseService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditUniverse, AuditUniverseModel>, AuditUniverseService>()
-        
-        .AddScoped<IBusinessObjectiveService, BusinessObjectiveService>()
-        .AddScoped<IUnifiedCacheService<Guid, BusinessObjective, BusinessObjectiveModel>, BusinessObjectiveService>()
-        
-        .AddScoped<ISpecialProjectService, SpecialProjectService>()
-        .AddScoped<IUnifiedCacheService<Guid, SpecialProject, SpecialProjectModel>, SpecialProjectService>()
-        
-        .AddScoped<IObjectiveService, ObjectiveService>()
-        .AddScoped<IUnifiedCacheService<Guid, Objective, ObjectiveModel>, ObjectiveService>()
-
-        // Checklist Services
-        .AddScoped<IChecklistService, ChecklistService>()
-        .AddScoped<IUnifiedCacheService<Guid, Checklist, ChecklistModel>, ChecklistService>()
-        
-        .AddScoped<IRemarkService, RemarkService>()
-        .AddScoped<IUnifiedCacheService<Guid, Remark, RemarkModel>, RemarkService>()
-
-        // Common Services
-        .AddScoped<IRatingService, RatingService>()
-        .AddScoped<IUnifiedCacheService<Guid, Rating, RatingModel>, RatingService>()
-
-        // Compliance Services
-        .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()
-        .AddScoped<IUnifiedCacheService<Guid, ComplianceChecklist, ComplianceChecklistModel>, ComplianceChecklistService>()
-
-        // Jobs Services
-        .AddScoped<IAuditJobService, AuditJobService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditJob, AuditJobModel>, AuditJobService>()
-        
-        .AddScoped<IJobPrioritizationService, JobPrioritizationService>()
-        .AddScoped<IUnifiedCacheService<Guid, JobPrioritization, JobPrioritizationModel>, JobPrioritizationService>()
-        
-        .AddScoped<IJobSchedulingService, JobSchedulingService>()
-        .AddScoped<IUnifiedCacheService<Guid, JobScheduling, JobSchedulingModel>, JobSchedulingService>()
-
-        // Organization Services
-        .AddScoped<ICompanyService, CompanyService>()
-        .AddScoped<IUnifiedCacheService<Guid, Company, CompanyModel>, CompanyService>()
-        
-        .AddScoped<IDepartmentService, DepartmentService>()
-        .AddScoped<IUnifiedCacheService<Guid, Department, DepartmentModel>, DepartmentService>()
-        
-        .AddScoped<ILocationService, LocationService>()
-        .AddScoped<IUnifiedCacheService<Guid, Location, LocationModel>, LocationService>()
-        
-        .AddScoped<ISubDepartmentService, SubDepartmentService>()
-        .AddScoped<IUnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>, SubDepartmentService>()
-        
-        .AddScoped<ISubLocationService, SubLocationService>()
-        .AddScoped<IUnifiedCacheService<Guid, SubLocation, SubLocationModel>, SubLocationService>()
-
-        // Processes Services
-        .AddScoped<IAuditProcessService, AuditProcessService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditProcess, AuditProcessModel>, AuditProcessService>()
-        
-        .AddScoped<ISubProcessService, SubProcessService>()
-        .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
-
-        // Reports Services
-        .AddScoped<IAuditExceptionReportService, AuditExceptionRepotService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditExceptionReport, AuditExceptionReportModel>, AuditExceptionRepotService>()
-        
-        .AddScoped<IAuditPlanSummaryReportService, AuditPlanSummaryReportService>()
-        .AddScoped<IUnifiedCacheService<Guid, AuditPlanSummaryReport, AuditPlanSummaryReportModel>, AuditPlanSummaryReportService>()
-        
-        .AddScoped<IInternalAuditConsolidationReportService, InternalAuditConsolidationReportService>()
-        .AddScoped<IUnifiedCacheService<Guid, InternalAuditConsolidationReport, InternalAuditConsolidationReportModel>, InternalAuditConsolidationReportService>()
-        
-        .AddScoped<IJobTimeAllocationReportService, JobTimeAllocationReportService>()
-        .AddScoped<IUnifiedCacheService<Guid, JobTimeAllocationReport, JobTimeAllocationReportModel>, JobTimeAllocationReportService>()
-        
-        .AddScoped<IPlanningReportService, PlanningReportService>()
-        .AddScoped<IUnifiedCacheService<Guid, PlanningReport, PlanningReportModel>, PlanningReportService>()
-        
-        .AddScoped<IReportingFollowUpService, ReportingFollowUpService>()
-        .AddScoped<IUnifiedCacheService<Guid, ReportingFollowUp, ReportingFollowUpModel>, ReportingFollowUpService>()
-
-        // Risk Control Services
-        .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()
-        .AddScoped<IUnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>, RiskControlMatrixService>()
-        
-        .AddScoped<IRiskControlService, RiskControlService>()
-        .AddScoped<IUnifiedCacheService<Guid, RiskControls, RiskControlsModel>, RiskControlService>()
-        
-        .AddScoped<IRiskProgramService, RiskProgramService>()
-        .AddScoped<IUnifiedCacheService<Guid, RiskProgram, RiskProgramModel>, RiskProgramService>()
-
-        // Risks Services
-        .AddScoped<IRiskAssessmentService, RiskAssessmentService>()
-        .AddScoped<IUnifiedCacheService<Guid, RiskAssessment, RiskAssessmentModel>, RiskAssessmentService>()
-        
-        .AddScoped<IRiskFactorService, RiskFactorService>()
-        .AddScoped<IUnifiedCacheService<Guid, RiskFactor, RiskFactorModel>, RiskFactorService>()
-
-        // Skills Services
-        .AddScoped<ISkillService, SkillService>()
-        .AddScoped<IUnifiedCacheService<Guid, Skill, SkillModel>, SkillService>()
-        
-        .AddScoped<ISkillSetService, SkillSetService>()
-        .AddScoped<IUnifiedCacheService<Guid, SkillSet, SkillSetModel>, SkillSetService>()
-        
-        .AddScoped<ISkillCategoryService, SkillCategoryService>()
-        .AddScoped<IUnifiedCacheService<Guid, SkillCategory, SkillCategoryModel>, SkillCategoryService>()
-
-        // Supporting Docs Services
-        .AddScoped<ISupportingDocService, SupportingDocService>()
-        .AddScoped<IUnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>, SupportingDocService>()
-
-        // Tasks Services
-        .AddScoped<ITaskManagementService, TaskManagementService>()
-        .AddScoped<IUnifiedCacheService<Guid, TaskManagement, TaskManagementModel>, TaskManagementService>()
-
-        // User Designation Services
-        .AddScoped<IUserDesignationService, UserDesignationService>()
-        .AddScoped<IUnifiedCacheService<Guid, UserDesignation, UserDesignationModel>, UserDesignationService>();
-    
+        services.AddAutoMapper(
+            typeof(BusinessLogicDependencies).Assembly,
+            typeof(AuditMappingProfile).Assembly,
+            typeof(ChecklistMappingProfile).Assembly,
+            typeof(CommonMappingProfile).Assembly,
+            typeof(ComplianceMappingProfile).Assembly,
+            typeof(JobsMappingProfile).Assembly,
+            typeof(OrganizationMappingProfile).Assembly,
+            typeof(ProcessMappingProfile).Assembly,
+            typeof(ReportsMappingProfile).Assembly,
+            typeof(RiskControlsMappingProfile).Assembly,
+            typeof(RisksMappingProfile).Assembly,
+            typeof(SkillsMappingProfile).Assembly,
+            typeof(SupportingDocsMappingProfile).Assembly,
+            typeof(TaskManagementMappingProfile).Assembly,
+            typeof(UserDesignationMappingProfile).Assembly
+        );
 }

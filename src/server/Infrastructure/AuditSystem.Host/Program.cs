@@ -85,7 +85,7 @@ var healthCheckBuilder = services.AddHealthChecks()
 services.AddClients(configuration, environment.IsProduction());
 services.AddLogging();
 services.AddApplication();
-services.AddDomain();
+services.AddBusinessLogic();
 services.AddAuthentication();
 services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
 

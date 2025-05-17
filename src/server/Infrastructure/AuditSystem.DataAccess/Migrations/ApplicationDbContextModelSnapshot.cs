@@ -17,7 +17,7 @@ namespace AuditSystem.DataAccess.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -114,6 +114,52 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AuditPlanSummaries");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BusinessObjective")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CompanyUpdate")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DomainId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IndustryUpdate")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsFinancialQuantifiable")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSpecialProject")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SpecialProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DomainId");
+
+                    b.ToTable("AuditUniverses");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverseObjective", b =>
@@ -244,52 +290,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("SpecialProject");
-                });
-
-            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BusinessObjective")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("CompanyUpdate")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DomainId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("IndustryUpdate")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsFinancialQuantifiable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSpecialProject")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("SpecialProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DomainId");
-
-                    b.ToTable("AuditUniverses");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Auth.RefreshToken", b =>
@@ -1285,26 +1285,41 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid>("DriveFileId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("FileSize")
-                        .HasColumnType("int");
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("URL")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.ToTable("SupportingDocs");
+                    b.HasIndex("DriveFileId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportingDocs", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Tasks.TaskManagement", b =>
@@ -1675,9 +1690,20 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Location");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditDomain", "Domain")
+                        .WithMany()
+                        .HasForeignKey("DomainId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Domain");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverseObjective", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1707,24 +1733,13 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.SpecialProject", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
                         .WithOne("SpecialProject")
                         .HasForeignKey("AuditSystem.Domain.Entities.Audit.SpecialProject", "AuditUniverseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AuditUniverse");
-                });
-
-            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditDomain", "Domain")
-                        .WithMany()
-                        .HasForeignKey("DomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Domain");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Auth.RefreshToken", b =>
@@ -1762,7 +1777,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Compliance.ComplianceAuditLink", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1789,7 +1804,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Jobs.AuditJob", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.AuditUniverse", "AuditUniverse")
+                    b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
                         .WithMany()
                         .HasForeignKey("AuditUniverseID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2036,6 +2051,17 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("SkillSet");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.SupportingDocs.SupportingDoc", b =>
+                {
+                    b.HasOne("User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Tasks.TaskManagement", b =>
                 {
                     b.HasOne("User", "AssignedBy")
@@ -2141,7 +2167,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("SubDepartment");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.AuditUniverse", b =>
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
                 {
                     b.Navigation("SpecialProject");
                 });

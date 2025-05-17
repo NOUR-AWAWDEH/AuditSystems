@@ -18,6 +18,12 @@ public sealed class CreateSupportingDocValidator : AbstractValidator<CreateSuppo
             .GreaterThan(0)
             .WithMessage("Supporting Doc File Size must be greater than 0.");
 
+        RuleFor(x => x.DriveFileId)
+            .NotEmpty()
+            .WithMessage("Supporting Doc Drive File ID is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("Supporting Doc Drive File ID must not be empty.");
+
         RuleFor(x => x.URL)
             .NotEmpty()
             .WithMessage("Supporting Doc URL is required.")

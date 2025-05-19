@@ -10,12 +10,13 @@ using AuditSystem.Application.Features.Organization.SubLocation.Search;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Contract.Common;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class SubLocationController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create SubLocation

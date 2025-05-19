@@ -72,7 +72,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("auth-status")]
-    [AllowAnonymous] // Or [Authorize] if you want to require auth for this endpoint
+    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]// if you want to require auth for this endpoint
     public async Task<IActionResult> GetAuthStatus([FromBody] AuthStatusRequestDto request)
     {
         var result = await _authService.GetAuthStatusFromToken(request);

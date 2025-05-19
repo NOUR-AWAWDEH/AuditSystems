@@ -1,25 +1,22 @@
 // src/composables/useLogin.js
 import { ref } from 'vue';
 import { loginRepository } from '@/services/auth/authRepos/loginRepository';
-
-// Constants for localStorage keys
-const TOKEN_KEY = 'token';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+import authService from '@/services/auth/authRepos/authService';
 
 export function useLogin() {
-  const isAuthenticated = ref(!!localStorage.getItem(TOKEN_KEY)); // Initialize based on existing token
+  const isAuthenticated = ref(!!authService.getLocalToken());
   const user = ref(null);
   const error = ref(null);
-  const token = ref(localStorage.getItem(TOKEN_KEY) || null);
-  const refreshToken = ref(localStorage.getItem(REFRESH_TOKEN_KEY) || null);
+  const token = ref(authService.getLocalToken() || null);
+  const refreshToken = ref(authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null);
 
   const setAuthData = (newToken, newRefreshToken, username) => {
     token.value = newToken;
     refreshToken.value = newRefreshToken;
     user.value = { username };
     isAuthenticated.value = true;
-    localStorage.setItem(TOKEN_KEY, token.value);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken.value);
+    authService.setLocalToken(token.value);
+    authService.setLocalRefreshToken(refreshToken.value);
   };
 
   const handleLoginSuccess = (response, username) => {
@@ -43,7 +40,6 @@ export function useLogin() {
     try {
       error.value = null;
       const response = await loginRepository.loginRequest(username, password);
-
       if (response?.success) {
         return handleLoginSuccess(response, username);
       } else {

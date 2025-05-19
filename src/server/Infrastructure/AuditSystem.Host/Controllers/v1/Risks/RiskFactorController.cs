@@ -10,12 +10,13 @@ using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Risks;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class RiskFactorController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Risk Factor

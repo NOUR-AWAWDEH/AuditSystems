@@ -122,7 +122,7 @@ services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://auditsystem.onrender.com", "https://localhost:7218")
+        policy.WithOrigins("https://auditsystem.onrender.com", "http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

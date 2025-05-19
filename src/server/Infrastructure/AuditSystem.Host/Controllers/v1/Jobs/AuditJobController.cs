@@ -10,12 +10,13 @@ using AuditSystem.Contract.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Jobs;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class AuditJobController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Audit Job

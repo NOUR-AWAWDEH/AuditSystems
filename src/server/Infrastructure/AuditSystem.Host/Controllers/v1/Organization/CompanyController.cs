@@ -10,12 +10,13 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Organization.Company.Search;
 using AuditSystem.Contract.Common;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class CompanyController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Company

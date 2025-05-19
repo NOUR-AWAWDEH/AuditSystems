@@ -8,6 +8,7 @@ using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Contract.Common;
 using AuditSystem.Contract.Models.Audit;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,7 @@ namespace AuditSystem.Host.Controllers.v1.Audit;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class AuditDomainController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Audit Domain

@@ -1,6 +1,7 @@
 using AuditSystem.Application.Features.SupportingDocs.Uplode;
 using AuditSystem.Contract.Common;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class SupportingDocsController(IMediator mediator) : ApiControllerBase(mediator)
 {
 

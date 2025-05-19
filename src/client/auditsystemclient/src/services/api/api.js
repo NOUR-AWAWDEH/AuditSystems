@@ -1,8 +1,9 @@
-// src/api.js
+// src/services/api/api.js
+
 import axios from 'axios';
 import authService from '@/services/auth/authRepos/authService';
 
-const apiUrl =  __VITE_API_URL__;
+const apiUrl = __VITE_API_URL__;
 
 const api = axios.create({
   baseURL: apiUrl,
@@ -33,12 +34,17 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Mark this request as a retry
 
-      const refreshSuccessful = await authService.refreshToken();
+      try {
+        const refreshSuccessful = await authService.refreshToken();
 
-      if (refreshSuccessful) {
-        // Retry the original request with the new token
-        originalRequest.headers.Authorization = `Bearer ${authService.getLocalToken()}`;
-        return api(originalRequest);
+        if (refreshSuccessful) {
+          // Retry the original request with the new token
+          originalRequest.headers.Authorization = `Bearer ${authService.getLocalToken()}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        return Promise.reject(error);
       }
     }
 

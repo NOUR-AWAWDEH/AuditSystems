@@ -70,4 +70,15 @@ public sealed class AuthController(
         var response = await _authService.RefreshTokenAsync(request.RefreshToken);
         return StatusCode(response.StatusCode, response);
     }
+
+    [HttpPost("auth-status")]
+    [AllowAnonymous] // Or [Authorize] if you want to require auth for this endpoint
+    public async Task<IActionResult> GetAuthStatus([FromBody] AuthStatusRequestDto request)
+    {
+        var result = await _authService.GetAuthStatusFromToken(request);
+        if (result == null || !result.IsAuthenticated)
+            return Unauthorized(result);
+
+        return Ok(result);
+    }
 }

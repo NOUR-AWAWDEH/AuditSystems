@@ -44,7 +44,7 @@ public class UploadSupportingDocCommandHandler : IRequestHandler<UploadSupportin
             var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.FileName);
             if (!fileSaveResult.IsSuccess)
             {
-                return Result.Error((ErrorList)fileSaveResult.Errors);
+                return Result.Error(new ErrorList(fileSaveResult.Errors));
             }
 
             // Create document with proper IDs

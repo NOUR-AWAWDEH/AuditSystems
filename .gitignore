@@ -99,3 +99,7 @@ coverage
 *.tsbuildinfo
 
 *.yml
+
+
+# ignore Uploads/ folder
+Uploads/

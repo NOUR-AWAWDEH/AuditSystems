@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace AuditSystem.BusinessLogic.Services.FileStorageServices;
 
@@ -14,6 +15,10 @@ public class LocalFileStorage : IFileStorage
     private readonly string _publicBaseUrl;
     private readonly ILogger<LocalFileStorage> _logger;
     private readonly IWebHostEnvironment _env;
+
+    private static readonly string[] AllowedExtensions =
+        { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" };
+    private const long MaxFileSizeBytes = 200 * 1024 * 1024;
 
     public LocalFileStorage(
         IWebHostEnvironment env,
@@ -28,7 +33,6 @@ public class LocalFileStorage : IFileStorage
 
         _publicBaseUrl = Environment.GetEnvironmentVariable("FILESTORAGE_PUBLICBASEURL")
             ?? throw new InvalidOperationException("Missing FILESTORAGE_PUBLICBASEURL in environment variables or .env file.");
-
 
         EnsureUploadDirectoryExists();
     }
@@ -54,36 +58,33 @@ public class LocalFileStorage : IFileStorage
     {
         try
         {
-            // Validate file
             if (file == null || file.Length == 0)
                 return Result.Error("No file uploaded.");
 
-            // Validate file type
-            var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" };
-            string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (string.IsNullOrEmpty(ext)) ext = ".dat";
-            if (!validExtensions.Contains(ext))
-                return Result.Error($"Invalid file type. Allowed: {string.Join(", ", validExtensions)}");
+            // Validate file extension
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(ext) || !AllowedExtensions.Contains(ext))
+            {
+                return Result.Error($"Invalid file type. Allowed types: {string.Join(", ", AllowedExtensions)}");
+            }
 
-            // Validate file size (50MB max)
-            if (file.Length > 50 * 1024 * 1024)
-                return Result.Error("File size exceeds 50MB limit.");
+            // Validate file size
+            if (file.Length > MaxFileSizeBytes)
+                return Result.Error("File size exceeds the 50MB limit.");
 
-            // Generate safe filename
-            string sanitizedFileName = Path.GetFileNameWithoutExtension(userProvidedFileName)
-                .Replace(" ", "_")
-                .Replace("..", "")
-                .Trim();
-            string uniqueFileName = $"{sanitizedFileName}_{Guid.NewGuid()}{ext}";
+            // Sanitize filename
+            string baseFileName = Path.GetFileNameWithoutExtension(userProvidedFileName);
+            baseFileName = Regex.Replace(baseFileName, @"[^a-zA-Z0-9_\-\.]", "_").Trim('_');
+            if (string.IsNullOrWhiteSpace(baseFileName))
+                baseFileName = "file";
+
+            string uniqueFileName = $"{baseFileName}_{Guid.NewGuid():N}{ext}";
             string fullPath = Path.Combine(_uploadFolderPath, uniqueFileName);
 
             // Save file
-            await using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            await using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
 
-            // Generate public URL
             string publicUrl = $"{_publicBaseUrl.TrimEnd('/')}/{uniqueFileName}";
 
             var details = new FileSaveDetails
@@ -94,37 +95,36 @@ public class LocalFileStorage : IFileStorage
                 FileSize = file.Length
             };
 
-            _logger.LogInformation("File saved successfully. Path: {Path}, URL: {Url}",
-                fullPath, publicUrl);
+            _logger.LogInformation("File saved successfully at {FullPath}", fullPath);
             return Result.Success(details);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving file {FileName}", userProvidedFileName);
-            return Result.Error("An error occurred while saving the file.");
+            _logger.LogError(ex, "Error saving file: {FileName}", userProvidedFileName);
+            return Result.Error("An unexpected error occurred while saving the file.");
         }
     }
 
     public async Task<Result> DeleteFileAsync(string fileName)
     {
-        //try
-        //{
-        //    if (string.IsNullOrWhiteSpace(fileName))
-        //        return Result.Error("Invalid filename");
+        try
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return Result.Error("Invalid file name.");
 
-        //    string fullPath = Path.Combine(_uploadFolderPath, fileName);
-        //    if (!File.Exists(fullPath))
-        //        return Result.NotFound();
+            string fullPath = Path.Combine(_uploadFolderPath, fileName);
 
-        //    File.Delete(fullPath);
-        //    return Result.Success();
-        //}
-        //catch (Exception ex)
-        //{
-        //    _logger.LogError(ex, "Error deleting file {FileName}", fileName);
-        //    return Result.Error("Failed to delete file");
-        //}
+            if (!File.Exists(fullPath))
+                return Result.NotFound("File not found.");
 
-        throw new NotImplementedException("DeleteFileAsync is not implemented yet.");
+            File.Delete(fullPath);
+            _logger.LogInformation("File deleted: {FullPath}", fullPath);
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting file: {FileName}", fileName);
+            return Result.Error("Failed to delete file due to an internal error.");
+        }
     }
 }

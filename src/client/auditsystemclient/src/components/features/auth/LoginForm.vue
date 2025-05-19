@@ -10,6 +10,7 @@ import PasswordInput from '@/components/base/PasswordInput.vue';
 import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';
+import authStorage from '@/services/auth/authRepos/authService.js';
 
 // Composables
 const { login, error } = useLogin();
@@ -68,6 +69,16 @@ const handleLogin = async () => {
   isLoading.value = false;
 
   if (response?.success) {
+    // Use the auth service consistently for token management
+    if (response.result?.jwtToken) {
+      // Store both tokens using the auth service
+      authStorage.setLocalToken(response.result.jwtToken);
+      if (response.result.refreshToken) {
+        authStorage.setLocalRefreshToken(response.result.refreshToken);
+      }
+      // Initialize token refresh scheduling
+      authStorage.initializeTokenRefresh();
+    }
     router.replace('/sidebar');
   }
 };

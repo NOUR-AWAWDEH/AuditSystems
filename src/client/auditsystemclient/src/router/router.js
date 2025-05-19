@@ -1,9 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LoginForm from '@/components/features/auth/LoginForm.vue';
+
 
 const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
 const ForgotPassword = () => import('@/components/features/auth/ForgotPassword.vue');
 const ResetPassword = () => import('@/components/features/auth/ResetPassword.vue');
+const SideBar = () => import('@/components/common/SideBar.vue');
+const Login = () => import('@/components/features/auth/LoginForm.vue');
+const SupportingDocManager = () => import('@/components/features/supportingDoc/SupportingDocManager.vue');
 
 const routes = [
   {
@@ -13,7 +16,7 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginForm,
+    component: Login,
     meta: { requiresAuth: false }
   },
   {
@@ -45,13 +48,19 @@ const routes = [
   {
     path: '/sidebar',
     name: 'Sidebar',
-    component: () => import('@/components/common/SideBar.vue'),
+    component: SideBar,
     meta: { requiresAuth: true }
   },
   {
     path: '/:pathMatch(.*)*',
     redirect: '/login'
-  }
+  },
+  {
+    path: '/supporting-docs',
+    name: 'SupportingDocs',
+    component: SupportingDocManager,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

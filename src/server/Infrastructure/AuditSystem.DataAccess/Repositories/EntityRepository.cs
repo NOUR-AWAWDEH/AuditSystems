@@ -87,4 +87,14 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     {
         return await query.ProjectTo<TResponse>(_mapper.ConfigurationProvider).ToListAsync();
     }
+
+    public async Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    {
+        IQueryable<TEntity> query = _entities.AsNoTracking();
+
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        return await query.ToListAsync();
+    }
 }

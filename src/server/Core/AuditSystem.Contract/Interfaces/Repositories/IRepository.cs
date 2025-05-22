@@ -17,4 +17,6 @@ public interface IRepository<TId, TEntity>
     Task<ICollection<TResponse>> GetByQueryAsync<TResponse>(IQueryable<TResponse> query);
     Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
     Task<ICollection<TResponse>> ProjectToAsync<TResponse>(IQueryable<TEntity> query);
+    Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null);
+
 }

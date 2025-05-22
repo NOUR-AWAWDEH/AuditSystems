@@ -62,30 +62,32 @@ public class LocalFileStorage : IFileStorage
                 return Result.Error("No file uploaded.");
 
             // Validate file extension
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (string.IsNullOrWhiteSpace(ext) || !AllowedExtensions.Contains(ext))
-            {
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (string.IsNullOrEmpty(extension) || !AllowedExtensions.Contains(extension))
                 return Result.Error($"Invalid file type. Allowed types: {string.Join(", ", AllowedExtensions)}");
-            }
 
             // Validate file size
             if (file.Length > MaxFileSizeBytes)
                 return Result.Error("File size exceeds the 50MB limit.");
 
-            // Sanitize filename
-            string baseFileName = Path.GetFileNameWithoutExtension(userProvidedFileName);
-            baseFileName = Regex.Replace(baseFileName, @"[^a-zA-Z0-9_\-\.]", "_").Trim('_');
-            if (string.IsNullOrWhiteSpace(baseFileName))
-                baseFileName = "file";
+            // Sanitize and generate filename
+            var sanitizedFileName = SanitizeFileName(userProvidedFileName);
+            var uniqueFileName = $"{sanitizedFileName}_{Guid.NewGuid():N}{extension}";
 
-            string uniqueFileName = $"{baseFileName}_{Guid.NewGuid():N}{ext}";
-            string fullPath = Path.Combine(_uploadFolderPath, uniqueFileName);
+            // Ensure upload directory exists
+            Directory.CreateDirectory(_uploadFolderPath);
 
+            // Create full file path
+            var fullPath = Path.Combine(_uploadFolderPath, uniqueFileName);
+            fullPath = Path.GetFullPath(fullPath);
+
+            var urlFriendlyFileName = uniqueFileName.Replace('\\', '/');  // Use forward slashes for URLs
             // Save file
-            await using var stream = new FileStream(fullPath, FileMode.Create);
-            await file.CopyToAsync(stream);
+            await using var fileStream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(fileStream);
 
-            string publicUrl = $"{_publicBaseUrl.TrimEnd('/')}/{uniqueFileName}";
+            // Create URL-friendly path
+            var publicUrl = BuildPublicUrl(uniqueFileName);
 
             var details = new FileSaveDetails
             {
@@ -103,6 +105,27 @@ public class LocalFileStorage : IFileStorage
             _logger.LogError(ex, "Error saving file: {FileName}", userProvidedFileName);
             return Result.Error("An unexpected error occurred while saving the file.");
         }
+    }
+
+    private string SanitizeFileName(string fileName)
+    {
+        var baseName = Path.GetFileNameWithoutExtension(fileName);
+
+        // More comprehensive sanitization
+        var cleanName = Regex.Replace(baseName, @"[^\w\-.]", "_")
+                            .Trim('_', '.', '-')
+                            .Trim();
+
+        return string.IsNullOrWhiteSpace(cleanName) ? "file" : cleanName;
+    }
+
+    private string BuildPublicUrl(string fileName)
+    {
+        // Normalize URL components
+        var baseUrl = _publicBaseUrl.TrimEnd('/');
+        var encodedFileName = Uri.EscapeDataString(fileName.Replace('\\', '/'));
+
+        return $"{baseUrl}/{encodedFileName}";
     }
 
     public async Task<Result> DeleteFileAsync(string fileName)

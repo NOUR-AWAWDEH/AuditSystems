@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
 
 public class UploadSupportingDocCommandHandler : IRequestHandler<UploadSupportingDocCommand, Result<Guid>>
 {
@@ -54,7 +54,7 @@ public class UploadSupportingDocCommandHandler : IRequestHandler<UploadSupportin
                 UserId = request.UserId,
                 FileName = fileSaveResult.Value.SavedFileName,
                 FileSize = fileSaveResult.Value.FileSize,
-                URL = fileSaveResult.Value.FullPath,
+                URL = fileSaveResult.Value.PublicUrl,
                 DriveFileId = Guid.NewGuid(), // Changed from Guid.Empty
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

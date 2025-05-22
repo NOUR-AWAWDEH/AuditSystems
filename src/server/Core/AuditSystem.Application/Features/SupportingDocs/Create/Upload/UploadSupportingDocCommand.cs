@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
 
 public class UploadSupportingDocCommand : IRequest<Result<Guid>>
 {

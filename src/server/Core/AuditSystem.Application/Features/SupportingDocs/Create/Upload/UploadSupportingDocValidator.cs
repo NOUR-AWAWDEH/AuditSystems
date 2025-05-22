@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
 
 public class UploadSupportingDocValidator : AbstractValidator<UploadSupportingDocCommand>
 {

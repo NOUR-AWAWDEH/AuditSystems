@@ -1,4 +1,5 @@
 using AuditSystem.BusinessLogic.Mappings;
+using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ChecklistServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
@@ -15,7 +16,9 @@ using AuditSystem.BusinessLogic.Services.EntityServices.TasksServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesignationServices;
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
+using AuditSystem.BusinessLogic.Services.UrlServices;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.Download;
 using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Interfaces.ModelServices.AuditServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ChecklistServices;
@@ -72,8 +75,12 @@ public static class BusinessLogicDependencies
         {
             UploadPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
                 ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH"),
-            PublicBaseUrl = Environment.GetEnvironmentVariable("FILESTORAGE_PUBLICBASEURL")
-                ?? throw new InvalidOperationException("Missing FILESTORAGE_PUBLICBASEURL")
+
+            PublicBaseUrl = Environment.GetEnvironmentVariable("FILE_STORAGE_BASE_URL")
+                ?? throw new InvalidOperationException("Missing FILE_STORAGE_BASE_URL"),
+
+            SignedUrlSecret = Environment.GetEnvironmentVariable("SIGNED_URL_SECRET_KEY")
+                ?? throw new InvalidOperationException("Missing SIGNED_URL_SECRET_KEY in environment variables or .env file.")
         };
 
         services
@@ -182,6 +189,18 @@ public static class BusinessLogicDependencies
             .AddScoped<ISupportingDocService, SupportingDocService>()
             .AddScoped<IUnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>, SupportingDocService>()
 
+            // File Path Builder
+            .AddSingleton<IFilePathBuilder, FilePathBuilder>()
+
+            // Url
+            .AddSingleton<ISignedUrlService, SignedUrlService>()
+
+            // Local File Storage
+            .AddScoped<IFileStorage, LocalFileStorage>()
+            .AddScoped<IURLService,URLService>()
+
+            // Download Service
+            .AddScoped<IDecodeDownloadService, DecodeDownloadService>()
             // Tasks
             .AddScoped<ITaskManagementService, TaskManagementService>()
             .AddScoped<IUnifiedCacheService<Guid, TaskManagement, TaskManagementModel>, TaskManagementService>()

@@ -1,3 +1,3 @@
-namespace AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 
 public sealed record UploadSupportingDocCommandResponse(Guid SupportingDocId);

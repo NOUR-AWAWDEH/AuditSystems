@@ -1,4 +1,4 @@
-﻿using AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
+﻿using AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 using AuditSystem.Contract.Models.SupportingDocs;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AutoMapper;

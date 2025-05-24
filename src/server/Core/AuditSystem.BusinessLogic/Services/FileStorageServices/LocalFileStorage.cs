@@ -1,153 +1,85 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Models.SupportingDocs;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
-
 namespace AuditSystem.BusinessLogic.Services.FileStorageServices;
 
-public class LocalFileStorage : IFileStorage
+public class LocalFileStorage( 
+        IFilePathBuilder pathBuilder,
+        ILogger<LocalFileStorage> logger) 
+        : IFileStorage
 {
-    private readonly string _uploadFolderPath;
-    private readonly string _publicBaseUrl;
-    private readonly ILogger<LocalFileStorage> _logger;
-    private readonly IWebHostEnvironment _env;
+    private readonly IFilePathBuilder _pathBuilder = pathBuilder;
+    private readonly ILogger<LocalFileStorage> _logger = logger;
 
     private static readonly string[] AllowedExtensions =
-        { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" };
+        [ ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" ];
     private const long MaxFileSizeBytes = 200 * 1024 * 1024;
 
-    public LocalFileStorage(
-        IWebHostEnvironment env,
-        ILogger<LocalFileStorage> logger,
-        IConfiguration configuration)
-    {
-        _logger = logger;
-        _env = env;
-
-        _uploadFolderPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
-            ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH in environment variables or .env file.");
-
-        _publicBaseUrl = Environment.GetEnvironmentVariable("FILESTORAGE_PUBLICBASEURL")
-            ?? throw new InvalidOperationException("Missing FILESTORAGE_PUBLICBASEURL in environment variables or .env file.");
-
-        EnsureUploadDirectoryExists();
-    }
-
-    private void EnsureUploadDirectoryExists()
-    {
-        try
-        {
-            if (!Directory.Exists(_uploadFolderPath))
-            {
-                Directory.CreateDirectory(_uploadFolderPath);
-                _logger.LogInformation("Created upload directory at {Path}", _uploadFolderPath);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Failed to create upload directory at {Path}", _uploadFolderPath);
-            throw;
-        }
-    }
-
-    public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, string userProvidedFileName)
+    public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, string userProvidedFileName, Guid userId,string serviceName)
     {
         try
         {
             if (file == null || file.Length == 0)
                 return Result.Error("No file uploaded.");
 
-            // Validate file extension
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (string.IsNullOrEmpty(extension) || !AllowedExtensions.Contains(extension))
-                return Result.Error($"Invalid file type. Allowed types: {string.Join(", ", AllowedExtensions)}");
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!AllowedExtensions.Contains(ext))
+                return Result.Error($"Invalid file type. Allowed: {string.Join(", ", AllowedExtensions)}");
 
-            // Validate file size
             if (file.Length > MaxFileSizeBytes)
-                return Result.Error("File size exceeds the 50MB limit.");
+                return Result.Error("File too large (200MB max).");
 
-            // Sanitize and generate filename
-            var sanitizedFileName = SanitizeFileName(userProvidedFileName);
-            var uniqueFileName = $"{sanitizedFileName}_{Guid.NewGuid():N}{extension}";
 
-            // Ensure upload directory exists
-            Directory.CreateDirectory(_uploadFolderPath);
+            var sanitized = SanitizeFileName(userProvidedFileName);
+            var unique = $"{sanitized}_{Guid.NewGuid():N}{ext}";
 
-            // Create full file path
-            var fullPath = Path.Combine(_uploadFolderPath, uniqueFileName);
-            fullPath = Path.GetFullPath(fullPath);
+            var fullPath = _pathBuilder.GetFullPath(userId, unique, serviceName);
+            await using var fs = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(fs);
 
-            var urlFriendlyFileName = uniqueFileName.Replace('\\', '/');  // Use forward slashes for URLs
-            // Save file
-            await using var fileStream = new FileStream(fullPath, FileMode.Create);
-            await file.CopyToAsync(fileStream);
+            var relPath = _pathBuilder.GetFullPath(userId, unique, serviceName);
 
-            // Create URL-friendly path
-            var publicUrl = BuildPublicUrl(uniqueFileName);
-
-            var details = new FileSaveDetails
+            return Result.Success(new FileSaveDetails
             {
-                SavedFileName = uniqueFileName,
+                SavedFileName = unique,
                 FullPath = fullPath,
-                PublicUrl = publicUrl,
                 FileSize = file.Length
-            };
-
-            _logger.LogInformation("File saved successfully at {FullPath}", fullPath);
-            return Result.Success(details);
+            });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving file: {FileName}", userProvidedFileName);
-            return Result.Error("An unexpected error occurred while saving the file.");
+            _logger.LogError(ex, "Save failed for file: {FileName}", userProvidedFileName);
+            return Result.Error("Unexpected error during file save.");
         }
     }
 
-    private string SanitizeFileName(string fileName)
+    private static string SanitizeFileName(string name)
     {
-        var baseName = Path.GetFileNameWithoutExtension(fileName);
-
-        // More comprehensive sanitization
-        var cleanName = Regex.Replace(baseName, @"[^\w\-.]", "_")
-                            .Trim('_', '.', '-')
-                            .Trim();
-
-        return string.IsNullOrWhiteSpace(cleanName) ? "file" : cleanName;
+        var baseName = Path.GetFileNameWithoutExtension(name);
+        var clean = Regex.Replace(baseName, @"[^\w\-.]", "_").Trim('_', '.', '-');
+        return string.IsNullOrWhiteSpace(clean) ? "file" : clean;
     }
 
-    private string BuildPublicUrl(string fileName)
-    {
-        // Normalize URL components
-        var baseUrl = _publicBaseUrl.TrimEnd('/');
-        var encodedFileName = Uri.EscapeDataString(fileName.Replace('\\', '/'));
-
-        return $"{baseUrl}/{encodedFileName}";
-    }
-
-    public async Task<Result> DeleteFileAsync(string fileName)
+    public Task<Result> DeleteFileAsync(string filePath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(fileName))
-                return Result.Error("Invalid file name.");
+            if (string.IsNullOrWhiteSpace(filePath))
+                return Task.FromResult(Result.Error("Invalid filename."));
 
-            string fullPath = Path.Combine(_uploadFolderPath, fileName);
-
-            if (!File.Exists(fullPath))
-                return Result.NotFound("File not found.");
+            var fullPath = Path.Combine(Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")!, filePath);
+            if (!File.Exists(fullPath)) return Task.FromResult(Result.NotFound("File not found."));
 
             File.Delete(fullPath);
-            _logger.LogInformation("File deleted: {FullPath}", fullPath);
-            return Result.Success();
+            return Task.FromResult(Result.Success());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting file: {FileName}", fileName);
-            return Result.Error("Failed to delete file due to an internal error.");
+            _logger.LogError(ex, "Delete failed for: {FilePath}", filePath);
+            return Task.FromResult(Result.Error("Error deleting file."));
         }
     }
 }

@@ -1,12 +1,10 @@
+using AuditSystem.Application.Features.SupportingDocs.Create.Upload;
+using AuditSystem.Application.Features.SupportingDocs.Get.GetURLByFileId;
 using AuditSystem.Application.Features.SupportingDocs.Get.GetByUserId;
-using AuditSystem.Application.Features.SupportingDocs.Get.DownloadByFileId;
-using AuditSystem.Application.Features.SupportingDocs.Create.Uplode;
 using AuditSystem.Contract.Common;
-using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using AuditSystem.Contract.Models.SupportingDocs;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 
@@ -33,11 +31,13 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
         return ProcessRequestToActionResultAsync(query);
     }
 
-
-    //[HttpGet("download/{id}")]
-    //[ProducesResponseType(StatusCodes.Status200OK)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> DownloadFile(Guid id) =>
-    //    await ProcessRequestToActionResultAsync(new DownloadSupportingDocQueryById(id));
+    [HttpGet("download/{fileId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<GetSupportingDocURLQueryByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public Task<IActionResult> DownloadSupportingDocument(Guid fileId)
+    {
+        var query = new GetSupportingDocURLQueryById(fileId);
+        return ProcessRequestToActionResultAsync(query);
+    }
 
 }

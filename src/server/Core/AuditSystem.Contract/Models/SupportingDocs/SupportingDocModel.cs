@@ -8,5 +8,4 @@ public sealed class SupportingDocModel : BaseModel<Guid>
     public required string FileName { get; set; } = string.Empty;
     public required long FileSize { get; set; }
     public Guid DriveFileId { get; set; }
-    public required string URL { get; set; } = string.Empty;
 }

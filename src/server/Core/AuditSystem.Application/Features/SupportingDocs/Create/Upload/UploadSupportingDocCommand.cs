@@ -2,9 +2,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 
-public class UploadSupportingDocCommand : IRequest<Result<Guid>>
+public sealed record class UploadSupportingDocCommand : IRequest<Result<Guid>>
 {
     public IFormFile File { get; set; } = null!;
     public Guid UserId { get; set; }

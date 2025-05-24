@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Get;
+namespace AuditSystem.Application.Features.SupportingDocs.Get.GetByUserId;
 
-public sealed class GetSupportingDocsByIdQueryValidator : AbstractValidator<GetSupportingDocsByIdQuery>
+public sealed class GetSupportingDocsByUserIdQueryValidator : AbstractValidator<GetSupportingDocsByUserIdQuery>
 {
-    public GetSupportingDocsByIdQueryValidator()
+    public GetSupportingDocsByUserIdQueryValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty()

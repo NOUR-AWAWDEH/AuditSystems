@@ -1,5 +1,4 @@
-﻿using AuditSystem.Application.Features.SupportingDocs.Create;
-using AuditSystem.Application.Features.SupportingDocs.Update;
+﻿using AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 using AuditSystem.Contract.Models.SupportingDocs;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AutoMapper;
@@ -12,7 +11,6 @@ public sealed class SupportingDocsMappingProfile : Profile
     {
         //SupportingDoc
         CreateMap<SupportingDocModel, SupportingDoc>().ReverseMap();
-        CreateMap<CreateSupportingDocCommand, SupportingDocModel>();
-        CreateMap<UpdateSupportingDocCommand, SupportingDocModel>();
+        CreateMap<UploadSupportingDocCommand, SupportingDocModel>();
     }
 }

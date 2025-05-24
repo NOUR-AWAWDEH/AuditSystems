@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 
-public class UploadSupportingDocValidator : AbstractValidator<UploadSupportingDocCommand>
+public sealed class UploadSupportingDocCommandValidator : AbstractValidator<UploadSupportingDocCommand>
 {
-    public UploadSupportingDocValidator()
+    public UploadSupportingDocCommandValidator()
     {
         RuleFor(x => x.File).NotNull().WithMessage("File is required.");
         RuleFor(x => x.File.Length).GreaterThan(0).WithMessage("File cannot be empty.");

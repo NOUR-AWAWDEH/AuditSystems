@@ -54,6 +54,30 @@ internal sealed class SupportingDocService(
         await ClearCacheAsync(cacheKey);
     }
 
+    public async Task<List<SupportingDocModel>> GetSupportingDocsByUserIdAsync(Guid userId)
+    {
+        if (userId == Guid.Empty)
+            throw new ArgumentException("UserId cannot be empty", nameof(userId));
+
+        var cacheKey = $"{CacheKeys.SupportingDoc}:user:{userId}";
+
+        // Try to get from cache
+        var cachedDocs = await cacheService.GetAsync<List<SupportingDoc>>(cacheKey);
+        if (cachedDocs is { Count: > 0 })
+            return mapper.Map<List<SupportingDocModel>>(cachedDocs);
+
+        // Fallback to DB
+        var entities = await repository.GetAllAsync(doc => doc.UserId == userId);
+
+        if (entities is not { Count: > 0 })
+            throw new KeyNotFoundException($"No supporting documents found for user ID '{userId}'.");
+
+        // Cache the list result
+        await cacheService.SetAsync(cacheKey, entities, tags: ListTags);
+
+        return mapper.Map<List<SupportingDocModel>>(entities);
+    }
+
     public async Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
@@ -69,7 +93,6 @@ internal sealed class SupportingDocService(
         
         return mapper.Map<SupportingDocModel>(entity);
     }
-
     public async Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));

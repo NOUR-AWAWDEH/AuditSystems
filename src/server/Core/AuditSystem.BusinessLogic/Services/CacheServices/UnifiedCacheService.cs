@@ -106,8 +106,6 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         return Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
     }
 
-
-
     public async Task<PaginationResult<TModel>?> GetFromCacheAsync<TModel>(string cacheKey, string countCacheKey, Page page)
     {
         var cachedEntities = await TryGetCachedSearchResults(cacheKey);

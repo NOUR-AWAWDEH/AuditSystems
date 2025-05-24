@@ -12,7 +12,7 @@ public static class ApplicationDependencies
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        var assembly = Assembly.GetExecutingAssembly(); 
+        var assembly = Assembly.GetExecutingAssembly();
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
                 .AddMediatR(assembly)

@@ -1,15 +1,16 @@
-using AuditSystem.Application.Features.SupportingDocs.Uplode;
+using AuditSystem.Application.Features.SupportingDocs.Create.Upload;
+using AuditSystem.Application.Features.SupportingDocs.Get.GetURLByFileId;
+using AuditSystem.Application.Features.SupportingDocs.Get.GetByUserId;
 using AuditSystem.Contract.Common;
+using AuditSystem.Contract.Models.SupportingDocs;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class SupportingDocsController(IMediator mediator) : ApiControllerBase(mediator)
 {
 
@@ -19,4 +20,24 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
     [ProducesResponseType(typeof(ApiResponse<UploadSupportingDocCommandResponse>), StatusCodes.Status201Created)]
     public async Task<IActionResult> UploadSupportingDocument([FromForm] UploadSupportingDocCommand command) =>
         await ProcessRequestToActionResultAsync(command);
+
+    //Get All Supporting Document for the User
+    [HttpGet("user/{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<List<SupportingDocModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public Task<IActionResult> GetSupportingDocumentsByUserId(Guid id)
+    {
+        var query = new GetSupportingDocsByUserIdQuery(id);
+        return ProcessRequestToActionResultAsync(query);
+    }
+
+    [HttpGet("download/{fileId:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<GetSupportingDocURLQueryByIdResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public Task<IActionResult> DownloadSupportingDocument(Guid fileId)
+    {
+        var query = new GetSupportingDocURLQueryById(fileId);
+        return ProcessRequestToActionResultAsync(query);
+    }
+
 }

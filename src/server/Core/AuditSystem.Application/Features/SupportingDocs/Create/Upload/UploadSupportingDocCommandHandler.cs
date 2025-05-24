@@ -8,59 +8,45 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace AuditSystem.Application.Features.SupportingDocs.Uplode;
+namespace AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 
-public class UploadSupportingDocCommandHandler : IRequestHandler<UploadSupportingDocCommand, Result<Guid>>
+public class UploadSupportingDocCommandHandler(
+    IFileStorage fileStorage,
+    ISupportingDocService supportingDocService,
+    ILogger<UploadSupportingDocCommandHandler> logger)
+    : IRequestHandler<UploadSupportingDocCommand, Result<Guid>>
 {
-    private readonly IFileStorage _fileStorage;
-    private readonly ISupportingDocService _supportingDocService;
-    private readonly IMapper _mapper;
-    private readonly ILogger<UploadSupportingDocCommandHandler> _logger;
-
-    public UploadSupportingDocCommandHandler(
-        IFileStorage fileStorage,
-        ISupportingDocService supportingDocService,
-        IMapper mapper,
-        ILogger<UploadSupportingDocCommandHandler> logger)
-    {
-        _fileStorage = fileStorage ?? throw new ArgumentNullException(nameof(fileStorage));
-        _supportingDocService = supportingDocService ?? throw new ArgumentNullException(nameof(supportingDocService));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IFileStorage _fileStorage = fileStorage ?? throw new ArgumentNullException(nameof(fileStorage));
+    private readonly ISupportingDocService _supportingDocService = supportingDocService ?? throw new ArgumentNullException(nameof(supportingDocService));
+    private readonly ILogger<UploadSupportingDocCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async Task<Result<Guid>> Handle(UploadSupportingDocCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            // Validate request
             if (request.File == null || request.File.Length == 0)
             {
                 _logger.LogWarning("Empty file received for user {UserId}", request.UserId);
                 return Result.Error("File cannot be empty");
             }
 
-            // Save the file
-            var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.FileName);
+            var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.FileName, request.UserId, "SupportingDocs");
             if (!fileSaveResult.IsSuccess)
             {
                 return Result.Error(new ErrorList(fileSaveResult.Errors));
             }
 
-            // Create document with proper IDs
             var supportingDocModel = new SupportingDocModel
             {
                 Id = Guid.NewGuid(),
                 UserId = request.UserId,
                 FileName = fileSaveResult.Value.SavedFileName,
                 FileSize = fileSaveResult.Value.FileSize,
-                URL = fileSaveResult.Value.FullPath,
-                DriveFileId = Guid.NewGuid(), // Changed from Guid.Empty
+                DriveFileId = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
-            // Save to database
             var docId = await _supportingDocService.CreateSupportingDocAsync(supportingDocModel);
             return Result.Success(docId, "File uploaded successfully");
         }

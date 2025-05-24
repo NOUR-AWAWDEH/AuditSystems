@@ -26,10 +26,6 @@ public class SupportingDocConfigration : IEntityTypeConfiguration<SupportingDoc>
         builder.Property(x => x.FileSize)
             .IsRequired();
 
-        builder.Property(x => x.URL)
-            .IsRequired()
-            .HasMaxLength(500);
-
         builder.Property(x => x.DriveFileId)
             .IsRequired();
 

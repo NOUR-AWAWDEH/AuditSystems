@@ -18,7 +18,7 @@ public class URLService(
     {
         try
         {
-            var relativePath = _pathBuilder.GetRelativePath(userId, fileName, serviceName); // ✅ fixed
+            var relativePath = _pathBuilder.GetRelativePath(userId, fileName, serviceName);
             var signedUrl = _signedUrlService.GenerateSignedUrl(relativePath, TimeSpan.FromMinutes(10));
             return Task.FromResult(Result<string>.Success(signedUrl));
         }

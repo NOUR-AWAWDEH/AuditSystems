@@ -1,31 +1,17 @@
 using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.Download;
-using AuditSystem.Contract.Interfaces.FileStorage;
 using MediatR;
 
 namespace AuditSystem.Application.Features.DownloadFile.Get;
 
-
-
-public sealed class GetFileByURLQueryHandler
+public sealed class GetFileByURLQueryHandler( IDecodeDownloadService decodeDownloadService)
     : IRequestHandler<GetFileByURLQuery, Result<GetFileByURLQueryResponse>>
 {
-    private readonly IDecodeDownloadService _decodeDownloadService;
-    private readonly IFilePathBuilder _filePathBuilder;
-
-    public GetFileByURLQueryHandler(
-        IDecodeDownloadService decodeDownloadService,
-        IFilePathBuilder filePathBuilder)
-    {
-        _decodeDownloadService = decodeDownloadService;
-        _filePathBuilder = filePathBuilder;
-    }
-
     public async Task<Result<GetFileByURLQueryResponse>> Handle(
         GetFileByURLQuery request,
         CancellationToken cancellationToken)
     {
-        var result = await _decodeDownloadService.DownloadFileAsync(request.URL, cancellationToken);
+        var result = await decodeDownloadService.DownloadFileAsync(request.URL, cancellationToken);
 
         return result.Status switch
         {
@@ -38,4 +24,3 @@ public sealed class GetFileByURLQueryHandler
         };
     }
 }
-

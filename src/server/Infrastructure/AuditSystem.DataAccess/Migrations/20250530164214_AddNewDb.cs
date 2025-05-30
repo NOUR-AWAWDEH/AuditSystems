@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AuditSystem.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class AddNewDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -220,22 +220,6 @@ namespace AuditSystem.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SkillSets", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SupportingDocs",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileSize = table.Column<int>(type: "int", nullable: false),
-                    URL = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SupportingDocs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -988,6 +972,29 @@ namespace AuditSystem.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SupportingDocs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    DriveFileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupportingDocs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupportingDocs_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TaskManagements",
                 columns: table => new
                 {
@@ -1413,6 +1420,17 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "IX_SubProcesses_ProcessId",
                 table: "SubProcesses",
                 column: "ProcessId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportingDocs_DriveFileId",
+                table: "SupportingDocs",
+                column: "DriveFileId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportingDocs_UserId",
+                table: "SupportingDocs",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskManagements_AssignedById",

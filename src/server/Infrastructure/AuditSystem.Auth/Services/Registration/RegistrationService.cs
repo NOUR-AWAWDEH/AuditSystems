@@ -166,7 +166,10 @@ namespace AuditSystem.Auth.Services.Registration
         private async Task<string> GenerateConfirmationLinkAsync(User user, string scheme, IUrlHelper urlHelper)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var domain = _configuration["AppSettings:Domain"];
+            var domain = Environment.GetEnvironmentVariable("APP_DOMAIN");
+            if (string.IsNullOrWhiteSpace(domain))
+                throw new ArgumentException("APP_DOMAIN environment variable is not set or is invalid.", nameof(domain));
+
             // Encode to prevent modification during transmission
             var tokenBytes = Encoding.UTF8.GetBytes(token);
             var base64Token = Convert.ToBase64String(tokenBytes);

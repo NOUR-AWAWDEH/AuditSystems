@@ -1,16 +1,16 @@
 using AuditSystem.Auth.Authentication;
+using AuditSystem.Auth.Dtos.Register;
 using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Authentication;
 using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using DotNetEnv;
 
 namespace AuditSystem.Auth
 {
@@ -39,7 +39,9 @@ namespace AuditSystem.Auth
             };
             services.AddSingleton(jwtSettings);
 
-            
+            var domain = Environment.GetEnvironmentVariable("APP_DOMAIN") ?? throw new ArgumentNullException("APP_DOMAIN");
+            services.Configure<AppSettings>(opt => opt.Domain = domain);
+
 
             // ✅ JWT Auth config
             services.AddAuthentication(options =>
@@ -71,7 +73,7 @@ namespace AuditSystem.Auth
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAccountService, AccountService>();
-            
+
             services.Configure<SmtpSettings>(options =>
             {
                 options.SenderAddress = Environment.GetEnvironmentVariable("SMTP_SENDER_ADDRESS") ?? throw new ArgumentNullException("SMTP_SENDER_ADDRESS");

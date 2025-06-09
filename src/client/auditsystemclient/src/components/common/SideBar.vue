@@ -35,9 +35,6 @@
   </div>
   <!-- Main Content -->
   <div class="flex-1">
-    <!-- header -->
-    <div class="bg-white shadow px-2 py-4">Header</div>
-
     <!-- Toggle button with dynamic arrow direction -->
     <BaseButton
       class="h-9 w-7 rounded-r-2xl mt-3.25"

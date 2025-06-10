@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-//import Navbar from '@/components/common/NavBar.vue';
 import SideBar from '@/components/common/SideBar.vue';
 
 const isSidebarOpen = ref(false);
@@ -8,8 +7,6 @@ const isSidebarOpen = ref(false);
 
 <template>
   <div class="text-secondary-shade flex flex-col h-screen bg-gray-tint overflow-hidden">
-   <!--<Navbar />-->
-
     <div class="flex flex-1 overflow-hidden">
       <SideBar v-model:isOpen="isSidebarOpen" />
 
@@ -25,11 +22,8 @@ const isSidebarOpen = ref(false);
           </svg>
         </button>
 
-        <main class="flex-1 p-6">
-          <div class="container mx-auto">
-            <h1 class="text-3xl font-bold mb-4 text-gray-800">Dashboard</h1>
-            <p class="text-lg text-gray-700">Welcome to your dashboard!</p>
-          </div>
+        <main class="flex-1">
+          <!-- Content will be injected here by child routes -->
         </main>
       </div>
     </div>

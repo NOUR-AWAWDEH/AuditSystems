@@ -1,20 +1,17 @@
 // src/components/SupportingDocManager.vue
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 import { useSupportingDoc } from "@/composables/supportingDoc/useSupportingDoc";
+import { useNotification } from "@/composables/notification/useNotification"; // Import the composable
 import SideBar from "@/components/common/SideBar.vue";
 
 const { uploadSupportingDoc, isUploading } = useSupportingDoc();
+const { showNotification } = useNotification(); // Use the composable
+
 const uploadDialogOpen = ref(false);
 const selectedFile = ref(null);
 const fileInput = ref(null);
-const notification = reactive({
-  show: false,
-  message: "",
-  type: "error",
-  timeout: null,
-});
 
 function openUploadDialog() {
   uploadDialogOpen.value = true;
@@ -54,8 +51,6 @@ async function uploadFile() {
   if (!selectedFile.value) return;
 
   try {
-    console.log("Uploading file:", selectedFile.value.name);
-
     const result = await uploadSupportingDoc({
       file: selectedFile.value,
       fileName: selectedFile.value.name,
@@ -73,25 +68,6 @@ async function uploadFile() {
     showNotification(err.message || "Upload failed", "error");
   }
 }
-
-function showNotification(message, type = "error") {
-  if (notification.timeout) {
-    clearTimeout(notification.timeout);
-  }
-  notification.show = true;
-  notification.message = message;
-  notification.type = type;
-  notification.timeout = setTimeout(() => {
-    notification.show = false;
-  }, 4000);
-}
-
-function closeNotification() {
-  notification.show = false;
-  if (notification.timeout) {
-    clearTimeout(notification.timeout);
-  }
-}
 </script>
 
 <template>
@@ -99,23 +75,6 @@ function closeNotification() {
     <SideBar />
     <div class="flex-1 p-6">
       <h2 class="text-2xl font-bold mb-4">Supporting Documents</h2>
-      <!-- Toast notifications -->
-      <Transition name="fade">
-        <div
-          v-if="notification.show"
-          class="fixed top-4 right-4 z-50 p-4 rounded-md shadow-md"
-          :class="
-            notification.type === 'error'
-              ? 'bg-red-100 text-red-700 border border-red-300'
-              : 'bg-green-100 text-green-700 border border-green-300'
-          "
-        >
-          <div class="flex items-center">
-            <span>{{ notification.message }}</span>
-            <button @click="closeNotification" class="ml-3 font-bold">×</button>
-          </div>
-        </div>
-      </Transition>
       <!-- Upload Controls -->
       <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <button

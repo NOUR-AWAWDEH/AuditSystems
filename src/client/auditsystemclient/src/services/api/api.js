@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import authService from '@/services/auth/authRepos/authService';
+import router from '@/router/router';
 
 const apiUrl = __VITE_API_URL__;
 
@@ -44,6 +45,8 @@ api.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
+        authService.removeLocalTokens();
+        router.push('/login');
         return Promise.reject(error);
       }
     }

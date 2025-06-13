@@ -1,13 +1,11 @@
 // src/services/auth/authRepos/authService.js
-
 import api from '@/services/api/api';
 import router from '@/router/router';
 
 // Constants for localStorage keys
 const TOKEN_KEY = 'token';
 const REFRESH_TOKEN_KEY = 'refreshToken';
-
-const REFRESH_INTERVAL = 55 * 60 * 1000; // 55 minutes in milliseconds
+const REFRESH_INTERVAL = 55 * 60 * 1000; // 55 minutes
 let refreshTokenTimeoutId = null;
 
 const getLocalToken = () => localStorage.getItem(TOKEN_KEY);
@@ -27,7 +25,6 @@ const refreshToken = async () => {
         redirectToLogin();
         return false;
     }
-
     try {
         const response = await api.post(
             '/api/Auth/refresh-token',
@@ -80,5 +77,5 @@ export default {
     setLocalRefreshToken,
     removeLocalTokens,
     initializeTokenRefresh,
-    refreshToken,  // This export is critical for the token refresh to work
+    refreshToken,
 };

@@ -5,12 +5,14 @@ using AuditSystem.Contract.Common;
 using AuditSystem.Contract.Models.SupportingDocs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class SupportingDocsController(IMediator mediator) : ApiControllerBase(mediator)
 {
 

@@ -24,14 +24,15 @@
           <span class="text-white pl-4" :class="{ 'hidden': isCollapsed }">Supporting Docs</span>
         </a>
 
-          <!-- User Menu -->
-          <div
+        <!-- User Menu trigger row -->
+        <div
           class="flex items-center px-3 hover:bg-secondary-shade rounded cursor-pointer"
           @click="toggleUserMenu"
         >
           <UserMenu ref="userMenuRef" />
           <span class="text-white pl-2" :class="{ 'hidden': isCollapsed }">User Menu</span>
         </div>
+
 
       </nav>
     </div>
@@ -67,11 +68,17 @@
   const isCollapsed = ref(false);
   const userMenuRef = ref(null);
 
-  const toggleUserMenu = () => {
+  const toggleUserMenu = (event) => {
+    if (event) {
+      event.stopPropagation();
+    }
     if (userMenuRef.value && userMenuRef.value.toggleDropdown) {
       userMenuRef.value.toggleDropdown();
     } else {
-      console.error('userMenuRef or toggleDropdown not available');
+      console.error('SideBar.vue: userMenuRef or toggleDropdown not available. userMenuRef.value:', userMenuRef.value);
+      if (userMenuRef.value) {
+        console.error('SideBar.vue: userMenuRef.value properties:', Object.keys(userMenuRef.value));
+      }
     }
   };
   // Function to toggle sidebar state

@@ -268,8 +268,8 @@ ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
             return ApiResponse<AuthResultDto>.BadRequest("User must have an assigned role");
 
 
-        // Revoke old token
-        token.IsRevoked = true;
+        // Remove old token from database
+        _applicationDbContext.RefreshTokens.Remove(token);
 
         // Generate new tokens
         var newJwt = await _tokenService.GenerateJwtTokenAsync(user);

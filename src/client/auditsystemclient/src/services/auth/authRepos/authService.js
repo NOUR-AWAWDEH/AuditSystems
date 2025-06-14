@@ -5,7 +5,7 @@ import router from '@/router/router';
 // Constants for localStorage keys
 const TOKEN_KEY = 'token';
 const REFRESH_TOKEN_KEY = 'refreshToken';
-const REFRESH_INTERVAL = 55 * 60 * 1000; // 55 minutes
+const REFRESH_INTERVAL =  55 * 60 * 1000; // 55 minutes
 let refreshTokenTimeoutId = null;
 
 const getLocalToken = () => localStorage.getItem(TOKEN_KEY);

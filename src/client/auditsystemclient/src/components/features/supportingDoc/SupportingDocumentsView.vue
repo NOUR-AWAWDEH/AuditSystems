@@ -1,13 +1,18 @@
 // src/components/SupportingDocManager.vue
 
 <script setup>
-import { ref } from "vue";
-import { useSupportingDoc } from "@/composables/supportingDoc/useSupportingDoc";
+import { ref, onMounted } from "vue";
+import { useSupportingDoc } from "@/composables/supportingDoc/useUploadSupportingDocuments";
+import { useFetchSupportingDocuments } from "@/composables/supportingDoc/useFetchSupportingDocuments"; // Import the fetch composable
 import { useNotification } from "@/composables/notification/useNotification"; // Import the composable
 import SideBar from "@/components/common/SideBar.vue";
+import { useAuthStatus } from '@/composables/auth/useAuthStatus'; // To get userId
+import ReusableTable from '@/components/common/ReusableTable.vue';
 
-const { uploadSupportingDoc, isUploading } = useSupportingDoc();
+const { uploadSupportingDoc, isUploading, error: uploadError } = useSupportingDoc();
+const { documents, isLoading: isLoadingDocuments, error: fetchError, fetchDocumentsByUserId } = useFetchSupportingDocuments();
 const { showNotification } = useNotification(); // Use the composable
+const { authStatus, checkAuthStatus } = useAuthStatus();
 
 const uploadDialogOpen = ref(false);
 const selectedFile = ref(null);
@@ -60,14 +65,49 @@ async function uploadFile() {
       selectedFile.value = null;
       uploadDialogOpen.value = false;
       showNotification("Document uploaded successfully", "success");
+      // Refresh the document list after successful upload
+      if (authStatus.value?.userId) {
+        fetchDocumentsByUserId(authStatus.value.userId);
+        console.log(authStatus.value.userId);
+      }
     } else {
-      showNotification(result.message || "Upload failed", "error");
+      showNotification(result.message || uploadError.value || "Upload failed", "error");
     }
   } catch (err) {
     console.error("Error in uploadFile function:", err);
     showNotification(err.message || "Upload failed", "error");
   }
 }
+
+onMounted(async () => {
+  await checkAuthStatus(); // Ensure auth status is checked and userId is available
+  if (authStatus.value?.userId) {
+    fetchDocumentsByUserId(authStatus.value.userId);
+  } else {
+    showNotification("User ID not found. Cannot fetch documents.", "error");
+    console.error('User ID not available in onMounted');
+  }
+});
+
+const documentTableColumns = [
+  { key: 'fileName', label: 'File Name' },
+  { key: 'uploadDate', label: 'Upload Date' },
+];
+
+const documentTableActions = [
+  { label: 'View', event: 'view-item', class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline mr-2' },
+  { label: 'Delete', event: 'delete-item', class: 'font-medium text-red-600 dark:text-red-500 hover:underline' },
+];
+
+const handleViewDocument = (document) => {
+  showNotification(`Viewing document: ${document.fileName}`, 'info');
+  // Implement actual view logic here, e.g., open in new tab or modal
+};
+
+const handleDeleteDocument = (document) => {
+  showNotification(`Deleting document: ${document.fileName}`, 'warning');
+  // Implement actual delete logic here
+};
 </script>
 
 <template>
@@ -84,6 +124,35 @@ async function uploadFile() {
           <span>Upload Document</span>
         </button>
       </div>
+      <!-- Upload Dialog -->
+      <!-- Display Documents Section -->
+      <div class="mt-6">
+        <h3 class="text-xl font-semibold mb-3">Uploaded Documents</h3>
+        <div v-if="isLoadingDocuments" class="text-center py-4">
+          <p class="text-gray-500">Loading documents...</p>
+        </div>
+        <div v-else-if="fetchError" class="text-center py-4 bg-red-100 border border-red-400 text-red-700 px-4 rounded">
+          <p>Error fetching documents: {{ fetchError }}</p>
+        </div>
+        <div v-else-if="documents.length === 0" class="text-center py-4">
+          <p class="text-gray-500">No documents found.</p>
+        </div>
+        <ReusableTable
+          :columns="documentTableColumns"
+          :items="documents"
+          item-key="id"
+          :is-loading="isLoadingDocuments"
+          no-data-message="No documents found."
+          :actions="documentTableActions"
+          @view-item="handleViewDocument"
+          @delete-item="handleDeleteDocument"
+        >
+          <template #cell-uploadDate="{ value }">
+            {{ value ? new Date(value).toLocaleDateString() : 'N/A' }}
+          </template>
+        </ReusableTable>
+      </div>
+
       <!-- Upload Dialog -->
       <div
         v-if="uploadDialogOpen"

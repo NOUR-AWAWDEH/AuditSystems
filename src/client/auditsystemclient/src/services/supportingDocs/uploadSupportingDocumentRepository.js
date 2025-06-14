@@ -3,8 +3,6 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import axios from 'axios'; // Import axios directly
 
 const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
-//const AUTHORIZATION_HEADER = 'Authorization';
-//const BEARER_PREFIX = 'Bearer ';
 
 export const supportingDocRepository = {
   async uploadSupportingDoc({ file, userId, fileName, token }) {
@@ -17,7 +15,7 @@ export const supportingDocRepository = {
 
       // Prepare form data - EXACT parameter names matter!
       const formData = new FormData();
-      formData.append('File', file); // Capital 'F' to match server expectation
+      formData.append('File', file);
       formData.append('UserId', userId);
       formData.append('FileName', fileName);
 

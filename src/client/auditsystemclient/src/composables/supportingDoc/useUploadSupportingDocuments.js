@@ -1,7 +1,7 @@
 // src/composables/supportingDoc/useSupportingDoc.js
 
 import { ref } from 'vue';
-import { supportingDocRepository } from '@/services/supportingDoc/supportingDocRepository';
+import { supportingDocRepository } from '@/services/supportingDocs/uploadSupportingDocumentRepository';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import authService from '@/services/auth/authRepos/authService';
 

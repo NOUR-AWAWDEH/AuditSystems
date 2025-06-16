@@ -103,3 +103,6 @@ coverage
 
 # ignore Uploads/ folder
 Uploads/
+
+# Entity Framework Migrations
+src/server/Infrastructure/AuditSystem.DataAccess/Migrations/

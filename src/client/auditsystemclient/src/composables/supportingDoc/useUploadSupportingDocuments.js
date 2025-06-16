@@ -1,17 +1,17 @@
 // src/composables/supportingDoc/useSupportingDoc.js
 
 import { ref } from 'vue';
-import { supportingDocRepository } from '@/services/supportingDocs/uploadSupportingDocumentRepository';
+import { uploadSupportingDocumentRepository } from '@/services/supportingDocs/uploadSupportingDocumentRepository';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import authService from '@/services/auth/authRepos/authService';
 
-export function useSupportingDoc() {
+export function useUploadSupportingDocument() {
   const uploadStatus = ref(null);
   const isUploading = ref(false);
   const error = ref(null);
   const { authStatus, checkAuthStatus } = useAuthStatus();
 
-  const uploadSupportingDoc = async ({ file, fileName }) => {
+  const uploadSupportingDocument = async ({ file, fileName }) => {
     isUploading.value = true;
     error.value = null;
     uploadStatus.value = null;
@@ -34,7 +34,7 @@ export function useSupportingDoc() {
         throw new Error('User ID not found');
       }
 
-      const response = await supportingDocRepository.uploadSupportingDoc({
+      const response = await uploadSupportingDocumentRepository.uploadSupportingDocument({
         file,
         userId,
         fileName,
@@ -72,7 +72,7 @@ export function useSupportingDoc() {
   };
 
   return {
-    uploadSupportingDoc,
+    uploadSupportingDocument,
     uploadStatus,
     isUploading,
     error,

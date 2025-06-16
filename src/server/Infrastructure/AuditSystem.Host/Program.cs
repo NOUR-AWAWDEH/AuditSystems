@@ -89,7 +89,7 @@ services.AddBusinessLogic();
 services.AddAuthentication();
 services.AddDataAccess(configuration, healthCheckBuilder, environment.IsProduction());
 
-// ⚠️ This is the CRITICAL FIX for API redirect issues
+// This is the CRITICAL FIX for API redirect issues
 services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
@@ -111,7 +111,6 @@ services.ConfigureApplicationCookie(options =>
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             return Task.CompletedTask;
         }
-
         context.Response.Redirect(context.RedirectUri);
         return Task.CompletedTask;
     };
@@ -125,8 +124,7 @@ services.AddCors(options =>
         policy.WithOrigins("https://auditsystem.onrender.com", "http://localhost:5173", "https://localhost:7218")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
-              
+              .AllowCredentials();      
     });
 });
 

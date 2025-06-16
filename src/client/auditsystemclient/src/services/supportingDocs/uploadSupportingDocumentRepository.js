@@ -4,8 +4,8 @@ import axios from 'axios'; // Import axios directly
 
 const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
 
-export const supportingDocRepository = {
-  async uploadSupportingDoc({ file, userId, fileName, token }) {
+export const uploadSupportingDocumentRepository = {
+  async uploadSupportingDocument({ file, userId, fileName, token }) {
     try {
       // Prepare form data - EXACT parameter names matter!
       const formData = new FormData();

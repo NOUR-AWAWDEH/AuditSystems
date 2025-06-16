@@ -1,40 +1,40 @@
 <template>
   <div class="overflow-x-auto shadow-md sm:rounded-lg">
-    <table class="w-full text-sm text-left text-gray-base">
+    <table class="w-full text-sm text-left text-gray-base border border-gray-300">
       <thead class="text-xs text-white uppercase bg-secondary-base">
         <tr>
-          <th v-if="showSrNo" scope="col" class="px-6 py-3 w-16">Sr. No.</th>
-          <th v-for="column in columns" :key="column.key" scope="col" class="px-6 py-3">
+          <th v-if="showSrNo" scope="col" class="px-6 py-3 w-16 border border-gray-300">Sr. No.</th>
+          <th v-for="column in columns" :key="column.key" scope="col" class="px-6 py-3 border border-gray-300">
             {{ column.label }}
           </th>
-          <th v-if="actions.length > 0" scope="col" class="px-6 py-3">Actions</th>
+          <th v-if="actions.length > 0" scope="col" class="px-6 py-3 border border-gray-300">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="isLoading" class="bg-white">
-          <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)" class="px-6 py-4 text-center text-gray-base">
+          <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)" class="px-6 py-4 text-center text-gray-base border border-gray-300">
             Loading data...
           </td>
         </tr>
         <tr v-else-if="items.length === 0" class="bg-white">
-          <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)" class="px-6 py-4 text-center text-gray-base">
+          <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)" class="px-6 py-4 text-center text-gray-base border border-gray-300">
             {{ noDataMessage }}
           </td>
         </tr>
         <tr
           v-for="(item, index) in items"
           :key="item[itemKey] || index"
-          class="bg-white border-b dark:border-gray-base hover:bg-gray-tint/50"
+          class="bg-white hover:bg-gray-tint/50"
           @click="$emit('row-click', item)"
           :class="{'cursor-pointer': !!$attrs['onRow-click']}"
         >
-          <td v-if="showSrNo" class="px-6 py-4">{{ index + 1 }}</td>
-          <td v-for="column in columns" :key="column.key" class="px-6 py-4 font-medium text-gray-shade whitespace-nowrap">
+          <td v-if="showSrNo" class="px-6 py-4 border border-gray-300">{{ index + 1 }}</td>
+          <td v-for="column in columns" :key="column.key" class="px-6 py-4 font-medium text-gray-shade whitespace-nowrap border border-gray-300">
             <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]">
               {{ item[column.key] }}
             </slot>
           </td>
-          <td v-if="actions.length > 0" class="px-6 py-4">
+          <td v-if="actions.length > 0" class="px-6 py-4 border border-gray-300">
             <button
               v-for="action in actions"
               :key="action.label"

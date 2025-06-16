@@ -126,6 +126,7 @@ services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
+              
     });
 });
 

@@ -17,6 +17,7 @@ const { authStatus, checkAuthStatus } = useAuthStatus();
 const uploadDialogOpen = ref(false);
 const selectedFile = ref(null);
 const fileInput = ref(null);
+const customFileName = ref(''); // Add custom file name input
 
 function openUploadDialog() {
   uploadDialogOpen.value = true;
@@ -25,6 +26,7 @@ function openUploadDialog() {
 function closeUploadDialog() {
   uploadDialogOpen.value = false;
   selectedFile.value = null;
+  customFileName.value = ''; // Clear custom file name
 }
 
 function triggerFileInput() {
@@ -35,6 +37,9 @@ function handleFileChange(e) {
   const file = e.target.files[0];
   if (file) {
     selectedFile.value = file;
+    // Auto-populate custom file name with original name (without extension)
+    const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+    customFileName.value = nameWithoutExtension;
   }
 }
 
@@ -42,11 +47,15 @@ function handleFileDrop(e) {
   const file = e.dataTransfer.files[0];
   if (file) {
     selectedFile.value = file;
+    // Auto-populate custom file name with original name (without extension)
+    const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+    customFileName.value = nameWithoutExtension;
   }
 }
 
 function clearSelectedFile() {
   selectedFile.value = null;
+  customFileName.value = ''; // Clear custom file name
   if (fileInput.value) {
     fileInput.value.value = "";
   }
@@ -56,13 +65,20 @@ async function uploadFile() {
   if (!selectedFile.value) return;
 
   try {
+    // Use custom file name if provided, otherwise use original file name
+    const fileExtension = selectedFile.value.name.substring(selectedFile.value.name.lastIndexOf('.'));
+    const finalFileName = customFileName.value.trim() 
+      ? `${customFileName.value.trim()}${fileExtension}`
+      : selectedFile.value.name;
+
     const result = await uploadSupportingDoc({
       file: selectedFile.value,
-      fileName: selectedFile.value.name,
+      fileName: finalFileName,
     });
 
     if (result.success) {
       selectedFile.value = null;
+      customFileName.value = '';
       uploadDialogOpen.value = false;
       showNotification("Document uploaded successfully", "success");
       // Refresh the document list after successful upload
@@ -177,10 +193,28 @@ const handleDeleteDocument = (document) => {
           </div>
           <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
           <div v-if="selectedFile" class="mt-4">
-            <div class="flex items-center justify-between bg-gray-100 p-2 rounded">
+            <div class="flex items-center justify-between bg-gray-100 p-2 rounded mb-3">
               <span class="font-medium truncate flex-1">{{ selectedFile.name }}</span>
               <button @click="clearSelectedFile" class="text-red-500 ml-2">×</button>
             </div>
+            
+            <!-- Custom File Name Input -->
+            <div class="mb-4">
+              <label for="customFileName" class="block text-sm font-medium text-gray-700 mb-2">
+                Custom File Name (optional)
+              </label>
+              <input
+                id="customFileName"
+                v-model="customFileName"
+                type="text"
+                placeholder="Enter custom file name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-base focus:border-transparent"
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                File extension will be added automatically. Leave empty to use original name.
+              </p>
+            </div>
+            
             <div class="flex justify-end mt-4 gap-3">
               <button
                 @click="closeUploadDialog"

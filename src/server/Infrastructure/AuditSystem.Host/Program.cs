@@ -1,4 +1,4 @@
-﻿using AuditSystem.Application;
+using AuditSystem.Application;
 using AuditSystem.Auth;
 using AuditSystem.BusinessLogic;
 using AuditSystem.DataAccess;
@@ -122,7 +122,7 @@ services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://auditsystem.onrender.com", "http://localhost:5173")
+        policy.WithOrigins("https://auditsystem.onrender.com", "http://localhost:5173", "https://localhost:7218")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

@@ -7,12 +7,6 @@ const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
 export const supportingDocRepository = {
   async uploadSupportingDoc({ file, userId, fileName, token }) {
     try {
-      // Debug logging
-      console.log('Starting file upload with:');
-      console.log('- Token exists:', !!token);
-      console.log('- UserId:', userId);
-      console.log('- FileName:', fileName);
-
       // Prepare form data - EXACT parameter names matter!
       const formData = new FormData();
       formData.append('File', file);
@@ -29,8 +23,6 @@ export const supportingDocRepository = {
           'Authorization': `Bearer ${token}`
         }
       });
-
-      console.log('Upload response status:', response.status);
 
       if (!response?.data?.success) {
         const errors = Array.isArray(response?.data?.errors)

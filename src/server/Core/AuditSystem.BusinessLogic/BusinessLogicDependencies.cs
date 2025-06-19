@@ -1,3 +1,5 @@
+using Ardalis.Result;
+using AuditSystem.Application.Features.SupportingDocs.Delete;
 using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
@@ -63,6 +65,7 @@ using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AuditSystem.BusinessLogic;
@@ -195,12 +198,11 @@ public static class BusinessLogicDependencies
             // Url
             .AddSingleton<ISignedUrlService, SignedUrlService>()
 
-            // Local File Storage
-            .AddScoped<IFileStorage, LocalFileStorage>()
             .AddScoped<IURLService,URLService>()
 
             // Download Service
             .AddScoped<IDecodeDownloadService, DecodeDownloadService>()
+            
             // Tasks
             .AddScoped<ITaskManagementService, TaskManagementService>()
             .AddScoped<IUnifiedCacheService<Guid, TaskManagement, TaskManagementModel>, TaskManagementService>()

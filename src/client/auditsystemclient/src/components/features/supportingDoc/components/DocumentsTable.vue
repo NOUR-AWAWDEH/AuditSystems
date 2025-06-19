@@ -38,7 +38,7 @@ function handleDeleteDocument(document) {
       :items="documents"
       item-key="id"
       :is-loading="false"
-      no-data-message="No documents found."
+      no-data-message=""
       :actions="documentTableActions"
       @delete-item="handleDeleteDocument"
     >

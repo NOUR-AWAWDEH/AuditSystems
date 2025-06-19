@@ -5,10 +5,10 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 
 public interface ISupportingDocService
 {
-    public Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel);
+    Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel);
     Task<SupportingDocModel> GetSupportingDocByIdAsync(Guid id);
-    public Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel);
-    public Task DeleteSupportingDocAsync(Guid supportingDocId);
+    Task UpdateSupportingDocAsync(SupportingDocModel supportingDocModel);
+    Task DeleteSupportingDocAsync(Guid supportingDocId);
     Task<List<SupportingDocModel>> GetSupportingDocsByUserIdAsync(Guid userId);
-    public Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page);
+    Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page);
 }

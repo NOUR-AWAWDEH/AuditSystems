@@ -30,7 +30,7 @@ public class UploadSupportingDocCommandHandler(
                 return Result.Error("File cannot be empty");
             }
 
-            var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.FileName, request.UserId, "SupportingDocs");
+            var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.UserId, "SupportingDocs" , request.FileName);
             if (!fileSaveResult.IsSuccess)
             {
                 return Result.Error(new ErrorList(fileSaveResult.Errors));

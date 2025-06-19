@@ -5,14 +5,14 @@ using AuditSystem.Contract.Common;
 using AuditSystem.Contract.Models.SupportingDocs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+using AuditSystem.Application.Features.SupportingDocs.Delete;
+using Ardalis.Result;
 
 namespace AuditSystem.Host.Controllers.v1.SupportingDocs;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public sealed class SupportingDocsController(IMediator mediator) : ApiControllerBase(mediator)
 {
 
@@ -33,6 +33,7 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
         return ProcessRequestToActionResultAsync(query);
     }
 
+    //Download Supporting Document
     [HttpGet("download/{fileId:guid}")]
     [ProducesResponseType(typeof(ApiResponse<GetSupportingDocURLQueryByIdResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,4 +43,12 @@ public sealed class SupportingDocsController(IMediator mediator) : ApiController
         return ProcessRequestToActionResultAsync(query);
     }
 
+    //Delete Supporting Document
+    [HttpDelete]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteSupportingDocument
+    ([FromBody]DeleteSupportingDocCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
 }

@@ -13,15 +13,21 @@ public class FilePathBuilder : IFilePathBuilder
             ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH");
     }
 
-    public string GetFullPath(Guid userId, string fileName, string serviceName)
+    public string GetFullPath(Guid userId, string serviceName, string fileName)
     {
-        var relativePath = GetRelativePath(userId, fileName, serviceName);
+        var relativePath = GetRelativePath(userId, serviceName, fileName);
         var fullPath = Path.Combine(_rootPath, relativePath);
         Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
         return Path.GetFullPath(fullPath);
     }
 
-    public string GetRelativePath(Guid userId, string fileName, string serviceName)
+    public string GetFullPath(string relativePath)
+    {
+        var fullPath = Path.Combine(_rootPath, relativePath);
+        return Path.GetFullPath(fullPath);
+    } 
+
+    private string GetRelativePath(Guid userId,  string serviceName, string fileName)
     {
         return Path.Combine(userId.ToString(), serviceName, fileName);
     }

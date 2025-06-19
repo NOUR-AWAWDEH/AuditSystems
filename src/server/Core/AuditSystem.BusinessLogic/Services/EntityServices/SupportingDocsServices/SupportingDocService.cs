@@ -1,6 +1,7 @@
 ﻿using AuditSystem.Application.Constants;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
@@ -15,6 +16,8 @@ internal sealed class SupportingDocService(
     IRepository<Guid, SupportingDoc> repository,
     IMapper mapper,
     ICacheService cacheService,
+    IFileStorage fileStorage,
+    IFilePathBuilder filePathBuilder,
     ILogger<SupportingDocService> logger) : 
     UnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>(
         repository,
@@ -27,8 +30,12 @@ internal sealed class SupportingDocService(
     ),
     ISupportingDocService
 {
+    private static readonly string ServiceName = "SupportingDocs";
     private static readonly string[] SupportingDocTags = ["supporting-docs", "supporting-doc-list"];
     private static readonly string[] ListTags = ["supporting-doc-list"];
+    private readonly IFileStorage _fileStorage = fileStorage; 
+    private readonly IFilePathBuilder _filePathBuilder = filePathBuilder;
+
 
     public async Task<Guid> CreateSupportingDocAsync(SupportingDocModel supportingDocModel)
     {
@@ -45,11 +52,20 @@ internal sealed class SupportingDocService(
 
     public async Task DeleteSupportingDocAsync(Guid supportingDocId)
     {
+        if (supportingDocId == Guid.Empty)
+            throw new ArgumentException("SupportingDocId cannot be empty", nameof(supportingDocId));
+
         var cacheKey = GetCacheKey(supportingDocId);
 
         var entity = await repository.GetByIdAsync(supportingDocId)
-            ?? throw new KeyNotFoundException($"SupportingDoc with ID {supportingDocId} not found.");
+            ?? throw new KeyNotFoundException($"{ServiceName} with ID {supportingDocId} not found.");
 
+        var fullFilePath = _filePathBuilder.GetFullPath(entity.UserId ,ServiceName,entity.FileName);
+        var fileDeleteResult = await _fileStorage.DeleteFileAsync(fullFilePath);
+        if (!fileDeleteResult.IsSuccess)
+        {
+            logger.LogWarning("Failed to delete physical file {FileName} for document {Id}: {Error}", entity.FileName, supportingDocId, string.Join("; ", fileDeleteResult.Errors));
+        }
         await repository.DeleteAsync(supportingDocId);
         await ClearCacheAsync(cacheKey);
     }
@@ -93,6 +109,7 @@ internal sealed class SupportingDocService(
         
         return mapper.Map<SupportingDocModel>(entity);
     }
+    
     public async Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));

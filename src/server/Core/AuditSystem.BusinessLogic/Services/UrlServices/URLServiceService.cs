@@ -5,12 +5,10 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.BusinessLogic.Services.FileStorageServices;
 
 public class URLService(
-        IFilePathBuilder pathBuilder,
         ISignedUrlService signedUrlService,
         ILogger<URLService> logger) 
         : IURLService
 {
-    private readonly IFilePathBuilder _pathBuilder = pathBuilder;
     private readonly ISignedUrlService _signedUrlService= signedUrlService;
     private readonly ILogger<URLService> _logger = logger;
 
@@ -18,7 +16,7 @@ public class URLService(
     {
         try
         {
-            var relativePath = _pathBuilder.GetRelativePath(userId, fileName, serviceName);
+            var relativePath = Path.Combine(userId.ToString(), serviceName, fileName);
             var signedUrl = _signedUrlService.GenerateSignedUrl(relativePath, TimeSpan.FromMinutes(10));
             return Task.FromResult(Result<string>.Success(signedUrl));
         }

@@ -1,7 +1,7 @@
-﻿using Ardalis.Result;
-using MediatR;
+﻿using MediatR;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using Microsoft.Extensions.Logging;
+using Ardalis.Result;
 
 namespace AuditSystem.Application.Features.SupportingDocs.Delete;
 internal sealed class DeleteSupportingDocCommandHandler(
@@ -15,12 +15,13 @@ internal sealed class DeleteSupportingDocCommandHandler(
         {
             await supportingDocService.DeleteSupportingDocAsync(request.Id);
             logger.LogInformation("Supporting doc with id: {Id} was deleted", request.Id);
-            return Result.SuccessWithMessage("Supporting doc deleted.");  
+            return Result.SuccessWithMessage("Supporting document deleted successfully.");
+
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting supporting doc with id: {Id}", request.Id);
+            logger.LogError(ex, "An error occurred while deleting Supporting Document with ID {Id}.", request.Id);
             return Result.Error(ex.Message);
-        }  
+        }
     }
 }

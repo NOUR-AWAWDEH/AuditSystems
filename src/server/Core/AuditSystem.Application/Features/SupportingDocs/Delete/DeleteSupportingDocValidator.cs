@@ -6,10 +6,10 @@ public sealed class DeleteSupportingDocValidator : AbstractValidator<DeleteSuppo
     public DeleteSupportingDocValidator()
     {
         RuleFor(x => x.Id)
-          .NotEmpty()
-          .WithMessage("Supporting Doc Id is required")
-          .Must(IsValidGuid)
-          .WithMessage("Invalid Supporting Doc Id format");
+              .NotEmpty()
+              .WithMessage("Supporting Document Id is required.")
+              .Must(IsValidGuid)
+              .WithMessage("Supporting Document Id is not a valid GUID.");
     }
 
     private bool IsValidGuid(Guid id)

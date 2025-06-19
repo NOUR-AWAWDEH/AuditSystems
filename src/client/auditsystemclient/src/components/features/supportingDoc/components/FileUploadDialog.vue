@@ -125,7 +125,13 @@ function handleClose() {
             :disabled="isUploading || !selectedFile"
             class="bg-primary-base text-white px-4 py-2 rounded hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span v-if="isUploading">Uploading...</span>
+            <!-- Add this after the upload button for a more prominent message -->
+            <div v-if="isUploading" class="mt-3 text-center">
+              <div class="flex items-center justify-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-base mr-2"></div>
+                <span class="text-sm text-gray-600">Please wait while your file is being uploaded...</span>
+              </div>
+            </div>
             <span v-else>Upload</span>
           </button>
         </div>

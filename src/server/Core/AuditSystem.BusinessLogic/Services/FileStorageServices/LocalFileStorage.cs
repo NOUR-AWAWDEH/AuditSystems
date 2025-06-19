@@ -18,15 +18,15 @@ public class LocalFileStorage(
         [ ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" ];
     private const long MaxFileSizeBytes = 200 * 1024 * 1024;
 
-    public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, string userProvidedFileName, Guid userId,string serviceName)
+    public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, Guid userId, string serviceName, string userProvidedFileName)
     {
         try
         {
             if (file == null || file.Length == 0)
                 return Result.Error("No file uploaded.");
 
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!AllowedExtensions.Contains(ext))
+            var ext = Path.GetExtension(file.FileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext) || !AllowedExtensions.Contains(ext))
                 return Result.Error($"Invalid file type. Allowed: {string.Join(", ", AllowedExtensions)}");
 
             if (file.Length > MaxFileSizeBytes)
@@ -34,17 +34,22 @@ public class LocalFileStorage(
 
 
             var sanitized = SanitizeFileName(userProvidedFileName);
-            var unique = $"{sanitized}_{Guid.NewGuid():N}{ext}";
+            var uniqueFileName = $"{sanitized}_{Guid.NewGuid():N}{ext}";
 
-            var fullPath = _pathBuilder.GetFullPath(userId, unique, serviceName);
+            var fullPath = _pathBuilder.GetFullPath(userId,serviceName, uniqueFileName);
+
+            //var directory = Path.GetDirectoryName(fullPath);
+            //if (!string.IsNullOrEmpty(directory))
+            //{
+            //    Directory.CreateDirectory(directory);
+            //}
+            
             await using var fs = new FileStream(fullPath, FileMode.Create);
             await file.CopyToAsync(fs);
 
-            var relPath = _pathBuilder.GetFullPath(userId, unique, serviceName);
-
             return Result.Success(new FileSaveDetails
             {
-                SavedFileName = unique,
+                SavedFileName = uniqueFileName,
                 FullPath = fullPath,
                 FileSize = file.Length
             });
@@ -63,22 +68,22 @@ public class LocalFileStorage(
         return string.IsNullOrWhiteSpace(clean) ? "file" : clean;
     }
 
-    public Task<Result> DeleteFileAsync(string filePath)
+    public Task<Result> DeleteFileAsync(string fullFilePath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-                return Task.FromResult(Result.Error("Invalid filename."));
+            if (string.IsNullOrWhiteSpace(fullFilePath))
+                return Task.FromResult(Result.Error("Invalid file path."));
+    
+            if (!File.Exists(fullFilePath))
+            return Task.FromResult(Result.Error("File does not exist."));
 
-            var fullPath = Path.Combine(Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")!, filePath);
-            if (!File.Exists(fullPath)) return Task.FromResult(Result.NotFound("File not found."));
-
-            File.Delete(fullPath);
+            File.Delete(fullFilePath);
             return Task.FromResult(Result.Success());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Delete failed for: {FilePath}", filePath);
+            _logger.LogError(ex, "Delete failed for: {FullFilePath}", fullFilePath);
             return Task.FromResult(Result.Error("Error deleting file."));
         }
     }

@@ -10,22 +10,29 @@ import { useNotification } from '@/composables/notification/useNotification';
 export function useUploadSupportingDocument() {
   const uploadStatus = ref(null);
   const isUploading = ref(false);
+  const uploadProgress = ref(0);
   const error = ref(null);
   const { authStatus, checkAuthStatus } = useAuthStatus();
   const { showNotification } = useNotification();
 
   const uploadSupportingDocument = async ({ file, fileName }) => {
     isUploading.value = true;
+    uploadProgress.value = 0;
     error.value = null;
     uploadStatus.value = null;
 
-    showNotification(`Uploading "${fileName}"...`, 'info', 0); // 0 duration means it won't auto-hide
+    showNotification(`Uploading "${fileName}"...`, 'info', 0);
 
     try {
+      // Simulate progress during authentication and setup
+      uploadProgress.value = 10;
+      
       const token = authService.getLocalToken();
       if (!token) {
         throw new Error('No authentication token found');
       }
+
+      uploadProgress.value = 20;
 
       if (!authStatus.value || !authStatus.value.userId) {
         const statusResult = await checkAuthStatus(token);
@@ -34,10 +41,15 @@ export function useUploadSupportingDocument() {
         }
       }
 
+      uploadProgress.value = 30;
+
       const userId = authStatus.value.userId;
       if (!userId) {
         throw new Error('User ID not found');
       }
+
+      // Start actual upload
+      uploadProgress.value = 40;
 
       const response = await uploadSupportingDocumentRepository.uploadSupportingDocument({
         file,
@@ -46,9 +58,15 @@ export function useUploadSupportingDocument() {
         token,
       });
 
+      // Upload completed
+      uploadProgress.value = 80;
+
       if (response?.success) {
-        // After successful upload, fetch updated documents list
+        // Fetch updated documents list
         const documentsResponse = await supportingDocsRepository.getSupportingDocumentsByUserId(userId);
+        
+        // Complete progress
+        uploadProgress.value = 100;
         
         uploadStatus.value = {
           success: true,
@@ -84,6 +102,7 @@ export function useUploadSupportingDocument() {
     uploadSupportingDocument,
     uploadStatus,
     isUploading,
+    uploadProgress,
     error,
   };
 }

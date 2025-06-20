@@ -1,21 +1,25 @@
-// src/composables/supportingDoc/useSupportingDoc.js
+// src/composables/supportingDoc/useUploadSupportingDocuments.js
 
 import { ref } from 'vue';
 import { uploadSupportingDocumentRepository } from '@/services/supportingDocs/uploadSupportingDocumentRepository';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import authService from '@/services/auth/authRepos/authService';
 import { supportingDocsRepository } from '@/services/supportingDocs/fetchSupportingDocumentsRepository';
+import { useNotification } from '@/composables/notification/useNotification';
 
 export function useUploadSupportingDocument() {
   const uploadStatus = ref(null);
   const isUploading = ref(false);
   const error = ref(null);
   const { authStatus, checkAuthStatus } = useAuthStatus();
+  const { showNotification } = useNotification();
 
   const uploadSupportingDocument = async ({ file, fileName }) => {
     isUploading.value = true;
     error.value = null;
     uploadStatus.value = null;
+
+    showNotification(`Uploading "${fileName}"...`, 'info', 0); // 0 duration means it won't auto-hide
 
     try {
       const token = authService.getLocalToken();

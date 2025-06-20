@@ -33,7 +33,7 @@ async function handleDeleteDocument(document) {
     if (result.success) {
       // Remove from local state
       emit('delete-document', document.id);
-      showNotification(`Document "${document.fileName}" deleted successfully`, 'success');
+      showNotification(`Document "${getCleanFileName(document.fileName)}" deleted successfully`, 'success');
     } else {
       showNotification(result.message || 'Delete failed', 'error');
     }
@@ -56,6 +56,11 @@ async function handleDeleteDocument(document) {
       :actions="documentTableActions"
       @delete-item="handleDeleteDocument"
     >
+      <!-- Custom slot for clean file name display -->
+      <template #cell-fileName="{ item }">
+        {{ getCleanFileName(item.fileName) }}
+      </template>
+      
       <!-- Custom slot for file type display -->
       <template #cell-fileType="{ item }">
         {{ getFileType(item.fileName) }}
@@ -71,6 +76,22 @@ async function handleDeleteDocument(document) {
 
 <script>
 // Helper functions for formatting
+function getCleanFileName(fileName) {
+  if (!fileName) return 'Unknown';
+  
+  // Remove the unique ID pattern (underscore followed by 32 characters before the file extension)
+  // Pattern: filename_32characterID.extension -> filename.extension
+  const regex = /^(.+)_[a-f0-9]{32}(\.[^.]+)$/i;
+  const match = fileName.match(regex);
+  
+  if (match) {
+    return match[1] + match[2]; // Return original name + extension
+  }
+  
+  // If pattern doesn't match, return original filename
+  return fileName;
+}
+
 function getFileType(fileName) {
   if (!fileName) return 'Unknown';
   const extension = fileName.split('.').pop();

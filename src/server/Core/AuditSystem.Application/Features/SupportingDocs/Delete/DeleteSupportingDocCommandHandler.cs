@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using Microsoft.Extensions.Logging;
 using Ardalis.Result;

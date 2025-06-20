@@ -85,8 +85,9 @@ internal sealed class SupportingDocService(
         // Fallback to DB
         var entities = await repository.GetAllAsync(doc => doc.UserId == userId);
 
+        // Return empty list instead of throwing exception
         if (entities is not { Count: > 0 })
-            throw new KeyNotFoundException($"No supporting documents found for user ID '{userId}'.");
+            return new List<SupportingDocModel>();
 
         // Cache the list result
         await cacheService.SetAsync(cacheKey, entities, tags: ListTags);

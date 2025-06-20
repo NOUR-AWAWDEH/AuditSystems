@@ -3,6 +3,10 @@ import { ref } from 'vue';
 export function useDocumentManager() {
   const documents = ref([]);
 
+  function setDocuments(newDocuments) {
+    documents.value = newDocuments || [];
+  }
+  
   function addDocument(document) {
     documents.value.push(document);
   }
@@ -24,6 +28,7 @@ export function useDocumentManager() {
 
   return {
     documents,
+    setDocuments,
     addDocument,
     removeDocument,
     getDocumentById,

@@ -3,9 +3,8 @@ import { ref } from "vue";
 import { useUploadSupportingDocument } from "@/composables/supportingDoc/useUploadSupportingDocuments";
 import { useNotification } from "@/composables/notification/useNotification";
 import FileUploadDialog from "./FileUploadDialog.vue";
-import { getFileType } from "../utils/fileUtils";
 
-const emit = defineEmits(['document-uploaded']);
+const emit = defineEmits(['document-uploaded', 'documents-refreshed']);
 
 const { uploadSupportingDocument, isUploading, error: uploadError } = useUploadSupportingDocument();
 const { showNotification } = useNotification();
@@ -28,15 +27,7 @@ async function handleFileUpload({ file, fileName }) {
     });
 
     if (result.success) {
-      const newDocument = {
-        id: Date.now(),
-        fileName,
-        fileType: getFileType(fileName),
-        uploadDate: new Date().toISOString(),
-        size: file.size
-      };
-      
-      emit('document-uploaded', newDocument);
+      emit('documents-refreshed', result.documents);
       closeUploadDialog();
       showNotification("Document uploaded successfully", "success");
     } else {

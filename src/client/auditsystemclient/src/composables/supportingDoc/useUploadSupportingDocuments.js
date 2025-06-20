@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { uploadSupportingDocumentRepository } from '@/services/supportingDocs/uploadSupportingDocumentRepository';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import authService from '@/services/auth/authRepos/authService';
+import { supportingDocsRepository } from '@/services/supportingDocs/fetchSupportingDocumentsRepository';
 
 export function useUploadSupportingDocument() {
   const uploadStatus = ref(null);
@@ -42,10 +43,14 @@ export function useUploadSupportingDocument() {
       });
 
       if (response?.success) {
+        // After successful upload, fetch updated documents list
+        const documentsResponse = await supportingDocsRepository.getSupportingDocumentsByUserId(userId);
+        
         uploadStatus.value = {
           success: true,
           message: response.successMessage || 'File uploaded successfully',
           result: response.result,
+          documents: documentsResponse?.success ? documentsResponse.result : []
         };
         return uploadStatus.value;
       } else {

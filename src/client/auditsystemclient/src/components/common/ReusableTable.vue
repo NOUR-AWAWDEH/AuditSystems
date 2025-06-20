@@ -30,8 +30,15 @@
         >
           <td v-if="showSrNo" class="px-6 py-4 border border-gray-300">{{ index + 1 }}</td>
           <td v-for="column in columns" :key="column.key" class="px-6 py-4 font-medium text-gray-shade whitespace-nowrap border border-gray-300">
-            <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]">
-              {{ item[column.key] }}
+            <!-- Use named slot if available -->
+            <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]" :column="column">
+              <!-- Default formatting based on column type -->
+              <span v-if="column.type === 'date'">
+                {{ formatDate(item[column.key]) }}
+              </span>
+              <span v-else>
+                {{ item[column.key] }}
+              </span>
             </slot>
           </td>
           <td v-if="actions.length > 0" class="px-6 py-4 border border-gray-300">
@@ -86,6 +93,15 @@ defineProps({
 
 defineEmits(['row-click', 'edit-item', 'delete-item', 'view-item']);
 
+// Helper function for date formatting
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  try {
+    return new Date(dateString).toLocaleDateString();
+  } catch {
+    return 'Invalid Date';
+  }
+}
 </script>
 
 <style scoped>

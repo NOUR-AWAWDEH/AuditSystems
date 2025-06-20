@@ -1,4 +1,4 @@
-// src/services/supportingDocs/getSupportingDocsByUserIdRepository.js
+// src/services/supportingDocs/fetchSupportingDocumentsRepository.js
 
 import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse'; // Assuming ApiResponseT is in this path
@@ -12,12 +12,13 @@ export const supportingDocsRepository = {
 
       if (response.data && response.status === 200) {
         if (response.data.success && response.data.result) {
-            return ApiResponseT.ok(response.data.result, response.data.message || 'Successfully retrieved supporting documents.');
+            const documents = response.data.result.supportingDocs || [];
+            return ApiResponseT.ok(documents, response.data.message || 'Successfully retrieved supporting documents.');
         } else if (response.data.success === false) {
             return ApiResponseT.badRequest(response.data.errors || [{ message: response.data.message || 'Failed to retrieve documents.' }], response.data.message || 'Failed to retrieve documents.');
         }
 
-        return ApiResponseT.ok(response.data, 'Successfully retrieved supporting documents, but response structure might differ.');
+        return ApiResponseT.ok([], 'Successfully retrieved supporting documents, but response structure might differ.');
       } else {
         return ApiResponseT.badRequest(
           [{ message: response.data?.message || 'Failed to retrieve supporting documents.' }],

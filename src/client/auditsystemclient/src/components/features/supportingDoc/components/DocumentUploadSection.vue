@@ -6,7 +6,7 @@ import FileUploadDialog from "./FileUploadDialog.vue";
 
 const emit = defineEmits(['document-uploaded', 'documents-refreshed']);
 
-const { uploadSupportingDocument, isUploading, error: uploadError } = useUploadSupportingDocument();
+const { uploadSupportingDocument, isUploading, uploadProgress, error: uploadError } = useUploadSupportingDocument();
 const { showNotification, hideNotification } = useNotification();
 
 const uploadDialogOpen = ref(false);
@@ -31,7 +31,12 @@ async function handleFileUpload({ file, fileName }) {
 
     if (result.success) {
       emit('documents-refreshed', result.documents);
-      closeUploadDialog();
+      
+      // Wait a moment to show 100% progress, then close
+      setTimeout(() => {
+        closeUploadDialog();
+      }, 1500);
+      
       showNotification("Document uploaded successfully", "success");
     } else {
       showNotification(result.message || uploadError.value || "Upload failed", "error");
@@ -58,6 +63,7 @@ async function handleFileUpload({ file, fileName }) {
   <FileUploadDialog
     v-if="uploadDialogOpen"
     :is-uploading="isUploading"
+    :upload-progress="uploadProgress"
     @close="closeUploadDialog"
     @upload="handleFileUpload"
   />

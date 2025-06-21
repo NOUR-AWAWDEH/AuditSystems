@@ -91,7 +91,7 @@ defineProps({
   }
 });
 
-defineEmits(['row-click', 'edit-item', 'delete-item', 'view-item']);
+defineEmits(['row-click', 'edit-item', 'delete-item', 'view-item', 'download-item']);
 
 // Helper function for date formatting
 function formatDate(dateString) {

@@ -1,6 +1,6 @@
 import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
-import axios from 'axios'; // Import axios directly
+import axios from 'axios';
 
 const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
 
@@ -34,12 +34,6 @@ export const uploadSupportingDocumentRepository = {
       return ApiResponseT.ok(response.data.result, response.data.message);
 
     } catch (error) {
-      // Detailed error logging
-      console.error('Upload error details:');
-      console.error('- Status:', error.response?.status);
-      console.error('- StatusText:', error.response?.statusText);
-      console.error('- Data:', error.response?.data);
-
       let errorMessage = 'Upload failed';
       let errors = [{ message: errorMessage }];
 

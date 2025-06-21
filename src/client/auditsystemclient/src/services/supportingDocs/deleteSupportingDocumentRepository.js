@@ -24,7 +24,6 @@ export const deleteSupportingDocumentRepository = {
       return ApiResponseT.badRequest(errors, response?.data?.message);
 
     } catch (error) {
-      console.error('Delete error:', error);
       let errorMessage = 'Delete failed';
       let errors = [{ message: errorMessage }];
 

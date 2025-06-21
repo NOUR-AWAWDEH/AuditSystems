@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.Download;
 using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Models.Download;
@@ -55,10 +56,13 @@ namespace AuditSystem.BusinessLogic.Services.DownloadFile
             }
 
             var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
-            var contentType = "application/octet-stream";
-            var fileName = Path.GetFileName(fullPath);
+            
+            // Use FileUtilities for content type detection and filename cleaning
+            var contentType = FileUtilities.GetContentType(fullPath);
+            var originalFileName = Path.GetFileName(fullPath);
+            var cleanFileName = FileUtilities.GetCleanFileName(originalFileName);
 
-            return Result<DownloadFileResult>.Success(new DownloadFileResult(stream, contentType, fileName));
+            return Result<DownloadFileResult>.Success(new DownloadFileResult(stream, contentType, cleanFileName));
         }
     }
 }

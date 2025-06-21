@@ -3,6 +3,7 @@ import { computed } from "vue";
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import { useNotification } from "@/composables/notification/useNotification";
 import { useDeleteSupportingDocument } from "@/composables/supportingDoc/useDeleteSupportingDocument";
+import { useSupportingDocDownload } from "@/composables/supportingDoc/useSupportingDocDownload";
 
 const props = defineProps({
   documents: {
@@ -15,6 +16,13 @@ const emit = defineEmits(['delete-document']);
 
 const { showNotification } = useNotification();
 const { isDeleting, deleteSupportingDocument } = useDeleteSupportingDocument();
+const { 
+  isLoading: isDownloadLoading, 
+  downloadSupportingDocument, 
+  downloadError, 
+  downloadSuccess,
+  resetAllStates 
+} = useSupportingDocDownload();
 
 const documentTableColumns = [
   { key: 'fileName', label: 'File Name' },
@@ -23,6 +31,7 @@ const documentTableColumns = [
 ];
 
 const documentTableActions = [
+  { label: 'Download', event: 'download-item', class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline mr-4' },
   { label: 'Delete', event: 'delete-item', class: 'font-medium text-red-600 dark:text-red-500 hover:underline' },
 ];
 
@@ -38,8 +47,25 @@ async function handleDeleteDocument(document) {
       showNotification(result.message || 'Delete failed', 'error');
     }
   } catch (error) {
-    console.error('Delete error:', error);
     showNotification('Delete failed', 'error');
+  }
+}
+
+async function handleDownloadDocument(document) {
+  try {
+    resetAllStates();
+    
+    // Don't pass clean filename - let backend handle the original filename
+    const result = await downloadSupportingDocument(document.id);
+    
+    if (result?.success) {
+      showNotification(`Document "${getCleanFileName(document.fileName)}" downloaded successfully`, 'success');
+    } else {
+      const errorMessage = result?.errors?.[0]?.message || result?.message || 'Download failed';
+      showNotification(errorMessage, 'error');
+    }
+  } catch (error) {
+    showNotification('Download failed', 'error');
   }
 }
 </script>
@@ -51,10 +77,11 @@ async function handleDeleteDocument(document) {
       :columns="documentTableColumns"
       :items="documents"
       item-key="id"
-      :is-loading="isDeleting"
+      :is-loading="isDeleting || isDownloadLoading"
       no-data-message="No documents uploaded yet."
       :actions="documentTableActions"
       @delete-item="handleDeleteDocument"
+      @download-item="handleDownloadDocument"
     >
       <!-- Custom slot for clean file name display -->
       <template #cell-fileName="{ item }">

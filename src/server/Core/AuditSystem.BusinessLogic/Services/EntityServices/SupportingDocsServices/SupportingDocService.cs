@@ -1,4 +1,4 @@
-﻿using AuditSystem.Application.Constants;
+using AuditSystem.Application.Constants;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.FileStorage;

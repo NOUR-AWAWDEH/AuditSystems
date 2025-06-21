@@ -44,7 +44,6 @@ export function useDeleteSupportingDocument() {
         return handleDeleteFailure(response);
       }
     } catch (err) {
-      console.error('Delete error:', err);
       return handleDeleteFailure(err, err.message || 'Delete failed');
     } finally {
       isDeleting.value = false;

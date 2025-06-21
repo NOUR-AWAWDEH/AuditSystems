@@ -25,7 +25,6 @@ export function useFetchSupportingDocuments() {
         return response; // Return the response object even on failure
       }
     } catch (err) {
-      console.error('Error in useFetchSupportingDocuments:', err);
       error.value = err.message || 'An unexpected error occurred while fetching documents.';
       documents.value = [];
       return { success: false, message: err.message || 'An unexpected error occurred while fetching documents.' };

@@ -1,14 +1,21 @@
 // src/services/supportingDocs/fetchSupportingDocumentsRepository.js
 
 import api from '@/services/api/api';
-import { ApiResponseT } from '@/utils/ApiResponse'; // Assuming ApiResponseT is in this path
+import { ApiResponseT } from '@/utils/ApiResponse';
+import authService from '@/services/auth/authRepos/authService';
 
 const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/SupportingDocs';
 
 export const supportingDocsRepository = {
   async getSupportingDocumentsByUserId(userId) {
     try {
-      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}/user/${userId}`);
+      const token = authService.getLocalToken();
+      
+      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}/user/${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       if (response.data && response.status === 200) {
         if (response.data.success && response.data.result) {
@@ -26,7 +33,6 @@ export const supportingDocsRepository = {
         );
       }
     } catch (error) {
-      console.error('Error fetching supporting documents by user ID:', error);
       let errorMessage = 'Failed to retrieve supporting documents.';
       let errors = [{ message: errorMessage }];
 

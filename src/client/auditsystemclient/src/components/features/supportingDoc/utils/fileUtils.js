@@ -1,22 +1,18 @@
-export function getFileType(fileName) {
-  const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-  const fileTypes = {
-    'pdf': 'PDF Document',
-    'doc': 'Word Document',
-    'docx': 'Word Document',
-    'xls': 'Excel Spreadsheet',
-    'xlsx': 'Excel Spreadsheet',
-    'ppt': 'PowerPoint Presentation',
-    'pptx': 'PowerPoint Presentation',
-    'txt': 'Text File',
-    'jpg': 'Image',
-    'jpeg': 'Image',
-    'png': 'Image',
-    'gif': 'Image',
-    'zip': 'Archive',
-    'rar': 'Archive'
-  };
-  return fileTypes[extension] || 'Unknown';
+export function getFileType(fileName) { 
+  const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase(); 
+  const fileTypes = { 
+    'pdf': 'PDF Document', 
+    'doc': 'Word Document', 
+    'docx': 'Word Document', 
+    'xlsx': 'Excel Spreadsheet', 
+    'jpg': 'Image', 
+    'jpeg': 'Image', 
+    'png': 'Image', 
+    'gif': 'Image', 
+    'mp4': 'Video', 
+    'mkv': 'Video' 
+  }; 
+  return fileTypes[extension] || 'Unknown'; 
 }
 
 export function formatFileSize(bytes) {

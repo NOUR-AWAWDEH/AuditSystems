@@ -15,7 +15,7 @@ public class LocalFileStorage(
     private readonly ILogger<LocalFileStorage> _logger = logger;
 
     private static readonly string[] AllowedExtensions =
-        [ ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx" ];
+        [ ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx", ".mp4",".mkv" ];
     private const long MaxFileSizeBytes = 200 * 1024 * 1024;
 
     public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, Guid userId, string serviceName, string userProvidedFileName)
@@ -37,12 +37,6 @@ public class LocalFileStorage(
             var uniqueFileName = $"{sanitized}_{Guid.NewGuid():N}{ext}";
 
             var fullPath = _pathBuilder.GetFullPath(userId,serviceName, uniqueFileName);
-
-            //var directory = Path.GetDirectoryName(fullPath);
-            //if (!string.IsNullOrEmpty(directory))
-            //{
-            //    Directory.CreateDirectory(directory);
-            //}
             
             await using var fs = new FileStream(fullPath, FileMode.Create);
             await file.CopyToAsync(fs);

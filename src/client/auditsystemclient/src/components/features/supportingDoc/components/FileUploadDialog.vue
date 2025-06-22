@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { validateFileType } from '../utils/fileUtils.js';
 
 const props = defineProps({
   isUploading: {
@@ -17,32 +18,57 @@ const emit = defineEmits(['close', 'upload']);
 const selectedFile = ref(null);
 const fileInput = ref(null);
 const customFileName = ref('');
+const errorMessage = ref('');
+
+// Define allowed file types based on your backend
+const allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'doc', 'xlsx', 'mp4', 'mkv'];
 
 function triggerFileInput() {
   fileInput.value.click();
 }
 
+function validateFile(file) {
+  errorMessage.value = '';
+  
+  if (!validateFileType(file, allowedTypes)) {
+    errorMessage.value = `Invalid file type. Allowed types: ${allowedTypes.join(', ')}`;
+    return false;
+  }
+  
+  return true;
+}
+
 function handleFileChange(e) {
   const file = e.target.files[0];
   if (file) {
-    selectedFile.value = file;
-    const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
-    customFileName.value = nameWithoutExtension;
+    if (validateFile(file)) {
+      selectedFile.value = file;
+      const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+      customFileName.value = nameWithoutExtension;
+    } else {
+      // Clear the input if file is invalid
+      if (fileInput.value) {
+        fileInput.value.value = "";
+      }
+    }
   }
 }
 
 function handleFileDrop(e) {
   const file = e.dataTransfer.files[0];
   if (file) {
-    selectedFile.value = file;
-    const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
-    customFileName.value = nameWithoutExtension;
+    if (validateFile(file)) {
+      selectedFile.value = file;
+      const nameWithoutExtension = file.name.substring(0, file.name.lastIndexOf('.'));
+      customFileName.value = nameWithoutExtension;
+    }
   }
 }
 
 function clearSelectedFile() {
   selectedFile.value = null;
   customFileName.value = '';
+  errorMessage.value = '';
   if (fileInput.value) {
     fileInput.value.value = "";
   }
@@ -64,6 +90,7 @@ function handleUpload() {
   // Reset form
   selectedFile.value = null;
   customFileName.value = '';
+  errorMessage.value = '';
 }
 
 function handleClose() {
@@ -78,6 +105,11 @@ function handleClose() {
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">Upload Document</h3>
         <button @click="handleClose" class="text-gray-500 hover:text-gray-700" :disabled="isUploading">×</button>
+      </div>
+      
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        {{ errorMessage }}
       </div>
       
       <!-- Progress Bar (shown when uploading) -->
@@ -113,6 +145,11 @@ function handleClose() {
         </div>
         
         <input ref="fileInput" type="file" class="hidden" @change="handleFileChange" />
+        
+        <!-- Allowed file types info -->
+        <div class="mt-2 text-xs text-gray-500">
+          Allowed file types: {{ allowedTypes.join(', ') }}
+        </div>
         
         <div v-if="selectedFile" class="mt-4">
           <div class="flex items-center justify-between bg-gray-100 p-2 rounded mb-3">

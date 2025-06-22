@@ -5,12 +5,14 @@ export function getFileType(fileName) {
     'doc': 'Word Document', 
     'docx': 'Word Document', 
     'xlsx': 'Excel Spreadsheet', 
+    'ppt': 'PowerPoint Presentation',
+    'pptx': 'PowerPoint Presentation',
     'jpg': 'Image', 
     'jpeg': 'Image', 
     'png': 'Image', 
     'gif': 'Image', 
     'mp4': 'Video', 
-    'mkv': 'Video' 
+    'mkv': 'Video'
   }; 
   return fileTypes[extension] || 'Unknown'; 
 }

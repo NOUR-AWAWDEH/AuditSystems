@@ -21,7 +21,7 @@ const customFileName = ref('');
 const errorMessage = ref('');
 
 // Define allowed file types based on your backend
-const allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'doc', 'xlsx', 'mp4', 'mkv'];
+const allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'doc', 'xlsx', 'ppt', 'pptx', 'mp4', 'mkv'];
 
 function triggerFileInput() {
   fileInput.value.click();

@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav class="space-y-1 w-full">
     <NavigationItem
       v-for="item in visibleItems"
       :key="item.route"
@@ -11,12 +11,21 @@
     
     <!-- User Menu trigger row -->
     <div
-      class="flex items-center px-3 hover:bg-secondary-shade rounded cursor-pointer"
+      :class="[
+        'flex items-center hover:bg-secondary-shade rounded cursor-pointer transition-all duration-200 w-full',
+        isCollapsed 
+          ? 'px-2 py-1 justify-center' 
+          : 'px-2 py-1 justify-start'
+      ]"
       @click="toggleUserMenu"
     >
       <UserMenu ref="userMenuRef" />
-      <span class="text-white pl-2" :class="{ 'hidden': isCollapsed }">
-        User Menu
+      <span 
+        :class="[
+          'text-white transition-all duration-200 truncate',
+          isCollapsed ? 'hidden' : 'block ml-2 sm:ml-3 text-sm sm:text-base'
+        ]"
+      > User Menu
       </span>
     </div>
   </nav>

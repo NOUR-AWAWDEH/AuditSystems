@@ -71,33 +71,44 @@ async function handleDownloadDocument(document) {
 </script>
 
 <template>
-  <div class="mt-6">
-    <h3 class="text-xl font-semibold mb-3 text-secondary-base">Uploaded Documents</h3>
-    <ReusableTable
-      :columns="documentTableColumns"
-      :items="documents"
-      item-key="id"
-      :is-loading="isDeleting || isDownloadLoading"
-      no-data-message="No documents uploaded yet."
-      :actions="documentTableActions"
-      @delete-item="handleDeleteDocument"
-      @download-item="handleDownloadDocument"
-    >
-      <!-- Custom slot for clean file name display -->
-      <template #cell-fileName="{ item }">
-        {{ getCleanFileName(item.fileName) }}
-      </template>
-      
-      <!-- Custom slot for file type display -->
-      <template #cell-fileType="{ item }">
-        {{ getFileType(item.fileName) }}
-      </template>
-      
-      <!-- Custom slot for upload date display -->
-      <template #cell-createdAt="{ value }">
-        {{ formatDate(value) }}
-      </template>
-    </ReusableTable>
+  <div class="w-full">
+    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-secondary-base px-1">Uploaded Documents</h3>
+    <div class="w-full overflow-hidden">
+      <ReusableTable
+        :columns="documentTableColumns"
+        :items="documents"
+        item-key="id"
+        :is-loading="isDeleting || isDownloadLoading"
+        no-data-message="No documents uploaded yet."
+        :actions="documentTableActions"
+        @delete-item="handleDeleteDocument"
+        @download-item="handleDownloadDocument"
+        class="w-full"
+      >
+        <!-- Custom slot for clean file name display -->
+        <template #cell-fileName="{ item }">
+          <div class="max-w-xs md:max-w-none">
+            <span class="block truncate md:inline" :title="getCleanFileName(item.fileName)">
+              {{ getCleanFileName(item.fileName) }}
+            </span>
+          </div>
+        </template>
+        
+        <!-- Custom slot for file type display -->
+        <template #cell-fileType="{ item }">
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {{ getFileType(item.fileName) }}
+          </span>
+        </template>
+        
+        <!-- Custom slot for upload date display -->
+        <template #cell-createdAt="{ value }">
+          <span class="text-sm text-gray-600">
+            {{ formatDate(value) }}
+          </span>
+        </template>
+      </ReusableTable>
+    </div>
   </div>
 </template>
 
@@ -134,3 +145,12 @@ function formatDate(dateString) {
   }
 }
 </script>
+
+<style scoped>
+/* Ensure proper mobile layout */
+@media (max-width: 768px) {
+  .max-w-xs {
+    max-width: 20rem;
+  }
+}
+</style>

@@ -63,6 +63,7 @@ async function loadDocuments() {
       error.value = 'Unable to identify user';
     }
   } catch (err) {
+    console.error('Error loading documents:', err);
     error.value = 'An error occurred while loading documents';
   } finally {
     isLoadingDocuments.value = false;

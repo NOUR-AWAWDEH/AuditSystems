@@ -1,34 +1,30 @@
-// Navigation configuration for the sidebar
 import DashboardIcon from '@/components/common/sidebar/icons/DashboardIcon.vue'
 import DocumentIcon from '@/components/common/sidebar/icons/DocumentIcon.vue'
 
-// Define all navigation items
-const navigationItems = [
+// Navigation items that correspond to your router.js routes
+export const navigationItems = [
   {
     route: '/dashboard',
+    name: 'Dashboard', // matches router name
     label: 'Dashboard',
     icon: DashboardIcon,
     requiresAuth: true
   },
   {
     route: '/supporting-docs',
-    label: 'Supporting Documents',
+    name: 'SupportingDocs', // matches router name
+    label: 'Supporting Docs',
     icon: DocumentIcon,
     requiresAuth: true
   }
 ]
 
-// Function to get visible navigation items based on authentication status
-export function getVisibleNavigationItems(isAuthenticated) {
-  if (!isAuthenticated) {
-    return []
-  }
-  
+// Filter navigation items based on authentication status
+export const getVisibleNavigationItems = (isAuthenticated) => {
   return navigationItems.filter(item => {
-    // Only show items that require auth when user is authenticated
-    return !item.requiresAuth || isAuthenticated
+    if (item.requiresAuth && !isAuthenticated) {
+      return false
+    }
+    return true
   })
 }
-
-// Export navigation items for other uses
-export { navigationItems }

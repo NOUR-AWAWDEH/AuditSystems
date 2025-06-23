@@ -55,7 +55,7 @@ export const decodeDownloadRepository = {
               const rawFilename = pathParts[pathParts.length - 1];
               filename = rawFilename;
             }
-          } catch (err) {
+          } catch {
             // Silent error handling
           }
         }

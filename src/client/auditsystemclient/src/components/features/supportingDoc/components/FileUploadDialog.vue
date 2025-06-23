@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { validateFileType } from '../utils/fileUtils.js';
 
-const props = defineProps({
+defineProps({
   isUploading: {
     type: Boolean,
     default: false

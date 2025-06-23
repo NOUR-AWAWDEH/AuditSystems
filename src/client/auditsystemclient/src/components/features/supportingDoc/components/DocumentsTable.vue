@@ -1,11 +1,10 @@
 <script setup>
-import { computed } from "vue";
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import { useNotification } from "@/composables/notification/useNotification";
 import { useDeleteSupportingDocument } from "@/composables/supportingDoc/useDeleteSupportingDocument";
 import { useSupportingDocDownload } from "@/composables/supportingDoc/useSupportingDocDownload";
 
-const props = defineProps({
+defineProps({
   documents: {
     type: Array,
     required: true
@@ -18,9 +17,7 @@ const { showNotification } = useNotification();
 const { isDeleting, deleteSupportingDocument } = useDeleteSupportingDocument();
 const { 
   isLoading: isDownloadLoading, 
-  downloadSupportingDocument, 
-  downloadError, 
-  downloadSuccess,
+  downloadSupportingDocument,
   resetAllStates 
 } = useSupportingDocDownload();
 
@@ -46,7 +43,7 @@ async function handleDeleteDocument(document) {
     } else {
       showNotification(result.message || 'Delete failed', 'error');
     }
-  } catch (error) {
+  } catch {
     showNotification('Delete failed', 'error');
   }
 }
@@ -64,7 +61,7 @@ async function handleDownloadDocument(document) {
       const errorMessage = result?.errors?.[0]?.message || result?.message || 'Download failed';
       showNotification(errorMessage, 'error');
     }
-  } catch (error) {
+  } catch {
     showNotification('Download failed', 'error');
   }
 }

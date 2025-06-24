@@ -66,6 +66,7 @@
                         </div>
                         
                         <BaseInput
+                            id="custom-file-name"
                             v-model="customFileName"
                             label="Custom File Name (optional)"
                             placeholder="Enter custom file name"

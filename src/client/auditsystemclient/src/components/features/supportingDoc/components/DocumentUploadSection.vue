@@ -32,10 +32,6 @@ async function handleFileUpload({ file, fileName }) {
 
     if (result.success) {
       emit('documents-refreshed', result.documents);
-      
-      // Removed the setTimeout that was closing the dialog
-      // The dialog will now stay open after successful upload
-      
       showNotification("Document uploaded successfully", "success");
     } else {
       showNotification(result.message || uploadError.value || "Upload failed", "error");

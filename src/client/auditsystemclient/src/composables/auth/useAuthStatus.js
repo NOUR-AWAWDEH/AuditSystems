@@ -43,6 +43,7 @@ export function useAuthStatus() {
           username: response.result.username,
           email: response.result.email,
           userId: response.result.userId,
+          companyId: response.result.companyId,
           roles: response.result.roles,
           expiresAt: response.result.expiresAt,
           isEmailVerified: response.result.isEmailVerified

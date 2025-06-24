@@ -6,6 +6,8 @@ import DocumentsTable from "./components/DocumentsTable.vue";
 import { useDocumentManager } from "./composables/useDocumentManager";
 import { useFetchSupportingDocuments } from "@/composables/supportingDoc/useFetchSupportingDocuments";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
+import { useDeleteSupportingDocument } from "@/composables/supportingDoc/useDeleteSupportingDocument";
+import { useNotification } from "@/composables/notification/useNotification";
 import authService from "@/services/auth/authRepos/authService";
 import { useRoute } from 'vue-router';
 
@@ -17,6 +19,8 @@ const {
 
 const { fetchDocumentsByUserId } = useFetchSupportingDocuments();
 const { authStatus, checkAuthStatus } = useAuthStatus();
+const { isDeleting, deleteSupportingDocument } = useDeleteSupportingDocument();
+const { showNotification } = useNotification();
 const route = useRoute();
 
 // Add loading state for better UX
@@ -74,8 +78,41 @@ function handleDocumentsRefreshed(refreshedDocuments) {
   setDocuments(refreshedDocuments);
 }
 
-function handleDocumentDeleted(documentId) {
-  removeDocument(documentId);
+// Enhanced delete function with native confirmation
+async function handleDocumentDeleted(document) {
+  const confirmed = confirm(`Are you sure you want to delete "${getCleanFileName(document.fileName)}"? This action cannot be undone.`);
+  
+  if (confirmed) {
+    try {
+      const result = await deleteSupportingDocument(document.id);
+      
+      if (result.success) {
+        // Remove from local state
+        removeDocument(document.id);
+        showNotification(`Document "${getCleanFileName(document.fileName)}" deleted successfully`, 'success');
+      } else {
+        showNotification(result.message || 'Delete failed', 'error');
+      }
+    } catch (err) {
+      console.error('Error deleting document:', err);
+      showNotification('Delete failed', 'error');
+    }
+  }
+}
+
+// Helper function for clean file name (same as in DocumentsTable)
+function getCleanFileName(fileName) {
+  if (!fileName) return 'Unknown';
+  
+  // Remove the unique ID pattern (underscore followed by 32 characters before the file extension)
+  const regex = /^(.+)_[a-f0-9]{32}(\.[^.]+)$/i;
+  const match = fileName.match(regex);
+  
+  if (match) {
+    return match[1] + match[2]; // Return original name + extension
+  }
+  
+  return fileName;
 }
 
 // Expose loadDocuments for manual refresh if needed

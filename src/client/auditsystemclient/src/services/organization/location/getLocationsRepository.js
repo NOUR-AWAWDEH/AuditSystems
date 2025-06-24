@@ -5,11 +5,10 @@ import authService from '@/services/auth/authRepos/authService';
 const LOCATION_BASE_ENDPOINT = 'api/Location';
 
 export const getLocationsRepository = {
-  async getLocationsByUserId(userId) {  // ← Receives userId parameter
+  async getLocationsByUserId(userId) { 
     try {
       const token = authService.getLocalToken();
       
-      // ← Uses correct API endpoint (fixed from previous issue)
       const response = await api.get(`${LOCATION_BASE_ENDPOINT}/get-locations-by-user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -34,8 +33,6 @@ export const getLocationsRepository = {
       );
 
     } catch (error) {
-      console.error('Get locations error:', error);
-      
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],

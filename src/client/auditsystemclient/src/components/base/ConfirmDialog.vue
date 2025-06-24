@@ -9,7 +9,6 @@
         ></div>
         
         <!-- Dialog -->
-        <!-- Dialog -->
         <div class="relative bg-white rounded-lg shadow-xl max-w-sm sm:max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center p-3 sm:p-4 border-b border-gray-tint">

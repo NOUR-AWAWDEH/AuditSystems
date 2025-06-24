@@ -7,6 +7,7 @@ public class AuthStatusResponseDto
     public string? AuthenticationType { get; set; }
     public string? Email { get; set; }
     public string? UserId { get; set; }
+    public string? CompanyId { get; set; }
     public string? Roles { get; set; }
     public DateTimeOffset? ExpiresAtRaw { get; set; }
     public DateTimeOffset? AuthenticatedAtRaw { get; set; }

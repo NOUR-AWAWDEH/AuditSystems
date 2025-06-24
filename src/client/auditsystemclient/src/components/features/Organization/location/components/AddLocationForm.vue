@@ -18,12 +18,14 @@
                 <form @submit.prevent="handleAddLocation" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <BaseInput
+                            id="location-name"
                             v-model="newLocation.name"
                             label="Location Name"
                             placeholder="Enter location name"
                             required
                         />
                         <BaseInput
+                            id="location-address"
                             v-model="newLocation.address"
                             label="Address"
                             placeholder="Enter location address"
@@ -52,11 +54,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useCreateLocation } from '@/composables/organization/location/useCreateLocation';
-import authService from '@/services/auth/authRepos/authService';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const emit = defineEmits(['location-added']);
 
@@ -67,6 +69,12 @@ const newLocation = ref({
 });
 
 const { isCreating, error, createLocation, resetState } = useCreateLocation();
+const { authStatus, checkAuthStatus, initCheck } = useAuthStatus();
+
+// Initialize authentication check on component mount
+onMounted(async () => {
+    await initCheck();
+});
 
 const toggleAddForm = () => {
     showAddForm.value = !showAddForm.value;
@@ -84,19 +92,25 @@ const resetForm = () => {
 };
 
 const handleAddLocation = async () => {
-    // Get current user info to extract companyId and userId
-    const currentUser = authService.getCurrentUser();
+    if (!authStatus.value) {
+        await checkAuthStatus();
+    }
     
-    if (!currentUser) {
-        error.value = 'User not authenticated';
+    if (!authStatus.value?.userId) {
+        errorMessage.value = 'User not authenticated';
+        return;
+    }
+    
+    if (!authStatus.value?.companyId) {
+        errorMessage.value = 'Company ID is required';
         return;
     }
 
     const locationData = {
-        name: newLocation.value.name,
-        address: newLocation.value.address || null,
-        companyId: currentUser.companyId,
-        userId: currentUser.id
+        name: newLocation.value.name,        // ← Fixed: was locationName.value
+        address: newLocation.value.address, // ← Fixed: was locationAddress.value
+        userId: authStatus.value.userId,
+        companyId: authStatus.value.companyId
     };
 
     const result = await createLocation(locationData);

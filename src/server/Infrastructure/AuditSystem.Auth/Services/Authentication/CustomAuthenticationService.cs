@@ -84,6 +84,7 @@ ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
         {
             Username = user.UserName,
             UserId = user.Id.ToString(),
+            CompanyId = user.CompanyId?.ToString(),
             Email = user.Email,
             Roles = string.Join(", ", roles),
             AuthenticationType = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",
@@ -126,7 +127,7 @@ ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
         }
 
         // 4. Check password using SignInManager
-        var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, false);
+        var result = await _signInManager.PasswordSignInAsync(user.UserName!, request.Password, false, false);
         if (!result.Succeeded)
         {
             string errorMessage = "Invalid username or password.";

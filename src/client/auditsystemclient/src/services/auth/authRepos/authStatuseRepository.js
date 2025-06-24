@@ -10,7 +10,16 @@ export const authStatuseRepository = {
     try {
       const response = await api.post(AUTH_STATUS_ENDPOINT, { token });
       if (response?.data?.isAuthenticated) {
-        return ApiResponseT.ok(response.data, 'Authenticated');
+        return ApiResponseT.ok({
+          isAuthenticated: response.data.isAuthenticated,
+          username: response.data.username,
+          email: response.data.email,
+          userId: response.data.userId,
+          companyId: response.data.companyId,
+          roles: response.data.roles,
+          expiresAt: response.data.expiresAt,
+          isEmailVerified: response.data.isEmailVerified
+        }, 'Authenticated');
       } else {
         return ApiResponseT.badRequest(
           [{ message: response?.data?.message || 'Not authenticated' }],

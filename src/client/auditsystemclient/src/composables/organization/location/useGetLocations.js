@@ -1,70 +1,60 @@
 import { ref } from 'vue';
 import { getLocationsRepository } from '@/services/organization/location/getLocationsRepository';
-import { useNotification } from '@/composables/notification/useNotification';
-import authService from '@/services/auth/authRepos/authService';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 export function useGetLocations() {
+  const locations = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
-  const locations = ref([]);
-  const { showNotification } = useNotification();
+  const { authStatus } = useAuthStatus();
 
   const fetchLocations = async () => {
+    if (!authStatus.value?.userId) {
+      error.value = 'User not authenticated';
+      return;
+    }
+
+    isLoading.value = true;
+    error.value = null;
+
     try {
-      isLoading.value = true;
-      error.value = null;
-
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser?.id) {
-        error.value = 'User not authenticated';
-        showNotification('User not authenticated', 'error');
-        return;
-      }
-
-      const response = await getLocationsRepository.getLocationsByUserId(currentUser.id);
-
-      if (response?.success) {
-        locations.value = response.result || [];
+      const result = await getLocationsRepository.getLocationsByUserId(authStatus.value.userId);
+      
+      if (result.success) {
+        locations.value = result.data || [];
       } else {
-        const errorMessage = response?.errors?.[0]?.message || response?.message || 'Failed to fetch locations';
-        error.value = errorMessage;
-        showNotification(errorMessage, 'error');
+        error.value = result.message || 'Failed to fetch locations';
       }
     } catch (err) {
-      console.error('Fetch locations error:', err);
-      const errorMessage = err.message || 'Failed to fetch locations';
-      error.value = errorMessage;
-      showNotification(errorMessage, 'error');
+      console.error('Error fetching locations:', err);
+      error.value = 'An error occurred while fetching locations';
     } finally {
       isLoading.value = false;
     }
   };
 
   const addLocation = (newLocation) => {
-    locations.value.unshift(newLocation);
+    locations.value.push(newLocation);
   };
 
   const removeLocation = (locationId) => {
-    locations.value = locations.value.filter(loc => loc.id !== locationId);
+    locations.value = locations.value.filter(location => location.id !== locationId);
   };
 
   const updateLocation = (updatedLocation) => {
-    const index = locations.value.findIndex(loc => loc.id === updatedLocation.id);
+    const index = locations.value.findIndex(location => location.id === updatedLocation.id);
     if (index !== -1) {
       locations.value[index] = updatedLocation;
     }
   };
 
   return {
-    // State
+    locations,
     isLoading,
     error,
-    locations,
-
-    // Actions
     fetchLocations,
     addLocation,
     removeLocation,
-    updateLocation,
+    updateLocation
   };
 }

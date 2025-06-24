@@ -12,8 +12,8 @@
                 @location-added="handleLocationAdded"
             />
             <LocationTable 
-                :locations="locations"
-                :is-loading="isLoading"
+                :locations="locations"          
+                :is-loading="isLoading"         
                 @edit-location="handleEditLocation"
                 @delete-location="handleDeleteLocation"
             />
@@ -46,6 +46,8 @@ import AddLocationForm from './components/AddLocationForm.vue';
 import LocationTable from './components/LocationTable.vue';
 import { useNotification } from '@/composables/notification/useNotification';
 import { useGetLocations } from '@/composables/organization/location/useGetLocations';
+import { useDeleteLocation } from '@/composables/organization/location/useDeleteLocation';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const showDeleteDialog = ref(false);
 const deleteDialogMessage = ref('');
@@ -53,43 +55,49 @@ const locationToDelete = ref(null);
 
 const { showNotification } = useNotification();
 const { isLoading, locations, fetchLocations, addLocation, removeLocation } = useGetLocations();
+const { isDeleting, deleteLocation } = useDeleteLocation();
+const { authStatus, initCheck } = useAuthStatus();
 
-const handleLocationAdded = (newLocation) => {
-    addLocation({
-        id: newLocation.id || Date.now(),
-        ...newLocation,
-        createdAt: new Date().toISOString()
-    });
-    showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
+onMounted(async () => {
+  await initCheck();
+  await fetchLocations();
+});
+
+const handleLocationAdded = async (newLocation) => {
+
+  await fetchLocations();
+  
+  // Show success notification
+  showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
 };
 
 const handleEditLocation = (location) => {
-    console.log('Edit location:', location);
-    showNotification('Edit functionality coming soon!', 'info');
-    // TODO: Implement edit functionality
+  showNotification('Edit functionality coming soon!', 'info');
 };
 
 const handleDeleteLocation = (location) => {
-    locationToDelete.value = location;
-    deleteDialogMessage.value = `Are you sure you want to delete "${location.name}"? This action cannot be undone.`;
-    showDeleteDialog.value = true;
+  locationToDelete.value = location;
+  deleteDialogMessage.value = `Are you sure you want to delete "${location.name}"? This action cannot be undone.`;
+  showDeleteDialog.value = true;
 };
 
-const confirmDelete = () => {
-    if (locationToDelete.value) {
-        removeLocation(locationToDelete.value.id);
-        showNotification(`Location "${locationToDelete.value.name}" has been deleted successfully!`, 'success');
-        locationToDelete.value = null;
+const confirmDelete = async () => {
+  if (locationToDelete.value) {
+    const result = await deleteLocation(locationToDelete.value.id, locationToDelete.value.name);
+    
+    if (result.success) {
+      // Remove from local state only after successful API call
+      removeLocation(locationToDelete.value.id);
     }
+    
+    locationToDelete.value = null;
+    showDeleteDialog.value = false;
+  }
 };
 
 const cancelDelete = () => {
-    locationToDelete.value = null;
+  locationToDelete.value = null;
 };
-
-onMounted(() => {
-    fetchLocations();
-});
 </script>
 
 <style scoped>

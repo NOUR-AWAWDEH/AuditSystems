@@ -26,7 +26,7 @@ public sealed class RegistrationController(
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.SelectMany(x => x.Value.Errors)
+                var errors = ModelState.SelectMany(x => x.Value!.Errors)
                     .Select(e => new ApiErrorResponse(e.ErrorMessage));
                 return BadRequest(ApiResponse.BadRequest(errors));
             }
@@ -96,7 +96,7 @@ public sealed class RegistrationController(
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.SelectMany(x => x.Value.Errors)
+                var errors = ModelState.SelectMany(x => x.Value!.Errors)
                     .Select(e => new ApiErrorResponse(e.ErrorMessage));
                 return BadRequest(ApiResponse.BadRequest(errors));
             }

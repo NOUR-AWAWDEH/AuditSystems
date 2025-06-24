@@ -20,7 +20,7 @@ export const navigationItems = [
   },
   {
     route: '/locations',
-    name: 'Locations', // matches router name
+    name: 'Locations',
     label: 'Locations',
     icon: LocationIcon,
     requiresAuth: true

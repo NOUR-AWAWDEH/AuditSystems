@@ -10,7 +10,8 @@ export function useGetLocations() {
 
   const fetchLocations = async () => {
     if (!authStatus.value?.userId) {
-      error.value = 'User not authenticated';
+      const errorMsg = 'User not authenticated';
+      error.value = errorMsg;
       return;
     }
 
@@ -21,12 +22,12 @@ export function useGetLocations() {
       const result = await getLocationsRepository.getLocationsByUserId(authStatus.value.userId);
       
       if (result.success) {
-        locations.value = result.data || [];
+        locations.value = result.result?.locations || [];
       } else {
-        error.value = result.message || 'Failed to fetch locations';
+        const errorMsg = result.message || 'Failed to fetch locations';
+        error.value = errorMsg;
       }
     } catch (err) {
-      console.error('Error fetching locations:', err);
       error.value = 'An error occurred while fetching locations';
     } finally {
       isLoading.value = false;

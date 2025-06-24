@@ -23,11 +23,12 @@ export const authStorage = {
   }
 };
 
-export function useAuthStatus() {
-  const authStatus = ref(null);
-  const isChecking = ref(false);
-  const error = ref(null);
+// 🔧 SINGLETON: Create shared reactive state outside the function
+const authStatus = ref(null);
+const isChecking = ref(false);
+const error = ref(null);
 
+export function useAuthStatus() {
   const checkAuthStatus = async (token = null) => {
     isChecking.value = true;
     error.value = null;

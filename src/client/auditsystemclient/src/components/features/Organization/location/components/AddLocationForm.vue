@@ -97,18 +97,18 @@ const handleAddLocation = async () => {
     }
     
     if (!authStatus.value?.userId) {
-        errorMessage.value = 'User not authenticated';
+        error.value = 'User not authenticated';
         return;
     }
     
     if (!authStatus.value?.companyId) {
-        errorMessage.value = 'Company ID is required';
+        error.value = 'Company ID is required';
         return;
     }
 
     const locationData = {
-        name: newLocation.value.name,        // ← Fixed: was locationName.value
-        address: newLocation.value.address, // ← Fixed: was locationAddress.value
+        name: newLocation.value.name,
+        address: newLocation.value.address,
         userId: authStatus.value.userId,
         companyId: authStatus.value.companyId
     };

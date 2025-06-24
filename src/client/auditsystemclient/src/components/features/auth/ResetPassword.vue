@@ -18,7 +18,7 @@
       v-model="confirmPassword"
     />
     <div class="flex items-center gap-25 w-full">
-      <BaseButton class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade" @click="handleResetPassword">Reset Password</BaseButton>
+      <BaseButton class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base" @click="handleResetPassword">Reset Password</BaseButton>
       <BaseLink class=" whitespace-nowrap " to="/login">Back To Login</BaseLink>
     </div>
   </div>

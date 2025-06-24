@@ -27,7 +27,7 @@
 
     <div class="flex items-center gap-25 w-full">
       <BaseButton
-        class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade"
+        class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base"
         @click="handleSubmit"
         :disabled="isLoading || !isFormValid"
       >

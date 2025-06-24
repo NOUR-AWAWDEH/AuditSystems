@@ -21,6 +21,18 @@
         
         <!-- Notification Component -->
         <BaseNotification />
+        
+        <!-- Confirmation Dialog -->
+        <ConfirmDialog
+            v-model="showDeleteDialog"
+            :title="'Delete Location'"
+            :message="deleteDialogMessage"
+            :highlight-text="locationToDelete?.name || ''"
+            :confirm-text="'Delete'"
+            :cancel-text="'Cancel'"
+            @confirm="confirmDelete"
+            @cancel="cancelDelete"
+        />
     </div>
 </template>
 
@@ -28,6 +40,7 @@
 import { ref, onMounted } from 'vue';
 import SideBar from '@/components/common/SideBar.vue';
 import BaseNotification from '@/components/base/BaseNotification.vue';
+import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import LocationHeader from './components/LocationHeader.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
 import LocationTable from './components/LocationTable.vue';
@@ -35,6 +48,9 @@ import { useNotification } from '@/composables/notification/useNotification';
 
 const isLoading = ref(false);
 const locations = ref([]);
+const showDeleteDialog = ref(false);
+const deleteDialogMessage = ref('');
+const locationToDelete = ref(null);
 
 const { showNotification } = useNotification();
 
@@ -54,12 +70,21 @@ const handleEditLocation = (location) => {
 };
 
 const handleDeleteLocation = (location) => {
-    const confirmed = confirm(`Are you sure you want to delete "${location.name}"? This action cannot be undone.`);
-    
-    if (confirmed) {
-        locations.value = locations.value.filter(loc => loc.id !== location.id);
-        showNotification(`Location "${location.name}" has been deleted successfully!`, 'success');
+    locationToDelete.value = location;
+    deleteDialogMessage.value = `Are you sure you want to delete "${location.name}"? This action cannot be undone.`;
+    showDeleteDialog.value = true;
+};
+
+const confirmDelete = () => {
+    if (locationToDelete.value) {
+        locations.value = locations.value.filter(loc => loc.id !== locationToDelete.value.id);
+        showNotification(`Location "${locationToDelete.value.name}" has been deleted successfully!`, 'success');
+        locationToDelete.value = null;
     }
+};
+
+const cancelDelete = () => {
+    locationToDelete.value = null;
 };
 
 onMounted(() => {

@@ -117,7 +117,7 @@ const customFileName = ref('');
 const errorMessage = ref('');
 
 // Define allowed file types based on your backend
-const allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'docx', 'doc', 'xlsx', 'ppt', 'pptx', 'mp4', 'mkv'];
+const allowedTypes = ['pdf', 'docx', 'doc', 'docm', 'dotx', 'dotm', 'rtf','xlsx', 'xls', 'xlsm', 'xltx', 'xltm','pptx', 'ppt', 'ppsm', 'ppsx', 'potx', 'potm'];
 
 const toggleUploadForm = () => {
     showUploadForm.value = !showUploadForm.value;

@@ -15,7 +15,16 @@ public class LocalFileStorage(
     private readonly ILogger<LocalFileStorage> _logger = logger;
 
     private static readonly string[] AllowedExtensions =
-        [ ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".doc", ".xlsx", ".ppt", ".pptx", ".mp4", ".mkv" ];
+    [ 
+        // PDF
+        ".pdf",
+        // Word formats
+        ".docx", ".doc", ".docm", ".dotx", ".dotm", ".rtf",
+        // Excel formats
+        ".xlsx", ".xls", ".xlsm", ".xltx", ".xltm",
+        // PowerPoint formats
+        ".pptx", ".ppt", ".ppsm", ".ppsx", ".potx", ".potm"
+    ];
     private const long MaxFileSizeBytes = 200 * 1024 * 1024;
 
     public async Task<Result<FileSaveDetails>> SaveFileAsync(IFormFile file, Guid userId, string serviceName, string userProvidedFileName)

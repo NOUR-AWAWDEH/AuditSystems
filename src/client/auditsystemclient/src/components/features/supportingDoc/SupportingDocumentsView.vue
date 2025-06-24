@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import SideBar from "@/components/common/SideBar.vue";
 import DocumentUploadSection from "./components/DocumentUploadSection.vue";
 import DocumentsTable from "./components/DocumentsTable.vue";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import { useDocumentManager } from "./composables/useDocumentManager";
 import { useFetchSupportingDocuments } from "@/composables/supportingDoc/useFetchSupportingDocuments";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
@@ -26,6 +27,11 @@ const route = useRoute();
 // Add loading state for better UX
 const isLoadingDocuments = ref(false);
 const error = ref(null);
+
+// Confirm dialog state
+const showConfirmDialog = ref(false);
+const documentToDelete = ref(null);
+const confirmMessage = ref('');
 
 // Load documents when component mounts
 onMounted(async () => {
@@ -78,25 +84,32 @@ function handleDocumentsRefreshed(refreshedDocuments) {
   setDocuments(refreshedDocuments);
 }
 
-// Enhanced delete function with native confirmation
-async function handleDocumentDeleted(document) {
-  const confirmed = confirm(`Are you sure you want to delete "${getCleanFileName(document.fileName)}"? This action cannot be undone.`);
+// Enhanced delete function with custom confirmation dialog
+function handleDocumentDeleted(document) {
+  documentToDelete.value = document;
+  confirmMessage.value = `Are you sure you want to delete "${getCleanFileName(document.fileName)}"? This action cannot be undone.`;
+  showConfirmDialog.value = true;
+}
+
+// Handle confirmation from dialog
+async function confirmDelete() {
+  if (!documentToDelete.value) return;
   
-  if (confirmed) {
-    try {
-      const result = await deleteSupportingDocument(document.id);
-      
-      if (result.success) {
-        // Remove from local state
-        removeDocument(document.id);
-        showNotification(`Document "${getCleanFileName(document.fileName)}" deleted successfully`, 'success');
-      } else {
-        showNotification(result.message || 'Delete failed', 'error');
-      }
-    } catch (err) {
-      console.error('Error deleting document:', err);
-      showNotification('Delete failed', 'error');
+  try {
+    const result = await deleteSupportingDocument(documentToDelete.value.id);
+    
+    if (result.success) {
+      // Remove from local state
+      removeDocument(documentToDelete.value.id);
+      showNotification(`Document "${getCleanFileName(documentToDelete.value.fileName)}" deleted successfully`, 'success');
+    } else {
+      showNotification(result.message || 'Delete failed', 'error');
     }
+  } catch (err) {
+    console.error('Error deleting document:', err);
+    showNotification('Delete failed', 'error');
+  } finally {
+    documentToDelete.value = null;
   }
 }
 
@@ -171,6 +184,15 @@ defineExpose({
       </div>
     </div>
   </div>
+  
+  <!-- Confirm Delete Dialog -->
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Delete Document"
+    :message="confirmMessage"
+    :highlight-text="documentToDelete ? getCleanFileName(documentToDelete.fileName) : ''"
+    @confirm="confirmDelete"
+  />
 </template>
 
 <style scoped>

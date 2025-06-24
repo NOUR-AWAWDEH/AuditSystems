@@ -23,6 +23,11 @@
                             placeholder="Enter location name"
                             required
                         />
+                        <BaseInput
+                            v-model="newLocation.address"
+                            label="Address"
+                            placeholder="Enter location address"
+                        />
                     </div>
                     
                     <div class="flex justify-end space-x-3">
@@ -51,12 +56,14 @@ import { ref } from 'vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useCreateLocation } from '@/composables/organization/location/useCreateLocation';
+import authService from '@/services/auth/authRepos/authService';
 
 const emit = defineEmits(['location-added']);
 
 const showAddForm = ref(false);
 const newLocation = ref({
-    name: ''
+    name: '',
+    address: ''
 });
 
 const { isCreating, error, createLocation, resetState } = useCreateLocation();
@@ -70,13 +77,29 @@ const toggleAddForm = () => {
 
 const resetForm = () => {
     newLocation.value = {
-        name: ''
+        name: '',
+        address: ''
     };
     resetState();
 };
 
 const handleAddLocation = async () => {
-    const result = await createLocation(newLocation.value);
+    // Get current user info to extract companyId and userId
+    const currentUser = authService.getCurrentUser();
+    
+    if (!currentUser) {
+        error.value = 'User not authenticated';
+        return;
+    }
+
+    const locationData = {
+        name: newLocation.value.name,
+        address: newLocation.value.address || null,
+        companyId: currentUser.companyId,
+        userId: currentUser.id
+    };
+
+    const result = await createLocation(locationData);
 
     if (result.success) {
         emit('location-added', {

@@ -1,6 +1,8 @@
 export const locationTableConfig = {
     locationColumns: [
-        { key: 'name', label: 'Location Name' }
+        { key: 'name', label: 'Location Name' },
+        { key: 'address', label: 'Address' },
+        { key: 'createdAt', label: 'Created Date', type: 'date' }
     ],
     
     locationActions: [

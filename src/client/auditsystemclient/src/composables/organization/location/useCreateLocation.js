@@ -29,11 +29,30 @@ export function useCreateLocation() {
     };
   };
 
+  const validateLocationData = (locationData) => {
+    if (!locationData.name?.trim()) {
+      return 'Location name is required';
+    }
+    if (!locationData.companyId) {
+      return 'Company ID is required';
+    }
+    if (!locationData.userId) {
+      return 'User ID is required';
+    }
+    return null;
+  };
+
   const createLocation = async (locationData) => {
     try {
         isCreating.value = true;
         error.value = null;
-        createLocation.value = null;
+        createdLocation.value = null;
+
+        // Validate required fields
+        const validationError = validateLocationData(locationData);
+        if (validationError) {
+          return handleCreateFailure({ message: validationError });
+        }
 
         const response = await createLocationRepository.createLocation(locationData);
 

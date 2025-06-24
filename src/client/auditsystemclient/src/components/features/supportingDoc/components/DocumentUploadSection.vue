@@ -9,7 +9,8 @@ const emit = defineEmits(['document-uploaded', 'documents-refreshed']);
 const { uploadSupportingDocument, isUploading, uploadProgress, error: uploadError } = useUploadSupportingDocument();
 const { showNotification, hideNotification } = useNotification();
 
-const uploadDialogOpen = ref(false);
+// Changed to true to show dialog automatically
+const uploadDialogOpen = ref(true);
 
 function openUploadDialog() {
   uploadDialogOpen.value = true;
@@ -32,10 +33,8 @@ async function handleFileUpload({ file, fileName }) {
     if (result.success) {
       emit('documents-refreshed', result.documents);
       
-      // Wait a moment to show 100% progress, then close
-      setTimeout(() => {
-        closeUploadDialog();
-      }, 1500);
+      // Removed the setTimeout that was closing the dialog
+      // The dialog will now stay open after successful upload
       
       showNotification("Document uploaded successfully", "success");
     } else {
@@ -51,15 +50,8 @@ async function handleFileUpload({ file, fileName }) {
 </script>
 
 <template>
-  <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-    <button
-      @click="openUploadDialog"
-      class="bg-primary-base text-white px-4 py-2 rounded hover:bg-primary-dark transition duration-200 flex items-center justify-center gap-2"
-    >
-      <span>Upload Document</span>
-    </button>
-  </div>
-
+  <!-- Removed the upload button div -->
+  
   <FileUploadDialog
     v-if="uploadDialogOpen"
     :is-uploading="isUploading"

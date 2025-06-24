@@ -45,17 +45,17 @@ import LocationHeader from './components/LocationHeader.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
 import LocationTable from './components/LocationTable.vue';
 import { useNotification } from '@/composables/notification/useNotification';
+import { useGetLocations } from '@/composables/organization/location/useGetLocations';
 
-const isLoading = ref(false);
-const locations = ref([]);
 const showDeleteDialog = ref(false);
 const deleteDialogMessage = ref('');
 const locationToDelete = ref(null);
 
 const { showNotification } = useNotification();
+const { isLoading, locations, fetchLocations, addLocation, removeLocation } = useGetLocations();
 
 const handleLocationAdded = (newLocation) => {
-    locations.value.unshift({
+    addLocation({
         id: newLocation.id || Date.now(),
         ...newLocation,
         createdAt: new Date().toISOString()
@@ -77,7 +77,7 @@ const handleDeleteLocation = (location) => {
 
 const confirmDelete = () => {
     if (locationToDelete.value) {
-        locations.value = locations.value.filter(loc => loc.id !== locationToDelete.value.id);
+        removeLocation(locationToDelete.value.id);
         showNotification(`Location "${locationToDelete.value.name}" has been deleted successfully!`, 'success');
         locationToDelete.value = null;
     }
@@ -88,8 +88,7 @@ const cancelDelete = () => {
 };
 
 onMounted(() => {
-    // Load locations from API or storage
-    // loadLocations();
+    fetchLocations();
 });
 </script>
 

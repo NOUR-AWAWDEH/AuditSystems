@@ -9,7 +9,15 @@ export const createLocationRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.post(`${LOCATION_BASE_ENDPOINT}/create-location`, locationData, {
+      // Ensure all required fields are present
+      const payload = {
+        name: locationData.name,
+        address: locationData.address || null,
+        companyId: locationData.companyId,
+        userId: locationData.userId
+      };
+      
+      const response = await api.post(`${LOCATION_BASE_ENDPOINT}/create-location`, payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

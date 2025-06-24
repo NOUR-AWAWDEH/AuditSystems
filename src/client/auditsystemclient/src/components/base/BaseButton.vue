@@ -1,7 +1,7 @@
 <template>
   <button
     @click="$emit('click')"
-    class=" bg-secondary-base text-white font-medium   transition-colors duration-300 cursor-pointer"
+    class=" text-white font-medium   transition-colors duration-300 cursor-pointer"
     :disabled="disabled"
   >
     <span v-if="isLoading"><slot name="loading">Loading...</slot></span>

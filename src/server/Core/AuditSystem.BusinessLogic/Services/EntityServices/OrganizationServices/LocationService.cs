@@ -93,4 +93,10 @@ internal sealed class LocationService(
         var cacheKey = GetCacheKey(entity.Id);
         await SetCacheAsync(cacheKey, entity);
     }
+
+    public async Task<IEnumerable<LocationModel>> GetLocationsByUserIdAsync(Guid userId)
+    {
+        var locations = await repository.GetAllAsync(l => l.UserId == userId);
+        return mapper.Map<IEnumerable<LocationModel>>(locations);
+    }
 }

@@ -11,6 +11,7 @@ using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Organization.Location.Search;
 using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuditSystem.Application.Features.Organization.Location.Get.GetByUserId;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -55,4 +56,14 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<LocationModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchLocation([FromQuery] SearchLocationQuery query) =>
         await ProcessRequestToActionResultAsync(query);
+
+    // Add this new endpoint to the existing LocationController
+    
+    //Get Locations by User ID (based on user's company)
+    [HttpGet("get-locations-by-user/{userId}")]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<LocationModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetLocationsByUserId(Guid userId) =>
+        await ProcessRequestToActionResultAsync(new GetLocationsByUserIdQuery(userId));
 }

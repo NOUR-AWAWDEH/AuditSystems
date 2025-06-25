@@ -12,7 +12,10 @@ export const getLocationsRepository = {
       const response = await api.get(`${LOCATION_BASE_ENDPOINT}/get-locations-by-user/${userId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
 

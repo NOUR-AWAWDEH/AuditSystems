@@ -22,6 +22,14 @@
         <!-- Notification Component -->
         <BaseNotification />
         
+        <!-- Edit Location Modal -->
+        <EditLocationModal
+            :is-visible="showEditModal"
+            :location="locationToEdit"
+            @close="handleCloseEditModal"
+            @updated="handleLocationUpdated"
+        />
+        
         <!-- Confirmation Dialog -->
         <ConfirmDialog
             v-model="showDeleteDialog"
@@ -37,13 +45,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import SideBar from '@/components/common/SideBar.vue';
 import BaseNotification from '@/components/base/BaseNotification.vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import LocationHeader from './components/LocationHeader.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
 import LocationTable from './components/LocationTable.vue';
+import EditLocationModal from './components/EditLocationModal.vue';
 import { useNotification } from '@/composables/notification/useNotification';
 import { useGetLocations } from '@/composables/organization/location/useGetLocations';
 import { useDeleteLocation } from '@/composables/organization/location/useDeleteLocation';
@@ -53,25 +62,72 @@ const showDeleteDialog = ref(false);
 const deleteDialogMessage = ref('');
 const locationToDelete = ref(null);
 
+// Edit modal state
+const showEditModal = ref(false);
+const locationToEdit = ref(null);
+
 const { showNotification } = useNotification();
 const { isLoading, locations, fetchLocations, addLocation, removeLocation } = useGetLocations();
 const { isDeleting, deleteLocation } = useDeleteLocation();
 const { authStatus, initCheck } = useAuthStatus();
 
-onMounted(async () => {
+// Function to refresh data
+const refreshData = async () => {
   await initCheck();
   await fetchLocations();
+};
+
+// Handle page visibility change to refresh data when user returns to tab
+const handleVisibilityChange = () => {
+  if (!document.hidden) {
+    refreshData();
+  }
+};
+
+// Handle focus event to refresh data when user returns to window
+const handleFocus = () => {
+  refreshData();
+};
+
+onMounted(async () => {
+  await refreshData();
+  
+  // Add event listeners for page visibility and focus
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('focus', handleFocus);
+});
+
+onBeforeUnmount(() => {
+  // Clean up event listeners
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  window.removeEventListener('focus', handleFocus);
 });
 
 const handleLocationAdded = async (newLocation) => {
-
   await fetchLocations();
   // Show success notification
   showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
 };
 
 const handleEditLocation = (location) => {
-  showNotification('Edit functionality coming soon!', 'info');
+  locationToEdit.value = location;
+  showEditModal.value = true;
+};
+
+const handleCloseEditModal = () => {
+  showEditModal.value = false;
+  locationToEdit.value = null;
+};
+
+const handleLocationUpdated = async (updatedLocation) => {
+  // Refresh the locations list to get the updated data
+  await fetchLocations();
+  
+  // Show success notification
+  showNotification(`Location "${updatedLocation.name}" has been updated successfully!`, 'success');
+  
+  // Close the modal
+  handleCloseEditModal();
 };
 
 const handleDeleteLocation = (location) => {

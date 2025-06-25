@@ -6,5 +6,7 @@ namespace AuditSystem.Application.Features.Organization.SubLocation.Create;
 public sealed record class CreateSubLocationCommand : ICommand<Result<CreateSubLocationCommandResponse>>
 {
     public required string Name { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+
     public required Guid LocationId { get; set; }
 }

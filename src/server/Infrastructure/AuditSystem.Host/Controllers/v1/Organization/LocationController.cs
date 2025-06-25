@@ -56,8 +56,6 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<LocationModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchLocation([FromQuery] SearchLocationQuery query) =>
         await ProcessRequestToActionResultAsync(query);
-
-    // Add this new endpoint to the existing LocationController
     
     //Get Locations by User ID (based on user's company)
     [HttpGet("get-locations-by-user/{userId}")]

@@ -66,7 +66,6 @@ onMounted(async () => {
 const handleLocationAdded = async (newLocation) => {
 
   await fetchLocations();
-  
   // Show success notification
   showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
 };
@@ -86,7 +85,8 @@ const confirmDelete = async () => {
     const result = await deleteLocation(locationToDelete.value.id, locationToDelete.value.name);
     
     if (result.success) {
-      // Remove from local state only after successful API call
+      // Show success notification
+      showNotification(`Location "${locationToDelete.value.name}" has been deleted successfully!`, 'success');
       removeLocation(locationToDelete.value.id);
     }
     

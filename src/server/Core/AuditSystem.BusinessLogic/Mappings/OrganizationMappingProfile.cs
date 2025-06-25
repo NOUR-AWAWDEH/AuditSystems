@@ -33,7 +33,7 @@ public sealed class OrganizationMappingProfile : Profile
         CreateMap<LocationModel, Location>().ReverseMap();
         CreateMap<CreateLocationCommand, LocationModel>();
         CreateMap<UpdateLocationCommand, LocationModel>();
-
+        
         //SubDepartment
         CreateMap<SubDepartmentModel, SubDepartment>().ReverseMap();
         CreateMap<CreateSubDepartmentCommand, SubDepartmentModel>();

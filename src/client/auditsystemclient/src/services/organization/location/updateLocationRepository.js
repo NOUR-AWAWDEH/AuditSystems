@@ -1,11 +1,72 @@
 import api from '@/services/api/api';
-import { ApiResponse } from '@/utils/ApiResponse';
+import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const LOCATION_API_URL = 'api/location';
+const LOCATION_BASE_ENDPOINT = 'api/Location';
 
 export const updateLocationRepository = {
-    async updateLocation(locationId) {
-        
+  async updateLocation(locationData) {
+    try {
+      const token = authService.getLocalToken();
+      
+      // Ensure all required fields are present
+      const payload = {
+        id: locationData.id,
+        name: locationData.name,
+        address: locationData.address || null,
+        companyId: locationData.companyId,
+        userId: locationData.userId
+      };
+      
+      const response = await api.put(`${LOCATION_BASE_ENDPOINT}/update-location`, payload, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data && response.status === 200) {
+        if (response.data.success) {
+          return ApiResponseT.ok(response.data.result, response.data.message || 'Location updated successfully.');
+        } else if (response.data.success === false) {
+          return ApiResponseT.badRequest(
+            response.data.errors || [{ message: response.data.message || 'Failed to update location.' }], 
+            response.data.message || 'Failed to update location.'
+          );
+        }
+      }
+
+      return ApiResponseT.badRequest(
+        [{ message: 'Unexpected response format' }],
+        'Failed to update location'
+      );
+
+    } catch (error) {
+      console.error('Update location error:', error);
+      
+      if (error.response?.status === 401) {
+        return ApiResponseT.unauthorized(
+          [{ message: 'Authentication required. Please log in again.' }],
+          'Authentication required'
+        );
+      }
+      
+      if (error.response?.status === 400) {
+        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+      }
+      
+      if (error.response?.status === 404) {
+        return ApiResponseT.notFound(
+          [{ message: 'Location not found' }],
+          'Location not found'
+        );
+      }
+      
+      return ApiResponseT.serverError(
+        [{ message: error.message || 'An unexpected error occurred while updating location.' }],
+        'Server error'
+      );
     }
-}
+  }
+};

@@ -103,6 +103,13 @@ class ApiResponseT extends ApiResponse {
       : [{ message: errorMessage }];
     return new ApiResponseT(false, 500, undefined, undefined, errors);
   }
+
+  static serverError(errorMessage) {
+    const errors = Array.isArray(errorMessage)
+      ? errorMessage
+      : [{ message: errorMessage }];
+    return new ApiResponseT(false, 500, undefined, undefined, errors);
+  }
 }
 
 export { ApiResponse, ApiResponseT, ApiErrorResponse };

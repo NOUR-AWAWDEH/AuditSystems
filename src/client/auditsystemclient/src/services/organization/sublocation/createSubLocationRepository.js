@@ -6,6 +6,7 @@ const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
 export const createSubLocationRepository = {
   async createSubLocation(subLocationData) {
+    
     try {
       const token = authService.getLocalToken();
       
@@ -13,7 +14,9 @@ export const createSubLocationRepository = {
       const payload = {
         name: subLocationData.name,
         address: subLocationData.address || '',
-        locationId: subLocationData.locationId
+        locationId: typeof subLocationData.locationId === 'object' 
+          ? subLocationData.locationId.value || subLocationData.locationId.id || subLocationData.locationId
+          : subLocationData.locationId
       };
       
       const response = await api.post(`${SUBLOCATION_BASE_ENDPOINT}/create-sub-location`, payload, {
@@ -40,8 +43,6 @@ export const createSubLocationRepository = {
       );
 
     } catch (error) {
-      console.error('Create sublocation error:', error);
-      
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],

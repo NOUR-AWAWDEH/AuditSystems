@@ -48,10 +48,10 @@ export function useDeleteLocation() {
       if (result.success) {
         return handleDeleteSuccess(locationName);
       } else {
-        return handleDeleteFailure(result, 'Failed to delete location');
+        return handleDeleteFailure(result);
       }
     } catch (err) {
-      return handleDeleteFailure(null, 'An unexpected error occurred while deleting the location');
+      return handleDeleteFailure(err);
     } finally {
       isDeleting.value = false;
     }

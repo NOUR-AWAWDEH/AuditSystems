@@ -10,11 +10,13 @@ export function useCreateSubLocation() {
 
   const handleCreateSuccess = (response) => {
     createdSubLocation.value = response.result;
-    showNotification(response.message || 'SubLocation created successfully!', 'success');
+    const message = response.message || 'SubLocation created successfully!';
+    showNotification(message, 'success');
     return { success: true, data: response.result };
   };
   
   const handleCreateFailure = (response, defaultErrorMessage = 'Failed to create sublocation') => {
+    
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
@@ -22,24 +24,29 @@ export function useCreateSubLocation() {
     error.value = errorMessage;
     showNotification(errorMessage, 'error');
     
-    return {
+    const failureResult = {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
     };
+    
+    return failureResult;
   };
 
   const validateSubLocationData = (subLocationData) => {
+    
     if (!subLocationData.name?.trim()) {
       return 'SubLocation name is required';
     }
     if (!subLocationData.locationId) {
       return 'Location ID is required';
     }
+    
     return null;
   };
 
   const createSubLocation = async (subLocationData) => {
+    
     try {
         isCreating.value = true;
         error.value = null;
@@ -59,7 +66,6 @@ export function useCreateSubLocation() {
             return handleCreateFailure(response);
         }
     } catch (err) {
-        console.error('Create sublocation error:', err);
         return handleCreateFailure(err, err.message || 'Failed to create sublocation');
     } finally {
         isCreating.value = false;

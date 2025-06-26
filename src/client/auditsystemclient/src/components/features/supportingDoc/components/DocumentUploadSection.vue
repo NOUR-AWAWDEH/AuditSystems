@@ -12,10 +12,6 @@ const { showNotification, hideNotification } = useNotification();
 // Changed to true to show dialog automatically
 const uploadDialogOpen = ref(true);
 
-function openUploadDialog() {
-  uploadDialogOpen.value = true;
-}
-
 function closeUploadDialog() {
   uploadDialogOpen.value = false;
 }

@@ -1,33 +1,33 @@
-import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
+import api from '@/services/api/api';
 
 const SUBLOCATION_API_BASE_URL = '/api/SubLocation';
-
 export const searchSubLocationRepository = {
-    async searchSubLocations( searchParams = {}) {
+    async searchSubLocations(searchParams = {}) {
         try {
             const token = authService.getLocationToken();
+            
+            if (!token) {
+                throw new Error('Authentication token not found');
+            }
 
             const queryParams = new URLSearchParams();
 
+            // Add search parameters
             if (searchParams.searchTerm) {
                 queryParams.append('searchTerm', searchParams.searchTerm);
             }
-            if (searchParams.locationId) {
-                queryParams.append('locationId', searchParams.locationId);
-            }
-
-            if (searchParams.pageNumber) {
-                queryParams.append('pageNumber', searchParams.pageNumber);
+            
+            // Pagination parameters
+            if (searchParams.page) {
+                queryParams.append('page', searchParams.page);
             }
             if (searchParams.pageSize) {
                 queryParams.append('pageSize', searchParams.pageSize);
             }
-
-            if (searchParams.sortBy) {
-                queryParams.append('sortBy', searchParams.sortBy);
-            }
+            
+            // Sorting parameters
             if (searchParams.sortBy) {
                 queryParams.append('sortBy', searchParams.sortBy);
             }
@@ -36,17 +36,29 @@ export const searchSubLocationRepository = {
             }
 
             const queryString = queryParams.toString();
-            const url = `${SUBLOCATION_BASE_ENDPOINT}/search-sub-location/${searchParams.locationId}${queryString ? `?${queryString}` : ''}`;
+            const url = `${SUBLOCATION_API_BASE_URL}/search-sub-location${queryString ? `?${queryString}` : ''}`;
             
             const response = await api.get(url, {
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
-        }catch(error)
-        {
 
+            return ApiResponseT.success(response.data);
+            
+        } catch (error) {
+            console.error('Error searching sublocations:', error);
+            
+            if (error.response?.status === 401) {
+                return ApiResponseT.error('Unauthorized: Please login again');
+            }
+            
+            return ApiResponseT.error(
+                error.response?.data?.message || 
+                error.message || 
+                'Failed to search sublocations'
+            );
         }
     }
-}
+};

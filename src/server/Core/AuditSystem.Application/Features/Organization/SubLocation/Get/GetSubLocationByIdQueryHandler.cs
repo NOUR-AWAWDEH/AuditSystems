@@ -8,14 +8,9 @@ internal sealed class GetSubLocationByIdQueryHandler(
     ISubLocationService subLocationService) : 
     IRequestHandler<GetSubLocationByIdQuery,Result<GetSubLocationByIdQueryResponse>>
 {
-    public async Task<Result<GetSubLocationByIdQueryResponse>> Handle(GetSubLocationByIdQuery request, CancellationToken cancellationToken) 
+    public async Task<Result<GetSubLocationByIdQueryResponse>> Handle(GetSubLocationByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await subLocationService.GetSubLocationByIdAsync(request.Id);
-        if (result == null)
-        {
-            return Result.NotFound();
-        }
-
-        return Result<GetSubLocationByIdQueryResponse>.Success(new GetSubLocationByIdQueryResponse(result));
+        var subLocation = await subLocationService.GetSubLocationByIdAsync(request.Id, request.UserId);
+        return Result<GetSubLocationByIdQueryResponse>.Success(new GetSubLocationByIdQueryResponse(subLocation), "Sub-location retrieved successfully");
     }
 }

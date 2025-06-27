@@ -1,4 +1,7 @@
 ﻿using AuditSystem.Application.Constants;
+using AuditSystem.Application.Constants.Organization.Sublocation;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -7,7 +10,6 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using AuditSystem.BusinessLogic.Services.CacheServices;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
@@ -22,75 +24,188 @@ internal sealed class SubLocationService(
         cacheService,
         logger,
         CacheKeys.SubLocation,
-        SubLocationTags,
-        ListTags
+        SubLocationConstants.SubLocationTags,
+        SubLocationConstants.ListTags
     ),
     ISubLocationService
 {
-    private static readonly string[] SubLocationTags = ["sub-locations", "sub-location-list"];
-    private static readonly string[] ListTags = ["sub-location-list"];
+    private readonly SubLocationValidationHelper _validationHelper = new(repository);
+    private readonly SubLocationSearchHelper _searchHelper = new(repository, mapper, cacheService);
 
-    public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel)
+    public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
+        SubLocationValidationHelper.ValidateUserId(userId);
+        
+        logger.LogInformation("Creating sublocation for user {UserId}", userId);
 
-        var entity = mapper.Map<SubLocation>(subLocationModel);
-        var createdEntity = await repository.CreateAsync(entity);
+        try
+        {
+            await _validationHelper.ValidateLocationOwnershipAsync(subLocationModel.LocationId, userId);
 
-        var cacheKey = GetCacheKey(createdEntity.Id);
-        await SetCacheAsync(cacheKey, createdEntity);
+            var entity = mapper.Map<SubLocation>(subLocationModel);
+            var createdEntity = await repository.CreateAsync(entity);
 
-        return createdEntity.Id;
+            await CacheEntityAsync(createdEntity);
+
+            logger.LogInformation("Successfully created sublocation {SubLocationId} for user {UserId}", 
+                createdEntity.Id, userId);
+            
+            return createdEntity.Id;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create sublocation for user {UserId}", userId);
+            throw;
+        }
     }
-    
-    public async Task DeleteSubLocationAsync(Guid subLocationId)
-    {
-        var cacheKey = GetCacheKey(subLocationId);
-        
-        var entity = await repository.GetByIdAsync(subLocationId)
-            ?? throw new KeyNotFoundException($"SubLocation with ID {subLocationId} not found.");
 
-        await repository.DeleteAsync(subLocationId);
-        await ClearCacheAsync(cacheKey);
+    public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id, Guid userId)
+    {
+        SubLocationValidationHelper.ValidateUserId(userId);
+        
+        logger.LogDebug("Retrieving sublocation {SubLocationId} for user {UserId}", id, userId);
+
+        try
+        {
+            var cachedResult = await TryGetFromCacheWithValidationAsync(id, userId);
+            if (cachedResult != null)
+            {
+                logger.LogDebug("Retrieved sublocation {SubLocationId} from cache", id);
+                return cachedResult;
+            }
+
+            var entity = await _validationHelper.ValidateSubLocationOwnershipAsync(id, userId);
+            
+            await CacheEntityAsync(entity);
+            
+            return mapper.Map<SubLocationModel>(entity);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve sublocation {SubLocationId} for user {UserId}", id, userId);
+            throw;
+        }
     }
-    
-    public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id)
+
+    public async Task DeleteSubLocationAsync(Guid subLocationId, Guid userId)
     {
-        var cacheKey = GetCacheKey(id);
+        SubLocationValidationHelper.ValidateUserId(userId);
         
-        var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
-        if (cachedEntity != null)
-            return mapper.Map<SubLocationModel>(cachedEntity);
+        logger.LogInformation("Deleting sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
 
-        var entity = await repository.GetByIdAsync(id)
-            ?? throw new KeyNotFoundException($"SubLocation with ID '{id}' not found.");
+        try
+        {
+            await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationId, userId);
+            
+            await repository.DeleteAsync(subLocationId);
+            
+            await ClearEntityCacheAsync(subLocationId);
+            
+            logger.LogInformation("Successfully deleted sublocation {SubLocationId}", subLocationId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to delete sublocation {SubLocationId} for user {UserId}", 
+                subLocationId, userId);
+            throw;
+        }
+    }
 
-        await SetCacheAsync(cacheKey, entity);
+    public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
+    {
+        ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
+        SubLocationValidationHelper.ValidateUserId(userId);
         
-        return mapper.Map<SubLocationModel>(entity);
+        logger.LogInformation("Updating sublocation {SubLocationId} for user {UserId}", 
+            subLocationModel.Id, userId);
+
+        try
+        {
+            await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
+        
+            var entity = mapper.Map<SubLocation>(subLocationModel);
+            await repository.UpdateAsync(entity);
+        
+            await CacheEntityAsync(entity);
+            
+            logger.LogInformation("Successfully updated sublocation {SubLocationId}", subLocationModel.Id);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to update sublocation {SubLocationId} for user {UserId}", 
+                subLocationModel.Id, userId);
+            throw;
+        }
     }
 
     public async Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         
+        logger.LogDebug("Searching sublocations with name filter: {Name}", name ?? "(none)");
+        
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
+        {
+            logger.LogDebug("Retrieved search results from cache");
             return cachedResult;
+        }
 
         return await GetFromRepositoryAsync<SubLocationModel>(cacheKey, countCacheKey, page, name);
     }
 
-    public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel)
+    public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page? page)
     {
-        ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
+        SubLocationValidationHelper.ValidateUserId(userId);
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
         
-        var entity = mapper.Map<SubLocation>(subLocationModel);
-        await repository.UpdateAsync(entity);
+        logger.LogDebug("Searching sublocations for user {UserId} with term: {SearchTerm}", 
+            userId, searchTerm ?? "(none)");
         
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, page);
+    
+        var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+        {
+            logger.LogDebug("Retrieved user search results from cache");
+            return cachedResult;
+        }
+    
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
+    }
+
+    // Private helper methods
+    private async Task<SubLocationModel?> TryGetFromCacheWithValidationAsync(Guid id, Guid userId)
+    {
+        var cacheKey = GetCacheKey(id);
+        var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
+        
+        if (cachedEntity?.Location?.UserId == userId)
+        {
+            return mapper.Map<SubLocationModel>(cachedEntity);
+        }
+        
+        if (cachedEntity != null && cachedEntity.Location?.UserId != userId)
+        {
+            throw new UnauthorizedAccessException(
+                string.Format(SubLocationConstants.UnauthorizedAccessMessage, userId, id));
+        }
+        
+        return null;
+    }
+
+    private async Task CacheEntityAsync(SubLocation entity)
+    {
         var cacheKey = GetCacheKey(entity.Id);
         await SetCacheAsync(cacheKey, entity);
+    }
+
+    private async Task ClearEntityCacheAsync(Guid entityId)
+    {
+        var cacheKey = GetCacheKey(entityId);
+        await ClearCacheAsync(cacheKey);
     }
 }

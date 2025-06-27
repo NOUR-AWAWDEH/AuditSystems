@@ -5,9 +5,11 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 
 public interface ISubLocationService
 {
-    public Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel);
-    public Task UpdateSubLocationAsync(SubLocationModel subLocationModel);
-    public Task DeleteSubLocationAsync(Guid subLocationId);
-    public Task<SubLocationModel> GetSubLocationByIdAsync(Guid id);
-    public Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page);
+    Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel, Guid userId);
+    Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId);
+    Task DeleteSubLocationAsync(Guid subLocationId, Guid userId);
+    Task<SubLocationModel> GetSubLocationByIdAsync(Guid id, Guid userId);
+    Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page? page);
+    // The existing SearchAsync for admin/system use if needed
+    Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page);
 }

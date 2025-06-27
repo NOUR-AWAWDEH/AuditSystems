@@ -9,7 +9,11 @@ public interface IRepository<TId, TEntity>
 {
     Task<TEntity> CreateAsync(TEntity entity);
     Task CreateRangeAsync(IEnumerable<TEntity> entities);
+    Task<TEntity?> GetByIdAsync(TId id, Expression<Func<TEntity, object?>>[]? include = null);
     Task<TEntity?> GetByIdAsync(TId id);
+    // Add generic method for cross-entity queries
+    Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id) where TOtherEntity : class;
+    // Enhanced method with include support
     Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null);
     Task DeleteAsync(TId id);
     ValueTask DeleteRangeAsync(ICollection<TEntity> entities);
@@ -18,5 +22,4 @@ public interface IRepository<TId, TEntity>
     Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
     Task<ICollection<TResponse>> ProjectToAsync<TResponse>(IQueryable<TEntity> query);
     Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null);
-
 }

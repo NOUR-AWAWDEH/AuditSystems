@@ -28,7 +28,7 @@ export function useGetLocations() {
         error.value = errorMsg;
       }
     } catch (err) {
-      error.value = 'An error occurred while fetching locations';
+      error.value = err.message || 'An error occurred while fetching locations';
     } finally {
       isLoading.value = false;
     }

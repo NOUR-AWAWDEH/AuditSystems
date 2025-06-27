@@ -20,7 +20,7 @@ const {
 
 const { fetchDocumentsByUserId } = useFetchSupportingDocuments();
 const { authStatus, checkAuthStatus } = useAuthStatus();
-const { isDeleting, deleteSupportingDocument } = useDeleteSupportingDocument();
+const { deleteSupportingDocument } = useDeleteSupportingDocument();
 const { showNotification } = useNotification();
 const route = useRoute();
 

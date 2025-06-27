@@ -12,17 +12,8 @@ internal sealed class DeleteSubLocationCommandHandler(
 {
     public async Task<Result> Handle(DeleteSubLocationCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await subLocationService.DeleteSubLocationAsync(request.Id);
-            logger.LogInformation("Deleting sublocation with ID {Id}", request.Id);
-            return Result.SuccessWithMessage("Sublocation deleted successfully");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error deleting sublocation with ID {Id}", request.Id);
-            return Result.Error(ex.Message);
-        }  
+        await subLocationService.DeleteSubLocationAsync(request.Id, request.UserId);
+        return Result.Success();
     }
 }
 

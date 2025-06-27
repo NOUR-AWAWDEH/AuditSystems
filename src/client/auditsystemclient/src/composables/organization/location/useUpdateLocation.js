@@ -39,7 +39,7 @@ export function useUpdateLocation() {
         return { success: false, message: errorMsg, errors: result.errors };
       }
     } catch (err) {
-      const errorMsg = 'An error occurred while updating location';
+      const errorMsg =  err.message || 'An error occurred while updating location';
       error.value = errorMsg;
       return { success: false, message: errorMsg };
     } finally {

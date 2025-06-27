@@ -36,6 +36,28 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         return await _entities.FindAsync(id);
     }
 
+    // Enhanced GetByIdAsync with include support
+    public async Task<TEntity?> GetByIdAsync(TId id, params Expression<Func<TEntity, object?>>[] include)
+    {
+        IQueryable<TEntity> query = _entities.AsQueryable();
+        
+        if (include != null && include.Length > 0)
+        {
+            foreach (var includeProperty in include)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
+        
+        return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+    }
+
+    // Generic method for cross-entity queries
+    public async Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id) where TOtherEntity : class
+    {
+        return await context.Set<TOtherEntity>().FindAsync(id);
+    }
+
     public async Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null)
     {
         _entities.Update(entity);

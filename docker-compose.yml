@@ -11,10 +11,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - DB_CONNECTION_STRING=Data Source=SQL1003.site4now.net;Initial Catalog=db_ab89b4_auditsystem;User Id=db_ab89b4_auditsystem_admin;Password=Havana123%100;
       - JWT_KEY=AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765e
-      - JWT_ISSUER=http://localhost:7218
-      - JWT_AUDIENCE=http://localhost:7218
+      - JWT_ISSUER=https://auditsystem.onrender.com
+      - JWT_AUDIENCE=https://auditsystem.onrender.com
       - JWT_EXPIRATION_MINUTES=60
-      - APP_DOMAIN=http://localhost:7218
+      - APP_DOMAIN=https://auditsystem.onrender.com
       - APP_LOGGING_PATH=/logs/AuditSystem
       - APP_EMAIL_CONFIRMATION=confirm-email?uid={0}&token={1}
       - SMTP_SENDER_ADDRESS=no-reply@AuditSystemApp.com
@@ -24,3 +24,5 @@ services:
       - SMTP_HOST=sandbox.smtp.mailtrap.io
       - SMTP_PORT=2525
       - SMTP_ENABLE_SSL=true
+      - FILE_STORAGE_BASE_URL=https://auditsystem.onrender.com
+      - FILESTORAGE_UPLOADPATH=https://auditsystem.onrender.com/uploads

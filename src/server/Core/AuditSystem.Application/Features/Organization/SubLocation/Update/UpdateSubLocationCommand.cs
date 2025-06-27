@@ -9,4 +9,5 @@ public sealed record class UpdateSubLocationCommand : ICommand<Result>
     public required string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public required Guid LocationId { get; set; }
+    public Guid UserId { get; set; } = Guid.Empty;
 }

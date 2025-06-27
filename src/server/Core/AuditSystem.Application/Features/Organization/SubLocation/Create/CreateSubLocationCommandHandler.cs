@@ -16,9 +16,7 @@ internal sealed class CreateSubLocationCommandHandler(
     public async Task<Result<CreateSubLocationCommandResponse>> Handle(CreateSubLocationCommand request, CancellationToken cancellationToken)
     {
         var subLocationModel = mapper.Map<SubLocationModel>(request);
-        var subLocationId = await subLocationService.CreateSubLocationAsync(subLocationModel);
-        logger.LogInformation("SubLocation with Name {SubLocationName} has been created.", request.Name);
-
-        return Result<CreateSubLocationCommandResponse>.Created(new CreateSubLocationCommandResponse(subLocationId), "SubLocation created.");
+        var subLocationId = await subLocationService.CreateSubLocationAsync(subLocationModel, request.UserId);
+        return Result<CreateSubLocationCommandResponse>.Success(new CreateSubLocationCommandResponse(subLocationId));
     }
 }

@@ -3,11 +3,9 @@ using AuditSystem.Application.Base;
 
 namespace AuditSystem.Application.Features.Organization.SubLocation.Update;
 
-public sealed record class UpdateSubLocationCommand : ICommand<Result>
-{
-    public required Guid Id { get; init; } = Guid.Empty;
-    public required string Name { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
-    public required Guid LocationId { get; set; }
-    public Guid UserId { get; set; } = Guid.Empty;
-}
+public sealed record UpdateSubLocationCommand(
+    Guid Id,
+    string Name,
+    string? Address,
+    Guid LocationId
+) : UserAwareCommand<Result>;

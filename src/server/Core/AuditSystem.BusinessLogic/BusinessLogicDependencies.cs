@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.SupportingDocs.Delete;
+using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
@@ -85,7 +86,8 @@ public static class BusinessLogicDependencies
             SignedUrlSecret = Environment.GetEnvironmentVariable("SIGNED_URL_SECRET_KEY")
                 ?? throw new InvalidOperationException("Missing SIGNED_URL_SECRET_KEY in environment variables or .env file.")
         };
-
+        
+        // Register all other services
         services
             .AddMappers()
             .AddSingleton(fileStorageSettings)

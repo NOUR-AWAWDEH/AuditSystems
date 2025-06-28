@@ -1,6 +1,7 @@
 using Ardalis.Result;
+using AuditSystem.Application.Base;
 using MediatR;
 
 namespace AuditSystem.Application.Features.Organization.Location.Get.GetByUserId;
 
-public sealed record class GetLocationsByUserIdQuery(Guid UserId) : IRequest<Result<GetLocationsByUserIdQueryResponse>>;
+public sealed record GetLocationsByUserIdQuery : UserAwareQuery<Result<GetLocationsByUserIdQueryResponse>>;

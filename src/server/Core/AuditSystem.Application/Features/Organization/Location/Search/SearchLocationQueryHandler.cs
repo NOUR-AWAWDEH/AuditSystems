@@ -13,7 +13,8 @@ internal sealed class SearchLocationQueryHandler(ILocationService locationServic
     public async Task<Result<PaginationRequestResponse<LocationModel>>> Handle(SearchLocationQuery request, CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
-        var searchResult = await locationService.SearchAsync(request.SearchTerm, page);
+        // Add user filtering to the search
+        var searchResult = await locationService.SearchByUserIdAsync(request.UserId, request.SearchTerm, page);
         var response = new PaginationRequestResponse<LocationModel>(searchResult.Items, searchResult.TotalCount);
         return Result.Success(response);
     }

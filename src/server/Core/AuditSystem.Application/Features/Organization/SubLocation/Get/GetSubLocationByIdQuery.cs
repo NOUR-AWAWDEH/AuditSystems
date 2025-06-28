@@ -1,10 +1,9 @@
 using Ardalis.Result;
+using AuditSystem.Application.Base;
 using MediatR;
 
 namespace AuditSystem.Application.Features.Organization.SubLocation.Get;
 
-public sealed record class GetSubLocationByIdQuery : IRequest<Result<GetSubLocationByIdQueryResponse>>
-{
-    public required Guid Id { get; init; }
-    public Guid UserId { get; init; }
-}
+public sealed record GetSubLocationByIdQuery(
+    Guid Id
+) : UserAwareQuery<Result<GetSubLocationByIdQueryResponse>>;

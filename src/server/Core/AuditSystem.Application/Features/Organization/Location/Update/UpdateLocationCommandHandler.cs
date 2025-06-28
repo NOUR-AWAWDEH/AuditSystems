@@ -17,7 +17,7 @@ internal sealed class UpdateLocationCommandHandler(
     {
         var locationModel = mapper.Map<LocationModel>(request);
         
-        await locationService.UpdateLocationAsync(locationModel);
+        await locationService.UpdateLocationAsync(locationModel, request.UserId);
         logger.LogInformation("Location updated successfully with ID: {LocationId}", request.Id);
         return Result.SuccessWithMessage("Location updated successfully");
     }

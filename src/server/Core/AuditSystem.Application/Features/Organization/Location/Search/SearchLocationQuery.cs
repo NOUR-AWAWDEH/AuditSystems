@@ -1,9 +1,12 @@
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Contract.Interfaces;
 
 namespace AuditSystem.Application.Features.Organization.Location.Search;
 
-public sealed record class SearchLocationQuery : PaginationRequest<LocationModel>
+public sealed record SearchLocationQuery(
+    string? SearchTerm
+) : PaginationRequest<LocationModel>, IUserAwareRequest
 {
-    public string? SearchTerm { get; set; } = string.Empty;
+    public Guid UserId { get; set; }
 }

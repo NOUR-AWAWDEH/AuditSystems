@@ -10,7 +10,7 @@ internal sealed class GetLocationByIdQueryHandler(
 {
     public async Task<Result<GetLocationByIdQueryResponse>> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await locationService.GetLocationByIdAsync(request.Id);
+        var result = await locationService.GetLocationByIdAsync(request.Id, request.UserId);
         if (result == null)
         {
             return Result.NotFound();

@@ -11,12 +11,14 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuditSystem.BusinessLogic.Attributes;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[AutoInjectUserId]
 public sealed class SubLocationController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create SubLocation
@@ -24,32 +26,14 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<CreateSubLocationCommandResponse>), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateSubLocation([FromBody] CreateSubLocationCommand command)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var validationResult = ValidateCurrentUser(out var userId);
-        if (validationResult != null) return validationResult;
-        
-        command = command with { UserId = userId };
-        return await ProcessRequestToActionResultAsync(command);
-    }
+        => await ProcessRequestToActionResultAsync(command);
 
     //Update Sub Location
     [HttpPut("update-sub-location")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateSubLocation([FromBody] UpdateSubLocationCommand command)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var validationResult = ValidateCurrentUser(out var userId);
-        if (validationResult != null) return validationResult;
-        
-        command = command with { UserId = userId };
-        return await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    }
+        => await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Get Sub Location
     [HttpGet("get-sub-location")]
@@ -57,44 +41,27 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSubLocation([FromQuery] GetSubLocationByIdQuery query)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        => await ProcessRequestToActionResultAsync(query);
 
-        var validationResult = ValidateCurrentUser(out var userId);
-        if (validationResult != null) return validationResult;
-        
-        var queryWithUserId = query with { UserId = userId };
-        return await ProcessRequestToActionResultAsync(queryWithUserId);
-    }
+    //Get Sub Locations by User ID
+    [HttpGet("get-sub-locations-by-user")]
+    [ProducesResponseType(typeof(ApiResponse<GetSubLocationsByUserIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetSubLocationsByUserId([FromQuery] GetSubLocationsByUserIdQuery query)
+        => await ProcessRequestToActionResultAsync(query);
 
     //Delete Sub Location
-    [HttpDelete("delete-sub-location/{id:guid}")]
+    [HttpDelete("delete-sub-location-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteSubLocation(Guid id)
-    {
-        var validationResult = ValidateCurrentUser(out var userId);
-        if (validationResult != null) return validationResult;
-        
-        var command = new DeleteSubLocationCommand { Id = id, UserId = userId };
-        return await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    }
+        => await ProcessRequestToActionNoContentResultAsync<Result>(new DeleteSubLocationCommand(id));
 
     //Search Sub Location
     [HttpGet("search-sub-location")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SubLocationModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchSubLocation([FromQuery] SearchSubLocationQuery query)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var validationResult = ValidateCurrentUser(out var userId);
-        if (validationResult != null) return validationResult;
-        
-        query = query with { UserId = userId };
-        return await ProcessRequestToActionResultAsync(query);
-    }
+        => await ProcessRequestToActionResultAsync(query);
 }

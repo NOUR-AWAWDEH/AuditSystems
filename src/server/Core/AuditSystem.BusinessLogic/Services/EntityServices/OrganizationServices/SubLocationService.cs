@@ -10,6 +10,7 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
@@ -122,12 +123,12 @@ internal sealed class SubLocationService(
 
         try
         {
-            await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
+            var existingEntity = await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
         
-            var entity = mapper.Map<SubLocation>(subLocationModel);
-            await repository.UpdateAsync(entity);
+            mapper.Map(subLocationModel, existingEntity);
+            await repository.UpdateAsync(existingEntity);
         
-            await CacheEntityAsync(entity);
+            await CacheEntityAsync(existingEntity);
             
             logger.LogInformation("Successfully updated sublocation {SubLocationId}", subLocationModel.Id);
         }
@@ -207,5 +208,40 @@ internal sealed class SubLocationService(
     {
         var cacheKey = GetCacheKey(entityId);
         await ClearCacheAsync(cacheKey);
+    }
+
+    public async Task<ICollection<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId)
+    {
+        SubLocationValidationHelper.ValidateUserId(userId);
+        
+        logger.LogDebug("Retrieving all sublocations for user {UserId}", userId);
+    
+        try
+        {
+            // Create the LINQ query equivalent to your SQL
+            var query = repository.GetAll()
+                .Include(s => s.Location) // Include the Location navigation property
+                .Where(s => s.Location.UserId == userId)
+                .Select(s => new SubLocationModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    LocationId = s.LocationId,
+                    CreatedAt = s.CreatedAt,
+                    UpdatedAt = s.UpdatedAt,
+                    Address = s.Address
+                });
+    
+            // Execute the query and get results
+            var subLocations = await query.ToListAsync();
+            logger.LogDebug("Retrieved {Count} sublocations for user {UserId}", subLocations.Count, userId);
+            
+            return subLocations;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to retrieve sublocations for user {UserId}", userId);
+            throw;
+        }
     }
 }

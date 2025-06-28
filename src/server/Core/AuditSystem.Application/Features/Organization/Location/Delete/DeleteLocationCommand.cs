@@ -3,7 +3,6 @@ using AuditSystem.Application.Base;
 
 namespace AuditSystem.Application.Features.Organization.Location.Delete;
 
-public sealed class DeleteLocationCommand : ICommand<Result>
-{
-    public required Guid Id { get; set; } = Guid.Empty;
-}
+public sealed record DeleteLocationCommand(
+    Guid Id
+) : UserAwareCommand<Result>;

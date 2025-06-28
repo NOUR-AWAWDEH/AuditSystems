@@ -13,7 +13,7 @@ internal sealed class GetLocationsByUserIdQueryHandler(
     {
         var locations = await locationService.GetLocationsByUserIdAsync(request.UserId);
         
-        if (locations == null || !locations.Any())
+        if (locations == null || locations.Count == 0)
         {
             return Result<GetLocationsByUserIdQueryResponse>.Success(new GetLocationsByUserIdQueryResponse(new List<LocationModel>()));
         }

@@ -12,56 +12,57 @@ using AuditSystem.Application.Features.Organization.Location.Search;
 using AuditSystem.Contract.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using AuditSystem.Application.Features.Organization.Location.Get.GetByUserId;
+using AuditSystem.BusinessLogic.Attributes;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[AutoInjectUserId]
 public sealed class LocationController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Location
     [HttpPost("create-location")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<CreateLocationCommandResponse>), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateLocation([FromBody] CreateLocationCommand command) =>
-        await ProcessRequestToActionResultAsync(command);
+    public async Task<IActionResult> CreateLocation([FromBody] CreateLocationCommand command)
+        => await ProcessRequestToActionResultAsync(command);
 
     //Update Location
     [HttpPut("update-location")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+    public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationCommand command)
+        => await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
     //Get Location
-    [HttpGet("get-location")]
+    [HttpGet("get-location-by-id")]
     [ProducesResponseType(typeof(ApiResponse<GetLocationByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocation([FromQuery] GetLocationByIdQuery query) =>
-        await ProcessRequestToActionResultAsync(query);
-    
-    //Delete Location
-    [HttpDelete("delete-location")]
+    public async Task<IActionResult> GetLocation([FromQuery] GetLocationByIdQuery query)
+        => await ProcessRequestToActionResultAsync(query);
+
+    //Get Locations by User ID
+    [HttpGet("get-locations-by-user-id")]
+    [ProducesResponseType(typeof(ApiResponse<GetLocationsByUserIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetLocationsByUserId([FromQuery] GetLocationsByUserIdQuery query)
+        => await ProcessRequestToActionResultAsync(query);
+
+    //Delete Location by location id
+    [HttpDelete("delete-location-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteLocation([FromBody] DeleteLocationCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+    public async Task<IActionResult> DeleteLocation([FromBody] DeleteLocationCommand command)
+        => await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Location
-    [HttpGet("search-location")]
+    [HttpGet("search-location-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<LocationModel>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchLocation([FromQuery] SearchLocationQuery query) =>
-        await ProcessRequestToActionResultAsync(query);
-    
-    //Get Locations by User ID (based on user's company)
-    [HttpGet("get-locations-by-user/{userId}")]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<LocationModel>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocationsByUserId(Guid userId) =>
-        await ProcessRequestToActionResultAsync(new GetLocationsByUserIdQuery(userId));
+    public async Task<IActionResult> SearchLocationByUserId([FromQuery] SearchLocationQuery query)
+        => await ProcessRequestToActionResultAsync(query);
 }

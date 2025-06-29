@@ -206,7 +206,6 @@ if (!environment.IsProduction())
     app.UseHttpsRedirection();
 }
 
-app.UseStaticFiles();
 // Enable authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();

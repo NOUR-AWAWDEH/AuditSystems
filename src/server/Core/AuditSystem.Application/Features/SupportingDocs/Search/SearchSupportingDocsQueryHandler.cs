@@ -13,7 +13,7 @@ internal sealed class SearchSupportingDocsQueryHandler(ISupportingDocService sup
     public async Task<Result<PaginationRequestResponse<SupportingDocModel>>> Handle(SearchSupportingDocsQuery request, CancellationToken cancellationToken)
     {
        var page = new Page(request.PageNumber, request.PageSize);
-       var searchResult = await supportingDocService.SearchAsync(request.SearchTerm, page);
+       var searchResult = await supportingDocService.SearchByUserIdAsync(request.UserId, request.SearchTerm, page);
        var response = new PaginationRequestResponse<SupportingDocModel>(searchResult.Items, searchResult.TotalCount);
        return Result.Success(response);
     }

@@ -11,16 +11,14 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.SupportingDocs.Create.Upload;
 
 public class UploadSupportingDocCommandHandler(
-    IFileStorage fileStorage,
     ISupportingDocService supportingDocService,
     ILogger<UploadSupportingDocCommandHandler> logger)
-    : IRequestHandler<UploadSupportingDocCommand, Result<Guid>>
+    : IRequestHandler<UploadSupportingDocCommand, Result<UploadSupportingDocCommandResponse>>
 {
-    private readonly IFileStorage _fileStorage = fileStorage ?? throw new ArgumentNullException(nameof(fileStorage));
     private readonly ISupportingDocService _supportingDocService = supportingDocService ?? throw new ArgumentNullException(nameof(supportingDocService));
     private readonly ILogger<UploadSupportingDocCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-    public async Task<Result<Guid>> Handle(UploadSupportingDocCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UploadSupportingDocCommandResponse>> Handle(UploadSupportingDocCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -30,25 +28,14 @@ public class UploadSupportingDocCommandHandler(
                 return Result.Error("File cannot be empty");
             }
 
-            var fileSaveResult = await _fileStorage.SaveFileAsync(request.File, request.UserId, "SupportingDocs" , request.FileName);
-            if (!fileSaveResult.IsSuccess)
+            var docId = await _supportingDocService.CreateSupportingDocAsync(request.File, request.FileName, request.UserId);
+            if (!docId.IsSuccess)
             {
-                return Result.Error(new ErrorList(fileSaveResult.Errors));
+                return Result.Error(new ErrorList(docId.Errors));
             }
 
-            var supportingDocModel = new SupportingDocModel
-            {
-                Id = Guid.NewGuid(),
-                UserId = request.UserId,
-                FileName = fileSaveResult.Value.SavedFileName,
-                FileSize = fileSaveResult.Value.FileSize,
-                DriveFileId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            var docId = await _supportingDocService.CreateSupportingDocAsync(supportingDocModel);
-            return Result.Success(docId, "File uploaded successfully");
+            var response = new UploadSupportingDocCommandResponse(docId.Value);
+            return Result.Success(response, "File uploaded successfully");
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
         {

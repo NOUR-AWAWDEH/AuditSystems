@@ -1,10 +1,12 @@
 using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Interfaces;
 using AuditSystem.Contract.Models.Organization;
 
 namespace AuditSystem.Application.Features.Organization.SubLocation.Search;
 
-public sealed record class SearchSubLocationQuery : PaginationRequest<SubLocationModel>
+public sealed record SearchSubLocationQuery(
+    string? SearchTerm
+) : PaginationRequest<SubLocationModel>, IUserAwareRequest
 {
-    public string? SearchTerm { get; set; } = string.Empty;
-    public Guid UserId { get; set; } = Guid.Empty;
+    public Guid UserId { get; set; }
 }

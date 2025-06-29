@@ -6,11 +6,11 @@ public sealed class GetSupportingDocsByUserIdQueryValidator : AbstractValidator<
 {
     public GetSupportingDocsByUserIdQueryValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.UserId)
             .NotEmpty()
-            .WithMessage("Supporting Doc Id is required")
+            .WithMessage("User Id is required")
             .Must(BeAValidGuid)
-            .WithMessage("Supporting Doc Id must be a valid Guid");
+            .WithMessage("User Id must be a valid Guid");
     }
 
     private bool BeAValidGuid(Guid id)

@@ -14,17 +14,17 @@ internal sealed class GetSupportingDocsByUserIdQueryHandler(
     {
         try
         {
-            var result = await supportingDocService.GetSupportingDocsByUserIdAsync(request.Id);
+            var result = await supportingDocService.GetSupportingDocsByUserIdAsync(request.UserId);
             return Result.Success(new GetSupportingDocsByUserIdQueryResponse(result), "Documents retrieved successfully.");
         }
         catch (KeyNotFoundException ex)
         {
-            logger.LogWarning(ex, "No supporting documents found for user ID: {UserId}", request.Id);
+            logger.LogWarning(ex, "No supporting documents found for user ID: {UserId}", request.UserId);
             return Result.NotFound();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected error occurred while retrieving supporting documents for user ID: {UserId}", request.Id);
+            logger.LogError(ex, "Unexpected error occurred while retrieving supporting documents for user ID: {UserId}", request.UserId);
             return Result.Error("Failed to retrieve supporting documents.");
         }
     }

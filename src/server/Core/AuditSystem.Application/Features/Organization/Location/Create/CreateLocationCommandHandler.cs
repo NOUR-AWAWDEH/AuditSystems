@@ -16,7 +16,7 @@ internal sealed class CreateLocationCommandHandler(
     public async Task<Result<CreateLocationCommandResponse>> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
     {
         var locationModel = mapper.Map<LocationModel>(request);
-        var locationId = await locationService.CreateLocationAsync(locationModel);
+        var locationId = await locationService.CreateLocationAsync(locationModel, request.UserId);
         logger.LogInformation("Location with Name {LocationName} has been created.", request.Name);
 
         return Result<CreateLocationCommandResponse>.Created(new(locationId), "Location created.");

@@ -5,10 +5,10 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 
 public interface ILocationService
 {
-    public Task<Guid> CreateLocationAsync(LocationModel locationModel);
-    public Task UpdateLocationAsync(LocationModel locationModel);
-    public Task DeleteLocationAsync(Guid locationId);
-    public Task<LocationModel> GetLocationByIdAsync(Guid id);
-    public Task<IEnumerable<LocationModel>> GetLocationsByUserIdAsync(Guid userId);
-    public Task<PaginationResult<LocationModel>> SearchAsync(string? name, Page page);
+    Task<Guid> CreateLocationAsync(LocationModel locationModel, Guid userId);
+    Task UpdateLocationAsync(LocationModel locationModel, Guid userId);
+    Task DeleteLocationAsync(Guid locationId, Guid userId);
+    Task<LocationModel> GetLocationByIdAsync(Guid id, Guid userId);
+    Task<ICollection<LocationModel>> GetLocationsByUserIdAsync(Guid userId);
+    Task<PaginationResult<LocationModel>> SearchByUserIdAsync(Guid userId, string? name, Page page);
 }

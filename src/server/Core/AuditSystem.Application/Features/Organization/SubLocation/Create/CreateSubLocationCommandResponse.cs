@@ -1,3 +1,3 @@
 ﻿namespace AuditSystem.Application.Features.Organization.SubLocation.Create;
 
-public sealed record class CreateSubLocationCommandResponse(Guid SubLocationId);
+public sealed record CreateSubLocationCommandResponse(Guid SubLocationId);

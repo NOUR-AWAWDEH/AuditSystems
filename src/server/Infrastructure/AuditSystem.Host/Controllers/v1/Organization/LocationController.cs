@@ -41,19 +41,18 @@ public sealed class LocationController(IMediator mediator) : ApiControllerBase(m
     [ProducesResponseType(typeof(ApiResponse<GetLocationByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocation([FromBody] GetLocationByIdQuery query)
+    public async Task<IActionResult> GetLocation([FromQuery] GetLocationByIdQuery query)
         => await ProcessRequestToActionResultAsync(query);
 
     //Get Locations by User ID
     [HttpGet("get-locations-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<GetLocationsByUserIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetLocationsByUserId([FromBody] GetLocationsByUserIdQuery query)
+    public async Task<IActionResult> GetLocationsByUserId([FromQuery] GetLocationsByUserIdQuery query)
         => await ProcessRequestToActionResultAsync(query);
 
     //Delete Location by location id
     [HttpDelete("delete-location-by-id")]
-
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]

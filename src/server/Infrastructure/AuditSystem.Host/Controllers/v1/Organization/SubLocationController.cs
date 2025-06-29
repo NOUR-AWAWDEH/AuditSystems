@@ -43,23 +43,23 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
     public async Task<IActionResult> GetSubLocation([FromQuery] GetSubLocationByIdQuery query)
         => await ProcessRequestToActionResultAsync(query);
 
-    //Get Sub Locations by User ID
+    //Get Sub-Locations by User ID
     [HttpGet("get-sub-locations-by-user")]
     [ProducesResponseType(typeof(ApiResponse<GetSubLocationsByUserIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetSubLocationsByUserId([FromQuery] GetSubLocationsByUserIdQuery query)
         => await ProcessRequestToActionResultAsync(query);
 
-    //Delete Sub Location
+    //Delete Sub-Location by ID
     [HttpDelete("delete-sub-location-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSubLocation(Guid id)
-        => await ProcessRequestToActionNoContentResultAsync<Result>(new DeleteSubLocationCommand(id));
+    public async Task<IActionResult> DeleteSubLocation([FromBody] DeleteSubLocationCommand command)
+        => await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Sub Location
-    [HttpGet("search-sub-location")]
+    [HttpGet("search-sub-location-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<SubLocationModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchSubLocation([FromQuery] SearchSubLocationQuery query)

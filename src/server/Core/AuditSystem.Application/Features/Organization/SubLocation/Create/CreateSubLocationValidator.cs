@@ -15,6 +15,8 @@ public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLoca
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("SubLocation Name is required.")
+            .MinimumLength(2)
+            .WithMessage("SubLocation Name must be at least 2 characters.")
             .MaximumLength(200)
             .WithMessage("SubLocation Name must not exceed 200 characters.");
     }

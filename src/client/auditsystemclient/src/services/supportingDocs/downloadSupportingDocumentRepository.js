@@ -1,8 +1,8 @@
-import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
+import api from '@/services/api/api';
 
-const SUPPORTING_DOCS_BASE_URL = 'api/SupportingDocs';
+const SUPPORTING_DOCS_BASE_URL = 'api/supportingdocs';
 
 export const downloadSupportingDocumentRepository = {
   
@@ -11,9 +11,10 @@ export const downloadSupportingDocumentRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const url = `${SUPPORTING_DOCS_BASE_URL}/download/${fileId}`;
+      const url = `${SUPPORTING_DOCS_BASE_URL}/get-supporting-doc-url-by-id`;
       
       const response = await api.get(url, {
+        params: { id: fileId },
         headers: {
           'Authorization': `Bearer ${token}`
         }

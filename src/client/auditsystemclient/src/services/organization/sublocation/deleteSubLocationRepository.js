@@ -9,7 +9,7 @@ export const deleteSubLocationRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location`, {
+      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location-by-id`, {
         data: { id: subLocationId },
         headers: {
           'Authorization': `Bearer ${token}`,

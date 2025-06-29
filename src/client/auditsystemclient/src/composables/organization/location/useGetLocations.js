@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { getLocationsRepository } from '@/services/organization/location/getLocationsRepository';
+import { getLocationsRepository } from '@/services/organization/location/getLocationsByUserIdRepository';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 export function useGetLocations() {
@@ -9,17 +9,12 @@ export function useGetLocations() {
   const { authStatus } = useAuthStatus();
 
   const fetchLocations = async () => {
-    if (!authStatus.value?.userId) {
-      const errorMsg = 'User not authenticated';
-      error.value = errorMsg;
-      return;
-    }
-
     isLoading.value = true;
     error.value = null;
 
     try {
-      const result = await getLocationsRepository.getLocationsByUserId(authStatus.value.userId);
+      // Fixed: Remove userId parameter due to UserAware pattern
+      const result = await getLocationsRepository.getLocationsByUserId();
       
       if (result.success) {
         locations.value = result.result?.locations || [];

@@ -36,53 +36,45 @@ export function useCreateLocation() {
     if (!locationData.companyId) {
       return 'Company ID is required';
     }
-    if (!locationData.userId) {
-      return 'User ID is required';
-    }
     return null;
   };
 
   const createLocation = async (locationData) => {
     try {
-        isCreating.value = true;
-        error.value = null;
-        createdLocation.value = null;
+      isCreating.value = true;
+      error.value = null;
+      createdLocation.value = null;
 
-        // Validate required fields
-        const validationError = validateLocationData(locationData);
-        if (validationError) {
-          return handleCreateFailure({ message: validationError });
-        }
+      // Validate input data
+      const validationError = validateLocationData(locationData);
+      if (validationError) {
+        return handleCreateFailure({ message: validationError });
+      }
 
-        const response = await createLocationRepository.createLocation(locationData);
-
-        if (response?.success) {
-            return handleCreateSuccess(response);
-        } else {
-            return handleCreateFailure(response);
-        }
+      const result = await createLocationRepository.createLocation(locationData);
+      
+      if (result.success) {
+        return handleCreateSuccess(result);
+      } else {
+        return handleCreateFailure(result);
+      }
     } catch (err) {
-        console.error('Create location error:', err);
-        return handleCreateFailure(err, err.message || 'Failed to create location');
+      return handleCreateFailure(err, err.message || 'Create failed');
     } finally {
-        isCreating.value = false;
+      isCreating.value = false;
     }
   };
 
-  const resetState = () => {
+  const clearState = () => {
     error.value = null;
     createdLocation.value = null;
-    isCreating.value = false;
   };
 
   return {
-    // State
     isCreating,
     error,
     createdLocation,
-
-    // Actions
     createLocation,
-    resetState,
+    clearState
   };
 }

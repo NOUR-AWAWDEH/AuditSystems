@@ -1,17 +1,15 @@
-// src/services/supportingDocs/fetchSupportingDocumentsRepository.js
-
 import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/SupportingDocs';
+const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
 
 export const supportingDocsRepository = {
-  async getSupportingDocumentsByUserId(userId) {
+  async getSupportingDocumentsByUserId() {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}/user/${userId}`, {
+      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}/get-supporting-docs-by-user-id`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

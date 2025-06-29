@@ -1,7 +1,7 @@
-import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
+import api from '@/services/api/api';
 
-const DELETE_ENDPOINT = 'api/supportingdocs';
+const DELETE_ENDPOINT = 'api/supportingdocs/delete-supporting-doc-by-id';
 
 export const deleteSupportingDocumentRepository = {
   async deleteSupportingDocument(documentId, token) {

@@ -1,6 +1,6 @@
-import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import axios from 'axios';
+import api from '@/services/api/api';
 
 const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
 

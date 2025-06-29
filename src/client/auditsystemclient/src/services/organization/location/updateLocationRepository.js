@@ -9,13 +9,12 @@ export const updateLocationRepository = {
     try {
       const token = authService.getLocalToken();
       
-      // Ensure all required fields are present
+      // Note: With UserAware pattern, userId is automatically injected
       const payload = {
         id: locationData.id,
         name: locationData.name,
         address: locationData.address || null,
-        companyId: locationData.companyId,
-        userId: locationData.userId
+        companyId: locationData.companyId
       };
       
       const response = await api.put(`${LOCATION_BASE_ENDPOINT}/update-location`, payload, {

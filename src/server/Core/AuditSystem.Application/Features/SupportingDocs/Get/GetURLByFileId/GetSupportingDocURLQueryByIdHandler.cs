@@ -16,7 +16,7 @@ internal class GetSupportingDocURLQueryByIdHandler(
 
     public async Task<Result<GetSupportingDocURLQueryByIdResponse>> Handle(GetSupportingDocURLQueryById request, CancellationToken cancellationToken)
     {
-        var supportingDoc = await _supportingDocService.GetSupportingDocByIdAsync(request.Id);
+        var supportingDoc = await _supportingDocService.GetSupportingDocByIdAsync(request.Id, request.UserId);
         if (supportingDoc is null)
         {
             return Result.NotFound("Document not found.");

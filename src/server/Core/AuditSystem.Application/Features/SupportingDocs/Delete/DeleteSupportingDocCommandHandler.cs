@@ -13,14 +13,14 @@ internal sealed class DeleteSupportingDocCommandHandler(
     {
         try
         {
-            await supportingDocService.DeleteSupportingDocAsync(request.Id);
-            logger.LogInformation("Supporting doc with id: {Id} was deleted", request.Id);
+            await supportingDocService.DeleteSupportingDocAsync(request.Id, request.UserId);
+            logger.LogInformation("Supporting doc with id: {Id} was deleted for user {UserId}", request.Id, request.UserId);
             return Result.SuccessWithMessage("Supporting document deleted successfully.");
 
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while deleting Supporting Document with ID {Id}.", request.Id);
+            logger.LogError(ex, "An error occurred while deleting Supporting Document with ID {Id} for user {UserId}.", request.Id, request.UserId);
             return Result.Error(ex.Message);
         }
     }

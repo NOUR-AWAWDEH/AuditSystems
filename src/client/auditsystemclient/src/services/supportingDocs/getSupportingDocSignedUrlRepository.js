@@ -4,7 +4,7 @@ import api from '@/services/api/api';
 
 const SUPPORTING_DOCS_BASE_URL = 'api/supportingdocs';
 
-export const downloadSupportingDocumentRepository = {
+export const getSupportingDocSignedUrlRepository = {
   
   async getSupportingDocSignedUrl(fileId) {
     

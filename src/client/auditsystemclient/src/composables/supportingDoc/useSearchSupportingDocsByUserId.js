@@ -1,7 +1,7 @@
 import { ref } from 'vue';
-import { searchSupportingDocumentRepository } from '@/services/supportingDocs/searchSupportingDocument';
+import { searchSupportingDocsByUserIdRepository } from '@/services/supportingDocs/searchSupportingDocsByUserIdRepository';
 
-export function useSearch() {
+export function useSearchSupportingDocsByUserId() {
   const searchResults = ref([]);
   const isSearching = ref(false);
   const searchError = ref(null);
@@ -15,7 +15,7 @@ export function useSearch() {
     searchError.value = null;
     
     try {
-      const response = await searchSupportingDocumentRepository.searchSupportingDocumentsByUserId(
+      const response = await searchSupportingDocsByUserIdRepository.searchSupportingDocsByUserId(
         term,
         pageNumber,
         size
@@ -52,34 +52,11 @@ export function useSearch() {
     searchTerm.value = '';
   };
 
-  const goToPage = async (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= Math.ceil(totalCount.value / pageSize.value)) {
-      return await searchSupportingDocuments(searchTerm.value, pageNumber, pageSize.value);
-    }
-  };
-
-  const nextPage = async () => {
-    const nextPageNumber = currentPage.value + 1;
-    if (nextPageNumber <= Math.ceil(totalCount.value / pageSize.value)) {
-      return await goToPage(nextPageNumber);
-    }
-  };
-
-  const previousPage = async () => {
-    const prevPageNumber = currentPage.value - 1;
-    if (prevPageNumber >= 1) {
-      return await goToPage(prevPageNumber);
-    }
-  };
-
-  const changePageSize = async (newSize) => {
-    pageSize.value = newSize;
-    currentPage.value = 1; // Reset to first page when changing page size
-    return await searchSupportingDocuments(searchTerm.value, 1, newSize);
+  const resetPagination = () => {
+    currentPage.value = 1;
   };
 
   return {
-    // State
     searchResults,
     isSearching,
     searchError,
@@ -87,13 +64,8 @@ export function useSearch() {
     currentPage,
     pageSize,
     searchTerm,
-    
-    // Methods
     searchSupportingDocuments,
     clearSearch,
-    goToPage,
-    nextPage,
-    previousPage,
-    changePageSize
+    resetPagination,
   };
 }

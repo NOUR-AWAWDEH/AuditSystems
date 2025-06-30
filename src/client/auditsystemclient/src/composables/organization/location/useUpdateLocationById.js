@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { updateLocationRepository } from '@/services/organization/location/updateLocationRepository';
+import { updateLocationByIdRepository } from '@/services/organization/location/updateLocationByIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useUpdateLocation() {
+export function useUpdateLocationById() {
   const isUpdating = ref(false);
   const error = ref(null);
   const { showNotification } = useNotification();
@@ -20,7 +20,8 @@ export function useUpdateLocation() {
 
     try {
       // Note: userId is automatically injected due to UserAware pattern
-      const result = await updateLocationRepository.updateLocation(locationData);
+      const result = await updateLocationByIdRepository.updateLocationById(locationData);
+
       
       if (result.success) {
         showNotification(result.message || 'Location updated successfully', 'success');

@@ -4,7 +4,8 @@ import api from '@/services/api/api';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
-export const searchSubLocationRepository = {
+export const searchSubLocationByUserIdRepository = {
+
     async searchSubLocationsByUserId(searchParams = {}) {
         try {
             const token = authService.getLocalToken();

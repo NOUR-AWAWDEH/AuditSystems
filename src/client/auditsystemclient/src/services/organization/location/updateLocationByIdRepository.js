@@ -4,19 +4,20 @@ import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
 
-export const searchLocationRepository = {
-  async searchLocationsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10) {
+export const updateLocationByIdRepository = {
+  async updateLocationById(locationData) {
     try {
       const token = authService.getLocalToken();
       
-      const params = {
-        searchTerm: searchTerm || '',
-        pageNumber,
-        pageSize
+      // Note: With UserAware pattern, userId is automatically injected
+      const payload = {
+        id: locationData.id,
+        name: locationData.name,
+        address: locationData.address || null,
+        companyId: locationData.companyId
       };
       
-      const response = await api.get(`${LOCATION_BASE_ENDPOINT}/search-location-by-user-id`, {
-        params,
+      const response = await api.put(`${LOCATION_BASE_ENDPOINT}/update-location`, payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -24,23 +25,23 @@ export const searchLocationRepository = {
       });
 
       if (response.data && response.status === 200) {
-        if (response.data.success && response.data.result) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'Locations searched successfully.');
+        if (response.data.success) {
+          return ApiResponseT.ok(response.data.result, response.data.message || 'Location updated successfully.');
         } else if (response.data.success === false) {
           return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to search locations.' }], 
-            response.data.message || 'Failed to search locations.'
+            response.data.errors || [{ message: response.data.message || 'Failed to update location.' }], 
+            response.data.message || 'Failed to update location.'
           );
         }
       }
 
       return ApiResponseT.badRequest(
         [{ message: 'Unexpected response format' }],
-        'Failed to search locations'
+        'Failed to update location'
       );
 
     } catch (error) {
-      console.error('Search locations error:', error);
+      console.error('Update location error:', error);
       
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
@@ -54,8 +55,15 @@ export const searchLocationRepository = {
         return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
       }
       
+      if (error.response?.status === 404) {
+        return ApiResponseT.notFound(
+          [{ message: 'Location not found' }],
+          'Location not found'
+        );
+      }
+      
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while searching locations.' }],
+        [{ message: error.message || 'An unexpected error occurred while updating location.' }],
         'Server error'
       );
     }

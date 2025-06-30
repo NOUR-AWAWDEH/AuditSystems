@@ -4,7 +4,7 @@ import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
 
-export const getLocationsRepository = {
+export const getLocationsByUserIdRepository = {
   // Get locations by user ID (UserAware - no userId parameter needed)
   async getLocationsByUserId() { 
     try {

@@ -9,7 +9,8 @@ export const getSubLocationByIdRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-location`, {
+      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-location-by-id`, {
+
         params: { id: subLocationId },
         headers: {
           'Authorization': `Bearer ${token}`,

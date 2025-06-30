@@ -1,9 +1,8 @@
 import { ref, computed } from 'vue';
-import { downloadSupportingDocumentRepository } from '@/services/supportingDocs/downloadSupportingDocumentRepository';
+import { getSupportingDocSignedUrlRepository } from '@/services/supportingDocs/getSupportingDocSignedUrlRepository';
 import { useDecodeDownload } from '@/composables/download/useDecodeDownload';
 
-export function useSupportingDocDownload() {
-  
+export function useGetSupportingDocSignedUrl() {
   const isGettingUrl = ref(false);
   const urlError = ref(null);
   
@@ -17,14 +16,13 @@ export function useSupportingDocDownload() {
   } = useDecodeDownload();
 
   const downloadSupportingDocument = async (fileId) => {
-    
     try {
       isGettingUrl.value = true;
       urlError.value = null;
-      resetDownloadState(); // Reset download state
+      resetDownloadState();
 
       // Step 1: Get signed URL from supporting docs repository
-      const signedUrlResult = await downloadSupportingDocumentRepository.getSupportingDocSignedUrl(fileId);
+      const signedUrlResult = await getSupportingDocSignedUrlRepository.getSupportingDocSignedUrl(fileId);
       
       if (!signedUrlResult.success) {
         urlError.value = signedUrlResult.message || 'Failed to get signed URL';
@@ -47,7 +45,6 @@ export function useSupportingDocDownload() {
       isGettingUrl.value = false;
       
       // Step 2: Use the decode download composable to download the file
-      // Don't pass preferredFileName - let backend determine the filename
       const downloadResult = await downloadFileFromSignedUrl(signedUrl);      
       return downloadResult;
     } catch (error) {

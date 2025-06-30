@@ -1,7 +1,7 @@
 <script setup>
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import { useNotification } from "@/composables/notification/useNotification";
-import { useSupportingDocDownload } from "@/composables/supportingDoc/useSupportingDocDownload";
+import { useGetSupportingDocSignedUrl } from "@/composables/supportingDoc/useGetSupportingDocSignedUrl";
 
 defineProps({
   documents: {
@@ -15,9 +15,9 @@ const emit = defineEmits(['delete-document']);
 const { showNotification } = useNotification();
 const { 
   isLoading: isDownloadLoading, 
-  downloadSupportingDocument,
+  downloadSupportingDocument,  // Changed from getSignedUrl
   resetAllStates 
-} = useSupportingDocDownload();
+} = useGetSupportingDocSignedUrl();
 
 const documentTableColumns = [
   { key: 'fileName', label: 'File Name' },

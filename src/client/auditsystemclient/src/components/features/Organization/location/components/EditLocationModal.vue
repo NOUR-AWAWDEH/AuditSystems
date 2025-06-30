@@ -57,7 +57,7 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-import { useUpdateLocation } from '@/composables/organization/location/useUpdateLocation';
+import { useUpdateLocation } from '@/composables/organization/location/useUpdateLocationById';
 
 const props = defineProps({
   isVisible: {

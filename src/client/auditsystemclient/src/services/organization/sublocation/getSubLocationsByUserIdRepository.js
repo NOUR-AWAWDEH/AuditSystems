@@ -4,12 +4,13 @@ import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
-export const getSubLocationsRepository = {
+export const getSubLocationsByUserIdRepository = {
   async getSubLocationsByUserId() {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-locations-by-user`, {
+      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-locations-by-user-id`, {
+
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

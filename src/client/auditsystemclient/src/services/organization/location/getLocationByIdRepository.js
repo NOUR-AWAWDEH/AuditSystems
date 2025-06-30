@@ -5,7 +5,7 @@ import authService from '@/services/auth/authRepos/authService';
 const LOCATION_BASE_ENDPOINT = 'api/Location';
 
 export const getLocationByIdRepository = {
-  // Get single location by ID
+
   async getLocationById(locationId) {
     try {
       const token = authService.getLocalToken();

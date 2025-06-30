@@ -1,8 +1,10 @@
 import { ref } from 'vue';
-import { searchLocationRepository } from '@/services/organization/location/searchLocationRepository';
+import { searchLocationByUserIdRepository } from '@/services/organization/location/searchLocationByUserIdRepository';
+
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSearchLocation() {
+export function useSearchLocationByUserId() {
+
   const searchResults = ref([]);
   const isSearching = ref(false);
   const error = ref(null);
@@ -18,7 +20,7 @@ export function useSearchLocation() {
     pageSize.value = pageSizeParam;
 
     try {
-      const result = await searchLocationRepository.searchLocationsByUserId(
+      const result = await searchLocationByUserIdRepository.searchLocationsByUserId(
         searchTerm, 
         pageNumber, 
         pageSizeParam

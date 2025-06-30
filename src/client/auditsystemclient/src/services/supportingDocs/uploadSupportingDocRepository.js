@@ -4,8 +4,8 @@ import api from '@/services/api/api';
 
 const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
 
-export const uploadSupportingDocumentRepository = {
-  async uploadSupportingDocument({ file, userId, fileName, token }) {
+export const uploadSupportingDocRepository = {
+  async uploadSupportingDoc({ file, userId, fileName, token }) {
     try {
       // Prepare form data - EXACT parameter names matter!
       const formData = new FormData();

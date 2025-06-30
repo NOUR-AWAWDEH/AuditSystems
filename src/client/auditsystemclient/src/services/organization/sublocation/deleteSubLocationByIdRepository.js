@@ -4,34 +4,26 @@ import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
-export const updateSubLocationRepository = {
-  async updateSubLocation(subLocationData) {
+export const deleteSubLocationByIdRepository = {
+  async deleteSubLocationById(subLocationId) {
     try {
       const token = authService.getLocalToken();
       
-      const payload = {
-        id: subLocationData.id,
-        name: subLocationData.name,
-        address: subLocationData.address || '',
-        locationId: typeof subLocationData.locationId === 'object' 
-          ? subLocationData.locationId.value || subLocationData.locationId.id || subLocationData.locationId
-          : subLocationData.locationId
-      };
-      
-      const response = await api.put(`${SUBLOCATION_BASE_ENDPOINT}/update-sub-location`, payload, {
+      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location-by-id`, {
+        data: { id: subLocationId },
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (response.status === 200 || response?.data?.success !== false) {
-        return ApiResponseT.ok(null, response.data?.message || 'SubLocation updated successfully');
+      if (response.status === 204 || response?.data?.success !== false) {
+        return ApiResponseT.ok(null, 'SubLocation deleted successfully');
       }
 
       const errors = Array.isArray(response?.data?.errors)
         ? response.data.errors
-        : [{ message: response?.data?.message || 'Update failed' }];
+        : [{ message: response?.data?.message || 'Delete failed' }];
       return ApiResponseT.badRequest(errors, response?.data?.message);
 
     } catch (error) {
@@ -55,7 +47,7 @@ export const updateSubLocationRepository = {
       }
       
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while updating sublocation.' }],
+        [{ message: error.message || 'An unexpected error occurred while deleting sublocation.' }],
         'Server error'
       );
     }

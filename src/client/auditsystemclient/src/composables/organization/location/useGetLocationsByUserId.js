@@ -1,12 +1,11 @@
 import { ref } from 'vue';
-import { getLocationsRepository } from '@/services/organization/location/getLocationsByUserIdRepository';
-import { useAuthStatus } from '@/composables/auth/useAuthStatus';
+import { getLocationsByUserIdRepository } from '@/services/organization/location/getLocationsByUserIdRepository';
 
-export function useGetLocations() {
+export function useGetLocationsByUserId() {
+
   const locations = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
-  const { authStatus } = useAuthStatus();
 
   const fetchLocations = async () => {
     isLoading.value = true;
@@ -14,7 +13,7 @@ export function useGetLocations() {
 
     try {
       // Fixed: Remove userId parameter due to UserAware pattern
-      const result = await getLocationsRepository.getLocationsByUserId();
+      const result = await getLocationsByUserIdRepository.getLocationsByUserId();
       
       if (result.success) {
         locations.value = result.result?.locations || [];

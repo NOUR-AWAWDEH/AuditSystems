@@ -1,5 +1,6 @@
 import { ref } from 'vue';
-import { getSubLocationsRepository } from '@/services/organization/sublocation/getSubLocationsByUserIdRepository';
+import { getSubLocationsByUserIdRepository } from '@/services/organization/sublocation/getSubLocationsByUserIdRepository';
+
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubLocationsByUserId() {
@@ -34,7 +35,8 @@ export function useGetSubLocationsByUserId() {
       error.value = null;
       sublocations.value = [];
 
-      const response = await getSubLocationsRepository.getSubLocationsByUserId();
+      const response = await getSubLocationsByUserIdRepository.getSubLocationsByUserId();
+
 
       if (response?.success) {
         return handleFetchSuccess(response);

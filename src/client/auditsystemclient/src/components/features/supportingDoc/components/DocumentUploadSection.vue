@@ -1,12 +1,16 @@
 <script setup>
 import { ref } from "vue";
-import { useUploadSupportingDocument } from "@/composables/supportingDoc/useUploadSupportingDocuments";
+import { useUploadSupportingDoc } from "@/composables/supportingDoc/useUploadSupportingDoc";
+import { useGetSupportingDocsByUserId } from "@/composables/supportingDoc/useGetSupportingDocsByUserId";
+import { useAuthStatus } from "@/composables/auth/useAuthStatus";
 import { useNotification } from "@/composables/notification/useNotification";
 import FileUploadDialog from "./FileUploadDialog.vue";
 
 const emit = defineEmits(['document-uploaded', 'documents-refreshed']);
 
-const { uploadSupportingDocument, isUploading, uploadProgress, error: uploadError } = useUploadSupportingDocument();
+const { uploadSupportingDocument, isUploading, uploadProgress, error: uploadError } = useUploadSupportingDoc();
+const { fetchDocumentsByUserId } = useGetSupportingDocsByUserId();
+const { authStatus } = useAuthStatus();
 const { showNotification, hideNotification } = useNotification();
 
 // Changed to true to show dialog automatically
@@ -27,7 +31,13 @@ async function handleFileUpload({ file, fileName }) {
     hideNotification();
 
     if (result.success) {
-      emit('documents-refreshed', result.documents);
+      // Fetch updated documents list after successful upload
+      if (authStatus.value?.userId) {
+        const documentsResponse = await fetchDocumentsByUserId(authStatus.value.userId);
+        if (documentsResponse?.success) {
+          emit('documents-refreshed', documentsResponse.result);
+        }
+      }
       showNotification("Document uploaded successfully", "success");
     } else {
       showNotification(result.message || uploadError.value || "Upload failed", "error");

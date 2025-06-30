@@ -67,8 +67,8 @@ import LocationHierarchyTable from './components/LocationHierarchyTable.vue';
 import EditLocationModal from './components/EditLocationModal.vue';
 import AddSublocationModal from '../sublocation/AddSublocationModal.vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { useGetLocations } from '@/composables/organization/location/useGetLocations';
-import { useDeleteLocation } from '@/composables/organization/location/useDeleteLocation';
+import { useGetLocations } from '@/composables/organization/location/useGetLocationsByUserId';
+import { useDeleteLocation } from '@/composables/organization/location/useDeleteLocationById';
 import { useGetSublocations } from '@/composables/organization/sublocation/useGetSublocations';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 

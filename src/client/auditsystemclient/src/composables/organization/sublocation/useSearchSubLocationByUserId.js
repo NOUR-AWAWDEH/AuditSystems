@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { searchSubLocationRepository } from '@/services/organization/sublocation/searchSubLocationRepository';
+import { searchSubLocationByUserIdRepository } from '@/services/organization/sublocation/searchSubLocationByUserIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSearchSubLocation() {
+export function useSearchSubLocationByUserId() {
   const searchResults = ref([]);
   const isSearching = ref(false);
   const error = ref(null);
@@ -51,7 +51,7 @@ export function useSearchSubLocation() {
       if (searchParams.page !== undefined) currentPage.value = searchParams.page;
       if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-      const response = await searchSubLocationRepository.searchSubLocationsByUserId(params);
+      const response = await searchSubLocationByUserIdRepository.searchSubLocationsByUserId(params);
 
       if (response?.success) {
         return handleSearchSuccess(response);

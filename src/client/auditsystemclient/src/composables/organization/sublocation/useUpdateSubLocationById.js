@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { updateSubLocationRepository } from '@/services/organization/sublocation/updateSubLocationRepository';
+import { updateSubLocationByIdRepository } from '@/services/organization/sublocation/updateSubLocationByIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useUpdateSubLocation() {
+export function useUpdateSubLocationById() {
   const isUpdating = ref(false);
   const error = ref(null);
   const updatedSubLocation = ref(null);
@@ -55,7 +55,7 @@ export function useUpdateSubLocation() {
         return handleUpdateFailure({ message: validationError });
       }
 
-      const response = await updateSubLocationRepository.updateSubLocation(subLocationData);
+      const response = await updateSubLocationByIdRepository.updateSubLocation(subLocationData);
 
       if (response?.success) {
         return handleUpdateSuccess(response);

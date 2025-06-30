@@ -4,8 +4,8 @@ import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
 
-export const deleteLocationRepository = {
-  async deleteLocation(locationId) {
+export const deleteLocationByIdRepository = {
+  async deleteLocationById(locationId) {
     try {
       const token = authService.getLocalToken();
       

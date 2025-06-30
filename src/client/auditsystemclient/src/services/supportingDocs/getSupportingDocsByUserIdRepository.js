@@ -4,8 +4,8 @@ import authService from '@/services/auth/authRepos/authService';
 
 const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
 
-export const supportingDocsRepository = {
-  async getSupportingDocumentsByUserId() {
+export const getSupportingDocsByUserIdRepository = {
+  async getSupportingDocsByUserId() {
     try {
       const token = authService.getLocalToken();
       

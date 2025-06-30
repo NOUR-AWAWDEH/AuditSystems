@@ -57,7 +57,8 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-import { useUpdateLocation } from '@/composables/organization/location/useUpdateLocationById';
+import { useUpdateLocationById } from '@/composables/organization/location/useUpdateLocationById';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const props = defineProps({
   isVisible: {
@@ -72,14 +73,14 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'updated']);
 
-const { isUpdating, updateLocation } = useUpdateLocation();
+const { isUpdating, updateLocation } = useUpdateLocationById();
+const { authStatus } = useAuthStatus();
 
 const formData = ref({
   name: '',
   address: ''
 });
 
-// Watch for location prop changes to populate form
 watch(() => props.location, (newLocation) => {
   if (newLocation) {
     formData.value = {
@@ -95,7 +96,8 @@ const handleSubmit = async () => {
   const result = await updateLocation({
     id: props.location.id,
     name: formData.value.name.trim(),
-    address: formData.value.address.trim() || null
+    address: formData.value.address.trim() || null,
+    companyId: authStatus.value?.companyId
   });
   
   if (result.success) {

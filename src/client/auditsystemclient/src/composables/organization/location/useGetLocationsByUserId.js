@@ -7,7 +7,7 @@ export function useGetLocationsByUserId() {
   const isLoading = ref(false);
   const error = ref(null);
 
-  const fetchLocations = async () => {
+  const fetchLocationsByUserId = async () => {
     isLoading.value = true;
     error.value = null;
 
@@ -47,7 +47,7 @@ export function useGetLocationsByUserId() {
     locations,
     isLoading,
     error,
-    fetchLocations,
+    fetchLocationsByUserId,
     addLocation,
     removeLocation,
     updateLocation

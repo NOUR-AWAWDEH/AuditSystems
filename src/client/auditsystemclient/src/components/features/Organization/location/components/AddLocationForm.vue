@@ -68,7 +68,7 @@ const newLocation = ref({
     address: ''
 });
 
-const { isCreating, error, createLocation, resetState } = useCreateLocation();
+const { isCreating, error, createLocation, clearState } = useCreateLocation();
 const { authStatus, checkAuthStatus, initCheck } = useAuthStatus();
 
 // Initialize authentication check on component mount
@@ -88,7 +88,7 @@ const resetForm = () => {
         name: '',
         address: ''
     };
-    resetState();
+    clearState();
 };
 
 const handleAddLocation = async () => {

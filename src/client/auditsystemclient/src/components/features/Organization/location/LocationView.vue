@@ -67,9 +67,9 @@ import LocationHierarchyTable from './components/LocationHierarchyTable.vue';
 import EditLocationModal from './components/EditLocationModal.vue';
 import AddSublocationModal from '../sublocation/AddSublocationModal.vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { useGetLocations } from '@/composables/organization/location/useGetLocationsByUserId';
-import { useDeleteLocation } from '@/composables/organization/location/useDeleteLocationById';
-import { useGetSublocations } from '@/composables/organization/sublocation/useGetSublocations';
+import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
+import { useDeleteLocationById } from '@/composables/organization/location/useDeleteLocationById';
+import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const showDeleteDialog = ref(false);
@@ -87,16 +87,16 @@ const showAddSublocationModal = ref(false);
 const selectedLocationId = ref(null);
 
 const { showNotification } = useNotification();
-const { isLoading, locations, fetchLocations, removeLocation } = useGetLocations();
-const { isLoading: isSublocationsLoading, sublocations, fetchSublocations } = useGetSublocations();
-const { deleteLocation } = useDeleteLocation();
+const { isLoading, locations, fetchLocationsByUserId, removeLocation } = useGetLocationsByUserId();
+const { isLoading: isSublocationsLoading, sublocations, getSubLocationsByUserId } = useGetSubLocationsByUserId();
+const { deleteLocation } = useDeleteLocationById();
 const { initCheck } = useAuthStatus();
 
 // Function to refresh data
 const refreshData = async () => {
   await initCheck();
-  await fetchLocations();
-  await fetchSublocations();
+  await fetchLocationsByUserId();
+  await getSubLocationsByUserId();
 };
 
 // Handle page visibility change to refresh data when user returns to tab
@@ -126,8 +126,7 @@ onBeforeUnmount(() => {
 });
 
 const handleLocationAdded = async (newLocation) => {
-  await fetchLocations();
-  // Show success notification
+  await fetchLocationsByUserId();
   showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
 };
 
@@ -142,13 +141,8 @@ const handleCloseEditModal = () => {
 };
 
 const handleLocationUpdated = async (updatedLocation) => {
-  // Refresh the locations list to get the updated data
-  await fetchLocations();
-  
-  // Show success notification
+  await fetchLocationsByUserId();
   showNotification(`Location "${updatedLocation.name}" has been updated successfully!`, 'success');
-  
-  // Close the modal
   handleCloseEditModal();
 };
 
@@ -172,12 +166,13 @@ const handleCloseAddSublocationModal = () => {
 };
 
 const handleSublocationAdded = async (newSublocation) => {
-  await fetchSublocations();
+  await getSubLocationsByUserId();
   showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
   handleCloseAddSublocationModal();
 };
 
-const handleEditSublocation = () => {
+// Add these missing methods:
+const handleEditSublocation = (sublocation) => {
   // TODO: Implement edit sublocation functionality
   showNotification('Edit sublocation functionality coming soon!', 'info');
 };
@@ -200,7 +195,6 @@ const confirmDelete = async () => {
         removeLocation(itemToDelete.value.id);
       }
     } else if (deleteType.value === 'sublocation') {
-      // TODO: Implement delete sublocation functionality
       showNotification('Delete sublocation functionality coming soon!', 'info');
     }
     

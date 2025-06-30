@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 import { getSubLocationsByUserIdRepository } from '@/services/organization/sublocation/getSubLocationsByUserIdRepository';
-
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubLocationsByUserId() {

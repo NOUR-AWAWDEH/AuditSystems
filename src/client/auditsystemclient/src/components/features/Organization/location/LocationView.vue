@@ -13,7 +13,7 @@
             />
             <LocationHierarchyTable 
                 :locations="locations"
-                :sublocations="sublocations"
+                :sublocations="Array.isArray(sublocations) ? sublocations : []"
                 :is-loading="isLoading || isSublocationsLoading"
                 @edit-location="handleEditLocation"
                 @delete-location="handleDeleteLocation"
@@ -156,6 +156,7 @@ const handleDeleteLocation = (location) => {
 
 // Sublocation handlers
 const handleAddSublocation = (locationId) => {
+  console.log('handleAddSublocation called with:', locationId);
   selectedLocationId.value = locationId;
   showAddSublocationModal.value = true;
 };

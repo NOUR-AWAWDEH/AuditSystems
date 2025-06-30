@@ -1,6 +1,6 @@
 <template>
     <HierarchicalTable
-        :data="locations"
+        :data="hierarchicalData"
         :columns="locationColumns"
         :is-loading="isLoading"
         title="Locations & Sublocations"
@@ -10,7 +10,7 @@
         parent-key="locationId"
         :parent-actions="locationActions"
         :child-actions="sublocationActions"
-        @add-child="$emit('add-sublocation', $event)"
+        @add-child="handleAddSublocation"
         @edit-parent="$emit('edit-location', $event)"
         @delete-parent="$emit('delete-location', $event)"
         @edit-child="$emit('edit-sublocation', $event)"
@@ -19,12 +19,17 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import HierarchicalTable from '@/components/common/HierarchicalTable.vue';
 
-defineProps({
+const props = defineProps({
     locations: {
         type: Array,
         required: true
+    },
+    sublocations: {
+        type: Array,
+        default: () => []
     },
     isLoading: {
         type: Boolean,
@@ -32,13 +37,34 @@ defineProps({
     }
 });
 
-defineEmits([
+const emit = defineEmits([
     'edit-location', 
     'delete-location', 
     'add-sublocation',
     'edit-sublocation', 
     'delete-sublocation'
 ]);
+
+// Handle add sublocation event
+const handleAddSublocation = (item) => {
+    // Emit the location ID (use 'id' property of the location)
+    emit('add-sublocation', item.id);
+};
+
+// Combine locations with their sublocations
+const hierarchicalData = computed(() => {
+    return props.locations.map(location => {
+        // Find sublocations that belong to this location
+        const locationSublocations = props.sublocations.filter(
+            sublocation => sublocation.locationId === location.id
+        );
+        
+        return {
+            ...location,
+            sublocations: locationSublocations
+        };
+    });
+});
 
 const locationColumns = [
     { key: 'name', label: 'Name' },

@@ -4,12 +4,12 @@ import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
-export const deleteSubLocationRepository = {
-  async deleteSubLocation(subLocationId) {
+export const deleteSubLocationByIdRepository = {
+  async deleteSubLocationById(subLocationId) {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location`, {
+      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location-by-id`, {
         data: { id: subLocationId },
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,8 +1,9 @@
 import { ref } from 'vue';
-import { deleteLocationRepository } from '@/services/organization/location/deleteLocationRepository';
+import { deleteLocationByIdRepository } from '@/services/organization/location/deleteLocationByIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useDeleteLocation() {
+export function useDeleteLocationById() {
+
   const isDeleting = ref(false);
   const error = ref(null);
   const deleteStatus = ref(null);
@@ -43,7 +44,7 @@ export function useDeleteLocation() {
     deleteStatus.value = null;
 
     try {
-      const result = await deleteLocationRepository.deleteLocation(locationId);
+      const result = await deleteLocationByIdRepository.deleteLocationById(locationId);
       
       if (result.success) {
         return handleDeleteSuccess(locationName);

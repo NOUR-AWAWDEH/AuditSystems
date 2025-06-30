@@ -1,9 +1,7 @@
-// src/composables/supportingDoc/useFetchSupportingDocuments.js
-
 import { ref } from 'vue';
-import { supportingDocsRepository } from '@/services/supportingDocs/fetchSupportingDocumentsRepository';
+import { getSupportingDocsByUserIdRepository } from '@/services/supportingDocs/getSupportingDocsByUserIdRepository';
 
-export function useFetchSupportingDocuments() {
+export function useGetSupportingDocsByUserId() {
   const documents = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
@@ -14,22 +12,21 @@ export function useFetchSupportingDocuments() {
     documents.value = [];
 
     try {
-      const response = await supportingDocsRepository.getSupportingDocumentsByUserId(userId);
+      const response = await getSupportingDocsByUserIdRepository.getSupportingDocsByUserId(userId);
 
       if (response && response.success) {
         documents.value = response.result || [];
-        return response; // Return the response object
+        return response;
       } else {
         error.value = response?.message || response?.errors?.[0]?.message || 'Failed to fetch supporting documents.';
         documents.value = [];
-        return response; // Return the response object even on failure
+        return response;
       }
     } catch (err) {
       error.value = err.message || 'An unexpected error occurred while fetching documents.';
       documents.value = [];
       return { success: false, message: err.message || 'An unexpected error occurred while fetching documents.' };
-    }
-    finally {
+    } finally {
       isLoading.value = false;
     }
   };

@@ -36,7 +36,7 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
         => await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Get Sub Location
-    [HttpGet("get-sub-location")]
+    [HttpGet("get-sub-location-by-id")]
     [ProducesResponseType(typeof(ApiResponse<GetSubLocationByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -44,7 +44,7 @@ public sealed class SubLocationController(IMediator mediator) : ApiControllerBas
         => await ProcessRequestToActionResultAsync(query);
 
     //Get Sub-Locations by User ID
-    [HttpGet("get-sub-locations-by-user")]
+    [HttpGet("get-sub-locations-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<GetSubLocationsByUserIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetSubLocationsByUserId([FromQuery] GetSubLocationsByUserIdQuery query)

@@ -5,9 +5,9 @@ import DocumentUploadSection from "./components/DocumentUploadSection.vue";
 import DocumentsTable from "./components/DocumentsTable.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import { useDocumentManager } from "./composables/useDocumentManager";
-import { useFetchSupportingDocuments } from "@/composables/supportingDoc/useFetchSupportingDocuments";
+import { useGetSupportingDocsByUserId } from "@/composables/supportingDoc/useGetSupportingDocsByUserId";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
-import { useDeleteSupportingDocument } from "@/composables/supportingDoc/useDeleteSupportingDocument";
+import { useDeleteSupportingDocById } from "@/composables/supportingDoc/useDeleteSupportingDocById";
 import { useNotification } from "@/composables/notification/useNotification";
 import authService from "@/services/auth/authRepos/authService";
 import { useRoute } from 'vue-router';
@@ -18,9 +18,9 @@ const {
   removeDocument
 } = useDocumentManager();
 
-const { fetchDocumentsByUserId } = useFetchSupportingDocuments();
+const { fetchDocumentsByUserId } = useGetSupportingDocsByUserId();
 const { authStatus, checkAuthStatus } = useAuthStatus();
-const { deleteSupportingDocument } = useDeleteSupportingDocument();
+const { deleteSupportingDocumentById } = useDeleteSupportingDocById();
 const { showNotification } = useNotification();
 const route = useRoute();
 
@@ -96,7 +96,7 @@ async function confirmDelete() {
   if (!documentToDelete.value) return;
   
   try {
-    const result = await deleteSupportingDocument(documentToDelete.value.id);
+    const result = await deleteSupportingDocumentById(documentToDelete.value.id);
     
     if (result.success) {
       // Remove from local state

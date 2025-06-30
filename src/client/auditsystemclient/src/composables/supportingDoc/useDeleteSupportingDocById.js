@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { deleteSupportingDocumentRepository } from '@/services/supportingDocs/deleteSupportingDocumentRepository';
+import { deleteSupportingDocByIdRepository } from '@/services/supportingDocs/deleteSupportingDocByIdRepository';
 import authService from '@/services/auth/authRepos/authService';
 
-export function useDeleteSupportingDocument() {
+export function useDeleteSupportingDocById() {
   const isDeleting = ref(false);
   const error = ref(null);
   const deleteStatus = ref(null);
@@ -25,7 +25,7 @@ export function useDeleteSupportingDocument() {
     return deleteStatus.value;
   };
 
-  const deleteSupportingDocument = async (documentId) => {
+  const deleteSupportingDocumentById = async (documentId) => {
     try {
       isDeleting.value = true;
       error.value = null;
@@ -36,8 +36,8 @@ export function useDeleteSupportingDocument() {
         throw new Error('No authentication token found');
       }
 
-      const response = await deleteSupportingDocumentRepository.deleteSupportingDocument(documentId, token);
-      
+      const response = await deleteSupportingDocByIdRepository.deleteSupportingDocById(documentId, token);
+
       if (response?.success) {
         return handleDeleteSuccess();
       } else {
@@ -54,6 +54,6 @@ export function useDeleteSupportingDocument() {
     isDeleting,
     error,
     deleteStatus,
-    deleteSupportingDocument,
+    deleteSupportingDocumentById,
   };
 }

@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { deleteSubLocationRepository } from '@/services/organization/sublocation/deleteSubLocationRepository';
+import { deleteSubLocationByIdRepository } from '@/services/organization/sublocation/deleteSubLocationByIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useDeleteSubLocation() {
+export function useDeleteSubLocationById() {
   const isDeleting = ref(false);
   const error = ref(null);
   const deletedSubLocation = ref(null);
@@ -51,7 +51,7 @@ export function useDeleteSubLocation() {
         return handleDeleteFailure({ message: validationError });
       }
 
-      const response = await deleteSubLocationRepository.deleteSubLocation(subLocationId);
+      const response = await deleteSubLocationByIdRepository.deleteSubLocationById(subLocationId);
 
       if (response?.success) {
         return handleDeleteSuccess(response);

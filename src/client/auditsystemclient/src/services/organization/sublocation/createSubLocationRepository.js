@@ -6,7 +6,6 @@ const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
 
 export const createSubLocationRepository = {
   async createSubLocation(subLocationData) {
-    
     try {
       const token = authService.getLocalToken();
       

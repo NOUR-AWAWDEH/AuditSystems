@@ -2,11 +2,13 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
-const SUBLOCATION_API_BASE_URL = '/api/SubLocation';
-export const searchSubLocationRepository = {
-    async searchSubLocations(searchParams = {}) {
+const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+
+export const searchSubLocationByUserIdRepository = {
+
+    async searchSubLocationsByUserId(searchParams = {}) {
         try {
-            const token = authService.getLocationToken();
+            const token = authService.getLocalToken();
             
             if (!token) {
                 throw new Error('Authentication token not found');
@@ -36,7 +38,7 @@ export const searchSubLocationRepository = {
             }
 
             const queryString = queryParams.toString();
-            const url = `${SUBLOCATION_API_BASE_URL}/search-sub-location${queryString ? `?${queryString}` : ''}`;
+            const url = `${SUBLOCATION_BASE_ENDPOINT}/search-sub-location-by-user-id${queryString ? `?${queryString}` : ''}`;
             
             const response = await api.get(url, {
                 headers: {

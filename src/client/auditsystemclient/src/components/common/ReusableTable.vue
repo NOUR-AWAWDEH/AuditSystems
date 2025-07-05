@@ -1,5 +1,3 @@
-
-
 <template>
   <div>
     <!-- Mobile Card View -->
@@ -8,6 +6,7 @@
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base"></div>
         <p class="mt-2 text-gray-600 text-sm">Loading data...</p>
       </div>
+
       <div v-else-if="items.length === 0" class="text-center py-8 text-gray-base">
         <div class="text-gray-400 mb-2">
           <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,21 +15,34 @@
         </div>
         <p class="text-sm">{{ noDataMessage }}</p>
       </div>
+
       <div v-else class="space-y-3">
         <div 
           v-for="(item, index) in items" 
           :key="item[itemKey] || index"
-          class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          class="rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          :class="{
+            'bg-white': !(item.isChild || item.isSubLocation),
+            'bg-primary-soft': item.isChild || item.isSubLocation,
+            'cursor-pointer': !!$attrs['onRow-click']
+          }"
           @click="$emit('row-click', item)"
-          :class="{'cursor-pointer': !!$attrs['onRow-click']}"
         >
           <div v-if="showSrNo" class="text-xs text-gray-500 mb-3 font-medium">
             {{ index + 1 }}
           </div>
+
+          <div v-if="(item.isChild || item.isSubLocation) && item.locationName" class="text-sm mb-3 pb-2 border-b border-gray-200">
+            <span class="text-gray-500 font-semibold">Location Name  </span>
+            <span class="text-gray-800 font-medium">{{ item.locationName }}</span>
+          </div>
+
           <div class="space-y-3">
-            <div v-for="column in columns" :key="column.key" class="">
+            <div v-for="column in columns" :key="column.key">
               <div class="flex flex-col space-y-1">
-                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ column.label }}</span>
+                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  {{ (item.isChild || item.isSubLocation) && column.key === 'hierarchy' ? 'Sublocation Name:' : column.label }}
+                </span>
                 <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]" :column="column">
                   <span v-if="column.type === 'date'" class="text-sm text-gray-900 font-medium">
                     {{ formatDate(item[column.key]) }}
@@ -42,6 +54,7 @@
               </div>
             </div>
           </div>
+
           <div v-if="actions.length > 0" class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
             <button
               v-for="action in actions"
@@ -122,7 +135,6 @@
 </template>
 
 <script setup>
-// Add this line
 defineOptions({
   inheritAttrs: false
 });
@@ -130,37 +142,36 @@ defineOptions({
 defineProps({
   columns: {
     type: Array,
-    required: true, // Example: [{ key: 'name', label: 'Name' }, { key: 'email', label: 'Email' }]
+    required: true
   },
   items: {
     type: Array,
-    required: true,
+    required: true
   },
   itemKey: {
     type: String,
-    default: 'id', // Unique key for each item in the items array
+    default: 'id'
   },
   showSrNo: {
     type: Boolean,
-    default: true,
+    default: true
   },
   isLoading: {
     type: Boolean,
-    default: false,
+    default: false
   },
   noDataMessage: {
     type: String,
-    default: 'No data available.',
+    default: 'No data available.'
   },
   actions: {
     type: Array,
-    default: () => [], // Example: [{label: 'Edit', event: 'edit-item', class: 'text-blue-500'}, {label: 'Delete', event: 'delete-item', class: 'text-red-500'}]
+    default: () => []
   }
 });
 
 defineEmits(['row-click', 'edit-item', 'delete-item', 'view-item', 'download-item']);
 
-// Helper function for date formatting
 function formatDate(dateString) {
   if (!dateString) return 'N/A';
   try {
@@ -172,7 +183,6 @@ function formatDate(dateString) {
 </script>
 
 <style scoped>
-/* Enhanced mobile responsiveness */
 @media (max-width: 640px) {
   .space-y-3 > * + * {
     margin-top: 0.75rem;

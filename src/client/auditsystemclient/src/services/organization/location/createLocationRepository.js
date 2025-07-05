@@ -19,7 +19,7 @@ export const createLocationRepository = {
       const response = await api.post(`${LOCATION_BASE_ENDPOINT}/create-location`, payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json' 
         }
       });
 

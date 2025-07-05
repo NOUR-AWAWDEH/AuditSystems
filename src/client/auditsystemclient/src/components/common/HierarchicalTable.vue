@@ -11,15 +11,22 @@
                 :actions="[]"
                 :show-sr-no="showSrNo"
                 :no-data-message="noDataMessage"
+                @row-click="handleRowClick"
+                class="hierarchical-table"
             >
                 <!-- Custom hierarchy cell with indentation -->
+                <!-- In the hierarchy cell template -->
                 <template #cell-hierarchy="{ item, value }">
                     <div :class="['flex items-center', getIndentationClass(item)]">
-                        <!-- Expand/Collapse button for items with children -->
+                        <!-- Enhanced expand/collapse button -->
                         <button
                             v-if="!item[childIndicatorKey] && hasChildren(item)"
-                            @click="toggleChildren(item[itemKey])"
-                            class="mr-2 p-1 hover:bg-gray-100 rounded transition-colors"
+                            @click.stop="toggleChildren(item[itemKey])"
+                            class="mr-2 p-1 hover:bg-gray-100 rounded transition-colors flex items-center"
+                            :class="{
+                                'bg-blue-50 text-blue-600': isExpanded(item[itemKey]),
+                                'text-gray-500': !isExpanded(item[itemKey])
+                            }"
                         >
                             <svg 
                                 :class="['w-4 h-4 transition-transform', isExpanded(item[itemKey]) ? 'rotate-90' : '']"
@@ -29,17 +36,23 @@
                             >
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
+                            <span class="ml-1 text-xs" v-if="hasChildren(item)">
+                                ({{ item[childrenKey].length }})
+                            </span>
                         </button>
                         
-                        <!-- Child indicator -->
-                        <div v-if="item[childIndicatorKey]" class="mr-2 text-gray-400">
+                        <!-- Sublocation indicator -->
+                        <div v-if="item[childIndicatorKey]" class="mr-2 text-blue-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
                             </svg>
                         </div>
                         
                         <span :class="getTextClass(item)">
                             {{ value }}
+                            <span v-if="!item[childIndicatorKey] && hasChildren(item)" class="text-sm text-gray-500 ml-2">
+                                ({{ isExpanded(item[itemKey]) ? 'Hide' : 'Show' }} {{ item[childrenKey].length }} sublocation{{ item[childrenKey].length !== 1 ? 's' : '' }})
+                            </span>
                         </span>
                     </div>
                 </template>
@@ -68,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import ReusableTable from './ReusableTable.vue';
 
 const props = defineProps({
@@ -143,6 +156,12 @@ const props = defineProps({
     childTextClass: {
         type: String,
         default: 'text-gray-700'
+    },
+    
+    // New prop for default expansion
+    expandByDefault: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -158,6 +177,22 @@ defineEmits([
 // Track expanded items
 const expandedItems = ref(new Set());
 
+// Check if item has children
+const hasChildren = (item) => {
+    return item[props.childrenKey] && item[props.childrenKey].length > 0;
+};
+
+// Auto-expand based on prop
+onMounted(() => {
+    if (props.expandByDefault && props.data) {
+        props.data.forEach(item => {
+            if (hasChildren(item)) {
+                expandedItems.value.add(item[props.itemKey]);
+            }
+        });
+    }
+});
+
 // Toggle children visibility
 const toggleChildren = (itemId) => {
     if (expandedItems.value.has(itemId)) {
@@ -170,11 +205,6 @@ const toggleChildren = (itemId) => {
 // Check if item is expanded
 const isExpanded = (itemId) => {
     return expandedItems.value.has(itemId);
-};
-
-// Check if item has children
-const hasChildren = (item) => {
-    return item[props.childrenKey] && item[props.childrenKey].length > 0;
 };
 
 // Get indentation class for item
@@ -209,7 +239,6 @@ const enhancedColumns = computed(() => {
 const flattenedItems = computed(() => {
     const items = [];
     
-    // Fix: Use props.data instead of props.items
     if (!props.data) return items;
     
     props.data.forEach(item => {
@@ -235,4 +264,56 @@ const flattenedItems = computed(() => {
     
     return items;
 });
+
+// Add this method to the script section
+const handleRowClick = (item) => {
+    // Only handle clicks on parent items (locations)
+    if (!item[props.childIndicatorKey] && hasChildren(item)) {
+        toggleChildren(item[props.itemKey]);
+    }
+    // Emit the row-click event for other handling
+    emit('row-click', item);
+};
 </script>
+
+<style scoped>
+/* Enhanced styling for dropdown-like appearance */
+.hierarchical-table .table-row {
+    transition: all 0.2s ease;
+}
+
+.hierarchical-table .parent-row {
+    background-color: #f8fafc;
+    border-left: 3px solid #3b82f6;
+}
+
+.hierarchical-table .parent-row:hover {
+    background-color: #e2e8f0;
+    cursor: pointer;
+}
+
+.hierarchical-table .child-row {
+    background-color: #ffffff;
+    border-left: 3px solid #e5e7eb;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.expand-button {
+    transition: all 0.2s ease;
+}
+
+.expand-button:hover {
+    transform: scale(1.1);
+}
+</style>

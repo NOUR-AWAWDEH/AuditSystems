@@ -9,8 +9,11 @@ export function useGetSubLocationsByUserId() {
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
-    sublocations.value = response.result || [];
-    return { success: true, data: response.result };
+    // Fix: Extract subLocations array from the nested result object
+    const sublocationData = response.result?.subLocations || [];
+    sublocations.value = sublocationData;
+    console.log('🎯 Mapped sublocation data:', sublocationData);
+    return { success: true, data: sublocationData };
   };
   
   const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch sublocations') => {
@@ -34,15 +37,19 @@ export function useGetSubLocationsByUserId() {
       error.value = null;
       sublocations.value = [];
 
+      console.log('🔍 Calling sublocation API...');
       const response = await getSubLocationsByUserIdRepository.getSubLocationsByUserId();
-
+      console.log('📡 Sublocation API response:', response);
 
       if (response?.success) {
+        console.log('✅ Sublocation API success:', response.result);
         return handleFetchSuccess(response);
       } else {
+        console.log('❌ Sublocation API failed:', response);
         return handleFetchFailure(response);
       }
     } catch (err) {
+      console.log('💥 Sublocation API error:', err);
       return handleFetchFailure(err, err.message || 'Failed to fetch sublocations');
     } finally {
       isLoading.value = false;
@@ -68,6 +75,34 @@ export function useGetSubLocationsByUserId() {
     return sublocations.value.filter(sublocation => sublocation.locationId === locationId);
   };
 
+  // NEW: Create hierarchical data structure
+  const createHierarchicalData = (locations) => {
+    if (!Array.isArray(locations) || !Array.isArray(sublocations.value)) {
+      return locations || [];
+    }
+
+    return locations.map(location => {
+      const locationSublocations = sublocations.value.filter(
+        sublocation => sublocation.locationId === location.id
+      );
+      
+      return {
+        ...location,
+        sublocations: locationSublocations,
+        hasSublocations: locationSublocations.length > 0
+      };
+    });
+  };
+
+  // NEW: Get hierarchical data grouped by location
+  const getHierarchicalDataByLocation = (locations) => {
+    const hierarchicalData = createHierarchicalData(locations);
+    
+    console.log('📊 Created hierarchical data:', hierarchicalData);
+    
+    return hierarchicalData;
+  };
+
   const resetState = () => {
     error.value = null;
     sublocations.value = [];
@@ -87,5 +122,9 @@ export function useGetSubLocationsByUserId() {
     updateSublocation,
     getSublocationsByLocationId,
     resetState,
+    
+    // NEW: Hierarchical data helpers
+    createHierarchicalData,
+    getHierarchicalDataByLocation,
   };
 }

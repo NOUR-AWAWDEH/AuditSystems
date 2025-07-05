@@ -10,6 +10,7 @@
         parent-key="locationId"
         :parent-actions="locationActions"
         :child-actions="sublocationActions"
+        :expand-by-default="true"
         @add-child="handleAddSublocation"
         @edit-parent="$emit('edit-location', $event)"
         @delete-parent="$emit('delete-location', $event)"
@@ -53,17 +54,25 @@ const handleAddSublocation = (item) => {
 
 // Combine locations with their sublocations
 const hierarchicalData = computed(() => {
-    return props.locations.map(location => {
+    console.log('Locations:', props.locations);
+    console.log('Sublocations:', props.sublocations);
+    
+    const result = props.locations.map(location => {
         // Find sublocations that belong to this location
         const locationSublocations = props.sublocations.filter(
             sublocation => sublocation.locationId === location.id
         );
+        
+        console.log(`Location ${location.name} (ID: ${location.id}) has ${locationSublocations.length} sublocations:`, locationSublocations);
         
         return {
             ...location,
             sublocations: locationSublocations
         };
     });
+    
+    console.log('Final hierarchical data:', result);
+    return result;
 });
 
 const locationColumns = [

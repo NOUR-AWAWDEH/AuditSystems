@@ -12,8 +12,8 @@
                 @location-added="handleLocationAdded"
             />
             <LocationHierarchyTable 
-                :locations="locations"
-                :sublocations="Array.isArray(sublocations) ? sublocations : []"
+                :locations="hierarchicalLocations"
+                :sublocations="sublocations"
                 :is-loading="isLoading || isSublocationsLoading"
                 @edit-location="handleEditLocation"
                 @delete-location="handleDeleteLocation"
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import SideBar from '@/components/common/SideBar.vue';
 import BaseNotification from '@/components/base/BaseNotification.vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
@@ -92,11 +92,38 @@ const { isLoading: isSublocationsLoading, sublocations, getSubLocationsByUserId 
 const { deleteLocation } = useDeleteLocationById();
 const { initCheck } = useAuthStatus();
 
+// Computed property for hierarchical locations
+const hierarchicalLocations = computed(() => {
+  if (!Array.isArray(locations.value) || !Array.isArray(sublocations.value)) {
+    return locations.value || [];
+  }
+
+  return locations.value.map(location => {
+    const locationSublocations = sublocations.value.filter(
+      sublocation => sublocation.locationId === location.id
+    );
+    
+    return {
+      ...location,
+      sublocations: locationSublocations,
+      hasSublocations: locationSublocations.length > 0
+    };
+  });
+});
+
 // Function to refresh data
 const refreshData = async () => {
+  console.log('🔄 Starting data refresh...');
   await initCheck();
+  
+  console.log('📍 Fetching locations...');
   await fetchLocationsByUserId();
+  console.log('📍 Locations fetched:', locations.value);
+  
+  console.log('🏢 Fetching sublocations...');
   await getSubLocationsByUserId();
+  console.log('🏢 Sublocations fetched:', sublocations.value);
+  console.log('🏢 Sublocations loading state:', isSublocationsLoading.value);
 };
 
 // Handle page visibility change to refresh data when user returns to tab
@@ -127,6 +154,8 @@ onBeforeUnmount(() => {
 
 const handleLocationAdded = async (newLocation) => {
   await fetchLocationsByUserId();
+  // Refresh sublocations to ensure proper association
+  await getSubLocationsByUserId();
   showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
 };
 
@@ -156,7 +185,6 @@ const handleDeleteLocation = (location) => {
 
 // Sublocation handlers
 const handleAddSublocation = (locationId) => {
-  console.log('handleAddSublocation called with:', locationId);
   selectedLocationId.value = locationId;
   showAddSublocationModal.value = true;
 };
@@ -167,12 +195,12 @@ const handleCloseAddSublocationModal = () => {
 };
 
 const handleSublocationAdded = async (newSublocation) => {
+  // Refresh sublocations to get the latest data
   await getSubLocationsByUserId();
   showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
   handleCloseAddSublocationModal();
 };
 
-// Add these missing methods:
 const handleEditSublocation = (sublocation) => {
   // TODO: Implement edit sublocation functionality
   showNotification('Edit sublocation functionality coming soon!', 'info');

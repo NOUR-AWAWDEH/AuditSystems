@@ -14,6 +14,6 @@ const transitionName = computed(() => route.meta.transition || 'fade');
         <component :is="Component" />
       </transition>
     </router-view>
-    <BaseNotification /> <!-- Add the notification component here -->
+    <BaseNotification />
   </div>
 </template>

@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, toRef } from 'vue';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
@@ -8,8 +8,12 @@ export function useSubLocationTable(locations) {
     
     const selectedLocationId = ref('');
     
+    // Convert locations to a ref to ensure reactivity
+    const locationsRef = toRef(() => locations);
+    
     const selectedLocation = computed(() => {
-        return locations.find(location => location.id === selectedLocationId.value) || null;
+        if (!locationsRef.value || !selectedLocationId.value) return null;
+        return locationsRef.value.find(location => location.id === selectedLocationId.value) || null;
     });
     
     const locationSublocations = computed(() => {
@@ -26,8 +30,9 @@ export function useSubLocationTable(locations) {
         console.log('🏢 Sublocations refreshed:', sublocations.value);
     };
     
-    const handleLocationChange = async () => {
-        if (selectedLocationId.value) {
+    const handleLocationChange = async (newLocationId) => {
+        selectedLocationId.value = newLocationId;
+        if (newLocationId) {
             await refreshData();
         }
     };
@@ -40,7 +45,7 @@ export function useSubLocationTable(locations) {
     // Watch for location changes
     watch(selectedLocationId, (newLocationId) => {
         if (newLocationId) {
-            handleLocationChange();
+            refreshData();
         }
     });
     

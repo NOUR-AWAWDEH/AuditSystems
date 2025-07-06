@@ -64,7 +64,7 @@
                   type="button"
                   @click="$emit('close')"
                   :disabled="isCreating"
-                  class="px-4 py-2 text-sm font-medium text-gray-shade bg-white border border-gray-tint rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
+                  class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   Cancel
                 </button>

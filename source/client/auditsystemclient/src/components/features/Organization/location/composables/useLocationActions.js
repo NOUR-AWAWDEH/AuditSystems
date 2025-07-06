@@ -6,7 +6,7 @@ export function useLocationActions(refreshData, showNotification) {
 
     // Modal states
     const showAddLocationModal = ref(false);
-    const showEditModal = ref(false);
+    const showEditLocationModal = ref(false); // Changed from showEditModal
     const locationToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
@@ -31,18 +31,18 @@ export function useLocationActions(refreshData, showNotification) {
     // Location actions
     const handleEditLocation = (location) => {
         locationToEdit.value = location;
-        showEditModal.value = true;
+        showEditLocationModal.value = true; // Changed from showEditModal
     };
 
-    const handleCloseEditModal = () => {
-        showEditModal.value = false;
+    const handleCloseEditLocationModal = () => { // Changed function name
+        showEditLocationModal.value = false; // Changed from showEditModal
         locationToEdit.value = null;
     };
 
     const handleLocationUpdated = async (updatedLocation) => {
         await refreshData();
         showNotification(`Location "${updatedLocation.name}" has been updated successfully!`, 'success');
-        handleCloseEditModal();
+        handleCloseEditLocationModal(); // Changed from handleCloseEditModal
     };
 
     const handleDeleteLocation = (location) => {
@@ -75,7 +75,7 @@ export function useLocationActions(refreshData, showNotification) {
     return {
         // Modal states
         showAddLocationModal,
-        showEditModal,
+        showEditLocationModal, // Changed from showEditModal
         locationToEdit,
         showDeleteDialog,
         deleteDialogTitle,
@@ -87,7 +87,7 @@ export function useLocationActions(refreshData, showNotification) {
         handleCloseAddLocationModal,
         handleLocationAdded,
         handleEditLocation,
-        handleCloseEditModal,
+        handleCloseEditLocationModal, // Changed from handleCloseEditModal
         handleLocationUpdated,
         handleDeleteLocation,
         confirmDelete,

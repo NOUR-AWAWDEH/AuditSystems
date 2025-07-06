@@ -11,25 +11,24 @@
             <div class="space-y-6">
                 <!-- Location Header -->
                 <LocationHeader @add-location="handleAddLocation" />
-                
-                <!-- Location Filters -->
-                <LocationFilters
-                    v-model:search="search"
-                    v-model:sort="sort"
-                    @refresh="refreshData"
-                />
+            
                  <!-- Add Location Modal -->
                 <AddLocationForm
                     :is-visible="showAddLocationModal"
                     @close="handleCloseAddLocationModal"
                     @location-added="handleLocationAdded"
                 />
-                <!-- Location Table -->
+                <!-- Location Table with integrated filters -->
                 <LocationTable
                     :locations="filteredLocations"
                     :is-loading="isLoading"
+                    :search="search"
+                    :sort="sort"
                     @edit-location="handleEditLocation"
                     @delete-location="handleDeleteLocation"
+                    @update:search="search = $event"
+                    @update:sort="sort = $event"
+                    @refresh="refreshData"
                 />
             </div>
             

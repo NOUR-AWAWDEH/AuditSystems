@@ -3,15 +3,14 @@
     <!-- Mobile Overlay Background -->
     <div 
       v-if="!isCollapsed && isMobile" 
-      class="fixed inset-0 bg-opacity-75 z-40 md:hidden"
+      class="fixed inset-0 bg-black bg-opacity-75 z-40 md:hidden"
       @click="toggleSidebar"
     ></div>
     
-    <!-- Sidebar - Fixed Full Height -->
+    <!-- Sidebar - Always Fixed Full Height -->
     <div :class="[
       'bg-secondary-base text-white transition-all duration-300 z-50',
       'fixed left-0 top-0 h-screen',
-      'md:relative md:flex-shrink-0',
       isCollapsed 
         ? 'w-12 sm:w-14 md:w-16 px-1' 
         : isMobile 
@@ -75,7 +74,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Fixed sidebar positioning */
+/* Ensure sidebar is always fixed and full height */
 .fixed {
   position: fixed !important;
 }
@@ -90,12 +89,8 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* Responsive adjustments for desktop */
-@media (min-width: 768px) {
-  .md\:relative {
-    position: relative !important;
-  }
-}
+/* Remove the relative positioning override for desktop */
+/* This ensures the sidebar stays fixed even on desktop */
 
 @media (max-width: 640px) {
   .w-12 {

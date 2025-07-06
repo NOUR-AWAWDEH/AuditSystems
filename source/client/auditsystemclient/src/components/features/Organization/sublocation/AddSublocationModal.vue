@@ -12,7 +12,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-gray-shade font-poppins">Add Sublocation</h3>
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Sublocation</h3>
             <button 
               @click="$emit('close')" 
               class="text-gray-base hover:text-gray-shade focus:outline-none"
@@ -28,30 +28,35 @@
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <!-- Sublocation Name Field -->
               <div>
-                <label for="sublocation-name" class="block text-sm font-medium text-gray-700 mb-1">
+                <label for="sublocation-name" class="block text-sm font-medium text-secondary-shade mb-1">
                   Sublocation Name *
                 </label>
                 <BaseInput
                   id="sublocation-name"
                   v-model="formData.name"
                   placeholder="Enter sublocation name"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-red-500' : 'border-secondary-base'}`"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                 />
-                <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
+                <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
               
               <!-- Address Field -->
               <div>
-                <label for="sublocation-address" class="block text-sm font-medium text-gray-700 mb-1">
+                <label for="sublocation-address" class="block text-sm font-medium text-secondary-shade mb-1">
                   Address
                 </label>
                 <BaseInput
                   id="sublocation-address"
                   v-model="formData.address"
                   placeholder="Enter sublocation address"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-red-500' : 'border-secondary-base'}`"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                 />
-                <p v-if="errors.address" class="text-red-500 text-sm mt-1">{{ errors.address }}</p>
+                <p v-if="errors.address" class="text-error text-sm mt-1">{{ errors.address }}</p>
+              </div>
+              
+              <!-- Error Display -->
+              <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
+                <p class="text-error text-sm">{{ error }}</p>
               </div>
               
               <div class="flex justify-end space-x-3 pt-4">
@@ -59,7 +64,7 @@
                   type="button"
                   @click="$emit('close')"
                   :disabled="isCreating"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -67,7 +72,7 @@
                 <button
                   type="submit"
                   :disabled="!formData.name.trim() || isCreating"
-                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   <span v-if="isCreating">Adding...</span>
                   <span v-else>Add Sublocation</span>
@@ -101,7 +106,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'sublocation-added']);
 
 const { showNotification } = useNotification();
-const { isCreating, createSubLocation, resetState } = useCreateSubLocation();
+const { isCreating, error, createSubLocation, resetState } = useCreateSubLocation();
 
 const formData = ref({
   name: '',

@@ -6,7 +6,7 @@
             </h2>
             <BaseButton
                 @click="toggleAddForm"
-                :class="showAddForm ? 'px-4 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white' : 'px-4 py-2 rounded-md text-sm font-medium bg-primary-base'"
+                :class="showAddForm ? 'px-4 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white' : 'px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white'"
             >
                 {{ showAddForm ? 'Cancel' : 'Add Location' }}
             </BaseButton>
@@ -37,7 +37,7 @@
                             type="submit"
                             :loading="isCreating"
                             :disabled="!newLocation.name.trim()"
-                            class="px-6 py-2 bg-primary-base rounded"
+                            class="px-6 py-2 bg-secondary-base hover:bg-secondary-shade rounded"
                         >
                             {{ isCreating ? 'Adding...' : 'Add Location' }}
                         </BaseButton>

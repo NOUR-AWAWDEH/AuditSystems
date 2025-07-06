@@ -55,7 +55,8 @@ export function useUpdateSubLocationById() {
         return handleUpdateFailure({ message: validationError });
       }
 
-      const response = await updateSubLocationByIdRepository.updateSubLocation(subLocationData);
+      // Fix: Change from updateSubLocation to updateSubLocationById
+      const response = await updateSubLocationByIdRepository.updateSubLocationById(subLocationData);
 
       if (response?.success) {
         return handleUpdateSuccess(response);

@@ -1,45 +1,53 @@
 <template>
     <div class="flex min-h-screen bg-gray-50">
-        <!-- Main Content with full height -->
-        <div class="flex-1 min-h-screen p-3 sm:p-4 md:p-6">
-            <LocationHeader />
-            <LocationFilters 
-                v-model:search="searchQuery"
-                v-model:sort="sortBy"
-                @refresh="refreshData"
-            />
-            <AddLocationForm 
-                @location-added="handleLocationAdded"
-            />
-            <LocationTable 
-                :locations="filteredLocations"
-                :sublocations="sublocations"
-                :is-loading="isLoading || isSublocationsLoading"
-                @edit-location="handleEditLocation"
-                @delete-location="handleDeleteLocation"
-                @add-sublocation="handleAddSublocation"
-                @edit-sublocation="handleEditSublocation"
-                @delete-sublocation="handleDeleteSublocation"
-            />
+        <!-- Sidebar - Full Height -->
+        <div class="flex-shrink-0">
+            <SideBar class="min-h-screen" />
         </div>
         
-        <!-- Notification Component -->
-        <BaseNotification />
+        <!-- Main Content with full height -->
+        <div class="flex-1 min-h-screen p-3 sm:p-4 md:p-6">
+            <!-- Location Management Section -->
+            <div class="space-y-6">
+                <!-- Location Header -->
+                <LocationHeader @add-location="handleAddLocation" />
+                
+                <!-- Location Filters -->
+                <LocationFilters
+                    v-model:search="search"
+                    v-model:sort="sort"
+                    @refresh="refreshData"
+                />
+                 <!-- Add Location Modal -->
+                <AddLocationForm
+                    :is-visible="showAddLocationModal"
+                    @close="handleCloseAddLocationModal"
+                    @location-added="handleLocationAdded"
+                />
+                <!-- Location Table -->
+                <LocationTable
+                    :locations="filteredLocations"
+                    :is-loading="isLoading"
+                    @edit-location="handleEditLocation"
+                    @delete-location="handleDeleteLocation"
+                />
+            </div>
+            
+            <!-- Sublocation Management Section -->
+            <div class="mt-8">
+                <SubLocationView :locations="locations" />
+            </div>
+        </div>
+        
+       
         
         <!-- Edit Location Modal -->
         <EditLocationModal
-            :is-visible="showEditModal"
+            v-if="showEditLocationModal"
+            :is-visible="showEditLocationModal"
             :location="locationToEdit"
-            @close="handleCloseEditModal"
+            @close="handleCloseEditLocationModal"
             @updated="handleLocationUpdated"
-        />
-        
-        <!-- Add Sublocation Modal -->
-        <AddSublocationModal
-            :is-visible="showAddSublocationModal"
-            :location-id="selectedLocationId"
-            @close="handleCloseAddSublocationModal"
-            @sublocation-added="handleSublocationAdded"
         />
         
         <!-- Confirmation Dialog -->
@@ -57,61 +65,49 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import BaseNotification from '@/components/base/BaseNotification.vue';
-import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
+import SideBar from '@/components/common/SideBar.vue';
 import LocationHeader from './components/LocationHeader.vue';
 import LocationFilters from './components/LocationFilters.vue';
-import AddLocationForm from './components/AddLocationForm.vue';
 import LocationTable from './components/LocationTable.vue';
+import AddLocationForm from './components/AddLocationForm.vue';
 import EditLocationModal from './components/EditLocationModal.vue';
-import AddSublocationModal from '../sublocation/AddSublocationModal.vue';
-
-// Import new composables
+import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
+import SubLocationView from '@/components/features/Organization/sublocation/SubLocationView.vue';
 import { useLocationTable } from './composables/useLocationTable';
 import { useLocationFilters } from './composables/useLocationFilters';
 import { useLocationActions } from './composables/useLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
 
-const { showNotification } = useNotification();
-
-// Use the new composables
+// Use composables
 const {
     locations,
-    sublocations,
     isLoading,
-    isSublocationsLoading,
-    refreshData,
-    handleLocationAdded,
-    handleSublocationAdded
+    refreshData
 } = useLocationTable();
 
 const {
-    searchQuery,
-    sortBy,
+    search,
+    sort,
     filteredLocations
-} = useLocationFilters(locations, sublocations);
+} = useLocationFilters(locations);
+
+const { showNotification } = useNotification();
 
 const {
-    // Modal states
-    showEditModal,
+    showAddLocationModal,
+    showEditLocationModal,
     locationToEdit,
-    showAddSublocationModal,
-    selectedLocationId,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    
-    // Action handlers
+    handleAddLocation,
+    handleCloseAddLocationModal,
+    handleLocationAdded,
     handleEditLocation,
-    handleCloseEditModal,
+    handleCloseEditLocationModal,
     handleLocationUpdated,
     handleDeleteLocation,
-    handleAddSublocation,
-    handleCloseAddSublocationModal,
-    handleEditSublocation,
-    handleDeleteSublocation,
     confirmDelete,
     cancelDelete
 } = useLocationActions(refreshData, showNotification);

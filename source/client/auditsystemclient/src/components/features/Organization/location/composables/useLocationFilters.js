@@ -1,35 +1,22 @@
 import { ref, computed } from 'vue';
 
-export function useLocationFilters(locations, sublocations) {
+export function useLocationFilters(locations) {
     const searchQuery = ref('');
     const sortBy = ref('name');
 
     const filteredLocations = computed(() => {
-        if (!Array.isArray(locations.value) || !Array.isArray(sublocations.value)) {
+        if (!Array.isArray(locations.value)) {
             return locations.value || [];
         }
 
-        let filtered = locations.value.map(location => {
-            const locationSublocations = sublocations.value.filter(
-                sublocation => sublocation.locationId === location.id
-            );
-            
-            return {
-                ...location,
-                sublocations: locationSublocations,
-                hasSublocations: locationSublocations.length > 0
-            };
-        });
+        let filtered = [...locations.value];
 
         // Apply search filter
         if (searchQuery.value) {
             const query = searchQuery.value.toLowerCase();
             filtered = filtered.filter(location => 
                 location.name.toLowerCase().includes(query) ||
-                location.address?.toLowerCase().includes(query) ||
-                location.sublocations.some(sub => 
-                    sub.name.toLowerCase().includes(query)
-                )
+                (location.address && location.address.toLowerCase().includes(query))
             );
         }
 
@@ -37,7 +24,16 @@ export function useLocationFilters(locations, sublocations) {
         filtered.sort((a, b) => {
             const aValue = a[sortBy.value] || '';
             const bValue = b[sortBy.value] || '';
-            return aValue.localeCompare(bValue);
+            
+            if (sortBy.value === 'createdAt') {
+                return new Date(bValue) - new Date(aValue); // Newest first
+            }
+            
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return aValue.localeCompare(bValue);
+            }
+            
+            return 0;
         });
 
         return filtered;

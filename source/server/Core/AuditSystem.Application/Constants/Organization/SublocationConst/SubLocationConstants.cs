@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using AuditSystem.Domain.Entities.Organization;
 
-namespace AuditSystem.Application.Constants.Organization.Sublocation;
+namespace AuditSystem.Application.Constants.Organization.SublocationConst;
 
 public static class SubLocationConstants
 {

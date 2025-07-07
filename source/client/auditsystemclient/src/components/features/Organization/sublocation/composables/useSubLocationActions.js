@@ -62,7 +62,7 @@ export function useSubLocationActions(refreshData, showNotification) {
                 // ✅ Add small delay to ensure cache is cleared
                 setTimeout(async () => {
                     await refreshData();
-                }, 500);
+                }, 100);
             }
             
             cancelDelete();

@@ -1,15 +1,16 @@
 using System.Linq.Expressions;
 using AuditSystem.Domain.Entities.Organization;
-using LocationEntity = AuditSystem.Domain.Entities.Organization.Location;
-namespace AuditSystem.Application.Constants.Organization.Location;
+
+namespace AuditSystem.Application.Constants.Organization.LocationConst;
+
 
 public static class LocationConstants
 {
     public static readonly string[] LocationTags = ["locations", "location-list"];
     public static readonly string[] ListTags = ["location-list"];
-    public static readonly Expression<Func<LocationEntity, object?>>[] IncludeCompany = [l => l.Company];
-    public static readonly Expression<Func<LocationEntity, object?>>[] IncludeUser = [l => l.User];
-    public static readonly Expression<Func<LocationEntity, object?>>[] IncludeAll = [l => l.Company, l => l.User];
+    public static readonly Expression<Func<Location, object?>>[] IncludeCompany = [l => l.Company];
+    public static readonly Expression<Func<Location, object?>>[] IncludeUser = [l => l.User];
+    public static readonly Expression<Func<Location, object?>>[] IncludeAll = [l => l.Company, l => l.User];
     
     public const string EntityName = "Location";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access location {1}.";

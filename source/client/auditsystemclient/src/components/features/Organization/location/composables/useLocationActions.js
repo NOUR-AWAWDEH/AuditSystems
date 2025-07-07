@@ -23,7 +23,7 @@ export function useLocationActions(refreshData, showNotification) {
     };
 
     const handleLocationAdded = async (newLocation) => {
-        await refreshData(); // Refresh the data to show the new location immediately
+        await refreshData(); 
         showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
         handleCloseAddLocationModal();
     };
@@ -42,7 +42,7 @@ export function useLocationActions(refreshData, showNotification) {
     const handleLocationUpdated = async (updatedLocation) => {
         await refreshData();
         showNotification(`Location "${updatedLocation.name}" has been updated successfully!`, 'success');
-        handleCloseEditLocationModal(); // Changed from handleCloseEditModal
+        handleCloseEditLocationModal();
     };
 
     const handleDeleteLocation = (location) => {
@@ -75,7 +75,7 @@ export function useLocationActions(refreshData, showNotification) {
     return {
         // Modal states
         showAddLocationModal,
-        showEditLocationModal, // Changed from showEditModal
+        showEditLocationModal,
         locationToEdit,
         showDeleteDialog,
         deleteDialogTitle,
@@ -87,7 +87,7 @@ export function useLocationActions(refreshData, showNotification) {
         handleCloseAddLocationModal,
         handleLocationAdded,
         handleEditLocation,
-        handleCloseEditLocationModal, // Changed from handleCloseEditModal
+        handleCloseEditLocationModal,
         handleLocationUpdated,
         handleDeleteLocation,
         confirmDelete,

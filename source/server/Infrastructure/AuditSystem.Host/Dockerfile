@@ -1,16 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["src/server/Infrastructure/AuditSystem.Host/AuditSystem.Host.csproj", "src/server/Infrastructure/AuditSystem.Host/"]
-COPY ["src/server/Core/AuditSystem.Application/AuditSystem.Application.csproj", "src/server/Core/AuditSystem.Application/"]
-COPY ["src/server/Core/AuditSystem.Contract/AuditSystem.Contract.csproj", "src/server/Core/AuditSystem.Contract/"]
-COPY ["src/server/Core/AuditSystem.Domain/AuditSystem.Domain.csproj", "src/server/Core/AuditSystem.Domain/"]
-COPY ["src/server/Infrastructure/AuditSystem.DataAccess/AuditSystem.DataAccess.csproj", "src/server/Infrastructure/AuditSystem.DataAccess/"]
-COPY ["src/server/Core/AuditSystem.BusinessLogic/AuditSystem.BusinessLogic.csproj", "src/server/Core/AuditSystem.BusinessLogic/"]
-COPY ["src/server/Infrastructure/AuditSystem.Auth/AuditSystem.Auth.csproj", "src/server/Infrastructure/AuditSystem.Auth/"]
-RUN dotnet restore "/src/src/server/Infrastructure/AuditSystem.Host/AuditSystem.Host.csproj"
-COPY . /src
-WORKDIR "/src/src/server/Infrastructure/AuditSystem.Host"
+WORKDIR /source
+COPY ["source/server/Infrastructure/AuditSystem.Host/AuditSystem.Host.csproj", "source/server/Infrastructure/AuditSystem.Host/"]
+COPY ["source/server/Core/AuditSystem.Application/AuditSystem.Application.csproj", "source/server/Core/AuditSystem.Application/"]
+COPY ["source/server/Core/AuditSystem.Contract/AuditSystem.Contract.csproj", "source/server/Core/AuditSystem.Contract/"]
+COPY ["source/server/Core/AuditSystem.Domain/AuditSystem.Domain.csproj", "source/server/Core/AuditSystem.Domain/"]
+COPY ["source/server/Infrastructure/AuditSystem.DataAccess/AuditSystem.DataAccess.csproj", "source/server/Infrastructure/AuditSystem.DataAccess/"]
+COPY ["source/server/Core/AuditSystem.BusinessLogic/AuditSystem.BusinessLogic.csproj", "source/server/Core/AuditSystem.BusinessLogic/"]
+COPY ["source/server/Infrastructure/AuditSystem.Auth/AuditSystem.Auth.csproj", "source/server/Infrastructure/AuditSystem.Auth/"]
+RUN dotnet restore "source/server/Infrastructure/AuditSystem.Host/AuditSystem.Host.csproj"
+COPY . /source
+WORKDIR "/source/source/server/Infrastructure/AuditSystem.Host"
 RUN dotnet build "AuditSystem.Host.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Publish stage

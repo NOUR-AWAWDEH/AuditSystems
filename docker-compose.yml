@@ -1,9 +1,9 @@
 services:
   auditsystem.host:
-    image: nourawawdeh/auditsystemsauditsystemhost:latest
+    image: nourawawdeh/auditsystem:latest
     build:
       context: .
-      dockerfile: .\src\server\Infrastructure\AuditSystem.Host\Dockerfile
+      dockerfile: .\source\server\Infrastructure\AuditSystem.Host\Dockerfile
     ports:
     - "80:80"
     - "443:443"

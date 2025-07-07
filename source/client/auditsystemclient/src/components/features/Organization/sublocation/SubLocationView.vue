@@ -50,7 +50,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubLocationTable from './SubLocationTable.vue';
 import AddSublocationModal from './AddSublocationModal.vue';

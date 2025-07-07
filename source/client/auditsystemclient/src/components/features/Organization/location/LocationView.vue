@@ -20,7 +20,7 @@
                 />
                 <!-- Location Table with integrated filters -->
                 <LocationTable
-                    :locations="filteredLocations"
+                    :locations="locations"
                     :is-loading="isLoading"
                     :search="search"
                     :sort="sort"
@@ -66,29 +66,24 @@
 <script setup>
 import SideBar from '@/components/common/SideBar.vue';
 import LocationHeader from './components/LocationHeader.vue';
-import LocationFilters from './components/LocationFilters.vue';
 import LocationTable from './components/LocationTable.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
 import EditLocationModal from './components/EditLocationModal.vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubLocationView from '@/components/features/Organization/sublocation/SubLocationView.vue';
 import { useLocationTable } from './composables/useLocationTable';
-import { useLocationFilters } from './composables/useLocationFilters';
 import { useLocationActions } from './composables/useLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
 
 // Use composables
+// In the script setup section, replace useLocationFilters with direct table management
 const {
     locations,
     isLoading,
+    searchQuery: search,
+    sortBy: sort,
     refreshData
 } = useLocationTable();
-
-const {
-    search,
-    sort,
-    filteredLocations
-} = useLocationFilters(locations);
 
 const { showNotification } = useNotification();
 

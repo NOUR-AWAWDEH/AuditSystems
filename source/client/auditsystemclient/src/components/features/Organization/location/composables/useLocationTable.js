@@ -13,11 +13,9 @@ export function useLocationTable() {
         searchResults: locations,
         isSearching: isLoading,
         totalCount,
-        searchLocations,
-        clearSearch
+        searchLocations
     } = useSearchLocationByUserId();
     
-    // Fallback to get all locations when no search
     const { 
         locations: allLocations, 
         fetchLocationsByUserId 
@@ -26,10 +24,8 @@ export function useLocationTable() {
     // Watch for search changes and trigger backend search
     watch([searchQuery, sortBy, currentPage], async ([search, sort, page]) => {
         if (search.trim()) {
-            // Use backend search when there's a search term
             await searchLocations(search, page, pageSize.value);
         } else {
-            // Load all locations when no search
             await fetchLocationsByUserId();
             locations.value = allLocations.value;
         }

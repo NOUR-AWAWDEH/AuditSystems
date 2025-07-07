@@ -20,47 +20,57 @@ export function useSearchLocationByUserId() {
     pageSize.value = pageSizeParam;
 
     try {
-      const result = await searchLocationByUserIdRepository.searchLocationsByUserId(
-        searchTerm, 
-        pageNumber, 
-        pageSizeParam
-      );
-      
-      if (result.success) {
-        searchResults.value = result.result?.locations || [];
-        totalCount.value = result.result?.totalCount || 0;
+        const result = await searchLocationByUserIdRepository.searchLocationsByUserId(
+            searchTerm, 
+            pageNumber, 
+            pageSizeParam
+        );
         
-        return { 
-          success: true, 
-          message: result.message || 'Search completed successfully',
-          data: {
-            locations: searchResults.value,
-            totalCount: totalCount.value,
-            currentPage: currentPage.value,
-            pageSize: pageSize.value
-          }
-        };
-      } else {
-        const errorMsg = result.message || 'Search failed';
+        if (result.success) {
+            // Try multiple possible data locations
+            const locations1 = result.result?.result?.items;
+            const locations2 = result.result?.locations;
+            const locations3 = result.result?.items;
+            const extractedTotalCount1 = result.result?.result?.totalCount;
+            const extractedTotalCount2 = result.result?.totalCount;
+            
+            const finalLocations = locations1 || locations2 || locations3 || [];
+            const finalTotalCount = extractedTotalCount1 || extractedTotalCount2 || 0;
+            
+            searchResults.value = finalLocations;
+            totalCount.value = finalTotalCount;
+            
+            return { 
+                success: true, 
+                message: result.message || 'Search completed successfully',
+                data: {
+                    locations: searchResults.value,
+                    totalCount: totalCount.value,
+                    currentPage: currentPage.value,
+                    pageSize: pageSize.value
+                }
+            };
+        } else {
+            const errorMsg = result.message || 'Search failed';
+            error.value = errorMsg;
+            searchResults.value = [];
+            totalCount.value = 0;
+            
+            if (result.errors && result.errors.length > 0) {
+                showNotification(errorMsg, 'error');
+            }
+            
+            return { success: false, message: errorMsg, errors: result.errors };
+        }
+    } catch (err) {
+        const errorMsg = err.message || 'An error occurred during search';
         error.value = errorMsg;
         searchResults.value = [];
         totalCount.value = 0;
-        
-        if (result.errors && result.errors.length > 0) {
-          showNotification(errorMsg, 'error');
-        }
-        
-        return { success: false, message: errorMsg, errors: result.errors };
-      }
-    } catch (err) {
-      const errorMsg = err.message || 'An error occurred during search';
-      error.value = errorMsg;
-      searchResults.value = [];
-      totalCount.value = 0;
-      showNotification(errorMsg, 'error');
-      return { success: false, message: errorMsg };
+        showNotification(errorMsg, 'error');
+        return { success: false, message: errorMsg };
     } finally {
-      isSearching.value = false;
+        isSearching.value = false;
     }
   };
 

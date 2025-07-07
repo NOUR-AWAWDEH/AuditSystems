@@ -3,16 +3,16 @@
         <!-- Sublocation Management -->
         <SubLocationTable
             :locations="locations"
-            :sublocations="filteredSublocations"
+            :sublocations="sublocations"
             :is-loading="isLoading"
             :selected-location-id="selectedLocationId"
             :selected-location="selectedLocation"
-            :search="searchQuery"
-            :sort="sortBy"
-            @update:selectedLocationId="handleLocationChange"
-            @update:search="searchQuery = $event"
-            @update:sort="sortBy = $event"
-            @refresh="refreshData"
+            :search-query="searchQuery"
+            :sort-by="sortBy"
+            :handle-location-change="handleLocationChange"
+            :handle-search="handleSearch"
+            :handle-sort="handleSort"
+            :refresh-data="refreshData"
             @add-sublocation="handleAddSublocation"
             @edit-sublocation="handleEditSublocation"
             @delete-sublocation="handleDeleteSublocation"
@@ -55,7 +55,6 @@ import SubLocationTable from './SubLocationTable.vue';
 import AddSublocationModal from './AddSublocationModal.vue';
 import EditSublocationModal from './EditSublocationModal.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
-import { useSubLocationFilters } from './composables/useSubLocationFilters';
 import { useSubLocationActions } from './composables/useSubLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
 
@@ -68,23 +67,22 @@ const props = defineProps({
 
 const { showNotification } = useNotification();
 
-// Use composables
+// Use composables - now with integrated backend search
 const {
     sublocations,
     isLoading,
     selectedLocationId,
     selectedLocation,
-    refreshData,
-    handleLocationChange,
-    handleSublocationAdded
-} = useSubLocationTable(props.locations);
-
-const {
     searchQuery,
     sortBy,
-    filteredSublocations
-} = useSubLocationFilters(sublocations);
+    refreshData,
+    handleLocationChange,
+    handleSublocationAdded,
+    handleSearch,
+    handleSort
+} = useSubLocationTable(props.locations);
 
+// Remove useSubLocationFilters since search is now handled by the table
 const {
     showAddSublocationModal,
     showEditSublocationModal,

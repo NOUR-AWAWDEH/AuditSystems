@@ -16,12 +16,12 @@
                     <SubLocationFilters
                         :locations="locations"
                         :selected-location-id="selectedLocationId"
-                        :search="search"
-                        :sort="sort"
-                        @update:selected-location-id="$emit('update:selectedLocationId', $event)"
-                        @update:search="$emit('update:search', $event)"
-                        @update:sort="$emit('update:sort', $event)"
-                        @refresh="$emit('refresh')"
+                        :search="searchQuery"
+                        :sort="sortBy"
+                        @update:selected-location-id="handleLocationChange"
+                        @update:search="handleSearch"
+                        @update:sort="handleSort"
+                        @refresh="refreshData"
                     />
                 </div>
 
@@ -35,6 +35,7 @@
                             </svg>
                             <p class="text-sm text-gray-700">
                                 Showing sublocations for: <span class="font-semibold text-blue-800">{{ selectedLocation?.name || 'Selected Location' }}</span>
+                                <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
                         <BaseButton 
@@ -56,6 +57,7 @@
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
                         :actions="[]"
+                        :no-data-message="noDataMessage"
                         class="sublocation-table"
                     >
                         <template #cell-actions="{ item }">
@@ -81,13 +83,18 @@
                             </div>
                         </template>
                     </ReusableTable>
-
-                    <div v-if="!isLoading && sublocations.length === 0" class="text-center py-12">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
-                        <p class="text-lg text-gray-500 mb-2">No sublocations found</p>
-                        <p class="text-sm text-gray-400">No sublocations exist for this location yet.</p>
+                    
+                    <!-- Clear Search Button (shown when no results and searching) -->
+                    <div v-if="searchQuery && sublocations.length === 0 && !isLoading" class="text-center py-4 border-t border-gray-200">
+                        <button
+                            @click="handleSearch('')"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                        >
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Clear Search
+                        </button>
                     </div>
                 </div>
 
@@ -117,18 +124,18 @@ const props = defineProps({
     isLoading: Boolean,
     selectedLocationId: String,
     selectedLocation: Object,
-    search: String,
-    sort: String
+    searchQuery: String,
+    sortBy: String,
+    handleLocationChange: Function,
+    handleSearch: Function,
+    handleSort: Function,
+    refreshData: Function
 });
 
 defineEmits([
     'add-sublocation',
     'edit-sublocation',
-    'delete-sublocation',
-    'update:selectedLocationId',
-    'update:search',
-    'update:sort',
-    'refresh'
+    'delete-sublocation'
 ]);
 
 const sublocationColumns = [
@@ -139,6 +146,14 @@ const sublocationColumns = [
 
 const enhancedColumns = computed(() => {
     return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
+});
+
+// Computed property for dynamic no data message
+const noDataMessage = computed(() => {
+    if (props.searchQuery) {
+        return `No sublocations found for "${props.searchQuery}".`;
+    }
+    return 'No sublocations found for this location.';
 });
 </script>
 

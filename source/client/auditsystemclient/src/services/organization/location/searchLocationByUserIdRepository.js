@@ -12,8 +12,9 @@ export const searchLocationByUserIdRepository = {
       
       const params = {
         searchTerm: searchTerm || '',
-        pageNumber,
-        pageSize
+        page: pageNumber,        // Change from pageNumber to page
+        pageSize: pageSize,      // Keep pageSize
+        sortBy: 'name'          // Add sortBy parameter
       };
       
       const response = await api.get(`${LOCATION_BASE_ENDPOINT}/search-location-by-user-id`, {

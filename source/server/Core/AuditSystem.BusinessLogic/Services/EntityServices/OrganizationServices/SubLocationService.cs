@@ -101,7 +101,11 @@ internal sealed class SubLocationService(
             
             await repository.DeleteAsync(subLocationId);
             
+            // Clear individual entity cache
             await ClearEntityCacheAsync(subLocationId);
+            
+            // ✅ FIX: Clear all related caches
+            await ClearUserRelatedCachesAsync(userId);
             
             logger.LogInformation("Successfully deleted sublocation {SubLocationId}", subLocationId);
         }
@@ -111,6 +115,18 @@ internal sealed class SubLocationService(
                 subLocationId, userId);
             throw;
         }
+    }
+
+    // Add this helper method
+    private async Task ClearUserRelatedCachesAsync(Guid userId)
+    {
+        // Clear search caches for this user
+        var searchPattern = $"sublocation_search_user_{userId}_*";
+        await cacheService.RemoveAsync(searchPattern);
+        
+        // Clear user sublocation list cache
+        var userListKey = $"sublocation_list_user_{userId}";
+        await cacheService.RemoveAsync(userListKey);
     }
 
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
@@ -158,15 +174,15 @@ internal sealed class SubLocationService(
         return await GetFromRepositoryAsync<SubLocationModel>(cacheKey, countCacheKey, page, name);
     }
 
-    public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page? page)
+    public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid? locationId, Page? page)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         
-        logger.LogDebug("Searching sublocations for user {UserId} with term: {SearchTerm}", 
-            userId, searchTerm ?? "(none)");
+        logger.LogDebug("Searching sublocations for user {UserId} with term: {SearchTerm} and locationId: {LocationId}", 
+            userId, searchTerm ?? "(none)", locationId?.ToString() ?? "(none)");
         
-        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, locationId, page);
     
         var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
@@ -175,7 +191,7 @@ internal sealed class SubLocationService(
             return cachedResult;
         }
     
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, locationId, page, cacheKey, countCacheKey);
     }
 
     // Private helper methods

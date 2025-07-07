@@ -1,9 +1,8 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{72DEFC5E-0F3D-4366-A913-46AC35474718}"
 EndProject
@@ -11,23 +10,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{00172CB3-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{E3B38056-5C79-43BB-8DCA-43D1D42A4DFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Application", "src\server\Core\AuditSystem.Application\AuditSystem.Application.csproj", "{8AC26F6F-2886-498F-0CBB-451EBFA2D61C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Application", "source\server\Core\AuditSystem.Application\AuditSystem.Application.csproj", "{8AC26F6F-2886-498F-0CBB-451EBFA2D61C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.BusinessLogic", "src\server\Core\AuditSystem.BusinessLogic\AuditSystem.BusinessLogic.csproj", "{8831E2A6-7012-9F99-D8E7-B91B94BD5D0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.BusinessLogic", "source\server\Core\AuditSystem.BusinessLogic\AuditSystem.BusinessLogic.csproj", "{8831E2A6-7012-9F99-D8E7-B91B94BD5D0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Contract", "src\server\Core\AuditSystem.Contract\AuditSystem.Contract.csproj", "{75020F6B-90BD-78D4-B2EF-14C92E22F9F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Contract", "source\server\Core\AuditSystem.Contract\AuditSystem.Contract.csproj", "{75020F6B-90BD-78D4-B2EF-14C92E22F9F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Domain", "src\server\Core\AuditSystem.Domain\AuditSystem.Domain.csproj", "{D0AF477B-71A5-621B-0601-D93A1197A6AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Domain", "source\server\Core\AuditSystem.Domain\AuditSystem.Domain.csproj", "{D0AF477B-71A5-621B-0601-D93A1197A6AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Auth", "src\server\Infrastructure\AuditSystem.Auth\AuditSystem.Auth.csproj", "{D136EB68-2D16-D993-FF32-69419E88B276}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Auth", "source\server\Infrastructure\AuditSystem.Auth\AuditSystem.Auth.csproj", "{D136EB68-2D16-D993-FF32-69419E88B276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Host", "src\server\Infrastructure\AuditSystem.Host\AuditSystem.Host.csproj", "{EC2F00A3-1B0F-CCEE-30C7-998C1F0187AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.Host", "source\server\Infrastructure\AuditSystem.Host\AuditSystem.Host.csproj", "{EC2F00A3-1B0F-CCEE-30C7-998C1F0187AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.DataAccess", "src\server\Infrastructure\AuditSystem.DataAccess\AuditSystem.DataAccess.csproj", "{F633AB0E-3B7A-49BF-C66C-A8E273607B7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuditSystem.DataAccess", "source\server\Infrastructure\AuditSystem.DataAccess\AuditSystem.DataAccess.csproj", "{F633AB0E-3B7A-49BF-C66C-A8E273607B7C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{95D252BB-EABE-4F04-B0A1-C3B8BC4C1F41}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "AuditSystemClient", "src\client\AuditsystemClient\AuditSystemClient.esproj", "{C24FCF14-4958-7938-ED10-5A09ACC915F0}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "AuditSystemClient", "source\client\AuditsystemClient\AuditSystemClient.esproj", "{C24FCF14-4958-7938-ED10-5A09ACC915F0}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject

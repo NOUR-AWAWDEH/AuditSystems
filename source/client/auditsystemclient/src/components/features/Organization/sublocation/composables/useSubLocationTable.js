@@ -1,61 +1,141 @@
-import { ref, computed, watch, toRef } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { useSearchSubLocationByUserId } from '@/composables/organization/sublocation/useSearchSubLocationByUserId';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
-import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 export function useSubLocationTable(locations) {
-    const { isLoading, sublocations, getSubLocationsByUserId } = useGetSubLocationsByUserId();
-    const { initCheck } = useAuthStatus();
-    
+    const searchQuery = ref('');
+    const sortBy = ref('name');
     const selectedLocationId = ref('');
+    const currentPage = ref(1);
+    const pageSize = ref(10);
     
-    // Convert locations to a ref to ensure reactivity
-    const locationsRef = toRef(() => locations);
+    // Use backend search with locationId support
+    const {
+        searchResults,
+        isSearching,
+        totalCount,
+        searchSubLocations,
+        clearSearch
+    } = useSearchSubLocationByUserId();
     
+    // Fallback to get all sublocations when no search
+    const { 
+        sublocations: allSublocations, 
+        isLoading: isLoadingAll,
+        getSubLocationsByUserId 
+    } = useGetSubLocationsByUserId();
+    
+    // Computed property for selected location
     const selectedLocation = computed(() => {
-        if (!locationsRef.value || !selectedLocationId.value) return null;
-        return locationsRef.value.find(location => location.id === selectedLocationId.value) || null;
+        if (!locations || !selectedLocationId.value) return null;
+        return locations.find(location => location.id === selectedLocationId.value) || null;
     });
     
-    const locationSublocations = computed(() => {
-        if (!selectedLocationId.value) return [];
-        return sublocations.value.filter(sublocation => 
-            sublocation.locationId === selectedLocationId.value
-        );
+    // Server-side filtering: No need for client-side filtering anymore
+    const sublocations = computed(() => {
+    
+    if (searchQuery.value.trim()) {
+        return searchResults.value;
+    } else {
+        return allSublocations.value; // Fixed: was filteredSublocations.value
+    }
+});
+    
+    // Combined loading state
+    const isLoading = computed(() => isSearching.value || isLoadingAll.value);
+    
+    // Watch for search and sort changes
+    watch([searchQuery, sortBy], async ([search, sort]) => {
+        if (!selectedLocationId.value) return;
+        
+        if (search.trim()) {
+            await searchSubLocations({
+                searchTerm: search,
+                locationId: selectedLocationId.value, // Server-side location filtering
+                page: currentPage.value,
+                pageSize: pageSize.value,
+                sortBy: sort
+            });
+        } else {
+            clearSearch();
+            // Only fetch if we don't have data yet
+            if (allSublocations.value.length === 0) {
+                await getSubLocationsByUserId();
+            }
+        }
+    });
+    
+    // Separate watch for location changes
+    watch(selectedLocationId, async (newLocationId) => {
+        if (!newLocationId) {
+            clearSearch();
+            return;
+        }
+        
+        // If we have search query, search with new location
+        if (searchQuery.value.trim()) {
+            await searchSubLocations({
+                searchTerm: searchQuery.value,
+                locationId: newLocationId, // Server-side location filtering
+                page: currentPage.value,
+                pageSize: pageSize.value,
+                sortBy: sortBy.value
+            });
+        } else {
+            // Only fetch all sublocations if we don't have them yet
+            if (allSublocations.value.length === 0) {
+                await getSubLocationsByUserId();
+            }
+        }
     });
     
     const refreshData = async () => {
-        console.log('🔄 Refreshing sublocation data...');
-        await initCheck();
-        await getSubLocationsByUserId();
-        console.log('🏢 Sublocations refreshed:', sublocations.value);
+        // Add cache busting parameter
+        const cacheBuster = Date.now();
+        
+        if (searchQuery.value.trim()) {
+            await searchSubLocations(searchQuery.value, currentPage.value, pageSize.value, cacheBuster);
+        } else {
+            await getSubLocationsByUserId(cacheBuster);
+            sublocations.value = allSublocations.value;
+        }
+    };
+    
+    // Add this function
+    const handleSublocationAdded = async (newSublocation) => {
+        await refreshData(); // Refresh the data to show the new sublocation immediately
     };
     
     const handleLocationChange = async (newLocationId) => {
         selectedLocationId.value = newLocationId;
-        if (newLocationId) {
-            await refreshData();
-        }
+        // The watch will handle the API call
     };
     
-    const handleSublocationAdded = async (newSublocation) => {
-        await getSubLocationsByUserId();
-        return newSublocation;
+    const handleSearch = async (newSearchQuery) => {
+        searchQuery.value = newSearchQuery;
+        currentPage.value = 1; // Reset to first page
+        // The watch will handle the API call
     };
     
-    // Watch for location changes
-    watch(selectedLocationId, (newLocationId) => {
-        if (newLocationId) {
-            refreshData();
-        }
-    });
+    const handleSort = async (newSortBy) => {
+        sortBy.value = newSortBy;
+        // The watch will handle the API call
+    };
     
     return {
-        sublocations: locationSublocations,
+        sublocations,
         isLoading,
         selectedLocationId,
         selectedLocation,
+        searchQuery,
+        sortBy,
+        currentPage,
+        pageSize,
+        totalCount,
         refreshData,
+        handleSublocationAdded, // Add this to the return object
         handleLocationChange,
-        handleSublocationAdded
+        handleSearch,
+        handleSort
     };
 }

@@ -12,7 +12,6 @@ export function useGetSubLocationsByUserId() {
     // Fix: Extract subLocations array from the nested result object
     const sublocationData = response.result?.subLocations || [];
     sublocations.value = sublocationData;
-    console.log('🎯 Mapped sublocation data:', sublocationData);
     return { success: true, data: sublocationData };
   };
   
@@ -37,19 +36,14 @@ export function useGetSubLocationsByUserId() {
       error.value = null;
       sublocations.value = [];
 
-      console.log('🔍 Calling sublocation API...');
       const response = await getSubLocationsByUserIdRepository.getSubLocationsByUserId();
-      console.log('📡 Sublocation API response:', response);
 
       if (response?.success) {
-        console.log('✅ Sublocation API success:', response.result);
         return handleFetchSuccess(response);
       } else {
-        console.log('❌ Sublocation API failed:', response);
         return handleFetchFailure(response);
       }
     } catch (err) {
-      console.log('💥 Sublocation API error:', err);
       return handleFetchFailure(err, err.message || 'Failed to fetch sublocations');
     } finally {
       isLoading.value = false;
@@ -96,10 +90,7 @@ export function useGetSubLocationsByUserId() {
 
   // NEW: Get hierarchical data grouped by location
   const getHierarchicalDataByLocation = (locations) => {
-    const hierarchicalData = createHierarchicalData(locations);
-    
-    console.log('📊 Created hierarchical data:', hierarchicalData);
-    
+    const hierarchicalData = createHierarchicalData(locations);   
     return hierarchicalData;
   };
 

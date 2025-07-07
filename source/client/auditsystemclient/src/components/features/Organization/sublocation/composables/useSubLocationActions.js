@@ -22,6 +22,13 @@ export function useSubLocationActions(refreshData, showNotification) {
         showAddSublocationModal.value = false;
     };
     
+    // Add this missing function
+    const handleSublocationAdded = async (newSublocation) => {
+        await refreshData(); // Refresh the data to show the new sublocation immediately
+        showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
+        handleCloseAddSublocationModal();
+    };
+    
     const handleEditSublocation = (sublocation) => {
         sublocationToEdit.value = sublocation;
         showEditSublocationModal.value = true;
@@ -51,7 +58,11 @@ export function useSubLocationActions(refreshData, showNotification) {
             
             if (result.success) {
                 showNotification(`Sublocation "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
-                await refreshData();
+                
+                // ✅ Add small delay to ensure cache is cleared
+                setTimeout(async () => {
+                    await refreshData();
+                }, 500);
             }
             
             cancelDelete();
@@ -75,6 +86,7 @@ export function useSubLocationActions(refreshData, showNotification) {
         itemToDelete,
         handleAddSublocation,
         handleCloseAddSublocationModal,
+        handleSublocationAdded, // Add this to the return object
         handleEditSublocation,
         handleCloseEditSublocationModal,
         handleSublocationUpdated,

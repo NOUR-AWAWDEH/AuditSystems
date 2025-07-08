@@ -36,11 +36,10 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         return await _entities.FindAsync(id);
     }
 
-    // Enhanced GetByIdAsync with include support
-    public async Task<TEntity?> GetByIdAsync(TId id, params Expression<Func<TEntity, object?>>[] include)
+    public async Task<TEntity?> GetByIdAsync(TId id, Expression<Func<TEntity, object?>>[]? include = null)
     {
         IQueryable<TEntity> query = _entities.AsQueryable();
-        
+
         if (include != null && include.Length > 0)
         {
             foreach (var includeProperty in include)

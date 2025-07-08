@@ -87,7 +87,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     // Tasks
     public required DbSet<TaskManagement> TaskManagements { get; set; }
 
-    public required DbSet<Role> Roles { get; set; }
+    public new required DbSet<Role> Roles { get; set; }
     public required DbSet<UserDesignation> UserDesignations { get; set; }
 
     // Auth

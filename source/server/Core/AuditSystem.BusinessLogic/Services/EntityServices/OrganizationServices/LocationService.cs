@@ -1,5 +1,5 @@
 ﻿using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Organization.Location;
+using AuditSystem.Application.Constants.Organization.LocationConst;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;

@@ -1,12 +1,12 @@
 import { ref } from 'vue';
 import { useDeleteLocationById } from '@/composables/organization/location/useDeleteLocationById';
 
-export function useLocationActions(refreshData, showNotification) {
+export function useLocationActions(refreshData, showNotification, onLocationDeleted = null) {
     const { deleteLocation } = useDeleteLocationById();
 
     // Modal states
     const showAddLocationModal = ref(false);
-    const showEditLocationModal = ref(false); // Changed from showEditModal
+    const showEditLocationModal = ref(false);
     const locationToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
@@ -55,11 +55,17 @@ export function useLocationActions(refreshData, showNotification) {
     // Delete confirmation
     const confirmDelete = async () => {
         if (itemToDelete.value) {
+            const deletedLocationId = itemToDelete.value.id;
             const result = await deleteLocation(itemToDelete.value.id, itemToDelete.value.name);
             
             if (result.success) {
                 showNotification(`Location "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
                 await refreshData();
+                
+                // Notify parent component about location deletion
+                if (onLocationDeleted) {
+                    onLocationDeleted(deletedLocationId);
+                }
             }
             
             itemToDelete.value = null;

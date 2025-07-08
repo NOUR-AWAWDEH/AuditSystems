@@ -10,12 +10,19 @@ namespace AuditSystem.Host.Controllers.v1.Download;
 [ApiController]
 [Route("[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class DecodeDownloadController(IMediator mediator) : ApiControllerBase(mediator)
+public class DecodeDownloadController : ApiControllerBase
 {
+    private readonly IMediator _mediator;
+
+    public DecodeDownloadController(IMediator mediator) : base(mediator)
+    {
+        _mediator = mediator;
+    }
+
     [HttpGet]
     public async Task<IActionResult> DecodeAndDownload([FromQuery] string signedUrl)
     {
-        var result = await mediator.Send(new GetFileByURLQuery(signedUrl));
+        var result = await _mediator.Send(new GetFileByURLQuery(signedUrl));
 
         if (!result.IsSuccess)
         {

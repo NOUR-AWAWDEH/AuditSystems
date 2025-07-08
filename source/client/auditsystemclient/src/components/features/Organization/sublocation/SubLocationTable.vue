@@ -3,16 +3,23 @@
         <!-- Sublocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-6">
-                <!-- Header with Title and Filters -->
+                <!-- Header with Location Selection -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-                    <div class="flex items-center"> 
-                        <div>
-                            <h2 class="text-2xl font-bold text-secondary-base">
-                                Sublocations
-                            </h2>
-                            <p class="text-sm text-gray-500 mt-1">Manage your organization sublocations</p>
-                        </div>
+                    <!-- Left side - Title and Description -->
+                    <SubLocationHeader />
+                    
+                    <!-- Right side - Location Selector -->
+                    <div class="min-w-64">
+                        <LocationSelector
+                            :locations="locations"
+                            :selected-location="selectedLocationId"
+                            @location-changed="handleLocationChange"
+                        />
                     </div>
+                </div>
+
+                <!-- Filters (show only when location is selected) -->
+                <div v-if="validSelectedLocation" class="mb-6">
                     <SubLocationFilters
                         :locations="locations"
                         :selected-location-id="selectedLocationId"
@@ -26,7 +33,7 @@
                 </div>
 
                 <!-- Selected Location Info -->
-                <div v-if="selectedLocationId" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                <div v-if="validSelectedLocation" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +58,7 @@
                 </div>
                 
                 <!-- Table Container -->
-                <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <div v-if="validSelectedLocation" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
                         :items="sublocations"
                         :columns="enhancedColumns"
@@ -104,8 +111,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Select a location to view sublocations</h3>
-                    <p class="text-gray-500">Choose a location from the filters above to get started</p>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Please select a location to view sublocations</h3>
+                    <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
+                    
+                    <!-- No Locations Available -->
+                    <div v-if="!locations || locations.length === 0" class="text-center">
+                        <p class="text-gray-500 mb-4">No locations available</p>
+                        <p class="text-sm text-gray-400">Please add a location first to manage sublocations</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,6 +130,8 @@ import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import SubLocationFilters from './SubLocationFilters.vue';
+import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
+import SubLocationHeader from './SubLocationHeader.vue';
 
 const props = defineProps({
     locations: Array,
@@ -155,6 +170,11 @@ const noDataMessage = computed(() => {
     }
     return 'No sublocations found for this location.';
 });
+
+const validSelectedLocation = computed(() => {
+    return props.selectedLocationId && props.locations?.some(loc => loc.id === props.selectedLocationId);
+});
+
 </script>
 
 <style scoped>

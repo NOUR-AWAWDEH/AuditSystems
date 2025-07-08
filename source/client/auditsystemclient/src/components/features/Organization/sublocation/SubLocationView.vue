@@ -79,7 +79,8 @@ const {
     handleLocationChange,
     handleSublocationAdded,
     handleSearch,
-    handleSort
+    handleSort,
+    resetToDefaultView
 } = useSubLocationTable(props.locations);
 
 // Remove useSubLocationFilters since search is now handled by the table
@@ -100,6 +101,11 @@ const {
     confirmDelete,
     cancelDelete
 } = useSubLocationActions(refreshData, showNotification);
+
+// Expose the reset method to parent
+defineExpose({
+    resetToDefaultView
+});
 </script>
 
 <style scoped>

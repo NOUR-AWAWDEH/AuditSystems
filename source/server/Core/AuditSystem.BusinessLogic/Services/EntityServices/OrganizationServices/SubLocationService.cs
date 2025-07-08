@@ -1,5 +1,5 @@
 ﻿using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Organization.Sublocation;
+using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
@@ -156,7 +156,7 @@ internal sealed class SubLocationService(
         }
     }
 
-    public async Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page? page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         

@@ -122,6 +122,25 @@ export function useSubLocationTable(locations) {
         // The watch will handle the API call
     };
     
+    // Add method to reset to default view
+    const resetToDefaultView = () => {
+        selectedLocationId.value = '';
+        searchQuery.value = '';
+        currentPage.value = 1;
+        clearSearch();
+    };
+    
+    // Watch for location changes to handle deleted locations
+    watch([locations, selectedLocationId], ([newLocations, currentLocationId]) => {
+        // If a location was selected but no longer exists in the locations array
+        if (currentLocationId && newLocations && newLocations.length > 0) {
+            const locationExists = newLocations.some(loc => loc.id === currentLocationId);
+            if (!locationExists) {
+                resetToDefaultView();
+            }
+        }
+    }, { deep: true });
+    
     return {
         sublocations,
         isLoading,
@@ -136,6 +155,7 @@ export function useSubLocationTable(locations) {
         handleSublocationAdded, // Add this to the return object
         handleLocationChange,
         handleSearch,
-        handleSort
+        handleSort,
+        resetToDefaultView
     };
 }

@@ -1,4 +1,4 @@
-using AuditSystem.Application.Constants.Organization.Sublocation;
+using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
 

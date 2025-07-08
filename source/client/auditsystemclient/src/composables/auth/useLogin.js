@@ -3,18 +3,19 @@ import { ref } from 'vue';
 import { loginRepository } from '@/services/auth/authRepos/loginRepository';
 import authService from '@/services/auth/authRepos/authService';
 
-export function useLogin() {
-  const isAuthenticated = ref(!!authService.getLocalToken());
-  const user = ref(null);
-  const error = ref(null);
-  const token = ref(authService.getLocalToken() || null);
-  const refreshToken = ref(authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null);
+// Move these outside the function to make them global/shared
+const isAuthenticated = ref(!!authService.getLocalToken());
+const user = ref(null);
+const error = ref(null);
+const token = ref(authService.getLocalToken() || null);
+const refreshToken = ref(authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null);
 
+export function useLogin() {
   const setAuthData = (newToken, newRefreshToken, username) => {
     token.value = newToken;
     refreshToken.value = newRefreshToken;
     user.value = { username };
-    isAuthenticated.value = true;
+    isAuthenticated.value = true; // This will now update globally
     authService.setLocalToken(token.value);
     authService.setLocalRefreshToken(refreshToken.value);
   };
@@ -51,6 +52,16 @@ export function useLogin() {
     }
   };
 
+  // Add a logout function to properly reset the global state
+  const logout = () => {
+    isAuthenticated.value = false;
+    user.value = null;
+    token.value = null;
+    refreshToken.value = null;
+    authService.removeLocalToken();
+    authService.removeLocalRefreshToken();
+  };
+
   return {
     isAuthenticated,
     user,
@@ -58,5 +69,6 @@ export function useLogin() {
     token,
     refreshToken,
     login,
+    logout,
   };
 }

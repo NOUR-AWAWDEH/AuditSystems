@@ -79,7 +79,7 @@ const handleLogin = async () => {
       // Initialize token refresh scheduling
       authStorage.initializeTokenRefresh();
     }
-    router.replace('/sidebar');
+    router.replace('/dashboard'); // Changed from '/sidebar' to '/dashboard'
   }
 };
 

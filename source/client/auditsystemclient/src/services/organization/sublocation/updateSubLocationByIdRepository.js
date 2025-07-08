@@ -48,7 +48,7 @@ export const updateSubLocationByIdRepository = {
       });
       
       if (error.response?.status === 401) {
-        console.error('🚫 Unauthorized - token may be invalid');
+        console.error('Unauthorized - token may be invalid');
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],
           'Authentication required'
@@ -56,7 +56,7 @@ export const updateSubLocationByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        console.error('❌ Bad Request:', error.response.data);
+        console.error(' Bad Request:', error.response.data);
         const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
         return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
       }

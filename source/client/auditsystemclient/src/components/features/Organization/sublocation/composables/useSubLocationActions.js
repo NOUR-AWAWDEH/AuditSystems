@@ -41,7 +41,7 @@ export function useSubLocationActions(refreshData, showNotification) {
     
     const handleSublocationUpdated = async (updatedSublocation) => {
         await refreshData();
-        showNotification(`Sublocation "${updatedSublocation.name}" has been updated successfully!`, 'success');
+        // The notification is already shown by the composable, so we don't need another one
         handleCloseEditSublocationModal();
     };
     

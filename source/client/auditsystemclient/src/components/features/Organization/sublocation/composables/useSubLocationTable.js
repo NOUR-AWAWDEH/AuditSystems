@@ -97,7 +97,8 @@ export function useSubLocationTable(locations) {
             await searchSubLocations(searchQuery.value, currentPage.value, pageSize.value, cacheBuster);
         } else {
             await getSubLocationsByUserId(cacheBuster);
-            sublocations.value = allSublocations.value;
+            // Remove this line - computed property will update automatically
+            // sublocations.value = allSublocations.value;
         }
     };
     

@@ -1,19 +1,10 @@
 <script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import BaseNotification from '@/components/base/BaseNotification.vue'; // Import the notification component
-
-const route = useRoute();
-const transitionName = computed(() => route.meta.transition || 'fade');
+import MainLayout from '@/components/layout/MainLayout.vue';
+import RouterViewWrapper from '@/components/layout/RouterViewWrapper.vue';
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen font-poppins">
-    <router-view v-slot="{ Component }">
-      <transition :name="transitionName">
-        <component :is="Component" />
-      </transition>
-    </router-view>
-    <BaseNotification />
-  </div>
+  <MainLayout>
+    <RouterViewWrapper />
+  </MainLayout>
 </template>

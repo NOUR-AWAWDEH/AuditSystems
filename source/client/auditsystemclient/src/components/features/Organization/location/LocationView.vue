@@ -1,12 +1,7 @@
 <template>
-    <div class="flex min-h-screen bg-gray-50">
-        <!-- Sidebar - Full Height -->
-        <div class="flex-shrink-0">
-            <SideBar class="min-h-screen" />
-        </div>
-        
+    <div class="flex min-h-[calc(100vh-4rem)] bg-gray-50">
         <!-- Main Content with full height -->
-        <div class="flex-1 min-h-screen p-3 sm:p-4 md:p-6">
+        <div class="flex-1 min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-6">
             <!-- Location Management Section -->
             <div class="space-y-6">
                 <!-- Location Header -->
@@ -38,8 +33,6 @@
             </div>
         </div>
         
-       
-        
         <!-- Edit Location Modal -->
         <EditLocationModal
             v-if="showEditLocationModal"
@@ -64,7 +57,6 @@
 </template>
 
 <script setup>
-import SideBar from '@/components/common/SideBar.vue';
 import LocationHeader from './components/LocationHeader.vue';
 import LocationTable from './components/LocationTable.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
@@ -108,9 +100,9 @@ const {
 </script>
 
 <style scoped>
-.min-h-screen {
-    min-height: 100vh;
-    min-height: 100dvh;
+.min-h-\[calc\(100vh-4rem\)\] {
+    min-height: calc(100vh - 4rem);
+    min-height: calc(100dvh - 4rem);
 }
 
 @media (max-width: 640px) {

@@ -45,25 +45,33 @@ export function useUpdateSubLocationById() {
 
   const updateSubLocation = async (subLocationData) => {
     try {
+      
       isUpdating.value = true;
       error.value = null;
       updatedSubLocation.value = null;
-
+  
       // Validate required fields
       const validationError = validateSubLocationData(subLocationData);
       if (validationError) {
+        console.error('❌ Validation failed:', validationError);
         return handleUpdateFailure({ message: validationError });
       }
-
-      // Fix: Change from updateSubLocation to updateSubLocationById
+  
       const response = await updateSubLocationByIdRepository.updateSubLocationById(subLocationData);
-
+  
       if (response?.success) {
         return handleUpdateSuccess(response);
       } else {
+        console.error('❌ Update failed - response not successful:', response);
         return handleUpdateFailure(response);
       }
     } catch (err) {
+      console.error('❌ Exception in updateSubLocation:', err);
+      console.error('Exception details:', {
+        message: err.message,
+        stack: err.stack,
+        response: err.response?.data
+      });
       return handleUpdateFailure(err, err.message || 'Failed to update sublocation');
     } finally {
       isUpdating.value = false;

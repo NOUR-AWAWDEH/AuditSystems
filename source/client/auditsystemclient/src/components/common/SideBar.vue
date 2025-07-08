@@ -3,14 +3,14 @@
     <!-- Mobile Overlay Background -->
     <div 
       v-if="!isCollapsed && isMobile" 
-      class="fixed inset-0 bg-black bg-opacity-75 z-40 md:hidden"
+      class="fixed inset-0 bg-white bg-opacity-10 z-40 md:hidden"
       @click="toggleSidebar"
     ></div>
     
-    <!-- Sidebar - Always Fixed Full Height -->
+    <!-- Sidebar - Always Fixed Full Height but positioned under NavBar -->
     <div :class="[
       'bg-secondary-base text-white transition-all duration-300 z-50',
-      'fixed left-0 top-0 h-screen',
+      'fixed left-0 top-16 h-[calc(100vh-4rem)]',
       isCollapsed 
         ? 'w-12 sm:w-14 md:w-16 px-1' 
         : isMobile 
@@ -25,7 +25,6 @@
             :toggle-sidebar="toggleSidebar" 
           />
         </div>
-        <SidebarHeader :is-collapsed="isCollapsed" />
         <div class="flex-1 overflow-y-auto">
           <SidebarNavigation :is-collapsed="isCollapsed" />
         </div>
@@ -74,15 +73,15 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Ensure sidebar is always fixed and full height */
+/* Ensure sidebar is always fixed and positioned under navbar */
 .fixed {
   position: fixed !important;
 }
 
-/* Ensure sidebar always takes full height */
-.h-screen {
-  height: 100vh;
-  height: 100dvh; /* Dynamic viewport height for better mobile support */
+/* Ensure sidebar takes full height minus navbar height */
+.h-\[calc\(100vh-4rem\)\] {
+  height: calc(100vh - 4rem);
+  height: calc(100dvh - 4rem); /* Dynamic viewport height for better mobile support */
 }
 
 .h-full {

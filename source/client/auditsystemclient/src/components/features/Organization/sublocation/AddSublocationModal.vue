@@ -4,7 +4,7 @@
       <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div 
-          class="absolute inset-0 bg-gray-shade bg-opacity-80 transition-opacity"
+          class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
           @click="$emit('close')"
         ></div>
         

@@ -47,7 +47,7 @@
                         </div>
                         <BaseButton 
                             @click="$emit('add-sublocation')"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
+                            class="inline-flex items-center px-2 py-1 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
                         >
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -107,16 +107,15 @@
 
                 <!-- No Location Selected -->
                 <div v-else class="text-center py-16">
-                    <svg class="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-20 h-20 text-secondary-base mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Please select a location to view sublocations</h3>
+                    <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a location to view sublocations</h3>
                     <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
                     
                     <!-- No Locations Available -->
                     <div v-if="!locations || locations.length === 0" class="text-center">
-                        <p class="text-gray-500 mb-4">No locations available</p>
                         <p class="text-sm text-gray-400">Please add a location first to manage sublocations</p>
                     </div>
                 </div>
@@ -160,6 +159,7 @@ const sublocationColumns = [
 ];
 
 const enhancedColumns = computed(() => {
+    // Defensive: never assign to this computed, only use it as a getter
     return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
 });
 

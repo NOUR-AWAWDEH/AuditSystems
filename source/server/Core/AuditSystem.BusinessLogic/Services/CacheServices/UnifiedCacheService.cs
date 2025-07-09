@@ -227,4 +227,59 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             tags: _listTags,
             expiration: CacheExpirations.MediumTerm);
     }
+
+    // New generic helper methods
+    public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(TId id, Guid userId, Expression<Func<TEntity, Guid>> userIdSelector, string unauthorizedMessage)
+    {
+        var cacheKey = GetCacheKey(id);
+        var cachedEntity = await _cacheService.GetAsync<TEntity>(cacheKey);
+
+        if (cachedEntity == null)
+        {
+            return default;
+        }
+
+        // Compile the expression to get the userId from the entity
+        var compiledSelector = userIdSelector.Compile();
+        var entityUserId = compiledSelector(cachedEntity);
+
+        if (entityUserId == userId)
+        {
+            return mapper.Map<TTargetModel>(cachedEntity);
+        }
+
+        if (entityUserId != userId)
+        {
+            throw new UnauthorizedAccessException(
+                string.Format(unauthorizedMessage, userId, id));
+        }
+
+        return default;
+    }
+
+    public async Task CacheEntityAsync(TEntity entity)
+    {
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
+    }
+
+    public async Task ClearEntityCacheAsync(TId id)
+    {
+        var cacheKey = GetCacheKey(id);
+        await ClearCacheAsync(cacheKey);
+    }
+    
+    // Add this new generic method
+    public async Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName)
+    {
+        // Clear search caches for this user
+        var searchPattern = $"{entityTypeName.ToLower()}_search_user_{userId}_*";
+        await _cacheService.RemoveAsync(searchPattern);
+        
+        // Clear user entity list cache
+        var userListKey = $"{entityTypeName.ToLower()}_list_user_{userId}";
+        await _cacheService.RemoveAsync(userListKey);
+        
+        _logger.LogDebug("Cleared user-related caches for user {UserId} and entity type {EntityType}", userId, entityTypeName);
+    }
 }

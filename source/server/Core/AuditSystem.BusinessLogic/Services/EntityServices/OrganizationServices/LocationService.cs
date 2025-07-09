@@ -40,24 +40,16 @@ internal sealed class LocationService(
         
         logger.LogInformation("Creating location for user {UserId}", userId);
 
-        try
-        {
-            var entity = mapper.Map<Location>(locationModel);
-            entity.UserId = userId; // Ensure the userId is set on the entity
-            var createdEntity = await repository.CreateAsync(entity);
+        var entity = mapper.Map<Location>(locationModel);
+        entity.UserId = userId;
+        var createdEntity = await repository.CreateAsync(entity);
 
-            await CacheEntityAsync(createdEntity);
+        await CacheEntityAsync(createdEntity);
 
-            logger.LogInformation("Successfully created location {LocationId} for user {UserId}", 
-                createdEntity.Id, userId);
-            
-            return createdEntity.Id;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to create location for user {UserId}", userId);
-            throw;
-        }
+        logger.LogInformation("Successfully created location {LocationId} for user {UserId}", 
+            createdEntity.Id, userId);
+        
+        return createdEntity.Id;
     }
 
     public async Task<LocationModel> GetLocationByIdAsync(Guid id, Guid userId)
@@ -66,26 +58,23 @@ internal sealed class LocationService(
         
         logger.LogDebug("Retrieving location {LocationId} for user {UserId}", id, userId);
 
-        try
+        var cachedResult = await TryGetFromCacheWithValidationAsync<LocationModel>(
+            id, 
+            userId, 
+            entity => entity.UserId, 
+            LocationConstants.UnauthorizedAccessMessage);
+            
+        if (cachedResult != null)
         {
-            var cachedResult = await TryGetFromCacheWithValidationAsync(id, userId);
-            if (cachedResult != null)
-            {
-                logger.LogDebug("Retrieved location {LocationId} from cache", id);
-                return cachedResult;
-            }
+            logger.LogDebug("Retrieved location {LocationId} from cache", id);
+            return cachedResult;
+        }
 
-            var entity = await _validationHelper.ValidateLocationOwnershipAsync(id, userId);
-            
-            await CacheEntityAsync(entity);
-            
-            return mapper.Map<LocationModel>(entity);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve location {LocationId} for user {UserId}", id, userId);
-            throw;
-        }
+        var entity = await _validationHelper.ValidateLocationOwnershipAsync(id, userId);
+        
+        await CacheEntityAsync(entity);
+        
+        return mapper.Map<LocationModel>(entity);
     }
 
     public async Task DeleteLocationAsync(Guid locationId, Guid userId)
@@ -94,22 +83,17 @@ internal sealed class LocationService(
         
         logger.LogInformation("Deleting location {LocationId} for user {UserId}", locationId, userId);
 
-        try
-        {
-            await _validationHelper.ValidateLocationOwnershipAsync(locationId, userId);
-            
-            await repository.DeleteAsync(locationId);
-            
-            await ClearEntityCacheAsync(locationId);
-            
-            logger.LogInformation("Successfully deleted location {LocationId}", locationId);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to delete location {LocationId} for user {UserId}", 
-                locationId, userId);
-            throw;
-        }
+        await _validationHelper.ValidateLocationOwnershipAsync(locationId, userId);
+        
+        await repository.DeleteAsync(locationId);
+        
+        // Clear individual entity cache using generic method
+        await ClearEntityCacheAsync(locationId);
+        
+        // Add this line to clear user-related caches
+        await ClearUserRelatedCachesAsync(userId, "Location");
+        
+        logger.LogInformation("Successfully deleted location {LocationId}", locationId);
     }
 
     public async Task UpdateLocationAsync(LocationModel locationModel, Guid userId)
@@ -119,27 +103,18 @@ internal sealed class LocationService(
         
         logger.LogInformation("Updating location {LocationId} for user {UserId}", 
             locationModel.Id, userId);
+
+        // Get the tracked entity from validation
+        var existingEntity = await _validationHelper.ValidateLocationOwnershipAsync(locationModel.Id, userId);
     
-        try
-        {
-            // Get the tracked entity from validation
-            var existingEntity = await _validationHelper.ValidateLocationOwnershipAsync(locationModel.Id, userId);
+        // Map the model to the existing tracked entity
+        mapper.Map(locationModel, existingEntity);
         
-            // Map the model to the existing tracked entity
-            mapper.Map(locationModel, existingEntity);
-            
-            await repository.UpdateAsync(existingEntity);
+        await repository.UpdateAsync(existingEntity);
+    
+        await CacheEntityAsync(existingEntity);
         
-            await CacheEntityAsync(existingEntity);
-            
-            logger.LogInformation("Successfully updated location {LocationId}", locationModel.Id);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to update location {LocationId} for user {UserId}", 
-                locationModel.Id, userId);
-            throw;
-        }
+        logger.LogInformation("Successfully updated location {LocationId}", locationModel.Id);
     }
 
     public async Task<PaginationResult<LocationModel>> SearchAsync(string? name, Page page)
@@ -153,7 +128,7 @@ internal sealed class LocationService(
         var cachedResult = await GetFromCacheAsync<LocationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved search results from cache");
+            logger.LogDebug(LocationConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -186,62 +161,22 @@ internal sealed class LocationService(
         
         logger.LogDebug("Retrieving all locations for user {UserId}", userId);
 
-        try
-        {
-            var query = repository.GetAll()
-                .Where(l => l.UserId == userId)
-                .Select(l => new LocationModel
-                {
-                    Id = l.Id,
-                    Name = l.Name,
-                    UserId = l.UserId,
-                    CreatedAt = l.CreatedAt,
-                    UpdatedAt = l.UpdatedAt,
-                    Address = l.Address,
-                    CompanyId = l.CompanyId,
-                });
+        var query = repository.GetAll()
+            .Where(l => l.UserId == userId)
+            .Select(l => new LocationModel
+            {
+                Id = l.Id,
+                Name = l.Name,
+                UserId = l.UserId,
+                CreatedAt = l.CreatedAt,
+                UpdatedAt = l.UpdatedAt,
+                Address = l.Address,
+                CompanyId = l.CompanyId,
+            });
 
-            var locations = await query.ToListAsync();
-            logger.LogDebug("Retrieved {Count} locations for user {UserId}", locations.Count, userId);
-            
-            return locations;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to retrieve locations for user {UserId}", userId);
-            throw;
-        }
-    }
-
-    // Private helper methods
-    private async Task<LocationModel?> TryGetFromCacheWithValidationAsync(Guid id, Guid userId)
-    {
-        var cacheKey = GetCacheKey(id);
-        var cachedEntity = await cacheService.GetAsync<Location>(cacheKey);
+        var locations = await query.ToListAsync();
+        logger.LogDebug("Retrieved {Count} locations for user {UserId}", locations.Count, userId);
         
-        if (cachedEntity?.UserId == userId)
-        {
-            return mapper.Map<LocationModel>(cachedEntity);
-        }
-        
-        if (cachedEntity != null && cachedEntity.UserId != userId)
-        {
-            throw new UnauthorizedAccessException(
-                string.Format(LocationConstants.UnauthorizedAccessMessage, userId, id));
-        }
-        
-        return null;
-    }
-
-    private async Task CacheEntityAsync(Location entity)
-    {
-        var cacheKey = GetCacheKey(entity.Id);
-        await SetCacheAsync(cacheKey, entity);
-    }
-
-    private async Task ClearEntityCacheAsync(Guid entityId)
-    {
-        var cacheKey = GetCacheKey(entityId);
-        await ClearCacheAsync(cacheKey);
+        return locations;
     }
 }

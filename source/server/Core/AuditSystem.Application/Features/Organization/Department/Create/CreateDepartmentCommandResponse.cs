@@ -1,3 +1,3 @@
 ﻿namespace AuditSystem.Application.Features.Organization.Department.Create;
 
-public sealed record class CreateDepartmentCommandResponse(Guid DepartmentId);
+public sealed record CreateDepartmentCommandResponse(Guid DepartmentId);

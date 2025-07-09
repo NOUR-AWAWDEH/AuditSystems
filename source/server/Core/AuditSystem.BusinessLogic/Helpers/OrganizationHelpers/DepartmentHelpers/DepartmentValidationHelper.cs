@@ -21,10 +21,10 @@ public class DepartmentValidationHelper
     }
     public async Task<Department> ValidateDepartmentOwnerShipAsync(Guid departmentId, Guid userId)
     {
-        var department = await _repository.GetByIdAsync(departmentId, DepartmentConstants.IncludeSubLocation)
+        var department = await _repository.GetByIdAsync(departmentId, DepartmentConstants.IncludeHierarchy)
             ?? throw new KeyNotFoundException(string.Format(DepartmentConstants.DepartmentNotFoundMessage, departmentId));
 
-        if (department.SubLocation.Location.UserId != userId)
+        if (department.SubLocation?.Location?.UserId != userId)
         {
             throw new UnauthorizedAccessException(
                 string.Format(DepartmentConstants.UnauthorizedDepartmentAccessMessage, userId, departmentId));
@@ -35,10 +35,11 @@ public class DepartmentValidationHelper
     
     public async Task<SubLocation> ValidateSubLocationOwnerShipAsync(Guid subLocationId, Guid userId)
     {
-        var subLocation = await _repository.GetByIdAsync<SubLocation>(subLocationId)
+        var subLocation = await _repository.GetByIdAsync(subLocationId, SubLocationConstants.IncludeLocation)
             ?? throw new KeyNotFoundException(string.Format(DepartmentConstants.SubLocationNotFoundMessage, subLocationId));
 
-        if (subLocation.Location.UserId != userId)
+        // Add null check for safety
+        if (subLocation.Location?.UserId != userId)
         {
             throw new UnauthorizedAccessException(
                 string.Format(DepartmentConstants.UnauthorizedSubLocationAccessMessage, userId, subLocationId));
@@ -47,4 +48,3 @@ public class DepartmentValidationHelper
         return subLocation;
     }
 }
-

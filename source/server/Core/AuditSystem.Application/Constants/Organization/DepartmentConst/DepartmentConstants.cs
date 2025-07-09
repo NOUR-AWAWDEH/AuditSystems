@@ -7,7 +7,13 @@ public static class DepartmentConstants
 {
     public static readonly string[] DepartmentTags = ["department", "department-list"];
     public static readonly string[] ListTags = ["department-list"];
-    public static readonly Expression<Func<Department, object?>>[] IncludeSubLocation = [d => d.SubLocation];    
+    public static readonly Expression<Func<Department, object?>>[] IncludeHierarchy =
+    [
+        d => d.SubLocation,
+        d => d.SubLocation.Location
+    ];
+
+
     public const string EntityName = "Department";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access department {1}.";

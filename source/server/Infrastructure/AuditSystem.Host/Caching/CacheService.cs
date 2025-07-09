@@ -2,6 +2,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AuditSystem.Host.Caching;
 
@@ -36,14 +37,18 @@ internal class CacheService : ICacheService
         ArgumentNullException.ThrowIfNull(key, nameof(key));
         ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        var serializedValue = JsonSerializer.Serialize(value);
-        var options = new DistributedCacheEntryOptions
+        var options = new JsonSerializerOptions
+        {
+            ReferenceHandler = ReferenceHandler.Preserve
+        };
+        var serializedValue = JsonSerializer.Serialize(value, options);
+        var cacheOptions = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = expiration
         };
 
         // Store the value in distributed cache
-        await _distributedCache.SetStringAsync(key, serializedValue, options, cancellationToken);
+        await _distributedCache.SetStringAsync(key, serializedValue, cacheOptions, cancellationToken);
 
         // Associate tags if provided
         if (tags != null && tags.Any())

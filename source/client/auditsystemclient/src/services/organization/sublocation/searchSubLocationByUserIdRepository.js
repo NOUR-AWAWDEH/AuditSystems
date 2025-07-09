@@ -21,6 +21,11 @@ export const searchSubLocationByUserIdRepository = {
                 queryParams.append('searchTerm', searchParams.searchTerm);
             }
             
+            // Add locationId parameter for server-side filtering
+            if (searchParams.locationId) {
+                queryParams.append('locationId', searchParams.locationId);
+            }
+            
             // Pagination parameters
             if (searchParams.page) {
                 queryParams.append('page', searchParams.page);
@@ -47,16 +52,16 @@ export const searchSubLocationByUserIdRepository = {
                 }
             });
 
-            return ApiResponseT.success(response.data);
+            return ApiResponseT.ok(response.data, 'Sublocations retrieved successfully');
             
         } catch (error) {
             console.error('Error searching sublocations:', error);
             
             if (error.response?.status === 401) {
-                return ApiResponseT.error('Unauthorized: Please login again');
+                return ApiResponseT.unauthorized('Unauthorized: Please login again');
             }
             
-            return ApiResponseT.error(
+            return ApiResponseT.internalServerError(
                 error.response?.data?.message || 
                 error.message || 
                 'Failed to search sublocations'

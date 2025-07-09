@@ -1,5 +1,6 @@
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Common;
+using System.Linq.Expressions;
 
 namespace AuditSystem.Contract.Interfaces.Cache;
 
@@ -19,4 +20,12 @@ public interface IUnifiedCacheService<TId, TEntity, TModel>
     string GetSearchCacheKey(string? searchTerm, Page page);
     Task SetCacheAsync(string cacheKey, TEntity entity);
     (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page);
+    
+    // New generic helper methods
+    Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(TId id, Guid userId, Expression<Func<TEntity, Guid>> userIdSelector, string unauthorizedMessage);
+    Task CacheEntityAsync(TEntity entity);
+    Task ClearEntityCacheAsync(TId id);
+    
+    // Add this new generic method
+    Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName);
 }

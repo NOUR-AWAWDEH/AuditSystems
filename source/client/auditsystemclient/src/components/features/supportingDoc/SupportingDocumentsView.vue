@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import SideBar from "@/components/common/SideBar.vue";
 import DocumentUploadSection from "./components/DocumentUploadSection.vue";
 import DocumentsTable from "./components/DocumentsTable.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
@@ -137,14 +136,9 @@ defineExpose({
 <template>
   <div>
     <div class="flex min-h-screen bg-gray-50">
-      <!-- Sidebar - Full Height -->
-      <div class="flex-shrink-0">
-        <SideBar class="min-h-screen" />
-      </div>
-      
       <!-- Main Content with full height -->
       <div class="flex-1 min-h-screen p-3 sm:p-4 md:p-6">
-        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-900">Supporting Documents</h2>
+        <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-4 md:mb-6 text-secondary-base">Supporting Documents</h2>
         
         <!-- Loading State -->
         <div v-if="isLoadingDocuments" class="text-center py-6 md:py-8">

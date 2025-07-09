@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Organization.Sublocation;
+using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
@@ -26,29 +26,46 @@ public class SubLocationSearchHelper
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public static Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
+    public static Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? locationId = null)
     {
         return sl => sl.Location.UserId == userId && 
-                    (string.IsNullOrEmpty(searchTerm) || sl.Name.Contains(searchTerm));
+                    (string.IsNullOrEmpty(searchTerm) || sl.Name.Contains(searchTerm)) &&
+                    (!locationId.HasValue || sl.LocationId == locationId.Value);
     }
 
+    // Original method for backward compatibility
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
     {
+        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
+    }
+
+    // Updated method with locationId support
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? locationId, Page page)
+    {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
+        var locationIdStr = locationId?.ToString() ?? "all";
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.SubLocation, userId, normalizedSearchTerm, page.Number, page.Size);
+            CacheKeys.SubLocation, userId, normalizedSearchTerm, locationIdStr, page.Number, page.Size);
         
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.SubLocation, userId, normalizedSearchTerm);
+            CacheKeys.SubLocation, userId, normalizedSearchTerm, locationIdStr);
         
         return (cacheKey, countCacheKey);
     }
 
+    // Original method for backward compatibility
     public async Task<PaginationResult<SubLocationModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm));
+        return await GetUserSearchFromRepositoryAsync(userId, searchTerm, null, page, cacheKey, countCacheKey);
+    }
+
+    // Updated method with locationId support
+    public async Task<PaginationResult<SubLocationModel>> GetUserSearchFromRepositoryAsync(
+        Guid userId, string? searchTerm, Guid? locationId, Page page, string cacheKey, string countCacheKey)
+    {
+        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, locationId));
     
         var totalCount = query.Count;
         var items = query

@@ -6,14 +6,14 @@ import LocationIcon from '@/components/common/sidebar/icons/LocationIcon.vue'
 export const navigationItems = [
   {
     route: '/dashboard',
-    name: 'Dashboard', // matches router name
+    name: 'Dashboard',
     label: 'Dashboard',
     icon: DashboardIcon,
     requiresAuth: true
   },
   {
     route: '/supporting-docs',
-    name: 'SupportingDocs', // matches router name
+    name: 'SupportingDocs',
     label: 'Supporting Docs',
     icon: DocumentIcon,
     requiresAuth: true
@@ -25,6 +25,7 @@ export const navigationItems = [
     icon: LocationIcon,
     requiresAuth: true
   }
+  // Removed User Menu from sidebar navigation
 ]
 
 // Filter navigation items based on authentication status

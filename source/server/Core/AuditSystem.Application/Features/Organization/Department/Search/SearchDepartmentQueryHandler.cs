@@ -13,7 +13,7 @@ internal sealed class SearchDepartmentQueryHandler(IDepartmentService department
     public async Task<Result<PaginationRequestResponse<DepartmentModel>>> Handle(SearchDepartmentQuery request, CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
-        var searchResult = await departmentService.SearchAsync(request.SearchTerm, page);
+        var searchResult = await departmentService.SearchByUserIdAsync(request.UserId, request.SearchTerm, request.SubLocationId, page);
         var response = new PaginationRequestResponse<DepartmentModel>(searchResult.Items, searchResult.TotalCount);
         return Result.Success(response);
     }

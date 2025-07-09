@@ -3,30 +3,37 @@
         <!-- Sublocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-6">
-                <!-- Header with Title and Filters -->
+                <!-- Header with Location Selection -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-                    <div class="flex items-center"> 
-                        <div>
-                            <h2 class="text-2xl font-bold text-secondary-base">
-                                Sublocations
-                            </h2>
-                            <p class="text-sm text-gray-500 mt-1">Manage your organization sublocations</p>
-                        </div>
+                    <!-- Left side - Title and Description -->
+                    <SubLocationHeader />
+                    
+                    <!-- Right side - Location Selector -->
+                    <div class="min-w-64">
+                        <LocationSelector
+                            :locations="locations"
+                            :selected-location="selectedLocationId"
+                            @location-changed="handleLocationChange"
+                        />
                     </div>
+                </div>
+
+                <!-- Filters (show only when location is selected) -->
+                <div v-if="validSelectedLocation" class="mb-6">
                     <SubLocationFilters
                         :locations="locations"
                         :selected-location-id="selectedLocationId"
-                        :search="search"
-                        :sort="sort"
-                        @update:selected-location-id="$emit('update:selectedLocationId', $event)"
-                        @update:search="$emit('update:search', $event)"
-                        @update:sort="$emit('update:sort', $event)"
-                        @refresh="$emit('refresh')"
+                        :search="searchQuery"
+                        :sort="sortBy"
+                        @update:selected-location-id="handleLocationChange"
+                        @update:search="handleSearch"
+                        @update:sort="handleSort"
+                        @refresh="refreshData"
                     />
                 </div>
 
                 <!-- Selected Location Info -->
-                <div v-if="selectedLocationId" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                <div v-if="validSelectedLocation" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,11 +42,12 @@
                             </svg>
                             <p class="text-sm text-gray-700">
                                 Showing sublocations for: <span class="font-semibold text-blue-800">{{ selectedLocation?.name || 'Selected Location' }}</span>
+                                <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
                         <BaseButton 
                             @click="$emit('add-sublocation')"
-                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
+                            class="inline-flex items-center px-2 py-1 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
                         >
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -50,12 +58,13 @@
                 </div>
                 
                 <!-- Table Container -->
-                <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <div v-if="validSelectedLocation" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
                         :items="sublocations"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
                         :actions="[]"
+                        :no-data-message="noDataMessage"
                         class="sublocation-table"
                     >
                         <template #cell-actions="{ item }">
@@ -81,24 +90,34 @@
                             </div>
                         </template>
                     </ReusableTable>
-
-                    <div v-if="!isLoading && sublocations.length === 0" class="text-center py-12">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
-                        <p class="text-lg text-gray-500 mb-2">No sublocations found</p>
-                        <p class="text-sm text-gray-400">No sublocations exist for this location yet.</p>
+                    
+                    <!-- Clear Search Button (shown when no results and searching) -->
+                    <div v-if="searchQuery && sublocations.length === 0 && !isLoading" class="text-center py-4 border-t border-gray-200">
+                        <button
+                            @click="handleSearch('')"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+                        >
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Clear Search
+                        </button>
                     </div>
                 </div>
 
                 <!-- No Location Selected -->
                 <div v-else class="text-center py-16">
-                    <svg class="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-20 h-20 text-secondary-base mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Select a location to view sublocations</h3>
-                    <p class="text-gray-500">Choose a location from the filters above to get started</p>
+                    <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a location to view sublocations</h3>
+                    <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
+                    
+                    <!-- No Locations Available -->
+                    <div v-if="!locations || locations.length === 0" class="text-center">
+                        <p class="text-sm text-gray-400">Please add a location first to manage sublocations</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -110,6 +129,8 @@ import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import SubLocationFilters from './SubLocationFilters.vue';
+import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
+import SubLocationHeader from './SubLocationHeader.vue';
 
 const props = defineProps({
     locations: Array,
@@ -117,18 +138,18 @@ const props = defineProps({
     isLoading: Boolean,
     selectedLocationId: String,
     selectedLocation: Object,
-    search: String,
-    sort: String
+    searchQuery: String,
+    sortBy: String,
+    handleLocationChange: Function,
+    handleSearch: Function,
+    handleSort: Function,
+    refreshData: Function
 });
 
 defineEmits([
     'add-sublocation',
     'edit-sublocation',
-    'delete-sublocation',
-    'update:selectedLocationId',
-    'update:search',
-    'update:sort',
-    'refresh'
+    'delete-sublocation'
 ]);
 
 const sublocationColumns = [
@@ -138,8 +159,22 @@ const sublocationColumns = [
 ];
 
 const enhancedColumns = computed(() => {
+    // Defensive: never assign to this computed, only use it as a getter
     return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
 });
+
+// Computed property for dynamic no data message
+const noDataMessage = computed(() => {
+    if (props.searchQuery) {
+        return `No sublocations found for "${props.searchQuery}".`;
+    }
+    return 'No sublocations found for this location.';
+});
+
+const validSelectedLocation = computed(() => {
+    return props.selectedLocationId && props.locations?.some(loc => loc.id === props.selectedLocationId);
+});
+
 </script>
 
 <style scoped>

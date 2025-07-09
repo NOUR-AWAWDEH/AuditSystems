@@ -7,6 +7,6 @@ public class SubLocation : Entity<Guid>
     public required string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public required Guid LocationId { get; set; }
-    
     public virtual Location Location { get; set; } = null!;
+    public virtual ICollection<Department> Departments { get; set; } = new HashSet<Department>();
 }

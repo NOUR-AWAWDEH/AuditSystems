@@ -625,24 +625,25 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("SubLocationId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("SubLocationId");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Department", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
@@ -1845,9 +1846,13 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Organization.Company", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubLocation", "SubLocation")
                         .WithMany("Departments")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("SubLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubLocation");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
@@ -2202,8 +2207,6 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Company", b =>
                 {
-                    b.Navigation("Departments");
-
                     b.Navigation("Locations");
 
                     b.Navigation("Users");
@@ -2212,6 +2215,11 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
                 {
                     b.Navigation("SubDepartments");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubLocation", b =>
+                {
+                    b.Navigation("Departments");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>

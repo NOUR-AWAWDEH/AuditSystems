@@ -13,6 +13,8 @@ public interface IRepository<TId, TEntity>
     Task<TEntity?> GetByIdAsync(TId id);
     // Add generic method for cross-entity queries
     Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id) where TOtherEntity : class;
+    // Add generic method for cross-entity queries with includes
+    Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id, Expression<Func<TOtherEntity, object?>>[]? include = null) where TOtherEntity : class;
     // Enhanced method with include support
     Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null);
     Task DeleteAsync(TId id);

@@ -10,13 +10,22 @@ export function useSearchSubLocationByUserId() {
   const currentPage = ref(1);
   const pageSize = ref(10);
   const searchTerm = ref('');
+  const locationId = ref(null);
   const { showNotification } = useNotification();
 
   const handleSearchSuccess = (response) => {
-    searchResults.value = response.result?.items || response.result || [];
-    totalCount.value = response.result?.totalCount || searchResults.value.length;
+    
+    // Fix: Handle the nested structure - data is at response.result.result.items
+    const items = response.result?.result?.items || response.result?.items || [];
+    const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0; // Renamed to avoid conflict
+        
+    const isValidArray = Array.isArray(items);
+    
+    searchResults.value = isValidArray ? items : [];
+    totalCount.value = extractedTotalCount; // Now using the renamed variable
+        
     return { success: true, data: response.result };
-  };
+};
   
   const handleSearchFailure = (response, defaultErrorMessage = 'Failed to search sublocations') => {
     const errorMessage = response?.errors?.length
@@ -40,6 +49,7 @@ export function useSearchSubLocationByUserId() {
 
       const params = {
         searchTerm: searchParams.searchTerm || searchTerm.value,
+        locationId: searchParams.locationId || locationId.value,
         page: searchParams.page || currentPage.value,
         pageSize: searchParams.pageSize || pageSize.value,
         sortBy: searchParams.sortBy,
@@ -48,6 +58,7 @@ export function useSearchSubLocationByUserId() {
 
       // Update local state
       if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
+      if (searchParams.locationId !== undefined) locationId.value = searchParams.locationId;
       if (searchParams.page !== undefined) currentPage.value = searchParams.page;
       if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
@@ -68,6 +79,7 @@ export function useSearchSubLocationByUserId() {
   const clearSearch = () => {
     searchResults.value = [];
     searchTerm.value = '';
+    locationId.value = null;
     currentPage.value = 1;
     error.value = null;
     totalCount.value = 0;
@@ -101,6 +113,7 @@ export function useSearchSubLocationByUserId() {
     totalCount.value = 0;
     currentPage.value = 1;
     searchTerm.value = '';
+    locationId.value = null;
   };
 
   return {
@@ -112,6 +125,7 @@ export function useSearchSubLocationByUserId() {
     currentPage,
     pageSize,
     searchTerm,
+    locationId,
 
     // Actions
     searchSubLocations,

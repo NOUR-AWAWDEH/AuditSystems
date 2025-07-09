@@ -36,11 +36,10 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         return await _entities.FindAsync(id);
     }
 
-    // Enhanced GetByIdAsync with include support
-    public async Task<TEntity?> GetByIdAsync(TId id, params Expression<Func<TEntity, object?>>[] include)
+    public async Task<TEntity?> GetByIdAsync(TId id, Expression<Func<TEntity, object?>>[]? include = null)
     {
         IQueryable<TEntity> query = _entities.AsQueryable();
-        
+
         if (include != null && include.Length > 0)
         {
             foreach (var includeProperty in include)
@@ -56,6 +55,22 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     public async Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id) where TOtherEntity : class
     {
         return await context.Set<TOtherEntity>().FindAsync(id);
+    }
+
+    // Generic method for cross-entity queries with includes
+    public async Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id, Expression<Func<TOtherEntity, object?>>[]? include = null) where TOtherEntity : class
+    {
+        IQueryable<TOtherEntity> query = context.Set<TOtherEntity>().AsQueryable();
+
+        if (include != null && include.Length > 0)
+        {
+            foreach (var includeProperty in include)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
+        
+        return await query.FirstOrDefaultAsync(e => EF.Property<object>(e, "Id").Equals(id));
     }
 
     public async Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null)

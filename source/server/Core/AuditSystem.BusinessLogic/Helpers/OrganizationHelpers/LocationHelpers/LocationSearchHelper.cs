@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Organization.Location;
+using AuditSystem.Application.Constants.Organization.LocationConst;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;

@@ -87,7 +87,7 @@ public sealed class ApiResponse<T> : ApiResponse
     public static ApiResponse<T> Created(T result) =>
         new() { Success = true, StatusCode = StatusCodes.Status201Created, Result = result };
 
-    public static ApiResponse<T> BadRequest(string errorMessage) =>
+    public static new ApiResponse<T> BadRequest(string errorMessage) =>
         new()
         {
             Success = false,
@@ -96,7 +96,7 @@ public sealed class ApiResponse<T> : ApiResponse
             Result = default
         };
 
-    public static ApiResponse<T> BadRequest(IEnumerable<ApiErrorResponse> errors) =>
+    public static new ApiResponse<T> BadRequest(IEnumerable<ApiErrorResponse> errors) =>
         new()
         {
             Success = false,
@@ -105,7 +105,7 @@ public sealed class ApiResponse<T> : ApiResponse
             Result = default
         };
 
-    public static ApiResponse<T> Unauthorized(string errorMessage) =>
+    public static new ApiResponse<T> Unauthorized(string errorMessage) =>
         new()
         {
             Success = false,
@@ -114,7 +114,7 @@ public sealed class ApiResponse<T> : ApiResponse
             Result = default
         };
 
-    public static ApiResponse<T> Forbidden(string errorMessage) =>
+    public static new ApiResponse<T> Forbidden(string errorMessage) =>
         new()
         {
             Success = false,
@@ -132,7 +132,7 @@ public sealed class ApiResponse<T> : ApiResponse
             Result = default
         };
 
-    public static ApiResponse<T> InternalServerError(string errorMessage) =>
+    public static new ApiResponse<T> InternalServerError(string errorMessage) =>
         new()
         {
             Success = false,
@@ -141,7 +141,7 @@ public sealed class ApiResponse<T> : ApiResponse
             Result = default
         };
 
-    public static ApiResponse<T> InternalServerError(IEnumerable<ApiErrorResponse> errors) =>
+    public static new ApiResponse<T> InternalServerError(IEnumerable<ApiErrorResponse> errors) =>
         new()
         {
             Success = false,

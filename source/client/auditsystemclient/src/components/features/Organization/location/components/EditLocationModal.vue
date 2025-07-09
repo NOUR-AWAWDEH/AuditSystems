@@ -40,7 +40,7 @@
           </BaseButton>
           <BaseButton
             @click="handleSubmit"
-            :disabled="isUpdating || !formData.name.trim()"
+            :disabled="isUpdating || !formData.name.trim() || !authStatus?.companyId"
             :is-loading="isUpdating"
             class="px-4 py-2 bg-primary-base text-white rounded-md hover:bg-primary-shade disabled:opacity-50"
           >
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import { useUpdateLocationById } from '@/composables/organization/location/useUpdateLocationById';
@@ -74,11 +74,18 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated']);
 
 const { isUpdating, updateLocation } = useUpdateLocationById();
-const { authStatus } = useAuthStatus();
+const { authStatus, checkAuthStatus } = useAuthStatus();
 
 const formData = ref({
   name: '',
   address: ''
+});
+
+// Initialize auth status when component mounts
+onMounted(async () => {
+  if (!authStatus.value) {
+    await checkAuthStatus();
+  }
 });
 
 watch(() => props.location, (newLocation) => {
@@ -93,11 +100,24 @@ watch(() => props.location, (newLocation) => {
 const handleSubmit = async () => {
   if (!props.location?.id) return;
   
+  // Ensure we have a valid companyId before proceeding
+  const companyId = authStatus.value?.companyId;
+  if (!companyId) {
+    console.error('CompanyId is missing from auth status:', authStatus.value);
+    // Try to refresh auth status
+    await checkAuthStatus();
+    const refreshedCompanyId = authStatus.value?.companyId;
+    if (!refreshedCompanyId) {
+      console.error('Still no companyId after refresh');
+      return;
+    }
+  }
+  
   const result = await updateLocation({
     id: props.location.id,
     name: formData.value.name.trim(),
     address: formData.value.address.trim() || null,
-    companyId: authStatus.value?.companyId
+    companyId: authStatus.value.companyId
   });
   
   if (result.success) {

@@ -4,7 +4,7 @@
       <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div 
-          class="absolute inset-0 bg-gray-shade bg-opacity-80 transition-opacity"
+          class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
           @click="$emit('close')"
         ></div>
         
@@ -64,7 +64,7 @@
                   type="button"
                   @click="$emit('close')"
                   :disabled="isUpdating"
-                  class="px-4 py-2 text-sm font-medium text-gray-shade bg-white border border-gray-tint rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
+                  class="px-4 py-2 text-sm font-medium text-gray-shade bg-error border border-gray-tint rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -87,10 +87,11 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useUpdateSubLocationById } from '@/composables/organization/sublocation/useUpdateSubLocationById';
 import { useNotification } from '@/composables/notification/useNotification';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const props = defineProps({
   isVisible: {
@@ -107,6 +108,7 @@ const emit = defineEmits(['close', 'updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateSubLocation, resetState } = useUpdateSubLocationById();
+const { authStatus, checkAuthStatus } = useAuthStatus();
 
 const formData = ref({
   name: '',
@@ -148,13 +150,31 @@ const populateForm = () => {
   }
 };
 
+// Initialize auth status when component mounts
+onMounted(async () => {
+  if (!authStatus.value) {
+    await checkAuthStatus();
+  }
+});
+
 const handleSubmit = async () => {
+  
+  // Check if user is authenticated
+  if (!authStatus.value) {
+    console.error('Authentication status not loaded');
+    showNotification('Authentication required. Please refresh the page and try again.', 'error');
+    return;
+  }
+
+
   if (!props.sublocation?.id) {
+    console.error('Missing sublocation ID:', props.sublocation);
     showNotification('Sublocation ID is required', 'error');
     return;
   }
   
   if (!validateForm()) {
+    console.error('Form validation failed:', errors.value);
     return;
   }
   
@@ -165,18 +185,32 @@ const handleSubmit = async () => {
       address: formData.value.address.trim(),
       locationId: props.sublocation.locationId
     };
-    
+   
     const result = await updateSubLocation(sublocationData);
     
-    if (result?.success) {
-      showNotification(`Sublocation "${sublocationData.name}" has been updated successfully!`, 'success');
-      emit('updated', result.data);
+    
+    if (result?.success) {      
+      // Pass the updated sublocation data with the correct structure
+      const updatedSublocationData = {
+        ...sublocationData,
+        ...result.data
+      };
+      
+      emit('updated', updatedSublocationData);
       emit('close');
+    } else {
+      console.error('❌ Update failed - result not successful:', result);
     }
   } catch (error) {
-    console.error('Error in handleSubmit:', error);
+    console.error('❌ Error in handleSubmit:', error);
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
     showNotification('Failed to update sublocation. Please try again.', 'error');
   }
+  
 };
 
 const validateForm = () => {

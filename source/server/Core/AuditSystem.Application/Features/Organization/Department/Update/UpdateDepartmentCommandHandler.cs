@@ -16,9 +16,9 @@ internal sealed class UpdateDepartmentCommandHandler(
     public async Task<Result> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
     {
         var departmentModel = mapper.Map<DepartmentModel>(request);
-        await departmentService.UpdateDepartmentAsync(departmentModel);
+        await departmentService.UpdateDepartmentAsync(departmentModel, request.UserId);
 
-        logger.LogInformation("Department updated successfully");
+        logger.LogInformation("Department with ID: {DepartmentId} updated by User Id: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("Department updated successfully");
     }
 }

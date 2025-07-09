@@ -12,16 +12,8 @@ internal sealed class DeleteDepartmentCommandHandler(
 {
     public async Task<Result> Handle(DeleteDepartmentCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await departmentService.DeleteDepartmentAsync(request.Id);
-            logger.LogInformation("Deleting department with ID {Id}", request.Id);
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error deleting department with ID {Id}", request.Id);
-            return Result.Error("An error occurred while deleting the department.");
-        } 
+        await departmentService.DeleteDepartmentAsync(request.Id, request.UserId);
+        logger.LogInformation("Deleting department with ID {Id} for user {UserId}", request.Id, request.UserId);
+        return Result.SuccessWithMessage("Department deleted successfully");
     }
 }

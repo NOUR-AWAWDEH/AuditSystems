@@ -193,39 +193,7 @@ internal sealed class SubLocationService(
     
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, locationId, page, cacheKey, countCacheKey);
     }
-
-    // Private helper methods
-    private async Task<SubLocationModel?> TryGetFromCacheWithValidationAsync(Guid id, Guid userId)
-    {
-        var cacheKey = GetCacheKey(id);
-        var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
-        
-        if (cachedEntity?.Location?.UserId == userId)
-        {
-            return mapper.Map<SubLocationModel>(cachedEntity);
-        }
-        
-        if (cachedEntity != null && cachedEntity.Location?.UserId != userId)
-        {
-            throw new UnauthorizedAccessException(
-                string.Format(SubLocationConstants.UnauthorizedAccessMessage, userId, id));
-        }
-        
-        return null;
-    }
-
-    private async Task CacheEntityAsync(SubLocation entity)
-    {
-        var cacheKey = GetCacheKey(entity.Id);
-        await SetCacheAsync(cacheKey, entity);
-    }
-
-    private async Task ClearEntityCacheAsync(Guid entityId)
-    {
-        var cacheKey = GetCacheKey(entityId);
-        await ClearCacheAsync(cacheKey);
-    }
-
+    
     public async Task<ICollection<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
@@ -260,4 +228,38 @@ internal sealed class SubLocationService(
             throw;
         }
     }
+
+    // Private helper methods
+    private async Task<SubLocationModel?> TryGetFromCacheWithValidationAsync(Guid id, Guid userId)
+    {
+        var cacheKey = GetCacheKey(id);
+        var cachedEntity = await cacheService.GetAsync<SubLocation>(cacheKey);
+
+        if (cachedEntity?.Location?.UserId == userId)
+        {
+            return mapper.Map<SubLocationModel>(cachedEntity);
+        }
+
+        if (cachedEntity != null && cachedEntity.Location?.UserId != userId)
+        {
+            throw new UnauthorizedAccessException(
+                string.Format(SubLocationConstants.UnauthorizedAccessMessage, userId, id));
+        }
+
+        return null;
+    }
+
+    private async Task CacheEntityAsync(SubLocation entity)
+    {
+        var cacheKey = GetCacheKey(entity.Id);
+        await SetCacheAsync(cacheKey, entity);
+    }
+
+    private async Task ClearEntityCacheAsync(Guid entityId)
+    {
+        var cacheKey = GetCacheKey(entityId);
+        await ClearCacheAsync(cacheKey);
+    }
+
+    
 }

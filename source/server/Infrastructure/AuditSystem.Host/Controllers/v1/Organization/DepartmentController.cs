@@ -11,12 +11,15 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuditSystem.BusinessLogic.Attributes;
+using AuditSystem.Application.Features.Organization.Department.Get.GetByuserId;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[AutoInjectUserId]
 public sealed class DepartmentController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Department
@@ -35,15 +38,23 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
     //Get Department
-    [HttpGet("get-department")]
+    [HttpGet("get-department-by-id")]
     [ProducesResponseType(typeof(ApiResponse<GetDepartmentByIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDepartment([FromQuery] GetDepartmentByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
     
+    //Get Departments By UserId
+    [HttpGet("get-departments-by-user-id")]
+    [ProducesResponseType(typeof(ApiResponse<List<GetDepartmentsByUserIdQueryResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetDepartmentsByUserId([FromQuery] GetDepartmentsByUserIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
     //Delete Department
-    [HttpDelete("delete-department")]
+    [HttpDelete("delete-department-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -51,7 +62,7 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Department
-    [HttpGet("search-department")]
+    [HttpGet("search-department-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<DepartmentModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchDepartment([FromQuery] SearchDepartmentQuery query) =>

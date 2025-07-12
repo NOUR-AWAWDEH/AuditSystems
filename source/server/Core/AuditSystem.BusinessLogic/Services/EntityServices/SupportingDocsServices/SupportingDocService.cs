@@ -16,10 +16,27 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 
-internal sealed class SupportingDocService(IRepository<Guid, SupportingDoc> repository, IMapper mapper, ICacheService cacheService, IFileStorage fileStorage, IFilePathBuilder filePathBuilder, ILogger<SupportingDocService> logger) : UnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>(repository, mapper, cacheService, logger, CacheKeys.SupportingDoc, SupportingDocsConstants.SupportingDocTags, SupportingDocsConstants.ListTags), ISupportingDocService
+internal sealed class SupportingDocService(
+    IRepository<Guid, SupportingDoc> repository, 
+    IMapper mapper, 
+    ICacheService cacheService, 
+    IFileStorage fileStorage, 
+    IFilePathBuilder filePathBuilder, 
+    ILogger<SupportingDocService> logger,
+    ISupportingDocValidation validationHelper,
+    ISupportingDocSearch searchHelper) 
+    : UnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>(
+        repository,
+        mapper,
+        cacheService,
+        logger,
+        CacheKeys.SupportingDoc,
+        SupportingDocsConstants.SupportingDocTags,
+        SupportingDocsConstants.ListTags
+    ), ISupportingDocService
 {
-    private readonly SupportingDocValidationHelper _validationHelper = new(repository);
-    private readonly SupportingDocSearchHelper _searchHelper = new(repository, mapper, cacheService);
+    private readonly ISupportingDocValidation _validationHelper = validationHelper;
+    private readonly ISupportingDocSearch _searchHelper = searchHelper;
     private readonly IFileStorage _fileStorage = fileStorage;
     private readonly IFilePathBuilder _filePathBuilder = filePathBuilder;
 

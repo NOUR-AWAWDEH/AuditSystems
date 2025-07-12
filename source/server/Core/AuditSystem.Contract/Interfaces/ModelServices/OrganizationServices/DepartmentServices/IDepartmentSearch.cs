@@ -3,7 +3,8 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 
-namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
+
 
 public interface IDepartmentSearch
 {

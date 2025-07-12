@@ -1,6 +1,6 @@
 ﻿using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
@@ -19,7 +19,9 @@ internal sealed class DepartmentService(
     IRepository<Guid, Department> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<DepartmentService> logger) : 
+    ILogger<DepartmentService> logger,
+    IDepartmentValidation validationHelper,
+    IDepartmentSearch searchHelper) : 
     UnifiedCacheService<Guid, Department, DepartmentModel>(
         repository,
         mapper,
@@ -31,8 +33,9 @@ internal sealed class DepartmentService(
     ),
     IDepartmentService
 {
-    private readonly DepartmentValidationHelper _validationHelper = new(repository);
-    private readonly DepartmentSearchHelper _searchHelper = new(repository, mapper, cacheService);
+    private readonly IDepartmentValidation _validationHelper = validationHelper;
+    private readonly IDepartmentSearch _searchHelper = searchHelper;
+
 
     public async Task<Guid> CreateDepartmentAsync(DepartmentModel departmentModel, Guid userId)
     {

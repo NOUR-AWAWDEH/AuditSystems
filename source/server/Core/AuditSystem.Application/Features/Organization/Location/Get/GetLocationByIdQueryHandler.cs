@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using MediatR;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 
 namespace AuditSystem.Application.Features.Organization.Location.Get;
 

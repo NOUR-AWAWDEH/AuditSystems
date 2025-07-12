@@ -1,6 +1,7 @@
 using MediatR;
 using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
+
 
 namespace AuditSystem.Application.Features.Organization.Department.Get;
 

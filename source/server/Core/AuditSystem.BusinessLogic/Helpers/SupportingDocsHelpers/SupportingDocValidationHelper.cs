@@ -1,10 +1,11 @@
 using AuditSystem.Application.Constants.SupportingDocs;
+using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.SupportingDocs;
 
 namespace AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
-public class SupportingDocValidationHelper
+public class SupportingDocValidationHelper : ISupportingDocValidation
 {
     private readonly IRepository<Guid, SupportingDoc> _repository;
 

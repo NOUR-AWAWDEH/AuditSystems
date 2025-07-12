@@ -3,7 +3,7 @@ using AuditSystem.Application.Constants.Organization.LocationConst;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
@@ -18,7 +18,9 @@ internal sealed class LocationService(
     IRepository<Guid, Location> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<LocationService> logger) : 
+    ILogger<LocationService> logger,
+    ILocationValidation validationHelper,
+    ILocationSearch searchHelper) : 
     UnifiedCacheService<Guid, Location, LocationModel>(
         repository,
         mapper,
@@ -30,8 +32,8 @@ internal sealed class LocationService(
     ),
     ILocationService
 {
-    private readonly LocationValidationHelper _validationHelper = new(repository);
-    private readonly LocationSearchHelper _searchHelper = new(repository, mapper, cacheService);
+    private readonly ILocationValidation _validationHelper = validationHelper;
+    private readonly ILocationSearch _searchHelper = searchHelper;
 
     public async Task<Guid> CreateLocationAsync(LocationModel locationModel, Guid userId)
     {

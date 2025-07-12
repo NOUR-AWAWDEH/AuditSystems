@@ -1,6 +1,3 @@
-using Ardalis.Result;
-using AuditSystem.Application.Features.SupportingDocs.Delete;
-using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
@@ -20,6 +17,9 @@ using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserDesigna
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.BusinessLogic.Services.UrlServices;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Download;
 using AuditSystem.Contract.Interfaces.FileStorage;
@@ -29,6 +29,9 @@ using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ComplianceServices;
 using AuditSystem.Contract.Interfaces.ModelServices.JobsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
@@ -68,6 +71,7 @@ using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -137,16 +141,31 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, JobScheduling, JobSchedulingModel>, JobSchedulingService>()
 
             // Organization
+            //Company
             .AddScoped<ICompanyService, CompanyService>()
             .AddScoped<IUnifiedCacheService<Guid, Company, CompanyModel>, CompanyService>()
+            
+            // Department
             .AddScoped<IDepartmentService, DepartmentService>()
             .AddScoped<IUnifiedCacheService<Guid, Department, DepartmentModel>, DepartmentService>()
+            .AddScoped<IDepartmentValidation, DepartmentValidationHelper>()
+            .AddScoped<IDepartmentSearch, DepartmentSearchHelper>()
+
+            //Location
             .AddScoped<ILocationService, LocationService>()
             .AddScoped<IUnifiedCacheService<Guid, Location, LocationModel>, LocationService>()
+            .AddScoped<ILocationValidation, LocationValidationHelper>()
+            .AddScoped<ILocationSearch, LocationSearchHelper>()
+
+            //SubDepartment
             .AddScoped<ISubDepartmentService, SubDepartmentService>()
             .AddScoped<IUnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>, SubDepartmentService>()
+            
+            // SubLocation
             .AddScoped<ISubLocationService, SubLocationService>()
             .AddScoped<IUnifiedCacheService<Guid, SubLocation, SubLocationModel>, SubLocationService>()
+            .AddScoped<ISubLocationValidation, SubLocationValidationHelper>()
+            .AddScoped<ISubLocationSearch, SubLocationSearchHelper>()
 
             // Processes
             .AddScoped<IAuditProcessService, AuditProcessService>()
@@ -193,13 +212,14 @@ public static class BusinessLogicDependencies
             // Supporting Docs
             .AddScoped<ISupportingDocService, SupportingDocService>()
             .AddScoped<IUnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>, SupportingDocService>()
-
+            .AddScoped<ISupportingDocValidation, SupportingDocValidationHelper>()
+            .AddScoped<ISupportingDocSearch, SupportingDocSearchHelper>()
+            
             // File Path Builder
             .AddSingleton<IFilePathBuilder, FilePathBuilder>()
 
             // Url
             .AddSingleton<ISignedUrlService, SignedUrlService>()
-
             .AddScoped<IURLService,URLService>()
 
             // Download Service

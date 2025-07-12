@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
 using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
@@ -10,7 +11,7 @@ using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 
-public class SubLocationSearchHelper
+public class SubLocationSearchHelper : ISubLocationSearch
 {
     private readonly IRepository<Guid, SubLocation> _repository;
     private readonly IMapper _mapper;
@@ -26,7 +27,7 @@ public class SubLocationSearchHelper
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public static Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? locationId = null)
+    public Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? locationId = null)
     {
         return sl => sl.Location.UserId == userId && 
                     (string.IsNullOrEmpty(searchTerm) || sl.Name.Contains(searchTerm)) &&

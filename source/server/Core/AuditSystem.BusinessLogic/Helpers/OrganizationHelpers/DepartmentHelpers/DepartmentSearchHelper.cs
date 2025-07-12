@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
 using AuditSystem.Application.Constants.Organization.DepartmentConst;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;

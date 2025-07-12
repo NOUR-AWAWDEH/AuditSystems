@@ -1,7 +1,8 @@
 ﻿using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
 
-namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
+
 
 public interface ISubLocationService
 {

@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
 using AuditSystem.Application.Constants.Organization.LocationConst;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
@@ -10,7 +11,7 @@ using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 
-public class LocationSearchHelper
+public class LocationSearchHelper : ILocationSearch
 {
     private readonly IRepository<Guid, Location> _repository;
     private readonly IMapper _mapper;
@@ -82,4 +83,6 @@ public class LocationSearchHelper
     {
         await _cacheService.SetAsync(countCacheKey, totalCount, LocationConstants.LocationTags, CacheExpirations.MediumTerm);
     }
+    
+    // Note: BuildUserSearchPredicate remains static as it doesn't need instance data
 }

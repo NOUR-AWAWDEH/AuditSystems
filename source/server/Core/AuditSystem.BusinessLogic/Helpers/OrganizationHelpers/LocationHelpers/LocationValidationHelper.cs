@@ -1,10 +1,11 @@
 using AuditSystem.Application.Constants.Organization.LocationConst;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 
-public class LocationValidationHelper
+public class LocationValidationHelper : ILocationValidation
 {
     private readonly IRepository<Guid, Location> _repository;
 

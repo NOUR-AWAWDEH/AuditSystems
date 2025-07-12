@@ -3,7 +3,7 @@ using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
@@ -18,6 +18,8 @@ internal sealed class SubLocationService(
     IRepository<Guid, SubLocation> repository,
     IMapper mapper,
     ICacheService cacheService,
+    ISubLocationValidation validationHelper,
+    ISubLocationSearch searchHelper,
     ILogger<SubLocationService> logger) :
     UnifiedCacheService<Guid, SubLocation, SubLocationModel>(
         repository,
@@ -30,8 +32,8 @@ internal sealed class SubLocationService(
     ),
     ISubLocationService
 {
-    private readonly SubLocationValidationHelper _validationHelper = new(repository);
-    private readonly SubLocationSearchHelper _searchHelper = new(repository, mapper, cacheService);
+    private readonly ISubLocationValidation _validationHelper = validationHelper;
+    private readonly ISubLocationSearch _searchHelper = searchHelper;
 
     public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
     {

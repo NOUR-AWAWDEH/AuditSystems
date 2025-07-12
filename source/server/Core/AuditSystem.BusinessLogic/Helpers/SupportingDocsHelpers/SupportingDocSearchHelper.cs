@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
 using AuditSystem.Application.Constants.SupportingDocs;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.SupportingDocs;
@@ -10,7 +11,7 @@ using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
-public class SupportingDocSearchHelper
+public class SupportingDocSearchHelper : ISupportingDocSearch
 {
     private readonly IRepository<Guid, SupportingDoc> _repository;
     private readonly IMapper _mapper;

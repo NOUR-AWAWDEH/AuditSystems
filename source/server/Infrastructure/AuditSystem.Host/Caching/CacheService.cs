@@ -14,6 +14,12 @@ internal class CacheService : ICacheService
     private readonly IOutputCacheStore _outputCache;
     private readonly IDistributedCache _distributedCache;
     private const string TagPrefix = "tag:"; // Prefix for tag-related keys in distributed cache
+    
+    // Static readonly JsonSerializerOptions to avoid creating new instances
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        ReferenceHandler = ReferenceHandler.Preserve
+    };
 
     public CacheService(IOutputCacheStore outputCache, IDistributedCache distributedCache)
     {
@@ -27,7 +33,10 @@ internal class CacheService : ICacheService
         ArgumentNullException.ThrowIfNull(key, nameof(key));
 
         var cachedValue = await _distributedCache.GetStringAsync(key, cancellationToken);
-        return cachedValue == null ? default : JsonSerializer.Deserialize<T>(cachedValue);
+        if (cachedValue == null) 
+            return default;
+            
+        return JsonSerializer.Deserialize<T>(cachedValue, JsonOptions);
     }
 
     /// <inheritdoc />
@@ -37,11 +46,7 @@ internal class CacheService : ICacheService
         ArgumentNullException.ThrowIfNull(key, nameof(key));
         ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        var options = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.Preserve
-        };
-        var serializedValue = JsonSerializer.Serialize(value, options);
+        var serializedValue = JsonSerializer.Serialize(value, JsonOptions);
         var cacheOptions = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = expiration

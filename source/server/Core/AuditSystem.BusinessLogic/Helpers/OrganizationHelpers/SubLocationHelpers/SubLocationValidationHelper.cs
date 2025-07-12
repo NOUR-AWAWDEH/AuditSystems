@@ -1,10 +1,11 @@
 using AuditSystem.Application.Constants.Organization.SublocationConst;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 
-public class SubLocationValidationHelper
+public class SubLocationValidationHelper : ISubLocationValidation
 {
     private readonly IRepository<Guid, SubLocation> _repository;
 

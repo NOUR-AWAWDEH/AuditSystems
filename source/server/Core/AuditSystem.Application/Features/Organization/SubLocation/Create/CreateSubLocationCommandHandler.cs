@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Models.Organization;
 using AutoMapper;
 using MediatR;

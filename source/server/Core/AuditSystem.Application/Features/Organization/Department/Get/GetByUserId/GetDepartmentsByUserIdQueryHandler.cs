@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Organization.Department.Get.GetByuserId;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

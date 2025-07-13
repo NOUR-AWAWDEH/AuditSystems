@@ -2,7 +2,8 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import axios from 'axios';
 import api from '@/services/api/api';
 
-const UPLOAD_ENDPOINT = 'api/supportingdocs/upload-supporting-document';
+const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
+const UPLOAD_SUPPORTING_DOC_ENDPOINT = '/upload-supporting-doc';
 
 export const uploadSupportingDocRepository = {
   async uploadSupportingDoc({ file, userId, fileName, token }) {
@@ -16,7 +17,7 @@ export const uploadSupportingDocRepository = {
       // Use direct axios call to ensure proper headers
       const response = await axios({
         method: 'post',
-        url: `${api.defaults.baseURL}/${UPLOAD_ENDPOINT}`,
+        url: `${api.defaults.baseURL}/${SUPPORTING_DOCS_BASE_ENDPOINT}${UPLOAD_SUPPORTING_DOC_ENDPOINT}`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',

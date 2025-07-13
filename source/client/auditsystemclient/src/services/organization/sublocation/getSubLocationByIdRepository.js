@@ -3,20 +3,23 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+const SUBLOCATION_GET_BY_ID_ENDPOINT = '/get-sub-location-by-id';
 
 export const getSubLocationByIdRepository = {
   async getSubLocationById(subLocationId) {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-location-by-id`, {
-
-        params: { id: subLocationId },
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await api.get(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_GET_BY_ID_ENDPOINT}`,
+        {
+          params: { id: subLocationId },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       if (response.data?.success && response.data?.result) {
         return ApiResponseT.ok(response.data.result, response.data.message || 'SubLocation retrieved successfully');

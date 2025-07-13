@@ -3,12 +3,13 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+const SUBLOCATION_CREATE_ENDPOINT = `/create-sub-location`;
 
 export const createSubLocationRepository = {
   async createSubLocation(subLocationData) {
     try {
       const token = authService.getLocalToken();
-      
+
       // Ensure all required fields are present
       const payload = {
         name: subLocationData.name,
@@ -18,12 +19,16 @@ export const createSubLocationRepository = {
           : subLocationData.locationId
       };
       
-      const response = await api.post(`${SUBLOCATION_BASE_ENDPOINT}/create-sub-location`, payload, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await api.post(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_CREATE_ENDPOINT}`,
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       if (response.data && response.status === 201) {
         if (response.data.success && response.data.result) {

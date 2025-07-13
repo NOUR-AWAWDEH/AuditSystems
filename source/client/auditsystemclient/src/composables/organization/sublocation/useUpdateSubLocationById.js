@@ -53,7 +53,7 @@ export function useUpdateSubLocationById() {
       // Validate required fields
       const validationError = validateSubLocationData(subLocationData);
       if (validationError) {
-        console.error('❌ Validation failed:', validationError);
+        showNotification(validationError, 'error');
         return handleUpdateFailure({ message: validationError });
       }
   
@@ -62,16 +62,9 @@ export function useUpdateSubLocationById() {
       if (response?.success) {
         return handleUpdateSuccess(response);
       } else {
-        console.error('❌ Update failed - response not successful:', response);
         return handleUpdateFailure(response);
       }
     } catch (err) {
-      console.error('❌ Exception in updateSubLocation:', err);
-      console.error('Exception details:', {
-        message: err.message,
-        stack: err.stack,
-        response: err.response?.data
-      });
       return handleUpdateFailure(err, err.message || 'Failed to update sublocation');
     } finally {
       isUpdating.value = false;

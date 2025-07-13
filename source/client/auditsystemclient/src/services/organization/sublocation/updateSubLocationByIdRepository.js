@@ -3,6 +3,7 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+const SUBLOCATION_UPDATE_ENDPOINT = '/update-sub-location';
 
 export const updateSubLocationByIdRepository = {
 
@@ -19,33 +20,29 @@ export const updateSubLocationByIdRepository = {
           : subLocationData.locationId
       };
             
-      const response = await api.put(`${SUBLOCATION_BASE_ENDPOINT}/update-sub-location`, payload, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await api.put(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_UPDATE_ENDPOINT}`,
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
 
       if (response.status === 200 || response?.data?.success !== false) {
         return ApiResponseT.ok(null, response.data?.message || 'SubLocation updated successfully');
       }
 
-      console.error('❌ API call failed - bad response');
+      console.error('API call failed - bad response');
       const errors = Array.isArray(response?.data?.errors)
         ? response.data.errors
         : [{ message: response?.data?.message || 'Update failed' }];
       return ApiResponseT.badRequest(errors, response?.data?.message);
 
     } catch (error) {
-      console.error('❌ API Exception:', error);
-      console.error('Exception details:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers
-      });
       
       if (error.response?.status === 401) {
         console.error('Unauthorized - token may be invalid');
@@ -62,14 +59,14 @@ export const updateSubLocationByIdRepository = {
       }
       
       if (error.response?.status === 404) {
-        console.error('🔍 Not Found - sublocation may not exist');
+        console.error(' Not Found - sublocation may not exist');
         return ApiResponseT.notFound(
           [{ message: 'SubLocation not found' }],
           'SubLocation not found'
         );
       }
       
-      console.error('🔥 Server Error or Network Issue');
+      console.error(' Server Error or Network Issue');
       return ApiResponseT.serverError(
         [{ message: error.message || 'An unexpected error occurred while updating sublocation.' }],
         'Server error'

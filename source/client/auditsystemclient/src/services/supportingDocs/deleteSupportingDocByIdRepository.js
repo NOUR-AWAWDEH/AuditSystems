@@ -1,12 +1,13 @@
 import { ApiResponseT } from '@/utils/ApiResponse';
 import api from '@/services/api/api';
 
-const DELETE_ENDPOINT = 'api/supportingdocs/delete-supporting-doc-by-id';
+const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
+const DELETE_SUPPORTIONG_DOC_BY_ID ='/delete-supporting-doc-by-id';
 
 export const deleteSupportingDocByIdRepository = {
   async deleteSupportingDocById(documentId, token) {
     try {
-      const response = await api.delete(DELETE_ENDPOINT, {
+      const response = await api.delete(`${SUPPORTING_DOCS_BASE_ENDPOINT}${DELETE_SUPPORTIONG_DOC_BY_ID}`, {
         data: { id: documentId },
         headers: {
           'Authorization': `Bearer ${token}`,

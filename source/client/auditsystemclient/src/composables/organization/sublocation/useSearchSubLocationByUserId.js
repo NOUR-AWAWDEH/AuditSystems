@@ -15,14 +15,13 @@ export function useSearchSubLocationByUserId() {
 
   const handleSearchSuccess = (response) => {
     
-    // Fix: Handle the nested structure - data is at response.result.result.items
     const items = response.result?.result?.items || response.result?.items || [];
-    const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0; // Renamed to avoid conflict
+    const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
         
     const isValidArray = Array.isArray(items);
     
     searchResults.value = isValidArray ? items : [];
-    totalCount.value = extractedTotalCount; // Now using the renamed variable
+    totalCount.value = extractedTotalCount;
         
     return { success: true, data: response.result };
 };
@@ -51,9 +50,7 @@ export function useSearchSubLocationByUserId() {
         searchTerm: searchParams.searchTerm || searchTerm.value,
         locationId: searchParams.locationId || locationId.value,
         page: searchParams.page || currentPage.value,
-        pageSize: searchParams.pageSize || pageSize.value,
-        sortBy: searchParams.sortBy,
-        sortDirection: searchParams.sortDirection
+        pageSize: searchParams.pageSize || pageSize.value
       };
 
       // Update local state

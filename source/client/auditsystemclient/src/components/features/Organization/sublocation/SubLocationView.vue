@@ -75,16 +75,18 @@ const {
     isLoading,
     selectedLocationId,
     selectedLocation,
-    currentLocation, // Add this
-    isLocationLoading, // Add this
+    currentLocation,
+    isLocationLoading,
     searchQuery,
-    sortBy,
+    currentPage,
+    pageSize,
+    totalCount,
     refreshData,
-    handleLocationChange,
     handleSublocationAdded,
+    handleLocationChange,
     handleSearch,
-    handleSort,
-    resetToDefaultView
+    resetToDefaultView,
+    initializeData
 } = useSubLocationTable(props.locations);
 
 // Remove useSubLocationFilters since search is now handled by the table
@@ -107,6 +109,7 @@ const {
 } = useSubLocationActions(refreshData, showNotification);
 
 // Expose the reset method to parent
+// Expose the resetToDefaultView method so parent components can call it
 defineExpose({
     resetToDefaultView
 });

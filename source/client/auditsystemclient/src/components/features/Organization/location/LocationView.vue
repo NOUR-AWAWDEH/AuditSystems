@@ -29,7 +29,7 @@
             
             <!-- Sublocation Management Section -->
             <div class="mt-8">
-                <SubLocationView :locations="locations" />
+                <SubLocationView ref="subLocationViewRef" :locations="locations" />
             </div>
         </div>
         
@@ -66,6 +66,7 @@ import SubLocationView from '@/components/features/Organization/sublocation/SubL
 import { useLocationTable } from './composables/useLocationTable';
 import { useLocationActions } from './composables/useLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
+import { ref } from 'vue';
 
 // Use composables
 // In the script setup section, replace useLocationFilters with direct table management
@@ -78,6 +79,17 @@ const {
 } = useLocationTable();
 
 const { showNotification } = useNotification();
+
+// Create a ref to access the SubLocationView component
+const subLocationViewRef = ref(null);
+
+// Callback function to handle location deletion
+const handleLocationDeleted = (deletedLocationId) => {
+    // Reset the sublocation view when a location is deleted
+    if (subLocationViewRef.value && subLocationViewRef.value.resetToDefaultView) {
+        subLocationViewRef.value.resetToDefaultView();
+    }
+};
 
 const {
     showAddLocationModal,
@@ -96,7 +108,7 @@ const {
     handleDeleteLocation,
     confirmDelete,
     cancelDelete
-} = useLocationActions(refreshData, showNotification);
+} = useLocationActions(refreshData, showNotification, handleLocationDeleted);
 </script>
 
 <style scoped>
@@ -109,11 +121,29 @@ const {
     .p-3 {
         padding: 0.75rem;
     }
+    
+    /* Ensure proper spacing on mobile */
+    .space-y-6 > * + * {
+        margin-top: 1rem;
+    }
+    
+    .mt-8 {
+        margin-top: 1.5rem;
+    }
 }
 
 @media (max-width: 480px) {
     .p-3 {
         padding: 0.5rem;
+    }
+    
+    /* Tighter spacing on very small screens */
+    .space-y-6 > * + * {
+        margin-top: 0.75rem;
+    }
+    
+    .mt-8 {
+        margin-top: 1rem;
     }
 }
 </style>

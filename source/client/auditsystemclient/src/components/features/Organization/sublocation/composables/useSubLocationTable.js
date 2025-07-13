@@ -12,7 +12,7 @@ export function useSubLocationTable(locations) {
     const isInitializing = ref(false);
     
     // Add useGetLocationById composable
-    const { location: fetchedLocation, isLoading: isLocationLoading, fetchLocationById } = useGetLocationById();
+    const { location: fetchedLocation, isLoading: isLocationLoading, fetchLocationById, clearLocation } = useGetLocationById();
     
     const {
         searchResults,
@@ -123,6 +123,11 @@ export function useSubLocationTable(locations) {
         clearSearch();
         allSublocations.value = [];
         
+        // Clear the fetched location when location changes or is cleared
+        if (!newLocationId) {
+            clearLocation(); // This will clear the fetchedLocation
+        }
+        
         // Fetch location details when location changes
         if (newLocationId) {
             try {
@@ -188,6 +193,7 @@ export function useSubLocationTable(locations) {
         currentPage.value = 1;
         clearSearch();
         allSublocations.value = [];
+        clearLocation(); // Clear the fetched location when resetting
         isInitialized.value = false;
         isInitializing.value = false;
     };

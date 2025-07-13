@@ -2,27 +2,28 @@
     <div>
         <!-- Sublocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <div class="p-6">
+            <div class="p-3 sm:p-4 md:p-6">
                 <!-- Header with Location Selection and Filters -->
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
+                <div class="flex flex-col gap-4 mb-6">
                     <SubLocationHeader />
                     
-                    <!-- Right side - Location Selector and Filters -->
-                    <div class="flex items-center gap-4">
-                        <div class="min-w-64">
+                    <!-- Location Selector and Filters - Stack on mobile -->
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div class="w-full sm:min-w-64 sm:max-w-xs">
                             <LocationSelector
                              :locations="locations"
                              :selected-location="selectedLocationId"
                              @location-changed="handleLocationChange"
                             />
                         </div>
-                        <div v-if="validSelectedLocation" class="p-4">
+                        <div v-if="validSelectedLocation" class="w-full sm:w-auto">
                             <Filters
                                 :search="searchQuery"
                                 @update:search="handleSearch"
                                 @refresh="refreshData"
                             />
                         </div>
+                       
                     </div>
                 </div>
 

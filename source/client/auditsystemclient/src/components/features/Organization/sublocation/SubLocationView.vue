@@ -7,6 +7,8 @@
             :is-loading="isLoading"
             :selected-location-id="selectedLocationId"
             :selected-location="selectedLocation"
+            :current-location="currentLocation"
+            :is-location-loading="isLocationLoading"
             :search-query="searchQuery"
             :sort-by="sortBy"
             :handle-location-change="handleLocationChange"
@@ -73,6 +75,8 @@ const {
     isLoading,
     selectedLocationId,
     selectedLocation,
+    currentLocation, // Add this
+    isLocationLoading, // Add this
     searchQuery,
     sortBy,
     refreshData,

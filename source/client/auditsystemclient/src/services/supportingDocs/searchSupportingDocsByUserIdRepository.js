@@ -3,13 +3,14 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
+const SUPPORTING_DOCS_SEARCH_BY_USER_ID_ENDPOINT = '/search-supporting-docs-by-user-id';
 
 export const searchSupportingDocsByUserIdRepository = {
   async searchSupportingDocsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10) {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}/search-supporting-docs-by-user-id/`, {
+      const response = await api.get(`${SUPPORTING_DOCS_BASE_ENDPOINT}${SUPPORTING_DOCS_SEARCH_BY_USER_ID_ENDPOINT}`, {
         params: {
           searchTerm,
           pageNumber,

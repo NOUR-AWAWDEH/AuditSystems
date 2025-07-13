@@ -3,6 +3,8 @@ import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
 const SUPPORTING_DOCS_BASE_URL = 'api/supportingdocs';
+const SUPPORTING_DOCS_GET_BY_ID_ENDPOINT = '/get-supporting-doc-url-by-id';
+
 
 export const getSupportingDocSignedUrlRepository = {
   
@@ -11,7 +13,7 @@ export const getSupportingDocSignedUrlRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const url = `${SUPPORTING_DOCS_BASE_URL}/get-supporting-doc-url-by-id`;
+      const url = `${SUPPORTING_DOCS_BASE_URL}${SUPPORTING_DOCS_GET_BY_ID_ENDPOINT}`;
       
       const response = await api.get(url, {
         params: { id: fileId },

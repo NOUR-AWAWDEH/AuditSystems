@@ -3,6 +3,7 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
+const SEARCH_LOCATION_BY_USER_ID_ENDPOINT = '/search-location-by-user-id';
 
 export const searchLocationByUserIdRepository = {
 
@@ -17,7 +18,9 @@ export const searchLocationByUserIdRepository = {
         sortBy: 'name'          // Add sortBy parameter
       };
       
-      const response = await api.get(`${LOCATION_BASE_ENDPOINT}/search-location-by-user-id`, {
+      const response = await api.get(
+        `${LOCATION_BASE_ENDPOINT}${SEARCH_LOCATION_BY_USER_ID_ENDPOINT}`, {
+        
         params,
         headers: {
           'Authorization': `Bearer ${token}`,

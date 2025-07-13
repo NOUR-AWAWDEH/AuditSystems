@@ -2,38 +2,33 @@
     <div>
         <!-- Sublocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <div class="p-6">
-                <!-- Header with Location Selection -->
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-                    <!-- Left side - Title and Description -->
+            <div class="p-3 sm:p-4 md:p-6">
+                <!-- Header with Location Selection and Filters -->
+                <div class="flex flex-col gap-4 mb-6">
                     <SubLocationHeader />
                     
-                    <!-- Right side - Location Selector -->
-                    <div class="min-w-64">
-                        <LocationSelector
-                            :locations="locations"
-                            :selected-location="selectedLocationId"
-                            @location-changed="handleLocationChange"
-                        />
+                    <!-- Location Selector and Filters - Stack on mobile -->
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div class="w-full sm:min-w-64 sm:max-w-xs">
+                            <LocationSelector
+                             :locations="locations"
+                             :selected-location="selectedLocationId"
+                             @location-changed="handleLocationChange"
+                            />
+                        </div>
+                        <div v-if="validSelectedLocation" class="w-full sm:w-auto">
+                            <Filters
+                                :search="searchQuery"
+                                @update:search="handleSearch"
+                                @refresh="refreshData"
+                            />
+                        </div>
+                       
                     </div>
                 </div>
 
-                <!-- Filters (show only when location is selected) -->
-                <div v-if="validSelectedLocation" class="mb-6">
-                    <SubLocationFilters
-                        :locations="locations"
-                        :selected-location-id="selectedLocationId"
-                        :search="searchQuery"
-                        :sort="sortBy"
-                        @update:selected-location-id="handleLocationChange"
-                        @update:search="handleSearch"
-                        @update:sort="handleSort"
-                        @refresh="refreshData"
-                    />
-                </div>
-
-                <!-- Selected Location Info -->
-                <div v-if="validSelectedLocation" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                <!-- Selected Location Info - Show when location is selected -->
+                <div v-if="selectedLocationId" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,24 +36,28 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
                             <p class="text-sm text-gray-700">
-                                Showing sublocations for: <span class="font-semibold text-blue-800">{{ selectedLocation?.name || 'Selected Location' }}</span>
+                                Showing sublocations for: &nbsp;&nbsp; 
+                                <span class="font-semibold text-blue-800">
+                                    <span v-if="isLocationLoading">Loading location...</span>
+                                    <span v-else>{{ currentLocation?.name || 'Loading...' }}</span>
+                                </span>
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
                         <BaseButton 
-                            @click="$emit('add-sublocation')"
-                            class="inline-flex items-center px-2 py-1 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                        >
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add Sublocation
+                            @click="$emit('add-sublocation')" 
+                            class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
+                        > 
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"> 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path> 
+                            </svg> 
+                            Add Sublocation 
                         </BaseButton>
                     </div>
                 </div>
                 
-                <!-- Table Container -->
-                <div v-if="validSelectedLocation" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <!-- Table Container - Show when location is selected -->
+                <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
                         :items="sublocations"
                         :columns="enhancedColumns"
@@ -105,7 +104,7 @@
                     </div>
                 </div>
 
-                <!-- No Location Selected -->
+                <!-- No Location Selected - Show when no location is selected -->
                 <div v-else class="text-center py-16">
                     <svg class="w-20 h-20 text-secondary-base mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -128,7 +127,7 @@
 import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-import SubLocationFilters from './SubLocationFilters.vue';
+import Filters from '@/components/common/Filters.vue';
 import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
 import SubLocationHeader from './SubLocationHeader.vue';
 
@@ -138,11 +137,11 @@ const props = defineProps({
     isLoading: Boolean,
     selectedLocationId: String,
     selectedLocation: Object,
+    currentLocation: Object, 
+    isLocationLoading: Boolean,
     searchQuery: String,
-    sortBy: String,
     handleLocationChange: Function,
     handleSearch: Function,
-    handleSort: Function,
     refreshData: Function
 });
 
@@ -159,11 +158,9 @@ const sublocationColumns = [
 ];
 
 const enhancedColumns = computed(() => {
-    // Defensive: never assign to this computed, only use it as a getter
     return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
 });
 
-// Computed property for dynamic no data message
 const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No sublocations found for "${props.searchQuery}".`;
@@ -172,9 +169,8 @@ const noDataMessage = computed(() => {
 });
 
 const validSelectedLocation = computed(() => {
-    return props.selectedLocationId && props.locations?.some(loc => loc.id === props.selectedLocationId);
+    return props.selectedLocationId && props.currentLocation?.name;
 });
-
 </script>
 
 <style scoped>

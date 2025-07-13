@@ -1,18 +1,17 @@
 <template>
   <CustomSelect
-    v-model="selectedLocation"
+    :model-value="selectedLocation"
     :options="locations"
     label="Select Location"
     placeholder="Choose a location"
     value-key="id"
     label-key="name"
     :error="locationError"
-    @change="handleLocationChange"
+    @update:modelValue="handleLocationChange"
   />
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
 import CustomSelect from '@/components/common/CustomSelect.vue';
 
 const props = defineProps({
@@ -30,17 +29,10 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['location-changed']);
-
-const selectedLocation = ref(props.selectedLocation);
-
-// Watch for external changes to selectedLocation prop
-watch(() => props.selectedLocation, (newValue) => {
-  selectedLocation.value = newValue;
-});
+const emit = defineEmits(['update:selectedLocation', 'location-changed']);
 
 const handleLocationChange = (value) => {
-  selectedLocation.value = value;
-  emit('location-changed', value);
+  emit('update:selectedLocation', value); // for v-model
+  emit('location-changed', value); // if you want custom logic
 };
 </script>

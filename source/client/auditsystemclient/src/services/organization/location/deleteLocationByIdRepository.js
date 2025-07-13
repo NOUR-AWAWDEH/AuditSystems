@@ -3,13 +3,14 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
+const DELETE_LOCATION_ENDPOINT = '/delete-location-by-id';
 
 export const deleteLocationByIdRepository = {
   async deleteLocationById(locationId) {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.delete(`${LOCATION_BASE_ENDPOINT}/delete-location-by-id`, {
+      const response = await api.delete(`${LOCATION_BASE_ENDPOINT}${DELETE_LOCATION_ENDPOINT}`, {
         data: { id: locationId },
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -3,19 +3,22 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+const SUBLOCATION_GET_BY_USER_ID_ENDPOINT = '/get-sub-locations-by-user-id';
 
 export const getSubLocationsByUserIdRepository = {
   async getSubLocationsByUserId() {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${SUBLOCATION_BASE_ENDPOINT}/get-sub-locations-by-user-id`, {
-
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await api.get(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_GET_BY_USER_ID_ENDPOINT}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       if (response.data?.success && response.data?.result) {
         return ApiResponseT.ok(response.data.result, response.data.message || 'SubLocations retrieved successfully');
@@ -35,7 +38,8 @@ export const getSubLocationsByUserIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
+        const errors = error.response.data?.errors || 
+          [{ message: error.response.data?.message || 'Bad request' }];
         return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
       }
       

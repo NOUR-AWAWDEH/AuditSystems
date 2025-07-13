@@ -3,6 +3,7 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
+const GET_LOCATION_BY_ID_ENDPOINT = '/get-location-by-id';
 
 export const getLocationByIdRepository = {
 
@@ -10,7 +11,8 @@ export const getLocationByIdRepository = {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.get(`${LOCATION_BASE_ENDPOINT}/get-location-by-id`, {
+      const response = await api.get(
+        `${LOCATION_BASE_ENDPOINT}${GET_LOCATION_BY_ID_ENDPOINT}`, {
         params: { id: locationId },
         headers: {
           'Authorization': `Bearer ${token}`,

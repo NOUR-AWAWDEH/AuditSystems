@@ -1,15 +1,19 @@
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted, nextTick } from 'vue';
 import { useSearchSubLocationByUserId } from '@/composables/organization/sublocation/useSearchSubLocationByUserId';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
+import { useGetLocationById } from '@/composables/organization/location/useGetLocationById';
 
 export function useSubLocationTable(locations) {
     const searchQuery = ref('');
-    const sortBy = ref('name');
     const selectedLocationId = ref('');
     const currentPage = ref(1);
     const pageSize = ref(10);
+    const isInitialized = ref(false);
+    const isInitializing = ref(false);
     
-    // Use backend search with locationId support
+    // Add useGetLocationById composable
+    const { location: fetchedLocation, isLoading: isLocationLoading, fetchLocationById, clearLocation } = useGetLocationById();
+    
     const {
         searchResults,
         isSearching,
@@ -18,145 +22,216 @@ export function useSubLocationTable(locations) {
         clearSearch
     } = useSearchSubLocationByUserId();
     
-    // Fallback to get all sublocations when no search
     const { 
         sublocations: allSublocations, 
         isLoading: isLoadingAll,
         getSubLocationsByUserId 
     } = useGetSubLocationsByUserId();
     
-    // Computed property for selected location
-    const selectedLocation = computed(() => {
-        if (!locations || !selectedLocationId.value) return null;
-        return locations.find(location => location.id === selectedLocationId.value) || null;
+    const locationsRef = computed(() => {
+        if (locations && typeof locations === 'object' && 'value' in locations) {
+            return locations.value || [];
+        }
+        return locations || [];
     });
     
-    // Server-side filtering: No need for client-side filtering anymore
-    const sublocations = computed(() => {
-    
-    if (searchQuery.value.trim()) {
-        return searchResults.value;
-    } else {
-        return allSublocations.value; // Fixed: was filteredSublocations.value
-    }
-});
-    
-    // Combined loading state
-    const isLoading = computed(() => isSearching.value || isLoadingAll.value);
-    
-    // Watch for search and sort changes
-    watch([searchQuery, sortBy], async ([search, sort]) => {
-        if (!selectedLocationId.value) return;
+    const selectedLocation = computed(() => {
+        const locationId = selectedLocationId.value;
+        const locationsList = locationsRef.value;
         
-        if (search.trim()) {
-            await searchSubLocations({
-                searchTerm: search,
-                locationId: selectedLocationId.value, // Server-side location filtering
-                page: currentPage.value,
-                pageSize: pageSize.value,
-                sortBy: sort
-            });
+        if (!locationId || !locationsList || locationsList.length === 0) {
+            return null;
+        }
+        
+        const location = locationsList.find(loc => loc.id === locationId);
+        return location || null;
+    });
+    
+    // Add currentLocation computed property
+    const currentLocation = computed(() => {
+        const location = fetchedLocation.value || selectedLocation.value;
+        // Handle nested locationModel structure
+        return location?.locationModel || location;
+    });
+    
+    const sublocations = computed(() => {
+        if (searchQuery.value.trim() || selectedLocationId.value) {
+            return searchResults.value;
         } else {
-            clearSearch();
-            // Only fetch if we don't have data yet
-            if (allSublocations.value.length === 0) {
-                await getSubLocationsByUserId();
-            }
+            return allSublocations.value;
         }
     });
     
-    // Separate watch for location changes
-    watch(selectedLocationId, async (newLocationId) => {
-        if (!newLocationId) {
-            clearSearch();
+    const isLoading = computed(() => isSearching.value || isLoadingAll.value || isInitializing.value);
+    
+    const initializeData = async () => {
+        if (!selectedLocationId.value || isInitialized.value || isInitializing.value) {
             return;
         }
         
-        // If we have search query, search with new location
-        if (searchQuery.value.trim()) {
+        try {
+            isInitializing.value = true;
             await searchSubLocations({
-                searchTerm: searchQuery.value,
-                locationId: newLocationId, // Server-side location filtering
+                searchTerm: searchQuery.value || '',
+                locationId: selectedLocationId.value,
                 page: currentPage.value,
-                pageSize: pageSize.value,
-                sortBy: sortBy.value
+                pageSize: pageSize.value
+            });
+            isInitialized.value = true;
+        } catch (error) {
+            console.error('Failed to initialize data:', error);
+        } finally {
+            isInitializing.value = false;
+        }
+    };
+    
+    watch(locationsRef, async (newLocations) => {
+        
+        if (!newLocations?.length || !selectedLocationId.value || isInitialized.value || isInitializing.value) {
+            return;
+        }
+        
+        const locationExists = newLocations.some(loc => loc.id === selectedLocationId.value);
+        if (locationExists) {
+            await nextTick();
+            await initializeData();
+        } else {
+            resetToDefaultView();
+        }
+    }, { immediate: true });
+    
+    watch(searchQuery, async (search) => {
+        if (isInitializing.value) return;
+        
+        if (search.trim() || selectedLocationId.value) {
+            await searchSubLocations({
+                searchTerm: search,
+                locationId: selectedLocationId.value,
+                page: currentPage.value,
+                pageSize: pageSize.value
             });
         } else {
-            // Only fetch all sublocations if we don't have them yet
-            if (allSublocations.value.length === 0) {
+            clearSearch();
+            if (!selectedLocationId.value) {
                 await getSubLocationsByUserId();
             }
         }
     });
     
-    const refreshData = async () => {
-        // Add cache busting parameter
-        const cacheBuster = Date.now();
+    // Watch for selectedLocationId changes and fetch location details
+    watch(selectedLocationId, async (newLocationId, oldLocationId) => {
+        clearSearch();
+        allSublocations.value = [];
         
-        if (searchQuery.value.trim()) {
-            await searchSubLocations(searchQuery.value, currentPage.value, pageSize.value, cacheBuster);
+        // Clear the fetched location when location changes or is cleared
+        if (!newLocationId) {
+            clearLocation(); // This will clear the fetchedLocation
+        }
+        
+        // Fetch location details when location changes
+        if (newLocationId) {
+            try {
+                await fetchLocationById(newLocationId);
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            }
+        }
+        
+        if (!newLocationId) {
+            if (!searchQuery.value.trim()) {
+                await getSubLocationsByUserId();
+            }
+            return;
+        }
+        
+        await searchSubLocations({
+            searchTerm: searchQuery.value || '',
+            locationId: newLocationId,
+            page: currentPage.value,
+            pageSize: pageSize.value
+        });
+    });
+    
+    const refreshData = async () => {
+        if (searchQuery.value.trim() || selectedLocationId.value) {
+            await searchSubLocations({
+                searchTerm: searchQuery.value || '',
+                locationId: selectedLocationId.value,
+                page: currentPage.value,
+                pageSize: pageSize.value
+            });
         } else {
-            await getSubLocationsByUserId(cacheBuster);
-            // Remove this line - computed property will update automatically
-            // sublocations.value = allSublocations.value;
+            await getSubLocationsByUserId();
         }
     };
     
-    // Add this function
-    const handleSublocationAdded = async (newSublocation) => {
-        await refreshData(); // Refresh the data to show the new sublocation immediately
+    const handleSublocationAdded = async () => {
+        await refreshData();
     };
     
     const handleLocationChange = async (newLocationId) => {
+        
+        clearSearch();
+        allSublocations.value = [];
+        
         selectedLocationId.value = newLocationId;
-        // The watch will handle the API call
+        
+        if (newLocationId) {
+            isInitialized.value = true;
+        }
     };
     
     const handleSearch = async (newSearchQuery) => {
         searchQuery.value = newSearchQuery;
-        currentPage.value = 1; // Reset to first page
-        // The watch will handle the API call
+        currentPage.value = 1;
     };
     
-    const handleSort = async (newSortBy) => {
-        sortBy.value = newSortBy;
-        // The watch will handle the API call
-    };
     
-    // Add method to reset to default view
     const resetToDefaultView = () => {
         selectedLocationId.value = '';
         searchQuery.value = '';
         currentPage.value = 1;
         clearSearch();
+        allSublocations.value = [];
+        clearLocation(); // Clear the fetched location when resetting
+        isInitialized.value = false;
+        isInitializing.value = false;
     };
     
-    // Watch for location changes to handle deleted locations
-    watch([locations, selectedLocationId], ([newLocations, currentLocationId]) => {
-        // If a location was selected but no longer exists in the locations array
-        if (currentLocationId && newLocations && newLocations.length > 0) {
-            const locationExists = newLocations.some(loc => loc.id === currentLocationId);
-            if (!locationExists) {
-                resetToDefaultView();
+    onMounted(async () => {
+        
+        await nextTick();
+        
+        if (selectedLocationId.value && !isInitialized.value && !isInitializing.value) {
+            if (locationsRef.value?.length > 0) {
+                const locationExists = locationsRef.value.some(loc => loc.id === selectedLocationId.value);
+                if (locationExists) {
+                    await initializeData();
+                } else {
+                    resetToDefaultView();
+                }
             }
+        } else if (!selectedLocationId.value && !searchQuery.value.trim()) {
+            await getSubLocationsByUserId();
         }
-    }, { deep: true });
+    });
     
     return {
         sublocations,
         isLoading,
         selectedLocationId,
-        selectedLocation,
+        selectedLocation, 
+        currentLocation, // Add currentLocation to return
+        isLocationLoading, // Add isLocationLoading to return
         searchQuery,
-        sortBy,
         currentPage,
         pageSize,
         totalCount,
         refreshData,
-        handleSublocationAdded, // Add this to the return object
+        handleSublocationAdded,
         handleLocationChange,
         handleSearch,
-        handleSort,
-        resetToDefaultView
+        resetToDefaultView,
+        initializeData
     };
 }

@@ -3,6 +3,7 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
+const UPDATE_LOCATION_BY_ID_ENDPOINT = '/update-location';
 
 export const updateLocationByIdRepository = {
   async updateLocationById(locationData) {
@@ -17,8 +18,11 @@ export const updateLocationByIdRepository = {
         companyId: locationData.companyId
       };
       
-      const response = await api.put(`${LOCATION_BASE_ENDPOINT}/update-location`, payload, {
-        headers: {
+      const response = await api.put(
+        `${LOCATION_BASE_ENDPOINT}${UPDATE_LOCATION_BY_ID_ENDPOINT}`,
+        payload, {
+          
+          headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }

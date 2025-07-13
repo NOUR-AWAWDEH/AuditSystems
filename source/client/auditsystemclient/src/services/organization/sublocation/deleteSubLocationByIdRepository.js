@@ -3,19 +3,23 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const SUBLOCATION_BASE_ENDPOINT = 'api/SubLocation';
+const SUBLOCATION_DELETE_ENDPOINT = `/delete-sub-location-by-id`;
 
 export const deleteSubLocationByIdRepository = {
   async deleteSubLocationById(subLocationId) {
     try {
       const token = authService.getLocalToken();
       
-      const response = await api.delete(`${SUBLOCATION_BASE_ENDPOINT}/delete-sub-location-by-id`, {
-        data: { id: subLocationId },
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await api.delete(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_DELETE_ENDPOINT}`,
+        {
+          data: { id: subLocationId },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
+      );
 
       if (response.status === 204 || response?.data?.success !== false) {
         return ApiResponseT.ok(null, 'SubLocation deleted successfully');

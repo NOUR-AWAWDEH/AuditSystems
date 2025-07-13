@@ -50,56 +50,6 @@ export function useGetSubLocationsByUserId() {
     }
   };
 
-  const addSublocation = (newSublocation) => {
-    sublocations.value.push(newSublocation);
-  };
-
-  const removeSublocation = (sublocationId) => {
-    sublocations.value = sublocations.value.filter(sublocation => sublocation.id !== sublocationId);
-  };
-
-  const updateSublocation = (updatedSublocation) => {
-    const index = sublocations.value.findIndex(sublocation => sublocation.id === updatedSublocation.id);
-    if (index !== -1) {
-      sublocations.value[index] = updatedSublocation;
-    }
-  };
-
-  const getSublocationsByLocationId = (locationId) => {
-    return sublocations.value.filter(sublocation => sublocation.locationId === locationId);
-  };
-
-  // NEW: Create hierarchical data structure
-  const createHierarchicalData = (locations) => {
-    if (!Array.isArray(locations) || !Array.isArray(sublocations.value)) {
-      return locations || [];
-    }
-
-    return locations.map(location => {
-      const locationSublocations = sublocations.value.filter(
-        sublocation => sublocation.locationId === location.id
-      );
-      
-      return {
-        ...location,
-        sublocations: locationSublocations,
-        hasSublocations: locationSublocations.length > 0
-      };
-    });
-  };
-
-  // NEW: Get hierarchical data grouped by location
-  const getHierarchicalDataByLocation = (locations) => {
-    const hierarchicalData = createHierarchicalData(locations);   
-    return hierarchicalData;
-  };
-
-  const resetState = () => {
-    error.value = null;
-    sublocations.value = [];
-    isLoading.value = false;
-  };
-
   return {
     // State
     sublocations,
@@ -108,14 +58,5 @@ export function useGetSubLocationsByUserId() {
 
     // Actions
     getSubLocationsByUserId,
-    addSublocation,
-    removeSublocation,
-    updateSublocation,
-    getSublocationsByLocationId,
-    resetState,
-    
-    // NEW: Hierarchical data helpers
-    createHierarchicalData,
-    getHierarchicalDataByLocation,
   };
 }

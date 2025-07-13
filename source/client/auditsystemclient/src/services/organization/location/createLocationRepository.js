@@ -3,6 +3,7 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
 const LOCATION_BASE_ENDPOINT = 'api/Location';
+const CREATE_LOCATION_ENDPOINT = '/create-location';
 
 export const createLocationRepository = {
   async createLocation(locationData) {
@@ -16,7 +17,7 @@ export const createLocationRepository = {
         companyId: locationData.companyId
       };
       
-      const response = await api.post(`${LOCATION_BASE_ENDPOINT}/create-location`, payload, {
+      const response = await api.post(`${LOCATION_BASE_ENDPOINT}${CREATE_LOCATION_ENDPOINT}`, payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json' 

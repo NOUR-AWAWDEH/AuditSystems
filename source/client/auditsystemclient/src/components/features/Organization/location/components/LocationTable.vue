@@ -14,11 +14,9 @@
                         </div>
                     </div>
                     <div class=" p-4">
-                        <LocationFilters
+                        <Filters
                             :search="search"
-                            :sort="sort"
                             @update:search="$emit('update:search', $event)"
-                            @update:sort="$emit('update:sort', $event)"
                             @refresh="$emit('refresh')"
                         />
                     </div>
@@ -65,20 +63,19 @@
 <script setup>
 import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
-import LocationFilters from './LocationFilters.vue';
+import Filters from '@/components/common/Filters.vue';
+
 
 defineProps({
     locations: Array,
     isLoading: Boolean,
-    search: String,
-    sort: String
+    search: String
 });
 
 defineEmits([
     'edit-location',
     'delete-location',
     'update:search',
-    'update:sort',
     'refresh'
 ]);
 

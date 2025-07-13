@@ -1,10 +1,9 @@
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, toRef } from 'vue';
 import { useSearchSubLocationByUserId } from '@/composables/organization/sublocation/useSearchSubLocationByUserId';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 
 export function useSubLocationTable(locations) {
     const searchQuery = ref('');
-    const sortBy = ref('name');
     const selectedLocationId = ref('');
     const currentPage = ref(1);
     const pageSize = ref(10);
@@ -18,12 +17,15 @@ export function useSubLocationTable(locations) {
         clearSearch
     } = useSearchSubLocationByUserId();
     
-    // Fallback to get all sublocations when no search
+    // Fallback to get all sublocations when no search and no location selected
     const { 
         sublocations: allSublocations, 
         isLoading: isLoadingAll,
         getSubLocationsByUserId 
     } = useGetSubLocationsByUserId();
+    
+    // Convert locations prop to reactive ref
+    const locationsRef = toRef(() => locations);
     
     // Computed property for selected location
     const selectedLocation = computed(() => {
@@ -33,33 +35,29 @@ export function useSubLocationTable(locations) {
     
     // Server-side filtering: No need for client-side filtering anymore
     const sublocations = computed(() => {
-    
-    if (searchQuery.value.trim()) {
-        return searchResults.value;
-    } else {
-        return allSublocations.value; // Fixed: was filteredSublocations.value
-    }
-});
+        if (searchQuery.value.trim() || selectedLocationId.value) {
+            return searchResults.value;
+        } else {
+            return allSublocations.value;
+        }
+    });
     
     // Combined loading state
     const isLoading = computed(() => isSearching.value || isLoadingAll.value);
     
-    // Watch for search and sort changes
-    watch([searchQuery, sortBy], async ([search, sort]) => {
-        if (!selectedLocationId.value) return;
-        
-        if (search.trim()) {
+    // Watch for search changes (removed sorting)
+    watch(searchQuery, async (search) => {
+        if (search.trim() || selectedLocationId.value) {
             await searchSubLocations({
                 searchTerm: search,
-                locationId: selectedLocationId.value, // Server-side location filtering
+                locationId: selectedLocationId.value,
                 page: currentPage.value,
-                pageSize: pageSize.value,
-                sortBy: sort
+                pageSize: pageSize.value
             });
         } else {
             clearSearch();
-            // Only fetch if we don't have data yet
-            if (allSublocations.value.length === 0) {
+            // Only fetch all sublocations if no location is selected
+            if (!selectedLocationId.value) {
                 await getSubLocationsByUserId();
             }
         }
@@ -67,59 +65,54 @@ export function useSubLocationTable(locations) {
     
     // Separate watch for location changes
     watch(selectedLocationId, async (newLocationId) => {
+        // Clear all data immediately when location changes
+        clearSearch();
+        allSublocations.value = [];
+        
         if (!newLocationId) {
-            clearSearch();
+            // If no location selected, get all sublocations
+            if (!searchQuery.value.trim()) {
+                await getSubLocationsByUserId();
+            }
             return;
         }
         
-        // If we have search query, search with new location
-        if (searchQuery.value.trim()) {
-            await searchSubLocations({
-                searchTerm: searchQuery.value,
-                locationId: newLocationId, // Server-side location filtering
-                page: currentPage.value,
-                pageSize: pageSize.value,
-                sortBy: sortBy.value
-            });
-        } else {
-            // Only fetch all sublocations if we don't have them yet
-            if (allSublocations.value.length === 0) {
-                await getSubLocationsByUserId();
-            }
-        }
+        // Always use search API when a location is selected (with or without search term)
+        await searchSubLocations({
+            searchTerm: searchQuery.value || '',
+            locationId: newLocationId,
+            page: currentPage.value,
+            pageSize: pageSize.value
+        });
     });
     
     const refreshData = async () => {
-        // Add cache busting parameter
-        const cacheBuster = Date.now();
-        
-        if (searchQuery.value.trim()) {
-            await searchSubLocations(searchQuery.value, currentPage.value, pageSize.value, cacheBuster);
+        if (searchQuery.value.trim() || selectedLocationId.value) {
+            await searchSubLocations({
+                searchTerm: searchQuery.value || '',
+                locationId: selectedLocationId.value,
+                page: currentPage.value,
+                pageSize: pageSize.value
+            });
         } else {
-            await getSubLocationsByUserId(cacheBuster);
-            // Remove this line - computed property will update automatically
-            // sublocations.value = allSublocations.value;
+            await getSubLocationsByUserId();
         }
     };
     
-    // Add this function
-    const handleSublocationAdded = async (newSublocation) => {
-        await refreshData(); // Refresh the data to show the new sublocation immediately
+    const handleSublocationAdded = async () => {
+        await refreshData();
     };
     
     const handleLocationChange = async (newLocationId) => {
+        // Clear data immediately before setting new location
+        clearSearch();
+        allSublocations.value = [];
         selectedLocationId.value = newLocationId;
-        // The watch will handle the API call
     };
     
     const handleSearch = async (newSearchQuery) => {
         searchQuery.value = newSearchQuery;
         currentPage.value = 1; // Reset to first page
-        // The watch will handle the API call
-    };
-    
-    const handleSort = async (newSortBy) => {
-        sortBy.value = newSortBy;
         // The watch will handle the API call
     };
     
@@ -129,6 +122,7 @@ export function useSubLocationTable(locations) {
         searchQuery.value = '';
         currentPage.value = 1;
         clearSearch();
+        allSublocations.value = [];
     };
     
     // Watch for location changes to handle deleted locations
@@ -148,15 +142,13 @@ export function useSubLocationTable(locations) {
         selectedLocationId,
         selectedLocation,
         searchQuery,
-        sortBy,
         currentPage,
         pageSize,
         totalCount,
         refreshData,
-        handleSublocationAdded, // Add this to the return object
+        handleSublocationAdded,
         handleLocationChange,
         handleSearch,
-        handleSort,
         resetToDefaultView
     };
 }

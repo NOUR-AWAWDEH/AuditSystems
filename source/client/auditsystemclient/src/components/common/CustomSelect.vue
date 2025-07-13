@@ -1,6 +1,9 @@
 <template>
   <div class="custom-select" :class="{ 'is-open': isOpen }">
-    <label v-if="label" :for="id" class="select-label">
+    <label v-if="label" :for="id" class="block text-sm font-semibold text-secondary-base mb-2">
+      <svg class="inline w-4 h-4 mr-1 text-secondary-base" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+      </svg>
       {{ label }}
     </label>
     
@@ -13,7 +16,7 @@
         @change="handleChange"
         @focus="handleFocus"
         @blur="handleBlur"
-        class="select-input"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 appearance-none bg-white text-secondary-shade"
       >
         <option v-if="placeholder" value="" disabled>
           {{ placeholder }}
@@ -27,14 +30,14 @@
         </option>
       </select>
       
-      <div class="select-icon">
+      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
         <svg class="w-4 h-4 text-secondary-base" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
       </div>
     </div>
     
-    <div v-if="error" class="error-message">
+    <div v-if="error" class="text-sm text-red-600 mt-1">
       {{ error }}
     </div>
   </div>
@@ -113,33 +116,15 @@ const handleBlur = () => {
 </script>
 
 <style scoped>
-@reference "../../styles/style.css";
-
 .custom-select {
   @apply relative;
-}
-
-.select-label {
-  @apply block text-sm font-medium text-secondary-shade mb-1;
 }
 
 .select-wrapper {
   @apply relative;
 }
 
-.select-input {
-  @apply w-full px-4 py-2 text-secondary-shade border border-secondary-base rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary-base appearance-none bg-white;
-}
-
-.select-input:disabled {
-  @apply bg-gray-tint cursor-not-allowed;
-}
-
-.select-icon {
-  @apply absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none;
-}
-
-.error-message {
-  @apply text-sm text-red-600 mt-1;
+.custom-select select:disabled {
+  @apply bg-gray-100 cursor-not-allowed;
 }
 </style>

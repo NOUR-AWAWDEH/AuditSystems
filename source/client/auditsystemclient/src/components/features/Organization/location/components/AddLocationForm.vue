@@ -8,6 +8,9 @@
                 @click="toggleAddForm"
                 :class="showAddForm ? 'px-4 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 text-white' : 'px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white'"
             >
+                <svg v-if="!showAddForm" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"> 
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path> 
+                </svg>
                 {{ showAddForm ? 'Cancel' : 'Add Location' }}
             </BaseButton>
         </div>

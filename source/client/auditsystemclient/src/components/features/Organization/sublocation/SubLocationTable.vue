@@ -3,33 +3,28 @@
         <!-- Sublocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-6">
-                <!-- Header with Location Selection -->
+                <!-- Header with Location Selection and Filters -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
                     <!-- Left side - Title and Description -->
                     <SubLocationHeader />
                     
-                    <!-- Right side - Location Selector -->
-                    <div class="min-w-64">
-                        <LocationSelector
-                            :locations="locations"
-                            :selected-location="selectedLocationId"
-                            @location-changed="handleLocationChange"
-                        />
+                    <!-- Right side - Location Selector and Filters -->
+                    <div class="flex items-center gap-4">
+                        <div class="min-w-64">
+                            <LocationSelector
+                                :locations="locations"
+                                :selected-location="selectedLocationId"
+                                @location-changed="handleLocationChange"
+                            />
+                        </div>
+                        <div v-if="validSelectedLocation" class="p-4">
+                            <Filters
+                                :search="searchQuery"
+                                @update:search="handleSearch"
+                                @refresh="refreshData"
+                            />
+                        </div>
                     </div>
-                </div>
-
-                <!-- Filters (show only when location is selected) -->
-                <div v-if="validSelectedLocation" class="mb-6">
-                    <SubLocationFilters
-                        :locations="locations"
-                        :selected-location-id="selectedLocationId"
-                        :search="searchQuery"
-                        :sort="sortBy"
-                        @update:selected-location-id="handleLocationChange"
-                        @update:search="handleSearch"
-                        @update:sort="handleSort"
-                        @refresh="refreshData"
-                    />
                 </div>
 
                 <!-- Selected Location Info -->
@@ -41,18 +36,18 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
                             <p class="text-sm text-gray-700">
-                                Showing sublocations for: <span class="font-semibold text-blue-800">{{ selectedLocation?.name || 'Selected Location' }}</span>
+                                Showing sublocations for: &nbsp;&nbsp; <span class="font-semibold text-blue-800">{{ selectedLocation?.name || 'Selected Location' }}</span>
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
                         <BaseButton 
-                            @click="$emit('add-sublocation')"
-                            class="inline-flex items-center px-2 py-1 bg-green-600 text-white font-medium rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                        >
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add Sublocation
+                            @click="$emit('add-sublocation')" 
+                            class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
+                        > 
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"> 
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path> 
+                            </svg> 
+                            Add Sublocation 
                         </BaseButton>
                     </div>
                 </div>
@@ -128,7 +123,7 @@
 import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
-import SubLocationFilters from './SubLocationFilters.vue';
+import Filters from '@/components/common/Filters.vue';
 import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
 import SubLocationHeader from './SubLocationHeader.vue';
 
@@ -139,10 +134,8 @@ const props = defineProps({
     selectedLocationId: String,
     selectedLocation: Object,
     searchQuery: String,
-    sortBy: String,
     handleLocationChange: Function,
     handleSearch: Function,
-    handleSort: Function,
     refreshData: Function
 });
 
@@ -159,7 +152,6 @@ const sublocationColumns = [
 ];
 
 const enhancedColumns = computed(() => {
-    // Defensive: never assign to this computed, only use it as a getter
     return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
 });
 
@@ -171,10 +163,20 @@ const noDataMessage = computed(() => {
     return 'No sublocations found for this location.';
 });
 
+// Fixed validation logic to show interface when location is selected
 const validSelectedLocation = computed(() => {
-    return props.selectedLocationId && props.locations?.some(loc => loc.id === props.selectedLocationId);
+    if (!props.selectedLocationId || props.selectedLocationId.trim() === '') {
+        return false;
+    }
+    
+    // If locations array is empty or undefined, still show the interface
+    if (!props.locations || props.locations.length === 0) {
+        return true;
+    }
+    
+    // Check if the selected location exists in the locations array
+    return props.locations.some(loc => loc.id === props.selectedLocationId);
 });
-
 </script>
 
 <style scoped>

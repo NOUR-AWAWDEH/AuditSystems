@@ -6,7 +6,7 @@ const ResetPassword = () => import('@/components/features/auth/ResetPassword.vue
 const SideBar = () => import('@/components/common/SideBar.vue');
 const Login = () => import('@/components/features/auth/LoginForm.vue');
 const SupportingDocManager = () => import('@/components/features/supportingDoc/SupportingDocumentsView.vue');
-const Location = () => import('@/components/features/Organization/location/LocationView.vue');
+const Location = () => import('@/components/features/Organization/OrganizationView.vue');
 const routes = [
   {
     path: '/',

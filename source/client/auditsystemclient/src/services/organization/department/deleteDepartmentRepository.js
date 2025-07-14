@@ -1,6 +1,6 @@
 import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
-import authService from "@/services/auth/authService";
+import authService from '@/services/auth/authRepos/authService';
 
 const DEPARTMENT_BSE_ENDPOINT = '/api/department';
 const DELETE_DEPARTMENT_ENDPOINT = '/delete-department-by-id';

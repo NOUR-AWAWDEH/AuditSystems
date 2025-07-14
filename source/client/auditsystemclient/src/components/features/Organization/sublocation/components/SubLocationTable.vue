@@ -31,10 +31,8 @@
                 <div v-if="selectedLocationId" class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
+                            <LocationIcon size="lg" custom-class="text-blue-600 mr-2" />
+
                             <p class="text-sm text-gray-700">
                                 Showing sublocations for: &nbsp;&nbsp; 
                                 <span class="font-semibold text-blue-800">
@@ -44,15 +42,13 @@
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
-                        <BaseButton 
+                        <button 
                             @click="$emit('add-sublocation')" 
                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
                         > 
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"> 
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path> 
-                            </svg> 
+                            <PlusIcon :stroke-width="3"/>
                             Add Sublocation 
-                        </BaseButton>
+                        </button>
                     </div>
                 </div>
                 
@@ -65,25 +61,31 @@
                         :actions="[]"
                         :no-data-message="noDataMessage"
                         class="sublocation-table"
+                        @row-click="handleRowClick"
                     >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button
+                                    @click.stop="handleSelectSublocation(item)"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                    :class="{ 'bg-green-200': selectedSublocationId === item.id }"
+                                >
+                                    <CheckIcon v-if="selectedSublocationId === item.id" size="sm" custom-class="mr-1" />
+                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
+                                    {{ selectedSublocationId === item.id ? 'Selected' : 'Select' }}
+                                </button>
+                                <button
                                     @click.stop="$emit('edit-sublocation', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
                                 >
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
+                                    <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
                                 <button
                                     @click.stop="$emit('delete-sublocation', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
                                 >
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
+                                    <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
                                 </button>
                             </div>
@@ -96,9 +98,7 @@
                             @click="handleSearch('')"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
                         >
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+                            <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
                             Clear Search
                         </button>
                     </div>
@@ -124,12 +124,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
-import BaseButton from '@/components/base/BaseButton.vue';
-import Filters from '@/components/common/Filters.vue';
+import Filters from '@/components/common/SearchFilter.vue';
 import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
 import SubLocationHeader from './SubLocationHeader.vue';
+import LocationIcon from '@/components/common/icons/LocationIcon.vue';
+import PlusIcon from '@/components/common/icons/PlusIcon.vue';
+import EditIcon from '@/components/common/icons/EditIcon.vue';
+import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
+import CloseIcon from '@/components/common/icons/CloseIcon.vue';
+import CheckIcon from '@/components/common/icons/CheckIcon.vue';
+import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
     locations: Array,
@@ -145,11 +151,43 @@ const props = defineProps({
     refreshData: Function
 });
 
-defineEmits([
+const emit = defineEmits([
     'add-sublocation',
     'edit-sublocation',
-    'delete-sublocation'
+    'delete-sublocation',
+    'sublocation-selected'
 ]);
+
+// Sublocation selection state
+const selectedSublocationId = ref(null);
+
+// Handle sublocation selection from table row or button
+const handleSelectSublocation = (sublocation) => {
+    selectedSublocationId.value = sublocation.id;
+    emit('sublocation-selected', sublocation.id);
+};
+
+// Handle row click to select sublocation
+const handleRowClick = (sublocation) => {
+    handleSelectSublocation(sublocation);
+};
+
+// Watch for sublocation changes to reset selection if sublocation is deleted
+watch(() => props.sublocations, (newSublocations) => {
+    if (selectedSublocationId.value && newSublocations) {
+        const sublocationExists = newSublocations.some(sub => sub.id === selectedSublocationId.value);
+        if (!sublocationExists) {
+            selectedSublocationId.value = null;
+            emit('sublocation-selected', null);
+        }
+    }
+}, { deep: true });
+
+// Reset selection when location changes
+watch(() => props.selectedLocationId, () => {
+    selectedSublocationId.value = null;
+    emit('sublocation-selected', null);
+});
 
 const sublocationColumns = [
     { key: 'name', label: 'Name' },
@@ -176,11 +214,17 @@ const validSelectedLocation = computed(() => {
 <style scoped>
 .sublocation-table .table-row {
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .sublocation-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.sublocation-table .table-row.selected {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
 }
 </style>

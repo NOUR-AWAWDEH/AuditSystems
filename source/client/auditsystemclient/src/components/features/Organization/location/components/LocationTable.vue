@@ -1,5 +1,7 @@
 <template>
     <div>
+        
+        
         <!-- Location Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
@@ -30,25 +32,31 @@
                         :is-loading="isLoading"
                         :actions="[]"
                         class="location-table"
+                        @row-click="handleRowClick"
                     >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button
+                                    @click.stop="handleSelectLocation(item)"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                    :class="{ 'bg-green-200': selectedLocationId === item.id }"
+                                >
+                                    <CheckIcon v-if="selectedLocationId === item.id" size="sm" custom-class="mr-1" />
+                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
+                                    {{ selectedLocationId === item.id ? 'Selected' : 'Select' }}
+                                </button>
+                                <button
                                     @click.stop="$emit('edit-location', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
                                 >
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
+                                    <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
                                 <button
                                     @click.stop="$emit('delete-location', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
                                 >
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
+                                    <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
                                 </button>
                             </div>
@@ -61,23 +69,52 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
-import Filters from '@/components/common/Filters.vue';
+import Filters from '@/components/common/SearchFilter.vue';
+import EditIcon from '@/components/common/icons/EditIcon.vue';
+import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
+import CheckIcon from '@/components/common/icons/CheckIcon.vue';
+import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
-
-defineProps({
+const props = defineProps({
     locations: Array,
     isLoading: Boolean,
     search: String
 });
 
-defineEmits([
+const emit = defineEmits([
     'edit-location',
     'delete-location',
     'update:search',
-    'refresh'
+    'refresh',
+    'location-selected'
 ]);
+
+// Location selection state
+const selectedLocationId = ref(null);
+
+// Handle location selection from table row or button
+const handleSelectLocation = (location) => {
+    selectedLocationId.value = location.id;
+    emit('location-selected', location.id);
+};
+
+// Handle row click to select location
+const handleRowClick = (location) => {
+    handleSelectLocation(location);
+};
+
+// Watch for location changes to reset selection if location is deleted
+watch(() => props.locations, (newLocations) => {
+    if (selectedLocationId.value && newLocations) {
+        const locationExists = newLocations.some(loc => loc.id === selectedLocationId.value);
+        if (!locationExists) {
+            selectedLocationId.value = null;
+            emit('location-selected', null);
+        }
+    }
+}, { deep: true });
 
 const locationColumns = [
     { key: 'name', label: 'Name' },
@@ -93,11 +130,17 @@ const enhancedColumns = computed(() => {
 <style scoped>
 .location-table .table-row {
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .location-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.location-table .table-row.selected {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
 }
 </style>

@@ -1,13 +1,11 @@
 <script setup>
 import { useLogout } from '@/composables/auth/useLogout';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 import BaseLink from '@/components/base/BaseLink.vue';
 import Logo from './AuditLogo.vue';
 import UserMenu from './UserMenu.vue';
 
 const { isAuthenticated } = useLogout();
-const router = useRouter();
 const userMenuRef = ref(null);
 
 const handleUserMenuClick = () => {

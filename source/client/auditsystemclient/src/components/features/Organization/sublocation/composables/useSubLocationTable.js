@@ -119,16 +119,14 @@ export function useSubLocationTable(locations) {
     });
     
     // Watch for selectedLocationId changes and fetch location details
-    watch(selectedLocationId, async (newLocationId, oldLocationId) => {
+    watch(selectedLocationId, async (newLocationId) => {
         clearSearch();
         allSublocations.value = [];
         
-        // Clear the fetched location when location changes or is cleared
         if (!newLocationId) {
-            clearLocation(); // This will clear the fetchedLocation
+            clearLocation();
         }
         
-        // Fetch location details when location changes
         if (newLocationId) {
             try {
                 await fetchLocationById(newLocationId);
@@ -193,7 +191,7 @@ export function useSubLocationTable(locations) {
         currentPage.value = 1;
         clearSearch();
         allSublocations.value = [];
-        clearLocation(); // Clear the fetched location when resetting
+        clearLocation();
         isInitialized.value = false;
         isInitializing.value = false;
     };

@@ -12,46 +12,32 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Sublocation</h3>
-            <button 
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Department</h3>
+            <BaseButton 
               @click="$emit('close')" 
               class="text-gray-base hover:text-gray-shade focus:outline-none"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </BaseButton>
           </div>
           
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Sublocation Name Field -->
+              <!-- Department Name Field -->
               <div>
-                <label for="edit-sublocation-name" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Sublocation Name *
+                <label for="edit-department-name" class="block text-sm font-medium text-secondary-shade mb-1">
+                  Department Name *
                 </label>
                 <BaseInput
-                  id="edit-sublocation-name"
+                  id="edit-department-name"
                   v-model="formData.name"
-                  placeholder="Enter sublocation name"
+                  placeholder="Enter Department name"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                 />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
-              </div>
-              
-              <!-- Address Field -->
-              <div>
-                <label for="edit-sublocation-address" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Address
-                </label>
-                <BaseInput
-                  id="edit-sublocation-address"
-                  v-model="formData.address"
-                  placeholder="Enter sublocation address"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
-                />
-                <p v-if="errors.address" class="text-error text-sm mt-1">{{ errors.address }}</p>
               </div>
               
               <!-- Error Display -->
@@ -60,23 +46,23 @@
               </div>
               
               <div class="flex justify-end space-x-3 pt-4">
-                <button
+                <BaseButton
                   type="button"
                   @click="$emit('close')"
                   :disabled="isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   Cancel
-                </button>
+                </BaseButton>
                 
-                <button
+                <BaseButton
                   type="submit"
                   :disabled="!formData.name.trim() || isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   <span v-if="isUpdating">Updating...</span>
-                  <span v-else>Update Sublocation</span>
-                </button>
+                  <span v-else>Update Department</span>
+                </BaseButton>
               </div>
             </form>
           </div>
@@ -89,7 +75,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { useUpdateSubLocationById } from '@/composables/organization/sublocation/useUpdateSubLocationById';
+import BaseButton from '@/components/base/BaseButton.vue';
+import { useUpdateDepartmentById } from '@/composables/organization/department/useUpdateDepartmentById';
 import { useNotification } from '@/composables/notification/useNotification';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
@@ -98,7 +85,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  sublocation: {
+  department: {
     type: Object,
     default: () => ({})
   }
@@ -107,22 +94,20 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated']);
 
 const { showNotification } = useNotification();
-const { isUpdating, error, updateSubLocation, resetState } = useUpdateSubLocationById();
+const { isUpdating, error, updateDepartment, resetState } = useUpdateDepartmentById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
 
 const formData = ref({
-  name: '',
-  address: ''
+  name: ''
 });
 
 const errors = ref({
-  name: '',
-  address: ''
+  name: ''
 });
 
-// Reset form when modal opens/closes or sublocation changes
-watch([() => props.isVisible, () => props.sublocation], ([newVisible, newSublocation]) => {
-  if (newVisible && newSublocation) {
+// Reset form when modal opens/closes or department changes
+watch([() => props.isVisible, () => props.department], ([newVisible, newDepartment]) => {
+  if (newVisible && newDepartment) {
     resetForm();
     populateForm();
   }
@@ -130,22 +115,19 @@ watch([() => props.isVisible, () => props.sublocation], ([newVisible, newSubloca
 
 const resetForm = () => {
   formData.value = {
-    name: '',
-    address: ''
+    name: ''
   };
   errors.value = {
-    name: '',
-    address: ''
+    name: ''
   };
   
   resetState();
 };
 
 const populateForm = () => {
-  if (props.sublocation) {
+  if (props.department) {
     formData.value = {
-      name: props.sublocation.name || '',
-      address: props.sublocation.address || ''
+      name: props.department.name || '',
     };
   }
 };
@@ -167,9 +149,9 @@ const handleSubmit = async () => {
   }
 
 
-  if (!props.sublocation?.id) {
-    console.error('Missing sublocation ID:', props.sublocation);
-    showNotification('Sublocation ID is required', 'error');
+  if (!props.department?.id) {
+    console.error('Missing department ID:', props.department);
+    showNotification('Department ID is required', 'error');
     return;
   }
   
@@ -179,50 +161,44 @@ const handleSubmit = async () => {
   }
   
   try {
-    const sublocationData = {
-      id: props.sublocation.id,
+    const departmentData = {
+      id: props.department.id,
       name: formData.value.name.trim(),
-      address: formData.value.address.trim(),
-      locationId: props.sublocation.locationId
+      subLocationId: props.department.subLocationId
     };
    
-    const result = await updateSubLocation(sublocationData);
-    
+    const result = await updateDepartment(departmentData);
     
     if (result?.success) {      
-      // Pass the updated sublocation data with the correct structure
-      const updatedSublocationData = {
-        ...sublocationData,
+      const updatedDepartment = {
+        ...departmentData,
         ...result.data
       };
       
-      emit('updated', updatedSublocationData);
+      emit('updated', updatedDepartment);
       emit('close');
     } else {
-      console.error('❌ Update failed - result not successful:', result);
+      // Handle specific error messages from the API
+      const errorMessage = result?.message || error.value || 'Failed to update department. Please try again.';
+      showNotification(errorMessage, 'error');
     }
-  } catch (error) {
-    console.error('❌ Error in handleSubmit:', error);
-    console.error('Error details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
-    showNotification('Failed to update sublocation. Please try again.', 'error');
+  } catch (err) {
+    console.error('❌ Error in handleSubmit:', err);
+    const errorMessage = err.response?.data?.message || err.message || 'Failed to update department. Please try again.';
+    showNotification(errorMessage, 'error');
   }
   
 };
 
 const validateForm = () => {
   errors.value = {
-    name: '',
-    address: ''
+    name: ''
   };
   
   let isValid = true;
   
   if (!formData.value.name.trim()) {
-    errors.value.name = 'Sublocation name is required';
+    errors.value.name = 'Department name is required';
     isValid = false;
   }
   

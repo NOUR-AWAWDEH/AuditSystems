@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { createDepartmentRepository } from '@/services/organization/department/createDepartmentRepository';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateDepartment() {
     const isCreating = ref(false);
@@ -64,7 +64,7 @@ export function useCreateDepartment() {
         }
     };
 
-    const clearState = () => {
+    const resetState = () => {
         isCreating.value = false;
         error.value = null;
         createdDepartment.value = null;
@@ -75,6 +75,6 @@ export function useCreateDepartment() {
         error,
         createdDepartment,
         createDepartment,
-        clearState
+        resetState
     };
 }

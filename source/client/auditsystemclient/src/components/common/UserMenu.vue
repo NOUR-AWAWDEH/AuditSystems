@@ -54,7 +54,7 @@
 import { useLogout } from '@/composables/auth/useLogout';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import UserMenuIcon from './sidebar/icons/UserMenuIcon.vue';
+import UserMenuIcon from '@/components/common/icons/UserMenuIcon.vue';
 
 const { logout } = useLogout();
 const router = useRouter();

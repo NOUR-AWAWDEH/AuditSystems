@@ -1,6 +1,6 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/useNotification';
-import { useUpdateDepartmentByIdRepository } from '@/repositories/organization/department/useUpdateDepartmentByIdRepository';
+import { useNotification } from '@/composables/notification/useNotification';
+import { updateDepartmentByIdRepository } from '@/services/organization/department/updateDepartmentByIdRepository';
 
 export function useUpdateDepartmentById() {
     const isUpdating = ref(false);
@@ -58,7 +58,7 @@ export function useUpdateDepartmentById() {
                 return handleUpdateFailure({ message: validationError });
             }
 
-            const response = await useUpdateDepartmentByIdRepository.updateDepartmentById(departmentData);
+            const response = await updateDepartmentByIdRepository.updateDepartmentById(departmentData);
 
             if (response?.success) {
                 return handleUpdateSuccess(response);

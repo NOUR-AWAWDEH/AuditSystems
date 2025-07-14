@@ -1,6 +1,6 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/useNotification';
-import { searchDepartmentByUserIdRepository } from '@/services/organization/department/searchDepartmentByUserIdRepository';
+import { useNotification } from '@/composables/notification/useNotification';
+import { searchDepartmentByUserIdRepository } from '@/services/organization/department/searchDepartmentsByUserIdRepository';
 
 export function useSearchDepartmentByUserId() {
     const searchResults = ref([]);
@@ -101,8 +101,6 @@ export function useSearchDepartmentByUserId() {
         currentPage,
         pageSize,
         searchTerm,
-        departmentId,
-
         // Actions
         searchDepartmentByUserId,
         clearSearch,

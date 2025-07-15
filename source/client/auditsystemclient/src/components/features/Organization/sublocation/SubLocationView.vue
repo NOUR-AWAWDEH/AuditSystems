@@ -110,8 +110,10 @@ const handleSublocationSelected = (sublocationId) => {
     emit('sublocation-selected', sublocationId);
 };
 
+// In the script setup section, add:
 defineExpose({
     sublocations,
+    selectedLocationId, // Expose selected location ID
     resetToDefaultView
 });
 </script>

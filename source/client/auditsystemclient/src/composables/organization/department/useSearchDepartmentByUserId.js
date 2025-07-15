@@ -40,7 +40,7 @@ export function useSearchDepartmentByUserId() {
         };
     };
 
-    const searchDepartmentByUserId = async (searchParams = {}) => {
+    const searchDepartments = async (searchParams = {}) => {
         try {
             isSearching.value = true;
             error.value = null;
@@ -102,7 +102,7 @@ export function useSearchDepartmentByUserId() {
         pageSize,
         searchTerm,
         // Actions
-        searchDepartmentByUserId,
+        searchDepartments,
         clearSearch,
         resetState
     }

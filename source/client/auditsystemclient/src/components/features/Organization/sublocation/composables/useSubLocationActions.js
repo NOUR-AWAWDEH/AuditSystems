@@ -23,7 +23,7 @@ export function useSubLocationActions(refreshData, showNotification) {
     };
     
     const handleSublocationAdded = async (newSublocation) => {
-        await refreshData(); // Refresh the data to show the new sublocation immediately
+        await refreshData();
         showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
         handleCloseAddSublocationModal();
     };

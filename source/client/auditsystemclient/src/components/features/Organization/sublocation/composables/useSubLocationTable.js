@@ -12,7 +12,12 @@ export function useSubLocationTable(locations) {
     const isInitializing = ref(false);
     
     // Add useGetLocationById composable
-    const { location: fetchedLocation, isLoading: isLocationLoading, fetchLocationById, clearLocation } = useGetLocationById();
+    const { 
+        location: fetchedLocation,
+        isLoading: isLocationLoading,
+        fetchLocationById,
+        clearLocation 
+    } = useGetLocationById();
     
     const {
         searchResults,
@@ -184,7 +189,6 @@ export function useSubLocationTable(locations) {
         currentPage.value = 1;
     };
     
-    
     const resetToDefaultView = () => {
         selectedLocationId.value = '';
         searchQuery.value = '';
@@ -219,8 +223,8 @@ export function useSubLocationTable(locations) {
         isLoading,
         selectedLocationId,
         selectedLocation, 
-        currentLocation, // Add currentLocation to return
-        isLocationLoading, // Add isLocationLoading to return
+        currentLocation,
+        isLocationLoading,
         searchQuery,
         currentPage,
         pageSize,

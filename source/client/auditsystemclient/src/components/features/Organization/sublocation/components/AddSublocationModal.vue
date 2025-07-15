@@ -10,9 +10,11 @@
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
             <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Sublocation</h3>
-            <BaseButton @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
+            <button 
+              @click="$emit('close')" 
+              class="text-gray-base hover:text-gray-shade focus:outline-none">
               <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
-            </BaseButton>
+            </button>
           </div>
 
           <!-- Content -->
@@ -23,8 +25,13 @@
                 <label for="sublocation-name" class="block text-sm font-medium text-secondary-shade mb-1">
                   Sublocation Name *
                 </label>
-                <BaseInput id="sublocation-name" v-model="formData.name" placeholder="Enter sublocation name"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                <BaseInput 
+                  id="sublocation-name" 
+                  v-model="formData.name"
+                  label="Sublocation Name" 
+                  placeholder="Enter sublocation name"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" 
+                />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
 
@@ -44,16 +51,18 @@
               </div>
 
               <div class="flex justify-end space-x-3 pt-4">
-                <BaseButton type="button" @click="$emit('close')" :disabled="isCreating"
+                <button type="button" @click="$emit('close')" :disabled="isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   Cancel
-                </BaseButton>
+                </button>
 
-                <BaseButton type="submit" :disabled="!formData.name.trim() || isCreating"
+                <button 
+                  type="submit" 
+                  :disabled="!formData.name.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isCreating">Adding...</span>
                   <span v-else>Add Sublocation</span>
-                </BaseButton>
+                </button>
               </div>
             </form>
           </div>
@@ -69,7 +78,6 @@ import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import { useCreateSubLocation } from '@/composables/organization/sublocation/useCreateSubLocation';
 import { useNotification } from '@/composables/notification/useNotification';
-import BaseButton from '@/components/base/BaseButton.vue';
 
 const props = defineProps({
   isVisible: {
@@ -97,7 +105,6 @@ const errors = ref({
   address: ''
 });
 
-// Reset form when modal opens/closes
 watch(() => props.isVisible, (newValue) => {
   if (newValue) {
     resetForm();

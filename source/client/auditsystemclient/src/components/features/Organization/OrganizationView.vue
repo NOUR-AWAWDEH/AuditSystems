@@ -22,11 +22,11 @@
             </div>
             
             <!-- Department Management Section -->
-            <div v-if="selectedSublocationId" class="mt-8">
+            <div v-if="effectiveSelectedSublocationId" class="mt-8">
                 <DepartmentView 
                     ref="departmentViewRef" 
                     :sublocations="sublocations"
-                    :selected-sublocation-id="selectedSublocationId"
+                    :selected-sublocation-id="effectiveSelectedSublocationId"
                     @department-selected="handleDepartmentSelected"
                 />
             </div>
@@ -61,11 +61,21 @@ const sublocations = computed(() => {
     return subLocationViewRef.value?.sublocations || [];
 });
 
+// Get the actual selected sublocation ID from SubLocationView
+const actualSelectedSublocationId = computed(() => {
+    return subLocationViewRef.value?.selectedSubLocationId || null;
+});
+
+// Use the actual selected sublocation ID for DepartmentView
+const effectiveSelectedSublocationId = computed(() => {
+    return actualSelectedSublocationId.value || selectedSublocationId.value;
+});
+
 // Handle location selection
 const handleLocationSelected = (locationId) => {
     selectedLocationId.value = locationId;
-    selectedSublocationId.value = null; // Reset sublocation selection
-    selectedDepartmentId.value = null; // Reset department selection
+    selectedSublocationId.value = null;
+    selectedDepartmentId.value = null;
     
     // Reset child views
     if (subLocationViewRef.value?.resetToDefaultView) {
@@ -89,7 +99,6 @@ const handleSublocationSelected = (sublocationId) => {
 // Handle department selection
 const handleDepartmentSelected = (departmentId) => {
     selectedDepartmentId.value = departmentId;
-    console.log('Department selected:', departmentId);
 };
 </script>
 

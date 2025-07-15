@@ -10,7 +10,7 @@
     <div class="select-wrapper relative">
       <select
         :id="id"
-        :value="modelValue"
+        :value="modelValue?.toString()"
         :disabled="disabled"
         :required="required"
         @change="handleChange"
@@ -24,7 +24,7 @@
         <option
           v-for="option in options"
           :key="getOptionValue(option)"
-          :value="getOptionValue(option)"
+          :value="getOptionValue(option).toString()"
           class="py-2 px-4 text-gray-900 hover:bg-blue-50 focus:bg-blue-50"
         >
           {{ getOptionLabel(option) }}
@@ -109,7 +109,7 @@ const getOptionLabel = (option) => {
 };
 
 const handleChange = (event) => {
-  const value = event.target.value;
+  const value = getOptionValue(props.options.find(opt => getOptionValue(opt).toString() === event.target.value));
   emit('update:modelValue', value);
   emit('change', value);
 };

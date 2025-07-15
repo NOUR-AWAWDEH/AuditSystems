@@ -25,15 +25,14 @@ defineProps({
   },
   subLocationError: {
     type: String,
-    default: null
+    default: ''
   }
 });
 
-// ✅ Correct event names
-const emit = defineEmits(['update:selectedSubLocation', 'subLocation-changed']);
+const emit = defineEmits(['update:selectedSubLocation', 'sublocation-changed']);
 
-const handleSubLocationChange = (value) => {
-  emit('update:selectedSubLocation', value); 
-  emit('subLocation-changed', value);
+const handleSubLocationChange = (value) => {  
+    emit('update:selectedSubLocation', value);
+    emit('sublocation-changed', value);
 };
 </script>

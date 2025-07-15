@@ -27,7 +27,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'md',
-    validator: (value) => ['xs', 'sm', 'md', 'lg', 'xl'].includes(value)
+    validator: (value) => ['xs', 'sm', 'md', 'lg', 'xl','xxl', 'xxxl'].includes(value)
   },
   strokeWidth: {
     type: [String, Number],
@@ -45,7 +45,9 @@ const sizeClass = computed(() => {
     sm: 'w-4 h-4',
     md: 'w-5 h-5',
     lg: 'w-6 h-6',
-    xl: 'w-8 h-8'
+    xl: 'w-8 h-8',
+    xxl: 'w-10 h-10',
+    xxxl: 'w-20 h-20',
   };
   return sizes[props.size];
 });

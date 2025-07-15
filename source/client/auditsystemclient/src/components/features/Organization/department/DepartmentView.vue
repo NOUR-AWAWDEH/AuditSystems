@@ -1,5 +1,9 @@
 <template>
     <div class="space-y-6">
+        <p class="text-xs text-gray-400 mt-2">
+            🔍 selectedSubLocationId: {{ selectedSubLocationId }}
+        </p>
+
         <!-- Department Management -->
         <DepartmentTable
             :sublocations="sublocations"
@@ -10,9 +14,9 @@
             :current-sublocation="currentSubLocation"
             :is-sublocation-loading="isSubLocationLoading"
             :search-query="searchQuery"
-            :handle-sublocation-change="handleSubLocationChange"
-            :handle-search="handleSearch"
-            :refresh-data="refreshData"
+            :handleSubLocationChange="handleSubLocationChange"
+            :handleSearch="handleSearch"
+            :refreshData="refreshData"
             @add-department="handleAddDepartment"
             @edit-department="handleEditDepartment"
             @delete-department="handleDeleteDepartment"
@@ -51,6 +55,7 @@
 </template>
 
 <script setup>
+import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import DepartmentTable from './components/DepartmentTable.vue';
 import AddDepartmentModal from './components/AddDepartmentModal.vue';
@@ -58,18 +63,15 @@ import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
 import { useDepartmentActions } from './composables/useDepartmentActions';
 import { useNotification } from '@/composables/notification/useNotification';
-import { watch } from 'vue';
 
 const props = defineProps({
     sublocations: {
         type: Array,
         default: () => []
-    },
-    selectedSublocationId: {
-        type: String,
-        default: null
     }
 });
+
+
 
 // Define emit first
 const emit = defineEmits(['department-selected']);
@@ -92,18 +94,6 @@ const {
     resetToDefaultView,
 } = useDepartmentTable(props.sublocations);
 
-// Watch for changes in the prop and update the composable's state
-watch(() => props.selectedSublocationId, (newSublocationId) => {
-    if (newSublocationId !== selectedSubLocationId.value) {
-        handleSubLocationChange(newSublocationId);
-    }
-}, { immediate: true });
-
-// Handle department selection and forward to parent
-const handleDepartmentSelected = (departmentId) => {
-    emit('department-selected', departmentId);
-};
-
 const {
     showAddDepartmentModal,
     showEditDepartmentModal,
@@ -122,7 +112,17 @@ const {
     cancelDelete
 } = useDepartmentActions(refreshData, showNotification);
 
+// Handle department selection and forward to parent
+const handleDepartmentSelected = (departmentId) => {
+    emit('department-selected', departmentId);
+};
+
+watch(() => selectedSubLocationId, (val) => {
+  console.log('🔁 selectedSubLocationId updated in parent:', val);
+});
+
 defineExpose({
+    departments,
     resetToDefaultView
 });
 </script>
@@ -132,4 +132,3 @@ defineExpose({
     transition: all 0.2s ease;
 }
 </style>
-

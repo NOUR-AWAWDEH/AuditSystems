@@ -5,21 +5,24 @@ import { useGetSubLocationById } from '@/composables/organization/sublocation/us
 
 export function useDepartmentTable(sublocations) {
     const searchQuery = ref('');
-    const selectedSubLocationId = ref('');
+    const selectedSubLocationId = ref(null);
     const currentPage = ref(1);
     const pageSize = ref(10);
     const isInitialized = ref(false);
     const isInitializing = ref(false);
     
-    // Add useGetSubLocationById composable
-    // Update the destructuring to use the correct function name
-    const { sublocation: fetchedSubLocation, isLoading: isSubLocationLoading, getSubLocationById, resetState: clearSubLocation } = useGetSubLocationById();
+    const { 
+        sublocation: fetchedSubLocation,
+        isLoading: isSubLocationLoading,
+        fetchSubLocationById,
+        clearSubLocation
+    } = useGetSubLocationById();
     
     const {
         searchResults,
         isSearching,
         totalCount,
-        searchDepartmentByUserId,
+        searchDepartments,
         clearSearch
     } = useSearchDepartmentByUserId();
     
@@ -51,7 +54,6 @@ export function useDepartmentTable(sublocations) {
     // Add currentSubLocation computed property
     const currentSubLocation = computed(() => {
         const sublocation = fetchedSubLocation.value || selectedSubLocation.value;
-        // Handle nested sublocationModel structure
         return sublocation?.sublocationModel || sublocation;
     });
     
@@ -65,7 +67,6 @@ export function useDepartmentTable(sublocations) {
     
     const isLoading = computed(() => isSearching.value || isLoadingAll.value || isInitializing.value);
     
-    // Update initializeData function (around line 73)
     const initializeData = async () => {
         if (!selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
             return;
@@ -73,7 +74,7 @@ export function useDepartmentTable(sublocations) {
         
         try {
             isInitializing.value = true;
-            await searchDepartmentByUserId({
+            await searchDepartments({
                 searchTerm: searchQuery.value || '',
                 subLocationId: selectedSubLocationId.value,
                 page: currentPage.value,
@@ -102,12 +103,11 @@ export function useDepartmentTable(sublocations) {
         }
     }, { immediate: true });
     
-    // Update watch(searchQuery) function (around line 100)
     watch(searchQuery, async (search) => {
         if (isInitializing.value) return;
         
         if (search.trim() || selectedSubLocationId.value) {
-            await searchDepartmentByUserId({
+            await searchDepartments({
                 searchTerm: search,
                 subLocationId: selectedSubLocationId.value,
                 page: currentPage.value,
@@ -122,7 +122,6 @@ export function useDepartmentTable(sublocations) {
     });
     
     // Watch for selectedSubLocationId changes and fetch sublocation details
-    // Update watch(selectedSubLocationId) function (around line 133)
     watch(selectedSubLocationId, async (newSubLocationId) => {
         clearSearch();
         allDepartments.value = [];
@@ -133,7 +132,7 @@ export function useDepartmentTable(sublocations) {
         
         if (newSubLocationId) {
             try {
-                await getSubLocationById(newSubLocationId);
+                await fetchSubLocationById(newSubLocationId);
             } catch (error) {
                 console.error('Error fetching sublocation:', error);
             }
@@ -146,7 +145,7 @@ export function useDepartmentTable(sublocations) {
             return;
         }
         
-        await searchDepartmentByUserId({
+        await searchDepartments({
             searchTerm: searchQuery.value || '',
             subLocationId: newSubLocationId,
             page: currentPage.value,
@@ -154,10 +153,9 @@ export function useDepartmentTable(sublocations) {
         });
     });
     
-    // Update refreshData function (around line 160)
     const refreshData = async () => {
         if (searchQuery.value.trim() || selectedSubLocationId.value) {
-            await searchDepartmentByUserId({
+            await searchDepartments({
                 searchTerm: searchQuery.value || '',
                 subLocationId: selectedSubLocationId.value,
                 page: currentPage.value,
@@ -176,22 +174,20 @@ export function useDepartmentTable(sublocations) {
         
         clearSearch();
         allDepartments.value = [];
-        
-        selectedSubLocationId.value = newSubLocationId;
+        selectedSubLocationId.value = newSubLocationId;        
         
         if (newSubLocationId) {
             isInitialized.value = true;
         }
     };
-    
+
     const handleSearch = async (newSearchQuery) => {
         searchQuery.value = newSearchQuery;
         currentPage.value = 1;
     };
-    
-    
+
     const resetToDefaultView = () => {
-        selectedSubLocationId.value = '';
+        selectedSubLocationId.value = null;
         searchQuery.value = '';
         currentPage.value = 1;
         clearSearch();

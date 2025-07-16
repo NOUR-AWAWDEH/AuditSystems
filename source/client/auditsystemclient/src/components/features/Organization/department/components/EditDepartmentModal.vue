@@ -121,14 +121,7 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
-    // Add debugging
-    console.log('Department data being submitted:', {
-        id: props.department?.id,
-        name: formData.value.name.trim(),
-        subLocationId: props.department?.subLocationId,
-        fullDepartment: props.department
-    });
-
+   
     // Check if user is authenticated
     if (!authStatus.value) {
         console.error('Authentication status not loaded');

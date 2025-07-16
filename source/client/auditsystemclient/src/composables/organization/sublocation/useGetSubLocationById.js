@@ -9,8 +9,10 @@ export function useGetSubLocationById() {
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
-    sublocation.value = response.result;
-    return { success: true, data: response.result };
+    // Handle potential nested structure - extract the actual sublocation data
+    const sublocationData = response.result?.subLocationModel || response.result;
+    sublocation.value = sublocationData;
+    return { success: true, data: sublocationData };
   };
   
   const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch sublocation') => {

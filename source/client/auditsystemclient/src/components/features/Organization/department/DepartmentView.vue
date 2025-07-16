@@ -113,10 +113,6 @@ const handleDepartmentSelected = (departmentId) => {
     emit('department-selected', departmentId);
 };
 
-watch(() => selectedSubLocationId, (val) => {
-  console.log('🔁 selectedSubLocationId updated in parent:', val);
-});
-
 defineExpose({
     departments,
     resetToDefaultView

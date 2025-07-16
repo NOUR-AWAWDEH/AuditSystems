@@ -12,7 +12,7 @@
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
                             <LocationSelector 
                                 :locations="locations" 
-                                :selected-location="selectedLocationId"
+                                :selected-location-id="selectedLocationId"
                                 @location-changed="handleLocationChange" />
                         </div>
                         <div v-if="validSelectedLocation" class="w-full sm:w-auto">

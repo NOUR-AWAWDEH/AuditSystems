@@ -1,6 +1,6 @@
 <template>
   <CustomSelect
-    :model-value="selectedLocation"
+    :model-value="selectedLocationId"
     :options="locations"
     label="Select Location"
     placeholder="Choose a location"
@@ -19,7 +19,7 @@ defineProps({
     type: Array,
     default: () => []
   },
-  selectedLocation: {
+  selectedLocationId: {
     type: String,
     default: ''
   },

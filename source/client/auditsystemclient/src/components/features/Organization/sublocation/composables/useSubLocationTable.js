@@ -12,7 +12,12 @@ export function useSubLocationTable(locations) {
     const isInitializing = ref(false);
     
     // Add useGetLocationById composable
-    const { location: fetchedLocation, isLoading: isLocationLoading, fetchLocationById, clearLocation } = useGetLocationById();
+    const { 
+        location: fetchedLocation,
+        isLoading: isLocationLoading,
+        fetchLocationById,
+        clearLocation 
+    } = useGetLocationById();
     
     const {
         searchResults,
@@ -119,16 +124,14 @@ export function useSubLocationTable(locations) {
     });
     
     // Watch for selectedLocationId changes and fetch location details
-    watch(selectedLocationId, async (newLocationId, oldLocationId) => {
+    watch(selectedLocationId, async (newLocationId) => {
         clearSearch();
         allSublocations.value = [];
         
-        // Clear the fetched location when location changes or is cleared
         if (!newLocationId) {
-            clearLocation(); // This will clear the fetchedLocation
+            clearLocation();
         }
         
-        // Fetch location details when location changes
         if (newLocationId) {
             try {
                 await fetchLocationById(newLocationId);
@@ -186,14 +189,13 @@ export function useSubLocationTable(locations) {
         currentPage.value = 1;
     };
     
-    
     const resetToDefaultView = () => {
         selectedLocationId.value = '';
         searchQuery.value = '';
         currentPage.value = 1;
         clearSearch();
         allSublocations.value = [];
-        clearLocation(); // Clear the fetched location when resetting
+        clearLocation();
         isInitialized.value = false;
         isInitializing.value = false;
     };
@@ -221,8 +223,8 @@ export function useSubLocationTable(locations) {
         isLoading,
         selectedLocationId,
         selectedLocation, 
-        currentLocation, // Add currentLocation to return
-        isLocationLoading, // Add isLocationLoading to return
+        currentLocation,
+        isLocationLoading,
         searchQuery,
         currentPage,
         pageSize,

@@ -10,14 +10,13 @@
             :current-location="currentLocation"
             :is-location-loading="isLocationLoading"
             :search-query="searchQuery"
-            :sort-by="sortBy"
             :handle-location-change="handleLocationChange"
             :handle-search="handleSearch"
-            :handle-sort="handleSort"
             :refresh-data="refreshData"
             @add-sublocation="handleAddSublocation"
             @edit-sublocation="handleEditSublocation"
             @delete-sublocation="handleDeleteSublocation"
+            @sublocation-selected="handleSublocationSelected"
         />
 
         <!-- Add Sublocation Modal -->
@@ -53,9 +52,9 @@
 
 <script setup>
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import SubLocationTable from './SubLocationTable.vue';
-import AddSublocationModal from './AddSublocationModal.vue';
-import EditSublocationModal from './EditSublocationModal.vue';
+import SubLocationTable from './components/SubLocationTable.vue';
+import AddSublocationModal from './components/AddSublocationModal.vue';
+import EditSublocationModal from './components/EditSublocationModal.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
 import { useSubLocationActions } from './composables/useSubLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
@@ -66,6 +65,9 @@ const props = defineProps({
         default: () => []
     }
 });
+
+// Define emit to forward sublocation selection to parent
+const emit = defineEmits(['sublocation-selected']);
 
 const { showNotification } = useNotification();
 
@@ -78,18 +80,13 @@ const {
     currentLocation,
     isLocationLoading,
     searchQuery,
-    currentPage,
-    pageSize,
-    totalCount,
     refreshData,
     handleSublocationAdded,
     handleLocationChange,
     handleSearch,
     resetToDefaultView,
-    initializeData
 } = useSubLocationTable(props.locations);
 
-// Remove useSubLocationFilters since search is now handled by the table
 const {
     showAddSublocationModal,
     showEditSublocationModal,
@@ -108,9 +105,15 @@ const {
     cancelDelete
 } = useSubLocationActions(refreshData, showNotification);
 
-// Expose the reset method to parent
-// Expose the resetToDefaultView method so parent components can call it
+// Handle sublocation selection and forward to parent
+const handleSublocationSelected = (sublocationId) => {
+    emit('sublocation-selected', sublocationId);
+};
+
+// In the script setup section, add:
 defineExpose({
+    sublocations,
+    selectedLocationId, // Expose selected location ID
     resetToDefaultView
 });
 </script>

@@ -57,7 +57,8 @@ export function useGetDepartmentById() {
                 return handleFetchFailure(response);
             }
         } catch (error) {
-            return handleFetchFailure(err, err.message || 'Failed to fetch department' );
+            return handleFetchFailure(error, error.message || 'Failed to fetch department' );
+
         }finally {
             isLoading.value = false;
         }

@@ -9,7 +9,7 @@
 
 <script setup>
 import BaseButton from '@/components/base/BaseButton.vue'
-import ArrowIcon from './icons/ArrowIcon.vue'
+import ArrowIcon from '@/components/common/icons/ArrowIcon.vue'
 
 defineProps({
   isCollapsed: {

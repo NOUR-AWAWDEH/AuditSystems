@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { getDepartmentsByUserIdRepository } from '@/services/organization/department/getDepartmentsByUserIdRepository';
+import { getDepartmentByUserIdRepository } from '@/services/organization/department/getDepartmentsByUserIdRepository';
 
 export function useGetDepartmentsByUserId() {
     const departments = ref(null);
@@ -35,7 +35,7 @@ export function useGetDepartmentsByUserId() {
             error.value = null;
             departments.value = [];
 
-            const response = await getDepartmentsByUserIdRepository.getDepartmentsByUserId();
+            const response = await getDepartmentByUserIdRepository.getDepartmentByUserId();
 
             if (response?.success) {
                 return handleFetchSuccess(response);

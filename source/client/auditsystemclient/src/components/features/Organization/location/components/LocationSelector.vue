@@ -14,7 +14,7 @@
 <script setup>
 import CustomSelect from '@/components/common/CustomSelect.vue';
 
-const props = defineProps({
+defineProps({
   locations: {
     type: Array,
     default: () => []
@@ -32,7 +32,7 @@ const props = defineProps({
 const emit = defineEmits(['update:selectedLocation', 'location-changed']);
 
 const handleLocationChange = (value) => {
-  emit('update:selectedLocation', value); // for v-model
-  emit('location-changed', value); // if you want custom logic
+  emit('update:selectedLocation', value);
+  emit('location-changed', value);
 };
 </script>

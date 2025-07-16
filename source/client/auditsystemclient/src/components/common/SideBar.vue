@@ -48,7 +48,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useSidebar } from '@/composables/sideBar/useSidebar.js'
-import SidebarHeader from './sidebar/SidebarHeader.vue'
 import SidebarNavigation from './sidebar/SidebarNavigation.vue'
 import SidebarToggle from './sidebar/SidebarToggle.vue'
 

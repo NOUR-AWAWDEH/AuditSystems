@@ -22,9 +22,8 @@ export function useSubLocationActions(refreshData, showNotification) {
         showAddSublocationModal.value = false;
     };
     
-    // Add this missing function
     const handleSublocationAdded = async (newSublocation) => {
-        await refreshData(); // Refresh the data to show the new sublocation immediately
+        await refreshData();
         showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
         handleCloseAddSublocationModal();
     };
@@ -39,9 +38,8 @@ export function useSubLocationActions(refreshData, showNotification) {
         sublocationToEdit.value = null;
     };
     
-    const handleSublocationUpdated = async (updatedSublocation) => {
+    const handleSublocationUpdated = async () => {
         await refreshData();
-        // The notification is already shown by the composable, so we don't need another one
         handleCloseEditSublocationModal();
     };
     
@@ -54,12 +52,11 @@ export function useSubLocationActions(refreshData, showNotification) {
     
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteSubLocation(itemToDelete.value.id, itemToDelete.value.name);
+            const result = await deleteSubLocation(itemToDelete.value.id);
             
             if (result.success) {
                 showNotification(`Sublocation "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
                 
-                // ✅ Add small delay to ensure cache is cleared
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);
@@ -86,7 +83,7 @@ export function useSubLocationActions(refreshData, showNotification) {
         itemToDelete,
         handleAddSublocation,
         handleCloseAddSublocationModal,
-        handleSublocationAdded, // Add this to the return object
+        handleSublocationAdded,
         handleEditSublocation,
         handleCloseEditSublocationModal,
         handleSublocationUpdated,

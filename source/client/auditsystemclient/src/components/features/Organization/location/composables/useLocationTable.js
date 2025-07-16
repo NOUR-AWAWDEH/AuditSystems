@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue';
 import { useSearchLocationByUserId } from '@/composables/organization/location/useSearchLocationByUserId';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
+import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 
 export function useLocationTable() {
     const searchQuery = ref('');
@@ -21,8 +22,14 @@ export function useLocationTable() {
         fetchLocationsByUserId 
     } = useGetLocationsByUserId();
     
+    // Add sublocation management
+    const { 
+        sublocations, 
+        getSubLocationsByUserId 
+    } = useGetSubLocationsByUserId();
+    
     // Watch for search changes and trigger backend search
-    watch([searchQuery, sortBy, currentPage], async ([search, sort, page]) => {
+    watch([searchQuery, sortBy, currentPage], async ([search, page]) => {
         if (search.trim()) {
             await searchLocations(search, page, pageSize.value);
         } else {
@@ -38,10 +45,13 @@ export function useLocationTable() {
             await fetchLocationsByUserId();
             locations.value = allLocations.value;
         }
+        // Also refresh sublocations
+        await getSubLocationsByUserId();
     };
     
     return {
         locations,
+        sublocations, // Add sublocations to return
         isLoading,
         searchQuery,
         sortBy,

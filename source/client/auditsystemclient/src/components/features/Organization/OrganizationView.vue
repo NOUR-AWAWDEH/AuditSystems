@@ -25,7 +25,7 @@
             <div v-if="effectiveSelectedSublocationId" class="mt-8">
                 <DepartmentView 
                     ref="departmentViewRef" 
-                    :sublocations="sublocations"
+                    :sub-locations="sublocations"
                     :selected-sublocation-id="effectiveSelectedSublocationId"
                     @department-selected="handleDepartmentSelected"
                 />

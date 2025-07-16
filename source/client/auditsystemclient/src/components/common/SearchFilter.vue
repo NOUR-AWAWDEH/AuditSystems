@@ -23,9 +23,7 @@
                 @click="$emit('refresh')"
                 class="w-full sm:w-auto inline-flex items-center justify-center px-2 py-1 sm:px-2 sm:py-1 bg-secondary-base text-white font-medium rounded-lg shadow-md hover:bg-secondary-shade focus:outline-none focus:ring-2 focus:ring-secondary-shade focus:ring-offset-2 transition-all duration-200"
             >
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
+                <SearchIcon size="sm" />
                 Search
             </BaseButton>
         </div>
@@ -35,6 +33,7 @@
 <script setup>
 import BaseInput from '@/components/base/BaseInput.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import SearchIcon from '@/components/common/icons/SearchIcon.vue';
 
 defineProps({
     search: {

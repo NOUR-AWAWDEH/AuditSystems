@@ -57,17 +57,16 @@ export function useDepartmentTable(sublocations) {
     // Add currentSubLocation computed property
     const currentSubLocation = computed(() => {
         const sublocation = fetchedSubLocation.value || selectedSubLocation.value;
-        // Remove the incorrect sublocationModel access
         return sublocation;
     });
     
     const departments = computed(() => {
         if (searchQuery.value.trim() || selectedSubLocationId.value) {
             console.log('[Department] departments computed: using searchResults', searchResults.value);
-            return searchResults.value || []; // Ensure array fallback
+            return searchResults.value || [];
         } else {
             console.log('[Department] departments computed: using allDepartments', allDepartments.value);
-            return allDepartments.value || []; // Ensure array fallback
+            return allDepartments.value || [];
         }
     });
     

@@ -7,14 +7,8 @@
             <div class="p-3 sm:p-4 md:p-6">
                 <!-- Header with Title and Filters -->
                 <div class="flex flex-col gap-4 mb-6">
-                    <div class="flex items-center"> 
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-secondary-base">
-                                Locations
-                            </h2>
-                            <p class="text-sm text-gray-500 mt-1">Manage your organization locations</p>
-                        </div>
-                    </div>
+                    <LocationHeader />
+
                     <div class="flex flex-col sm:flex-row sm:items-end gap-3">
                         <Filters
                             :search="search"
@@ -76,6 +70,7 @@ import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+import LocationHeader from './LocationHeader.vue';
 
 const props = defineProps({
     locations: Array,

@@ -1,31 +1,30 @@
 <template>
     <div class="space-y-6">
-        
-        <!-- Department Management -->
-        <DepartmentTable
-            :sublocations="sublocations"
-            :departments="departments"
-            :is-loading="isLoading"
-            :selected-sublocation-id="selectedSubLocationId"
-            :selected-sublocation="selectedSubLocation"
-            :current-sublocation="currentSubLocation"
-            :is-sublocation-loading="isSubLocationLoading"
-            :search-query="searchQuery"
-            :handleSubLocationChange="handleSubLocationChange"
-            :handleSearch="handleSearch"
-            :refreshData="refreshData"
-            @add-department="handleAddDepartment"
-            @edit-department="handleEditDepartment"
-            @delete-department="handleDeleteDepartment"
-            @department-selected="handleDepartmentSelected"
-        />
-
         <!-- Add Department Modal -->
         <AddDepartmentModal
             :is-visible="showAddDepartmentModal"
             :sub-location-id="selectedSubLocationId"
             @close="handleCloseAddDepartmentModal"
             @department-added="handleDepartmentAdded"
+        />
+        
+        <!-- Department Management -->
+        <DepartmentTable
+            :sub-locations="subLocations"
+            :departments="departments"
+            :is-loading="isLoading"
+            :selected-sub-location-id="selectedSubLocationId"
+            :selected-sub-location="selectedSubLocation"
+            :current-sub-location="currentSubLocation"
+            :is-sub-location-loading="isSubLocationLoading"
+            :search-query="searchQuery"
+            :handle-sub-location-change="handleSubLocationChange"
+            :handle-search="handleSearch"
+            :refresh-data="refreshData"
+            @add-department="handleAddDepartment"
+            @edit-department="handleEditDepartment"
+            @delete-department="handleDeleteDepartment"
+            @department-selected="handleDepartmentSelected"
         />
 
         <!-- Edit Department Modal -->
@@ -62,7 +61,7 @@ import { useDepartmentActions } from './composables/useDepartmentActions';
 import { useNotification } from '@/composables/notification/useNotification';
 
 const props = defineProps({
-    sublocations: {
+    subLocations: {
         type: Array,
         default: () => []
     }
@@ -89,7 +88,7 @@ const {
     handleSubLocationChange,
     handleSearch,
     resetToDefaultView,
-} = useDepartmentTable(props.sublocations);
+} = useDepartmentTable(props.subLocations);
 
 const {
     showAddDepartmentModal,

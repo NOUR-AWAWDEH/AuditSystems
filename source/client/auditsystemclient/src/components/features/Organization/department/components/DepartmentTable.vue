@@ -11,9 +11,9 @@
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
                             <SubLocationSelector 
-                                :subLocations="sublocations"
-                                :selectedSubLocationId="selectedSubLocationId"
-                                @sublocation-changed="handleSubLocationChange"
+                                :sub-locations="subLocations"
+                                :selected-sub-location-id="selectedSubLocationId"
+                                @sub-location-changed="handleSubLocationChange"
                             />
                         </div>
                         <div v-if="validSelectedSubLocation" class="w-full sm:w-auto">
@@ -122,7 +122,7 @@ import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
-    sublocations: Array,
+    subLocations: Array,
     departments: Array,
     isLoading: Boolean,
     selectedSubLocationId: String,
@@ -142,7 +142,7 @@ watch(() => props.selectedSubLocationId, (newVal) => {
 });
 
 watch(internalSelectedSubLocationId, (newVal) => {
-  props.handleSubLocationChange(newVal); // sync back to parent
+  props.handleSubLocationChange(newVal);
 });
 
 const emit = defineEmits([

@@ -3,7 +3,7 @@ import axios from 'axios';
 import api from '@/services/api/api';
 
 const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
-const UPLOAD_SUPPORTING_DOC_ENDPOINT = '/upload-supporting-doc';
+const UPLOAD_SUPPORTING_DOC_ENDPOINT = '/upload-supporting-document'; // Changed from '/upload-supporting-doc'
 
 export const uploadSupportingDocRepository = {
   async uploadSupportingDoc({ file, userId, fileName, token }) {

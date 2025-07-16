@@ -98,7 +98,8 @@
                     <p class="text-gray-500 mb-6">Choose a subLocation from the dropdown above to get started</p>
 
                     <!-- No SubLocations Available -->
-                    <div v-if="!sublocations || sublocations.length === 0" class="text-center">
+                    <!-- No SubLocations Available -->
+                    <div v-if="!subLocations || subLocations.length === 0" class="text-center">
                         <p class="text-sm text-gray-400">Please add a subLocation first to manage departments</p>
                     </div>
                 </div>

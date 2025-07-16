@@ -147,14 +147,14 @@ const validateForm = () => {
         name: ''
     };
 
-    let isVisible = true;
+    let isValid = true;  // Fixed: was 'isVisible' which conflicts with the prop
 
     if (!formData.value.name.trim()) {
         errors.value.name = 'Department name is required';
-        isVisible = false;
+        isValid = false;  // Fixed: was 'isVisible'
     }
 
-    return isVisible;
+    return isValid;  // Fixed: was 'isVisible'
 };
 </script>
 

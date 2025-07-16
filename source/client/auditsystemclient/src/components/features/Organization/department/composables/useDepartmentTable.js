@@ -5,7 +5,7 @@ import { useGetSubLocationById } from '@/composables/organization/sublocation/us
 
 export function useDepartmentTable(sublocations) {
     const searchQuery = ref('');
-    const selectedSubLocationId = ref(null);
+    const selectedSubLocationId = ref('');
     const currentPage = ref(1);
     const pageSize = ref(10);
     const isInitialized = ref(false);
@@ -27,10 +27,12 @@ export function useDepartmentTable(sublocations) {
     } = useSearchDepartmentByUserId();
     
     const { 
-        departments: allDepartments, 
+        departments: allDepartments,
         isLoading: isLoadingAll,
         getDepartmentsByUserId 
     } = useGetDepartmentsByUserId();
+    
+    console.log('[Department] useDepartmentTable initialized', { sublocations });
     
     const sublocationsRef = computed(() => {
         if (sublocations && typeof sublocations === 'object' && 'value' in sublocations) {
@@ -48,20 +50,24 @@ export function useDepartmentTable(sublocations) {
         }
         
         const sublocation = sublocationsList.find(sub => sub.id === subLocationId);
+        console.log('[Department] selectedSubLocation computed', { subLocationId, sublocation });
         return sublocation || null;
     });
     
     // Add currentSubLocation computed property
     const currentSubLocation = computed(() => {
         const sublocation = fetchedSubLocation.value || selectedSubLocation.value;
-        return sublocation?.sublocationModel || sublocation;
+        // Remove the incorrect sublocationModel access
+        return sublocation;
     });
     
     const departments = computed(() => {
         if (searchQuery.value.trim() || selectedSubLocationId.value) {
-            return searchResults.value;
+            console.log('[Department] departments computed: using searchResults', searchResults.value);
+            return searchResults.value || []; // Ensure array fallback
         } else {
-            return allDepartments.value;
+            console.log('[Department] departments computed: using allDepartments', allDepartments.value);
+            return allDepartments.value || []; // Ensure array fallback
         }
     });
     
@@ -73,23 +79,30 @@ export function useDepartmentTable(sublocations) {
         }
         
         try {
-            isInitializing.value = true;
-            await searchDepartments({
+            console.log('[Department] Initializing data', {
                 searchTerm: searchQuery.value || '',
                 subLocationId: selectedSubLocationId.value,
                 page: currentPage.value,
                 pageSize: pageSize.value
             });
+            
+            isInitializing.value = true;
+            await searchDepartments({
+                subLocationId: selectedSubLocationId.value,
+                page: currentPage.value,
+                pageSize: pageSize.value
+            });
+            
+            console.log('[Department] Data initialized', searchResults.value);
             isInitialized.value = true;
         } catch (error) {
-            console.error('Failed to initialize data:', error);
+            console.error('[Department] Failed to initialize data:', error);
         } finally {
             isInitializing.value = false;
         }
     };
     
     watch(sublocationsRef, async (newSubLocations) => {
-        
         if (!newSubLocations?.length || !selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
             return;
         }
@@ -106,6 +119,11 @@ export function useDepartmentTable(sublocations) {
     watch(searchQuery, async (search) => {
         if (isInitializing.value) return;
         
+        console.log('[Department] searchQuery changed, searching departments', {
+            search,
+            subLocationId: selectedSubLocationId.value
+        });
+        
         if (search.trim() || selectedSubLocationId.value) {
             await searchDepartments({
                 searchTerm: search,
@@ -114,6 +132,7 @@ export function useDepartmentTable(sublocations) {
                 pageSize: pageSize.value
             });
         } else {
+            console.log('[Department] searchQuery cleared, loading all departments');
             clearSearch();
             if (!selectedSubLocationId.value) {
                 await getDepartmentsByUserId();
@@ -123,6 +142,7 @@ export function useDepartmentTable(sublocations) {
     
     // Watch for selectedSubLocationId changes and fetch sublocation details
     watch(selectedSubLocationId, async (newSubLocationId) => {
+        console.log('[Department] selectedSubLocationId changed:', newSubLocationId);
         clearSearch();
         allDepartments.value = [];
         
@@ -134,12 +154,13 @@ export function useDepartmentTable(sublocations) {
             try {
                 await fetchSubLocationById(newSubLocationId);
             } catch (error) {
-                console.error('Error fetching sublocation:', error);
+                console.error('[Department] Error fetching sublocation:', error);
             }
         }
         
         if (!newSubLocationId) {
             if (!searchQuery.value.trim()) {
+                console.log('[Department] Refreshing data: loading all departments');
                 await getDepartmentsByUserId();
             }
             return;
@@ -151,6 +172,8 @@ export function useDepartmentTable(sublocations) {
             page: currentPage.value,
             pageSize: pageSize.value
         });
+        
+        console.log('[Department] SubLocation changed', newSubLocationId);
     });
     
     const refreshData = async () => {
@@ -167,11 +190,12 @@ export function useDepartmentTable(sublocations) {
     };
     
     const handleDepartmentAdded = async () => {
+        console.log('[Department] Department added, refreshing data');
         await refreshData();
     };
     
     const handleSubLocationChange = async (newSubLocationId) => {
-        
+        console.log('[Department] SubLocation changed:', newSubLocationId);
         clearSearch();
         allDepartments.value = [];
         selectedSubLocationId.value = newSubLocationId;        
@@ -182,11 +206,13 @@ export function useDepartmentTable(sublocations) {
     };
 
     const handleSearch = async (newSearchQuery) => {
+        console.log('[Department] Search triggered:', newSearchQuery);
         searchQuery.value = newSearchQuery;
         currentPage.value = 1;
     };
 
     const resetToDefaultView = () => {
+        console.log('[Department] Resetting to default view');
         selectedSubLocationId.value = null;
         searchQuery.value = '';
         currentPage.value = 1;
@@ -198,19 +224,22 @@ export function useDepartmentTable(sublocations) {
     };
     
     onMounted(async () => {
-        
+        console.log('[Department] Component mounted');
         await nextTick();
         
         if (selectedSubLocationId.value && !isInitialized.value && !isInitializing.value) {
             if (sublocationsRef.value?.length > 0) {
                 const sublocationExists = sublocationsRef.value.some(sub => sub.id === selectedSubLocationId.value);
                 if (sublocationExists) {
+                    console.log('[Department] SubLocation exists on mount, initializing data');
                     await initializeData();
                 } else {
+                    console.log('[Department] SubLocation does not exist on mount, resetting view');
                     resetToDefaultView();
                 }
             }
         } else if (!selectedSubLocationId.value && !searchQuery.value.trim()) {
+            console.log('[Department] No sublocation or search query on mount, loading all departments');
             await getDepartmentsByUserId();
         }
     });

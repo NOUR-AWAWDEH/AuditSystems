@@ -10,21 +10,18 @@
                     <!-- SubLocationSelector and Filters - Stack on mobile -->
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
-                        <SubLocationSelector 
-                            :subLocations="sublocations"
-                            v-model:selectedSubLocation="internalSelectedSubLocationId"
-                        />
-
-
-
+                            <SubLocationSelector 
+                                :subLocations="sublocations"
+                                :selectedSubLocationId="selectedSubLocationId"
+                                @sublocation-changed="handleSubLocationChange"
+                            />
                         </div>
-                        <p class="text-xs text-gray-400 mt-2">
-                            🔍 selectedSubLocationId: {{ selectedSubLocationId }}
-                        </p>
-
-
                         <div v-if="validSelectedSubLocation" class="w-full sm:w-auto">
-                            <SearchFilter :search="searchQuery" @update:search="handleSearch" @refresh="refreshData" />
+                            <SearchFilter 
+                                :search="searchQuery" 
+                                @update:search="handleSearch" 
+                                @refresh="refreshData" 
+                            />
                         </div>
 
                     </div>

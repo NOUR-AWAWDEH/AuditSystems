@@ -1,6 +1,6 @@
 <template>
   <CustomSelect
-    :model-value="selectedSubLocation"
+    :model-value="selectedSubLocationId"
     :options="subLocations"
     label="Select Sub Location"
     placeholder="Choose a sub location"
@@ -19,7 +19,7 @@ defineProps({
     type: Array,
     default: () => []
   },
-  selectedSubLocation: { 
+  selectedSubLocationId: { 
     type: String,
     default: ''
   },

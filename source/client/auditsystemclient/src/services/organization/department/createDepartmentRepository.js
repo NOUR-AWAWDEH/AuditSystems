@@ -8,7 +8,7 @@ const CREATE_DEPARTMENT_ENDPOINT = '/create-department';
 export const createDepartmentRepository = {
     async createDepartment(departmentData) {
         try {
-            const token = authService.getLocalAccessToken();
+            const token = authService.getLocalToken();
 
             const payload = {
                 name: departmentData.name,

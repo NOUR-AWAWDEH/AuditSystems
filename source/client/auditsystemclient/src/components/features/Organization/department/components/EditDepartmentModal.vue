@@ -121,20 +121,26 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
+    // Add debugging
+    console.log('Department data being submitted:', {
+        id: props.department?.id,
+        name: formData.value.name.trim(),
+        subLocationId: props.department?.subLocationId,
+        fullDepartment: props.department
+    });
 
-  // Check if user is authenticated
-  if (!authStatus.value) {
-    console.error('Authentication status not loaded');
-    showNotification('Authentication required. Please refresh the page and try again.', 'error');
-    return;
-  }
+    // Check if user is authenticated
+    if (!authStatus.value) {
+        console.error('Authentication status not loaded');
+        showNotification('Authentication required. Please refresh the page and try again.', 'error');
+        return;
+    }
 
-
-  if (!props.department?.id) {
-    console.error('Missing department ID:', props.department);
-    showNotification('Department ID is required', 'error');
-    return;
-  }
+    if (!props.department?.id) {
+        console.error('Missing department ID:', props.department);
+        showNotification('Department ID is required', 'error');
+        return;
+    }
 
   if (!validateForm()) {
     console.error('Form validation failed:', errors.value);

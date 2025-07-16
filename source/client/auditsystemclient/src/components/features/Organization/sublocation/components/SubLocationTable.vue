@@ -16,7 +16,11 @@
                                 @location-changed="handleLocationChange" />
                         </div>
                         <div v-if="validSelectedLocation" class="w-full sm:w-auto">
-                            <SearchFilter :search="searchQuery" @update:search="handleSearch" @refresh="refreshData" />
+                            <SearchFilter 
+                                :search="searchQuery" 
+                                @update:search="handleSearch" 
+                                @refresh="refreshData" 
+                            />
                         </div>
 
                     </div>

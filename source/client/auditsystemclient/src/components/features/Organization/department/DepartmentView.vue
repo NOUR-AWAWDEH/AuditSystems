@@ -1,9 +1,6 @@
 <template>
     <div class="space-y-6">
-        <p class="text-xs text-gray-400 mt-2">
-            🔍 selectedSubLocationId: {{ selectedSubLocationId }}
-        </p>
-
+        
         <!-- Department Management -->
         <DepartmentTable
             :sublocations="sublocations"

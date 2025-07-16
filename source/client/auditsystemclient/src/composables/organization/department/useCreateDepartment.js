@@ -16,7 +16,7 @@ export function useCreateDepartment() {
 
     const handleCreateFailure = (response, defaultErrorMessage = 'Failed to create department.') => {
         const errorMessage = response?.errors?.length
-            ? response.error[0].message
+            ? response.errors[0].message  // Fixed: was response.error[0].message
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;

@@ -30,6 +30,16 @@
                     @department-selected="handleDepartmentSelected"
                 />
             </div>
+            
+            <!-- SubDepartment Management Section -->
+            <div v-if="selectedDepartmentId" class="mt-8">
+                <SubDepartmentView 
+                    ref="subDepartmentViewRef" 
+                    :departments="departments"
+                    @selected-department-id="handleDepartmentSelected"
+                    @subdepartment-selected="handleSubDepartmentSelected"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -39,17 +49,20 @@ import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
 import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
+import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
 import { ref, computed } from 'vue';
 
 // Component refs
 const locationViewRef = ref(null);
 const subLocationViewRef = ref(null);
 const departmentViewRef = ref(null);
+const subDepartmentViewRef = ref(null);
 
 // State for hierarchical selection
 const selectedLocationId = ref(null);
 const selectedSublocationId = ref(null);
 const selectedDepartmentId = ref(null);
+const selectedSubDepartmentId = ref(null);
 
 // Get locations from LocationView
 const locations = computed(() => {
@@ -59,6 +72,11 @@ const locations = computed(() => {
 // Get sublocations from SubLocationView
 const sublocations = computed(() => {
     return subLocationViewRef.value?.sublocations || [];
+});
+
+// Get departments from DepartmentView
+const departments = computed(() => {
+    return departmentViewRef.value?.departments || [];
 });
 
 // Get the actual selected sublocation ID from SubLocationView
@@ -76,6 +94,7 @@ const handleLocationSelected = (locationId) => {
     selectedLocationId.value = locationId;
     selectedSublocationId.value = null;
     selectedDepartmentId.value = null;
+    selectedSubDepartmentId.value = null;
     
     // Reset child views
     if (subLocationViewRef.value?.resetToDefaultView) {
@@ -84,21 +103,38 @@ const handleLocationSelected = (locationId) => {
     if (departmentViewRef.value?.resetToDefaultView) {
         departmentViewRef.value.resetToDefaultView();
     }
+    if (subDepartmentViewRef.value?.resetToDefaultView) {
+        subDepartmentViewRef.value.resetToDefaultView();
+    }
 };
 
 // Handle sublocation selection
 const handleSublocationSelected = (sublocationId) => {
     selectedSublocationId.value = sublocationId;
     selectedDepartmentId.value = null; // Reset department selection
+    selectedSubDepartmentId.value = null; // Reset subdepartment selection
     
     if (departmentViewRef.value?.resetToDefaultView) {
         departmentViewRef.value.resetToDefaultView();
+    }
+    if (subDepartmentViewRef.value?.resetToDefaultView) {
+        subDepartmentViewRef.value.resetToDefaultView();
     }
 };
 
 // Handle department selection
 const handleDepartmentSelected = (departmentId) => {
     selectedDepartmentId.value = departmentId;
+    selectedSubDepartmentId.value = null; // Reset subdepartment selection
+    
+    if (subDepartmentViewRef.value?.resetToDefaultView) {
+        subDepartmentViewRef.value.resetToDefaultView();
+    }
+};
+
+// Handle subdepartment selection
+const handleSubDepartmentSelected = (subdepartmentId) => {
+    selectedSubDepartmentId.value = subdepartmentId;
 };
 </script>
 

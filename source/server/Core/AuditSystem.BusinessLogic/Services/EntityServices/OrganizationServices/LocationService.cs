@@ -16,11 +16,11 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices
 
 internal sealed class LocationService(
     IRepository<Guid, Location> repository,
-    IMapper mapper,
     ICacheService cacheService,
     ILogger<LocationService> logger,
     ILocationValidation validationHelper,
-    ILocationSearch searchHelper) : 
+    ILocationSearch searchHelper,
+    IMapper mapper) : 
     UnifiedCacheService<Guid, Location, LocationModel>(
         repository,
         mapper,

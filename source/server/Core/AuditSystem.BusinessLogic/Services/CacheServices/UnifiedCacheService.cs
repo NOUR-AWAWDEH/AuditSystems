@@ -30,7 +30,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     private readonly string[] _entityTags = entityTags;
     private readonly string[] _listTags = listTags;
 
-    public async Task<PaginationResult<TModel>?> GetFromCacheAsync(string cacheKey, string countCacheKey, Page page)
+    public async Task<PaginationResult<TTargetModel>?> GetFromCacheAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page)
     {
         var cachedEntities = await TryGetCachedSearchResults(cacheKey);
         if (cachedEntities == null)
@@ -44,32 +44,31 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             return null;
         }
 
-        var models = mapper.Map<List<TModel>>(cachedEntities);
-        return new PaginationResult<TModel>
+        return new PaginationResult<TTargetModel>
         {
-            Items = models,
+            Items = mapper.Map<List<TTargetModel>>(cachedEntities),
             TotalCount = cachedCount.Value,
             PageNumber = page.Number,
             PageSize = page.Size
         };
     }
 
-    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? searchTerm, string propertyName)
+    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page, string? name)
     {
-        var predicate = BuildSearchPredicate<TEntity>(propertyName, searchTerm);
+        var predicate = BuildSearchPredicate<TEntity>("Name", name);
 
         var query = repository.GetAll()
             .Where(predicate)
             .OrderBy(x => x.Id);
 
-        var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
+        var modelQuery = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
         var result = await modelQuery.PaginateAsync(page, repository);
 
         var entities = mapper.Map<List<TEntity>>(result.Items);
         await CacheSearchResultsAsync(cacheKey, entities);
         await CacheSearchCountAsync(countCacheKey, result.TotalCount);
 
-        return new PaginationResult<TModel>
+        return new PaginationResult<TTargetModel>
         {
             Items = result.Items,
             TotalCount = result.TotalCount,
@@ -78,21 +77,21 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         };
     }
 
-    public static Expression<Func<TEntity, bool>> BuildSearchPredicate<TEntity>(string propertyName, string? searchTerm)
+    public static Expression<Func<T, bool>> BuildSearchPredicate<T>(string propertyName, string? searchTerm)
     {
-        var parameter = Expression.Parameter(typeof(TEntity), "entity");
+        var parameter = Expression.Parameter(typeof(T), "entity");
         var property = Expression.Property(parameter, propertyName);
 
         if (property.Type != typeof(string))
             throw new InvalidOperationException($"Property '{propertyName}' is not of type string.");
 
         if (string.IsNullOrEmpty(searchTerm))
-            return Expression.Lambda<Func<TEntity, bool>>(Expression.Constant(true), parameter);
+            return Expression.Lambda<Func<T, bool>>(Expression.Constant(true), parameter);
 
         // Build: entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
 
         var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
-        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), [typeof(string)])!;
 
         // entity.PropertyName.ToLower()
         var propertyToLower = Expression.Call(property, toLowerMethod);
@@ -103,58 +102,8 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         // entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
         var containsCall = Expression.Call(propertyToLower, containsMethod, searchTermToLower);
 
-        return Expression.Lambda<Func<TEntity, bool>>(containsCall, parameter);
+        return Expression.Lambda<Func<T, bool>>(containsCall, parameter);
     }
-
-    public async Task<PaginationResult<TModel>?> GetFromCacheAsync<TModel>(string cacheKey, string countCacheKey, Page page)
-    {
-        var cachedEntities = await TryGetCachedSearchResults(cacheKey);
-        if (cachedEntities == null)
-        {
-            return null;
-        }
-
-        var cachedCount = await TryGetCachedSearchCountAsync(countCacheKey);
-        if (!cachedCount.HasValue)
-        {
-            return null;
-        }
-
-        return new PaginationResult<TModel>
-        {
-            Items = mapper.Map<List<TModel>>(cachedEntities),
-            TotalCount = cachedCount.Value,
-            PageNumber = page.Number,
-            PageSize = page.Size
-        };
-    }
-
-    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync<TModel>(string cacheKey, string countCacheKey, Page page, string? name)
-    {
-        var predicate = BuildSearchPredicate<TEntity>("Name", name);
-
-        var query = repository.GetAll()
-            .Where(predicate)
-            .OrderBy(x => x.Id);
-
-        var modelQuery = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
-
-        var result = await modelQuery.PaginateAsync(page, repository);
-
-        var entities = mapper.Map<List<TEntity>>(result.Items);
-
-        await CacheSearchResultsAsync(cacheKey, entities);
-        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
-
-        return new PaginationResult<TModel>
-        {
-            Items = result.Items,
-            TotalCount = result.TotalCount,
-            PageNumber = page.Number,
-            PageSize = page.Size
-        };
-    }
-
 
     public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
     {
@@ -228,7 +177,6 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             expiration: CacheExpirations.MediumTerm);
     }
 
-    // New generic helper methods
     public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(TId id, Guid userId, Expression<Func<TEntity, Guid>> userIdSelector, string unauthorizedMessage)
     {
         var cacheKey = GetCacheKey(id);
@@ -243,18 +191,13 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         var compiledSelector = userIdSelector.Compile();
         var entityUserId = compiledSelector(cachedEntity);
 
-        if (entityUserId == userId)
-        {
-            return mapper.Map<TTargetModel>(cachedEntity);
-        }
-
         if (entityUserId != userId)
         {
             throw new UnauthorizedAccessException(
                 string.Format(unauthorizedMessage, userId, id));
         }
 
-        return default;
+        return mapper.Map<TTargetModel>(cachedEntity);
     }
 
     public async Task CacheEntityAsync(TEntity entity)
@@ -269,7 +212,6 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         await ClearCacheAsync(cacheKey);
     }
     
-    // Add this new generic method
     public async Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName)
     {
         // Clear search caches for this user

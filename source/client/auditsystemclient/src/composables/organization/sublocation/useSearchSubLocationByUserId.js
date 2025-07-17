@@ -86,8 +86,6 @@ export function useSearchSubLocationByUserId() {
   const clearSearch = () => {
     searchResults.value = [];
     searchTerm.value = '';
-    // DON'T clear locationId here - it should persist
-    // locationId.value = null;  // ← REMOVED
     currentPage.value = 1;
     error.value = null;
     totalCount.value = 0;
@@ -145,7 +143,7 @@ export function useSearchSubLocationByUserId() {
     // Actions
     searchSubLocations,
     clearSearch,
-    clearLocationFilter, // New method to clear location specifically
+    clearLocationFilter,
     nextPage,
     previousPage,
     goToPage,

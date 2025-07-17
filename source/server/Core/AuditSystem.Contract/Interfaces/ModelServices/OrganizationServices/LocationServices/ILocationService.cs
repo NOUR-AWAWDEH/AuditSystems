@@ -10,5 +10,5 @@ public interface ILocationService
     Task DeleteLocationAsync(Guid locationId, Guid userId);
     Task<LocationModel> GetLocationByIdAsync(Guid id, Guid userId);
     Task<ICollection<LocationModel>> GetLocationsByUserIdAsync(Guid userId);
-    Task<PaginationResult<LocationModel>> SearchByUserIdAsync(Guid userId, string? name, Page page);
+    Task<PaginationResult<LocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page page);
 }

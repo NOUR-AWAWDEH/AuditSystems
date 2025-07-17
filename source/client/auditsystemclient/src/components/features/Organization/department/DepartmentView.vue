@@ -51,7 +51,6 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import DepartmentTable from './components/DepartmentTable.vue';
 import AddDepartmentModal from './components/AddDepartmentModal.vue';

@@ -1,16 +1,16 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Organization.Company.Create;
-using AuditSystem.Application.Features.Organization.Company.Update;
 using AuditSystem.Application.Features.Organization.Company.Delete;
+using AuditSystem.Application.Features.Organization.Company.Get;
+using AuditSystem.Application.Features.Organization.Company.Search;
+using AuditSystem.Application.Features.Organization.Company.Update;
+using AuditSystem.Contract.Common;
+using AuditSystem.Contract.Models.Organization;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AuditSystem.Application.Features.Organization.Company.Get;
-using AuditSystem.Contract.Models.Organization;
-using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Application.Features.Organization.Company.Search;
-using AuditSystem.Contract.Common;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -32,7 +32,7 @@ public sealed class CompanyController(IMediator mediator) : ApiControllerBase(me
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateCompany([FromBody] UpdateCompanyCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Get Company
     [HttpGet("get-company")]
     [ProducesResponseType(typeof(ApiResponse<GetCompanyByIdQueryResponse>), StatusCodes.Status200OK)]

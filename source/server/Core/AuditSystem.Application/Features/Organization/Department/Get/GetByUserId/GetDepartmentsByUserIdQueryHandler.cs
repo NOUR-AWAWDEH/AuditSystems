@@ -1,14 +1,13 @@
 using Ardalis.Result;
-using AuditSystem.Application.Features.Organization.Department.Get.GetByuserId;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Features.Organization.Department.Get.GetByUserId;
 
-internal sealed class GetDepartmentByIdQueryHandler(
+internal sealed class GetDepartmentsByUserIdQueryHandler(
     IDepartmentService departmentService,
-    ILogger<GetDepartmentByIdQueryHandler> logger ) : 
+    ILogger<GetDepartmentsByUserIdQueryHandler> logger ) : 
     IRequestHandler<GetDepartmentsByUserIdQuery, Result<GetDepartmentsByUserIdQueryResponse>>
 {
     public async Task<Result<GetDepartmentsByUserIdQueryResponse>> Handle(

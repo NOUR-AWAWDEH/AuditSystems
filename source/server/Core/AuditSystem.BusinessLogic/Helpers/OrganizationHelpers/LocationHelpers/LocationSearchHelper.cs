@@ -27,7 +27,7 @@ public class LocationSearchHelper : ILocationSearch
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public static Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
+    public Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {
         return l => l.UserId == userId && 
                    (string.IsNullOrEmpty(searchTerm) || l.Name.Contains(searchTerm));
@@ -38,10 +38,10 @@ public class LocationSearchHelper : ILocationSearch
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Location, userId, normalizedSearchTerm, page.Number, page.Size);
+            CacheKeys.Location, userId, normalizedSearchTerm, "all", page.Number, page.Size);
         
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Location, userId, normalizedSearchTerm);
+            CacheKeys.Location, userId, normalizedSearchTerm, "all");
         
         return (cacheKey, countCacheKey);
     }
@@ -83,6 +83,4 @@ public class LocationSearchHelper : ILocationSearch
     {
         await _cacheService.SetAsync(countCacheKey, totalCount, LocationConstants.LocationTags, CacheExpirations.MediumTerm);
     }
-    
-    // Note: BuildUserSearchPredicate remains static as it doesn't need instance data
 }

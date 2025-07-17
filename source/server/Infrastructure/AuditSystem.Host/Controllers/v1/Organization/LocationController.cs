@@ -1,18 +1,18 @@
 using Ardalis.Result;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Organization.Location.Create;
-using AuditSystem.Application.Features.Organization.Location.Update;
 using AuditSystem.Application.Features.Organization.Location.Delete;
+using AuditSystem.Application.Features.Organization.Location.Get.GetById;
+using AuditSystem.Application.Features.Organization.Location.Get.GetByUserId;
+using AuditSystem.Application.Features.Organization.Location.Search;
+using AuditSystem.Application.Features.Organization.Location.Update;
+using AuditSystem.BusinessLogic.Attributes;
+using AuditSystem.Contract.Common;
+using AuditSystem.Contract.Models.Organization;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AuditSystem.Application.Features.Organization.Location.Get;
-using AuditSystem.Contract.Models.Organization;
-using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Application.Features.Organization.Location.Search;
-using AuditSystem.Contract.Common;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using AuditSystem.Application.Features.Organization.Location.Get.GetByUserId;
-using AuditSystem.BusinessLogic.Attributes;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 

@@ -8,22 +8,19 @@ public sealed class SearchSubLocationQueryValidator : AbstractValidator<SearchSu
     {
         RuleFor(x => x.UserId)
             .NotEmpty()
-            .WithMessage("User Id is required")
+            .WithMessage("User ID is required.")
             .Must(BeAValidGuid)
-            .WithMessage("User Id must be a valid Guid");
+            .WithMessage("User ID must be a valid GUID.");
             
         RuleFor(x => x.LocationId)
-            .Must(BeAValidGuidWhenProvided)
-            .WithMessage("Location Id must be a valid Guid when provided");
+            .NotEmpty()
+            .WithMessage("Location ID is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("Location ID must be a valid GUID.");
     }
 
     private bool BeAValidGuid(Guid id)
     {
         return id != Guid.Empty;
-    }
-    
-    private bool BeAValidGuidWhenProvided(Guid? id)
-    {
-        return !id.HasValue || id.Value != Guid.Empty;
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -12,16 +12,9 @@ internal sealed class DeleteSubDepartmentCommandHandler(
 {
     public async Task<Result> Handle(DeleteSubDepartmentCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await subDepartmentService.DeleteSubDepartmentAsync(request.Id);
-            logger.LogInformation("Deleting subdepartment with ID {Id}", request.Id);
-            return Result.SuccessWithMessage("Subdepartment deleted.");  
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error deleting subdepartment with ID {Id}", request.Id);
-            return Result.Error(ex.Message);
-        }  
+        
+        await subDepartmentService.DeleteSubDepartmentAsync(request.Id, request.UserId);
+        logger.LogInformation("Sub-Department with ID: {Id} deleted by User ID: {UserId}", request.Id, request.UserId);
+        return Result.SuccessWithMessage("Sub-Department was deleted. Successfully.");  
     }
 }

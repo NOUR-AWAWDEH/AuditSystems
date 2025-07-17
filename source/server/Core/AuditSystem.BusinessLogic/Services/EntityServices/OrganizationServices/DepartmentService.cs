@@ -134,13 +134,13 @@ internal sealed class DepartmentService(
         return departments;
     }
 
-    public async Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid? subLocationId, Page? page)
+    public async Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subLocationId, Page? page)
     {
         DepartmentValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and sublocation: {SubLocationId}",
-             userId, searchTerm ?? "(none)", subLocationId?.ToString() ?? "(none)");
+             userId, searchTerm ?? "(none)", subLocationId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subLocationId, page);
 

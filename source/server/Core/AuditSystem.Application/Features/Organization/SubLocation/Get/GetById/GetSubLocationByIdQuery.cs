@@ -1,8 +1,7 @@
 using Ardalis.Result;
 using AuditSystem.Application.Base;
-using MediatR;
 
-namespace AuditSystem.Application.Features.Organization.SubLocation.Get;
+namespace AuditSystem.Application.Features.Organization.SubLocation.Get.GetById;
 
 public sealed record GetSubLocationByIdQuery(
     Guid Id

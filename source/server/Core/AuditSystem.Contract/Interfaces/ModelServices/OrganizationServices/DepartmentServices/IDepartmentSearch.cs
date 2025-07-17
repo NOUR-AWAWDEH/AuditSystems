@@ -8,8 +8,8 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Dep
 
 public interface IDepartmentSearch
 {
-    Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? subLocationId);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page);
+    Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subLocationId);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid subLocationId, Page page);
     (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page);
-    Task<PaginationResult<DepartmentModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid? subLocationId, Page page, string cacheKey, string countCacheKey);
+    Task<PaginationResult<DepartmentModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid subLocationId, Page page, string cacheKey, string countCacheKey);
 }

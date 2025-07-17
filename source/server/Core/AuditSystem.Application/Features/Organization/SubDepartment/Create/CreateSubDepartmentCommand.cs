@@ -3,8 +3,7 @@ using AuditSystem.Application.Base;
 
 namespace AuditSystem.Application.Features.Organization.SubDepartment.Create;
 
-public sealed record class CreateSubDepartmentCommand : ICommand<Result<CreateSubDepartmentCommandResponse>>
-{
-    public required string Name { get; set; } = string.Empty;
-    public required Guid DepartmentId { get; set; }
-}
+public sealed record class CreateSubDepartmentCommand(
+    string Name,
+    Guid DepartmentId
+) : UserAwareCommand<Result<CreateSubDepartmentCommandResponse>>;

@@ -72,6 +72,8 @@ using AuditSystem.Domain.Entities.Users;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -160,6 +162,8 @@ public static class BusinessLogicDependencies
             //SubDepartment
             .AddScoped<ISubDepartmentService, SubDepartmentService>()
             .AddScoped<IUnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>, SubDepartmentService>()
+            .AddScoped<ISubDepartmentValidation, SubDepartmentValidationHelper>()
+            .AddScoped<ISubDepartmentSearch, SubDepartmentSearchHelper>()
             
             // SubLocation
             .AddScoped<ISubLocationService, SubLocationService>()

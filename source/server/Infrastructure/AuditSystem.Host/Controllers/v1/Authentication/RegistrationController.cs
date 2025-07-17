@@ -31,7 +31,7 @@ public sealed class RegistrationController(
                 return BadRequest(ApiResponse.BadRequest(errors));
             }
 
-            await _registrationService.RegisterAsync(model, Request.Scheme, Url);
+            await _registrationService.RegisterAsync(model, Request.Scheme);
             return Ok(ApiResponse.Ok("User registered successfully. Please check your email for verification"));
         }
         catch (InvalidOperationException ex) when (
@@ -101,7 +101,7 @@ public sealed class RegistrationController(
                 return BadRequest(ApiResponse.BadRequest(errors));
             }
 
-            await _registrationService.VerificationEmailAsync(request, Request.Scheme, Url);
+            await _registrationService.VerificationEmailAsync(request, Request.Scheme);
             return Ok(ApiResponse.Ok("Verification email sent successfully. Please check your inbox."));
         }
         catch (InvalidOperationException ex)

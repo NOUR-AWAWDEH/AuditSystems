@@ -4,8 +4,6 @@ using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,7 +18,6 @@ namespace AuditSystem.Auth.Services.Registration
         private readonly RoleManager<Role> _roleManager;
         private readonly IEmailService _emailService;
         private readonly ILogger<RegistrationService> _logger;
-        private readonly LinkGenerator _linkGenerator;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _dbContext;
 
@@ -29,7 +26,6 @@ namespace AuditSystem.Auth.Services.Registration
             RoleManager<Role> roleManager,
             ILogger<RegistrationService> logger,
             IEmailService emailService,
-            LinkGenerator linkGenerator,
             IConfiguration configuration,
             ApplicationDbContext applicationDbContext)
         {
@@ -37,19 +33,18 @@ namespace AuditSystem.Auth.Services.Registration
             _roleManager = roleManager;
             _logger = logger;
             _emailService = emailService;
-            _linkGenerator = linkGenerator;
             _configuration = configuration;
             _dbContext = applicationDbContext;
         }
 
-        public async Task RegisterAsync(RegisterDto request, string scheme, IUrlHelper urlHelper)
+        public async Task RegisterAsync(RegisterDto request, string scheme)
         {
             try
             {
                 var role = await ValidateAndGetRoleAsync(request.RoleName);
                 await ValidateUserDoesNotExistAsync(request.UserName);
                 var newUser = await CreateUserAsync(request, role);
-                var confirmationLink = await GenerateConfirmationLinkAsync(newUser, scheme, urlHelper);
+                var confirmationLink = await GenerateConfirmationLinkAsync(newUser, scheme);
                 await SendConfirmationEmailAsync(newUser, confirmationLink);
 
                 _logger.LogInformation("Confirmation email sent to {Email}", newUser.Email);
@@ -61,24 +56,23 @@ namespace AuditSystem.Auth.Services.Registration
             }
         }
 
-        public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme, IUrlHelper urlHelper)
+        public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme)
         {
             try
             {
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null)
-                {
                     throw new InvalidOperationException($"User with email '{request.Email}' does not exist");
-                }
+                
 
-                var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme, urlHelper);
+                var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme);
                 await SendConfirmationEmailAsync(user, confirmationLink);
 
                 _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Verfication Email failed for {UserEmail}", request.Email);
+                _logger.LogError(ex, "Verification Email failed for {UserEmail}", request.Email);
                 throw;
             }
         }
@@ -132,7 +126,7 @@ namespace AuditSystem.Auth.Services.Registration
 
                 // Save refresh token manually
                 _dbContext.RefreshTokens.Add(refreshToken);
-                await _userManager.AddToRoleAsync(newUser, role.Name);
+                await _userManager.AddToRoleAsync(newUser, role.Name ?? throw new InvalidOperationException("Role name cannot be null"));
                 await _dbContext.SaveChangesAsync();
 
                 return newUser;
@@ -163,12 +157,12 @@ namespace AuditSystem.Auth.Services.Registration
                 $"{prefix}: {string.Join(", ", errorDescriptions)}");
         }
 
-        private async Task<string> GenerateConfirmationLinkAsync(User user, string scheme, IUrlHelper urlHelper)
+        private async Task<string> GenerateConfirmationLinkAsync(User user, string scheme)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var domain = Environment.GetEnvironmentVariable("APP_DOMAIN");
             if (string.IsNullOrWhiteSpace(domain))
-                throw new ArgumentException("APP_DOMAIN environment variable is not set or is invalid.", nameof(domain));
+                throw new ArgumentException("APP_DOMAIN environment variable is not set or is invalid.", nameof(scheme));
 
             // Encode to prevent modification during transmission
             var tokenBytes = Encoding.UTF8.GetBytes(token);
@@ -184,8 +178,8 @@ namespace AuditSystem.Auth.Services.Registration
         {
             await _emailService.SendEmailAsync(
                 new EmailConfirmationRequest(
-                    email: user.Email,
-                    userName: user.UserName,
+                    email: user.Email ?? throw new ArgumentNullException(nameof(user), "User email cannot be null"),
+                    userName: user.UserName ?? throw new ArgumentNullException(nameof(user), "User username cannot be null"),
                     confirmationLink: confirmationLink
                 )
             );

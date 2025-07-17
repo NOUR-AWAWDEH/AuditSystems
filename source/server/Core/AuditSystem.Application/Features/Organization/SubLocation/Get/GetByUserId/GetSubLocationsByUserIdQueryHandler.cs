@@ -1,10 +1,9 @@
 using MediatR;
 using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
-
 using Microsoft.Extensions.Logging;
 
-namespace AuditSystem.Application.Features.Organization.SubLocation.Get;
+namespace AuditSystem.Application.Features.Organization.SubLocation.Get.GetByUserId;
 
 internal sealed class GetSubLocationsByUserIdQueryHandler(
     ISubLocationService subLocationService,

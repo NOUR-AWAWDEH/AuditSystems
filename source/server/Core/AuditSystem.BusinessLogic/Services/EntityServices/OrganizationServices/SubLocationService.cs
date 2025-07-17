@@ -92,7 +92,7 @@ internal sealed class SubLocationService(
 
         await ClearEntityCacheAsync(subLocationId);
 
-        await ClearUserRelatedCachesAsync(userId, "SubLocation");
+        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName);
 
         logger.LogInformation("Successfully deleted sublocation {SubLocationId}", subLocationId);
     }
@@ -142,13 +142,13 @@ internal sealed class SubLocationService(
         return subLocations;
     }
 
-    public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid? locationId, Page? page)
+    public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching sublocations for user {UserId} with term: {SearchTerm} and locationId: {LocationId}",
-            userId, searchTerm ?? "(none)", locationId?.ToString() ?? "(none)");
+            userId, searchTerm ?? "(none)", locationId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, locationId, page);
 

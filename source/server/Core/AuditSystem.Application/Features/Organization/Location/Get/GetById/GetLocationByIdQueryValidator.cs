@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organization.Location.Get;
+namespace AuditSystem.Application.Features.Organization.Location.Get.GetById;
 
 public sealed class GetLocationByIdQueryValidator : AbstractValidator<GetLocationByIdQuery>
 {

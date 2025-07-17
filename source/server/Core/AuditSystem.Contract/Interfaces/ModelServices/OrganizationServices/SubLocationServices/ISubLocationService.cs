@@ -10,7 +10,7 @@ public interface ISubLocationService
     Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId);
     Task DeleteSubLocationAsync(Guid subLocationId, Guid userId);
     Task<SubLocationModel> GetSubLocationByIdAsync(Guid id, Guid userId);
-    Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid? locationId, Page? page);
+    Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page);
     Task<ICollection<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId);
     
     // The existing SearchAsync for admin/system use if needed

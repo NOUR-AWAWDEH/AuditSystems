@@ -6,7 +6,7 @@ namespace AuditSystem.Application.Features.Organization.SubLocation.Search;
 
 public sealed record SearchSubLocationQuery(
     string? SearchTerm,
-    Guid? LocationId
+    Guid LocationId
 ) : PaginationRequest<SubLocationModel>, IUserAwareRequest
 {
     public Guid UserId { get; set; }

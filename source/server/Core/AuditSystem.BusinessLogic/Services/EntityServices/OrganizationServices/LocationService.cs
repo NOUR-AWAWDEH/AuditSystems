@@ -137,7 +137,7 @@ internal sealed class LocationService(
         return await GetFromRepositoryAsync<LocationModel>(cacheKey, countCacheKey, page, name);
     }
 
-    public async Task<PaginationResult<LocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page? page)
+    public async Task<PaginationResult<LocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Page page)
     {
         LocationValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));

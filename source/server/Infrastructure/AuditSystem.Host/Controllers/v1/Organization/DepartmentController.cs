@@ -2,17 +2,17 @@ using Ardalis.Result;
 using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.Application.Features.Organization.Department.Create;
 using AuditSystem.Application.Features.Organization.Department.Delete;
-using AuditSystem.Application.Features.Organization.Department.Get;
+using AuditSystem.Application.Features.Organization.Department.Get.GetById;
+using AuditSystem.Application.Features.Organization.Department.Get.GetByUserId;
 using AuditSystem.Application.Features.Organization.Department.Search;
 using AuditSystem.Application.Features.Organization.Department.Update;
-using AuditSystem.Contract.Models.Organization;
+using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
+using AuditSystem.Contract.Models.Organization;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using AuditSystem.BusinessLogic.Attributes;
-using AuditSystem.Application.Features.Organization.Department.Get.GetByuserId;
 
 namespace AuditSystem.Host.Controllers.v1.Organization;
 
@@ -36,7 +36,7 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateDepartment([FromBody] UpdateDepartmentCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
+
     //Get Department
     [HttpGet("get-department-by-id")]
     [ProducesResponseType(typeof(ApiResponse<GetDepartmentByIdQueryResponse>), StatusCodes.Status200OK)]
@@ -44,7 +44,7 @@ public sealed class DepartmentController(IMediator mediator) : ApiControllerBase
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetDepartment([FromQuery] GetDepartmentByIdQuery query) =>
         await ProcessRequestToActionResultAsync(query);
-    
+
     //Get Departments By UserId
     [HttpGet("get-departments-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<List<GetDepartmentsByUserIdQueryResponse>>), StatusCodes.Status200OK)]

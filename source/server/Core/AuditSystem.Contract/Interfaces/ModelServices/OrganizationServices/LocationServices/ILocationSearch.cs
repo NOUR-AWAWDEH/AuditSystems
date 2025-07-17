@@ -7,6 +7,7 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Loc
 
 public interface ILocationSearch
 {
+    Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm);
     (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page);
     Task<PaginationResult<LocationModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey);
 }

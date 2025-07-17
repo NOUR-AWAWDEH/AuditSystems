@@ -1,6 +1,7 @@
 using FluentValidation;
 
-namespace AuditSystem.Application.Features.Organization.SubDepartment.Get;
+namespace AuditSystem.Application.Features.Organization.SubDepartment.Get.GetById;
+
 
 public sealed class GetSubDepartmentByIdQueryValidator : AbstractValidator<GetSubDepartmentByIdQuery>
 {

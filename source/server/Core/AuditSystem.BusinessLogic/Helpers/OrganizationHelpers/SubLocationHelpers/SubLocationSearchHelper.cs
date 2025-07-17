@@ -27,24 +27,24 @@ public class SubLocationSearchHelper : ISubLocationSearch
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? locationId = null)
+    public Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid locationId)
     {
         return sl => sl.Location.UserId == userId && 
                     (string.IsNullOrEmpty(searchTerm) || sl.Name.Contains(searchTerm)) &&
-                    (!locationId.HasValue || sl.LocationId == locationId.Value);
+                    sl.LocationId == locationId;
     }
 
     // Original method for backward compatibility
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
     {
-        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
+        return GetUserSearchCacheKeys(userId, searchTerm, page);
     }
 
-    // Updated method with locationId support
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? locationId, Page page)
+    // Method with required Guid locationId (not nullable) - matches interface
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid locationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var locationIdStr = locationId?.ToString() ?? "all";
+        var locationIdStr = locationId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
             CacheKeys.SubLocation, userId, normalizedSearchTerm, locationIdStr, page.Number, page.Size);
@@ -59,12 +59,12 @@ public class SubLocationSearchHelper : ISubLocationSearch
     public async Task<PaginationResult<SubLocationModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey)
     {
-        return await GetUserSearchFromRepositoryAsync(userId, searchTerm, null, page, cacheKey, countCacheKey);
+        return await GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
     }
 
-    // Updated method with locationId support
+    // Method with required Guid locationId (not nullable) - matches interface
     public async Task<PaginationResult<SubLocationModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid? locationId, Page page, string cacheKey, string countCacheKey)
+        Guid userId, string? searchTerm, Guid locationId, Page page, string cacheKey, string countCacheKey)
     {
         var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, locationId));
     

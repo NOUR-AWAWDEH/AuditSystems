@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Models.Organization;
 using AutoMapper;
 using MediatR;
@@ -16,9 +17,8 @@ internal sealed class CreateSubDepartmentCommandHandler(
     public async Task<Result<CreateSubDepartmentCommandResponse>> Handle(CreateSubDepartmentCommand request, CancellationToken cancellationToken)
     {
         var subDepartmentModel = mapper.Map<SubDepartmentModel>(request);
-        var subDepartmentId = await subDepartmentService.CreateSubDepartmentAsync(subDepartmentModel);
-        logger.LogInformation("SubDepartment with Name {SubDepartmentName} has been created.", request.Name);
-
-        return Result<CreateSubDepartmentCommandResponse>.Created(new(subDepartmentId), "SubDepartment created.");
+        var subDepartmentId = await subDepartmentService.CreateSubDepartmentAsync(subDepartmentModel, request.UserId);
+        logger.LogInformation("sub-department created with ID: {SubDepartmentId}", subDepartmentId);
+        return Result<CreateSubDepartmentCommandResponse>.Created(new CreateSubDepartmentCommandResponse(subDepartmentId), "sub-department created.");
     }
 }

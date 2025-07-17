@@ -27,22 +27,25 @@ public class DepartmentSearchHelper : IDepartmentSearch
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? subLocationId)
+    public Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subLocationId)
     {
         return d => d.SubLocation.Location.UserId == userId && 
                 (string.IsNullOrEmpty(searchTerm) || d.Name.Contains(searchTerm)) &&
-                (!subLocationId.HasValue || d.SubLocationId == subLocationId.Value);
+                d.SubLocationId == subLocationId;  // Always filter by sublocation
     }
 
+    // Original method for backward compatibility
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
     {
         return GetUserSearchCacheKeys(userId, searchTerm, null, page);
     }
 
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page)
+    // Method with required Guid subLocationId (not nullable) - matches interface
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid subLocationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subLocationIdStr = subLocationId?.ToString() ?? "all";
+        var subLocationIdStr = subLocationId.ToString();
+        
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
             CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr, page.Number, page.Size);
 
@@ -52,18 +55,33 @@ public class DepartmentSearchHelper : IDepartmentSearch
         return (cacheKey, countCacheKey);
     }
 
-    public async Task<PaginationResult<DepartmentModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid? subLocationId, Page page, string cacheKey, string countCacheKey)
+    // Updated method with nullable subLocationId support (for internal use)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page)
     {
-       var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, subLocationId));
+        var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
+        var subLocationIdStr = subLocationId?.ToString() ?? "all";
+        
+        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
+            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr, page.Number, page.Size);
 
+        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
+            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr);
 
-       var totalCount = query.Count;
-       var items = query
-                    .Skip((page.Number - 1) * page.Size)
-                    .Take(page.Size)
-                    .ToList();
+        return (cacheKey, countCacheKey);
+    }
 
+    // Add the missing method required by interface
+    public async Task<PaginationResult<DepartmentModel>> GetUserSearchFromRepositoryAsync(
+        Guid userId, string? searchTerm, Guid subLocationId, Page page, string cacheKey, string countCacheKey)
+    {
+        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, subLocationId));
+    
+        var totalCount = query.Count;
+        var items = query
+            .Skip((page.Number - 1) * page.Size)
+            .Take(page.Size)
+            .ToList();
+    
         var mappedItems = _mapper.Map<List<DepartmentModel>>(items);
         var result = new PaginationResult<DepartmentModel>
         {
@@ -72,12 +90,12 @@ public class DepartmentSearchHelper : IDepartmentSearch
             PageNumber = page.Number,
             PageSize = page.Size
         };
-
+    
         await Task.WhenAll(
-             CacheSearchResultsAsync(cacheKey, items),
-             CacheSearchCountAsync(countCacheKey, totalCount)
+            CacheSearchResultsAsync(cacheKey, items),
+            CacheSearchCountAsync(countCacheKey, totalCount)
         );
-
+    
         return result;
     }
 

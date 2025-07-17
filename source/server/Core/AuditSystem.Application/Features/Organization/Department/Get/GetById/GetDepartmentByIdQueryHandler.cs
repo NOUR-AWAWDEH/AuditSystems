@@ -3,7 +3,7 @@ using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 
 
-namespace AuditSystem.Application.Features.Organization.Department.Get;
+namespace AuditSystem.Application.Features.Organization.Department.Get.GetById;
 
 internal sealed class GetDepartmentByIdQueryHandler(
     IDepartmentService departmentService) 

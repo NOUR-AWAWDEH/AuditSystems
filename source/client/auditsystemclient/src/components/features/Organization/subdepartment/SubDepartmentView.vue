@@ -3,7 +3,7 @@
         <!-- Department and SubDepartment Management -->
         <SubDepartmentTable
             :departments="departments"
-            :subdepartments="subdepartments"
+            :sub-departments="subDepartments"
             :is-loading="isLoading"
             :selected-department-id="selectedDepartmentId"
             :selected-department="selectedDepartment" 
@@ -13,28 +13,27 @@
             :handle-department-change="handleDepartmentChange"
             :handle-search="handleSearch"
             :refresh-data="refreshData"
-            @add-subdepartment="handleAddSubdepartment"
-            @edit-subdepartment="handleEditSubdepartment"
-            @delete-subdepartment="handleDeleteSubdepartment"
-            @subdepartment-selected="handleSubDepartmentSelected"
-            @department-selected="handleDepartmentSelected"
+            @add-sub-department="handleAddSubDepartment"
+            @edit-sub-department="handleEditSubDepartment"
+            @delete-sub-department="handleDeleteSubDepartment"
+            @sub-department-selected="handleSubDepartmentSelected"
         />
 
         <!-- Add SubDepartment Modal -->
         <AddSubDepartmentModal
-            :is-visible="showAddSubdepartmentModal"
+            :is-visible="showAddSubDepartmentModal"
             :department-id="selectedDepartmentId"
-            @close="handleCloseAddSubdepartmentModal"
-            @subdepartment-added="handleSubdepartment"
+            @close="handleCloseAddSubDepartmentModal"
+            @sub-department-added="handleSubDepartmentAdded"
         />
 
         <!-- Edit SubDepartment Modal -->
         <EditSubDepartmentModal
-            v-if="showEditSubdepartmentModal"
-            :is-visible="showEditSubdepartmentModal"
-            :subdepartment="subdepartmentToEdit"
-            @close="handleCloseEditSubdepartmentModal"
-            @updated="handleSubdepartmentUpdated"
+            v-if="showEditSubDepartmentModal"
+            :is-visible="showEditSubDepartmentModal"
+            :sub-department="subDepartmentToEdit"
+            @close="handleCloseEditSubDepartmentModal"
+            @updated="handleSubDepartmentUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -52,15 +51,10 @@
 </template>
 
 <script setup>
-// Base Components
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-
-// Feature Components
 import SubDepartmentTable from './components/SubDepartmentTable.vue';
 import AddSubDepartmentModal from './components/AddSubDepartmentModal.vue'
 import EditSubDepartmentModal from './components/EditSubDepartmentModal.vue';
-
-// Composables
 import { useSubDepartmentTable } from './composables/useSubDepartmentTable';
 import { useSubDepartmentActions } from './composables/useSubDepartmentActions';
 import { useNotification } from '@/composables/notification/useNotification';
@@ -72,14 +66,13 @@ const props = defineProps({
     }
 });
 
-// Define emits for both department and subdepartment selections
-const emit = defineEmits(['subdepartment-selected', 'department-selected']);
+const emit = defineEmits(['sub-department-selected']);
 
 const { showNotification } = useNotification();
 
-// Use composables with integrated department and subdepartment handling
+// Use composables
 const {
-    subdepartments,
+    subDepartments,
     isLoading,
     selectedDepartmentId,
     selectedDepartment,
@@ -94,37 +87,31 @@ const {
 } = useSubDepartmentTable(props.departments);
 
 const {
-    showAddSubdepartmentModal,
-    showEditSubdepartmentModal,
-    subdepartmentToEdit,
+    showAddSubDepartmentModal,
+    showEditSubDepartmentModal,
+    subDepartmentToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    handleAddSubdepartment,
-    handleCloseAddSubdepartmentModal,
-    handleSubdepartment,
-    handleEditSubdepartment,
-    handleCloseEditSubdepartmentModal,
-    handleSubdepartmentUpdated,
-    handleDeleteSubdepartment,
+    handleAddSubDepartment,
+    handleCloseAddSubDepartmentModal,
+    handleEditSubDepartment,
+    handleCloseEditSubDepartmentModal,
+    handleSubDepartmentUpdated,
+    handleDeleteSubDepartment,
     confirmDelete,
     cancelDelete
 } = useSubDepartmentActions(refreshData, showNotification);
 
-// Handle department selection
-const handleDepartmentSelected = (departmentId) => {
-    emit('department-selected', departmentId);
-};
-
-// Handle subdepartment selection
+// Handle subdepartment selection and forward to parent
 const handleSubDepartmentSelected = (subdepartmentId) => {
-    emit('subdepartment-selected', subdepartmentId);
+    emit('sub-department-selected', subdepartmentId);
 };
 
 // Expose necessary properties and methods
 defineExpose({
-    subdepartments,
+    subDepartments,
     selectedDepartmentId,
     resetToDefaultView
 });

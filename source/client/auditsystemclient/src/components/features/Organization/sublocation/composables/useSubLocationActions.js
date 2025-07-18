@@ -5,48 +5,49 @@ export function useSubLocationActions(refreshData, showNotification) {
     const { deleteSubLocation } = useDeleteSubLocationById();
     
     // Modal states
-    const showAddSublocationModal = ref(false);
-    const showEditSublocationModal = ref(false);
-    const sublocationToEdit = ref(null);
+    const showAddSubLocationModal = ref(false);
+
+    const showEditSubLocationModal = ref(false);
+    const subLocationToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
     const deleteDialogMessage = ref('');
     const itemToDelete = ref(null);
     
     // Action handlers
-    const handleAddSublocation = () => {
-        showAddSublocationModal.value = true;
+    const handleAddSubLocation = () => {
+        showAddSubLocationModal.value = true;
     };
     
-    const handleCloseAddSublocationModal = () => {
-        showAddSublocationModal.value = false;
+    const handleCloseAddSubLocationModal = () => {
+        showAddSubLocationModal.value = false;
     };
     
-    const handleSublocationAdded = async (newSublocation) => {
+    const handleSubLocationAdded = async (newSubLocation) => {
         await refreshData();
-        showNotification(`Sublocation "${newSublocation.name}" has been added successfully!`, 'success');
-        handleCloseAddSublocationModal();
+        showNotification(`SubLocation "${newSubLocation.name}" has been added successfully!`, 'success');
+        handleCloseAddSubLocationModal();
     };
     
-    const handleEditSublocation = (sublocation) => {
-        sublocationToEdit.value = sublocation;
-        showEditSublocationModal.value = true;
+    const handleEditSubLocation = (subLocation) => {
+        subLocationToEdit.value = subLocation;
+        showEditSubLocationModal.value = true;
     };
     
-    const handleCloseEditSublocationModal = () => {
-        showEditSublocationModal.value = false;
-        sublocationToEdit.value = null;
+    const handleCloseEditSubLocationModal = () => {
+        showEditSubLocationModal.value = false;
+        subLocationToEdit.value = null;
     };
     
-    const handleSublocationUpdated = async () => {
+    const handleSubLocationUpdated = async () => {
         await refreshData();
-        handleCloseEditSublocationModal();
+        handleCloseEditSubLocationModal();
     };
     
-    const handleDeleteSublocation = (sublocation) => {
-        itemToDelete.value = sublocation;
-        deleteDialogTitle.value = 'Delete Sublocation';
-        deleteDialogMessage.value = `Are you sure you want to delete "${sublocation.name}"? This action cannot be undone.`;
+    const handleDeleteSubLocation = (subLocation) => {
+        itemToDelete.value = subLocation;
+        deleteDialogTitle.value = 'Delete SubLocation';
+        deleteDialogMessage.value = `Are you sure you want to delete "${subLocation.name}"? This action cannot be undone.`;     
         showDeleteDialog.value = true;
     };
     
@@ -55,7 +56,7 @@ export function useSubLocationActions(refreshData, showNotification) {
             const result = await deleteSubLocation(itemToDelete.value.id);
             
             if (result.success) {
-                showNotification(`Sublocation "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
+                showNotification(`SubLocation "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
                 
                 setTimeout(async () => {
                     await refreshData();
@@ -74,20 +75,20 @@ export function useSubLocationActions(refreshData, showNotification) {
     };
     
     return {
-        showAddSublocationModal,
-        showEditSublocationModal,
-        sublocationToEdit,
+        showAddSubLocationModal,
+        showEditSubLocationModal,
+        subLocationToEdit,
         showDeleteDialog,
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
-        handleAddSublocation,
-        handleCloseAddSublocationModal,
-        handleSublocationAdded,
-        handleEditSublocation,
-        handleCloseEditSublocationModal,
-        handleSublocationUpdated,
-        handleDeleteSublocation,
+        handleAddSubLocation,
+        handleCloseAddSubLocationModal,
+        handleSubLocationAdded,
+        handleEditSubLocation,
+        handleCloseEditSubLocationModal,
+        handleSubLocationUpdated,
+        handleDeleteSubLocation,
         confirmDelete,
         cancelDelete
     };

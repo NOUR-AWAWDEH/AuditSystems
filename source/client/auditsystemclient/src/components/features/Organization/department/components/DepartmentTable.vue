@@ -197,7 +197,7 @@ const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No departments found for "${props.searchQuery}".`;
     }
-    return 'No departments found for this sublocation.';
+    return 'No departments found for this sub location.';
 });
 
 const validSelectedSubLocation = computed(() => {

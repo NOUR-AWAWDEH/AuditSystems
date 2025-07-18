@@ -1,6 +1,6 @@
 <template>
     <div>
-        <!-- Sublocation Table -->
+        <!-- SubLocation Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
                 <!-- Header with Location Selection and Filters -->
@@ -34,7 +34,7 @@
                             <LocationIcon size="lg" custom-class="text-blue-600 mr-2" />
 
                             <p class="text-sm text-gray-700">
-                                Showing sublocations for: &nbsp;&nbsp;
+                                Showing Sub Locations for: &nbsp;&nbsp;
                                 <span class="font-semibold text-blue-800">
                                     <span v-if="isLocationLoading">Loading location...</span>
                                     <span v-else>{{ currentLocation?.name || 'Loading...' }}</span>
@@ -42,34 +42,34 @@
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
-                        <button @click="$emit('add-sublocation')"
+                        <button @click="$emit('add-sub-location')"
                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
                             <PlusIcon :stroke-width="3" />
-                            Add Sublocation
+                            Add Sub Location
                         </button>
                     </div>
                 </div>
 
                 <!-- Table Container - Show when location is selected -->
                 <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="sublocations" :columns="enhancedColumns" :is-loading="isLoading"
-                        :actions="[]" :no-data-message="noDataMessage" class="sublocation-table"
+                    <ReusableTable :items="subLocations" :columns="enhancedColumns" :is-loading="isLoading"
+                        :actions="[]" :no-data-message="noDataMessage" class="sub-location-table"
                         @row-click="handleRowClick">
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                <button @click.stop="handleSelectSublocation(item)"
+                                <button @click.stop="handleSelectSubLocation(item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                                    :class="{ 'bg-green-200': selectedSublocationId === item.id }">
-                                    <CheckIcon v-if="selectedSublocationId === item.id" size="sm" custom-class="mr-1" />
+                                    :class="{ 'bg-green-200': selectedSubLocationId === item.id }">
+                                    <CheckIcon v-if="selectedSubLocationId === item.id" size="sm" custom-class="mr-1" />
                                     <SelectIcon v-else size="sm" custom-class="mr-1" />
-                                    {{ selectedSublocationId === item.id ? 'Selected' : 'Select' }}
+                                    {{ selectedSubLocationId === item.id ? 'Selected' : 'Select' }}
                                 </button>
-                                <button @click.stop="$emit('edit-sublocation', item)"
+                                <button @click.stop="$emit('edit-sub-location', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
-                                <button @click.stop="$emit('delete-sublocation', item)"
+                                <button @click.stop="$emit('delete-sub-location', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
                                     <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
@@ -79,7 +79,7 @@
                     </ReusableTable>
 
                     <!-- Clear Search Button (shown when no results and searching) -->
-                    <div v-if="searchQuery && sublocations.length === 0 && !isLoading"
+                    <div v-if="searchQuery && subLocations.length === 0 && !isLoading"
                         class="text-center py-4 border-t border-gray-200">
                         <button @click="handleSearch('')"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
@@ -94,12 +94,12 @@
                     <LocationIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
 
                     <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a location to view
-                        sublocations</h3>
+                        sub locations</h3>
                     <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
 
                     <!-- No Locations Available -->
                     <div v-if="!locations || locations.length === 0" class="text-center">
-                        <p class="text-sm text-gray-400">Please add a location first to manage sublocations</p>
+                        <p class="text-sm text-gray-400">Please add a location first to manage sub locations</p>
                     </div>
                 </div>
             </div>
@@ -123,7 +123,7 @@ import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
     locations: Array,
-    sublocations: Array,
+    subLocations: Array,
     isLoading: Boolean,
     selectedLocationId: String,
     selectedLocation: Object,
@@ -136,58 +136,60 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-    'add-sublocation',
-    'edit-sublocation',
-    'delete-sublocation',
-    'sublocation-selected'
+    'add-sub-location',
+    'edit-sub-location',
+    'delete-sub-location',
+    'sub-location-selected'
 ]);
 
-// Sublocation selection state
-const selectedSublocationId = ref(null);
+// SubLocation selection state
+const selectedSubLocationId = ref(null);
 
-// Handle sublocation selection from table row or button
-const handleSelectSublocation = (sublocation) => {
-    selectedSublocationId.value = sublocation.id;
-    emit('sublocation-selected', sublocation.id);
+// Handle SubLocation selection from table row or button
+const handleSelectSubLocation = (subLocation) => {
+    if (subLocation && subLocation.id) {
+        selectedSubLocationId.value = subLocation.id;
+        emit('sub-location-selected', subLocation.id);
+    }
 };
 
 // Handle row click to select sublocation
-const handleRowClick = (sublocation) => {
-    handleSelectSublocation(sublocation);
+const handleRowClick = (subLocation) => {
+    handleSelectSubLocation(subLocation);
 };
 
 // Watch for sublocation changes to reset selection if sublocation is deleted
-watch(() => props.sublocations, (newSublocations) => {
-    if (selectedSublocationId.value && newSublocations) {
-        const sublocationExists = newSublocations.some(sub => sub.id === selectedSublocationId.value);
-        if (!sublocationExists) {
-            selectedSublocationId.value = null;
-            emit('sublocation-selected', null);
+watch(() => props.subLocations, (newSubLocations) => {
+    if (selectedSubLocationId.value && newSubLocations) {
+        const subLocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
+        if (!subLocationExists) {
+            selectedSubLocationId.value = null;
+            emit('sub-location-selected', null);
         }
     }
 }, { deep: true });
 
 // Reset selection when location changes
 watch(() => props.selectedLocationId, () => {
-    selectedSublocationId.value = null;
-    emit('sublocation-selected', null);
+    selectedSubLocationId.value = null;
+    emit('sub-location-selected', null);
 });
 
-const sublocationColumns = [
+const subLocationColumns = [
     { key: 'name', label: 'Name' },
     { key: 'address', label: 'Address' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
 const enhancedColumns = computed(() => {
-    return [...sublocationColumns, { key: 'actions', label: 'Actions' }];
+    return [...subLocationColumns, { key: 'actions', label: 'Actions' }];
 });
 
 const noDataMessage = computed(() => {
     if (props.searchQuery) {
-        return `No sublocations found for "${props.searchQuery}".`;
+        return `No SubLocations found for "${props.searchQuery}".`;
     }
-    return 'No sublocations found for this location.';
+    return 'No SubLocations found for this location.';
 });
 
 const validSelectedLocation = computed(() => {
@@ -196,12 +198,12 @@ const validSelectedLocation = computed(() => {
 </script>
 
 <style scoped>
-.sublocation-table .table-row {
+.sub-location-table .table-row {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.sublocation-table .table-row:hover {
+.sub-location-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);

@@ -9,7 +9,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit SubDepartment</h3>
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Sub Department</h3>
             <button @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
               <CloseIcon size="md" />
             </button>
@@ -23,7 +23,7 @@
                 <label for="edit-subdepartment-name" class="block text-sm font-medium text-secondary-shade mb-1">
                   SubDepartment Name *
                 </label>
-                <BaseInput id="edit-subdepartment-name" v-model="formData.name" placeholder="Enter subdepartment name"
+                <BaseInput id="edit-sub-department-name" v-model="formData.name" placeholder="Enter sub department name"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
@@ -43,7 +43,7 @@
                 <button type="submit" :disabled="!formData.name.trim() || isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isUpdating">Updating...</span>
-                  <span v-else>Update SubDepartment</span>
+                  <span v-else>Update Sub Department</span>
                 </button>
               </div>
             </form>
@@ -67,7 +67,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  subdepartment: {
+  subDepartment: {
     type: Object,
     default: () => ({})
   }
@@ -88,7 +88,7 @@ const errors = ref({
 });
 
 // Reset form when modal opens/closes or subdepartment changes
-watch([() => props.isVisible, () => props.subdepartment], ([newVisible, newSubDepartment]) => {
+watch([() => props.isVisible, () => props.subDepartment], ([newVisible, newSubDepartment]) => {
   if (newVisible && newSubDepartment) {
     resetForm();
     populateForm();
@@ -107,9 +107,9 @@ const resetForm = () => {
 };
 
 const populateForm = () => {
-  if (props.subdepartment) {
+  if (props.subDepartment) {
     formData.value = {
-      name: props.subdepartment.name || ''
+      name: props.subDepartment.name || ''
     };
   }
 };
@@ -131,9 +131,9 @@ const handleSubmit = async () => {
   }
 
 
-  if (!props.subdepartment?.id) {
-    console.error('Missing subdepartment ID:', props.subdepartment);
-    showNotification('SubDepartment ID is required', 'error');
+  if (!props.subDepartment?.id) {
+    console.error('Missing sub department ID:', props.subDepartment);
+    showNotification('Sub Department ID is required', 'error');
     return;
   }
 
@@ -143,19 +143,19 @@ const handleSubmit = async () => {
   }
 
   try {
-    const subdepartmentData = {
-      id: props.subdepartment.id,
+    const subDepartmentData = {
+      id: props.subDepartment.id,
       name: formData.value.name.trim(),
-      departmentId: props.subdepartment.departmentId
+      departmentId: props.subDepartment.departmentId
     };
 
-    const result = await updateSubDepartment(subdepartmentData);
+    const result = await updateSubDepartment(subDepartmentData);
 
 
     if (result?.success) {
       // Pass the updated subdepartment data with the correct structure
       const updatedSubDepartmentData = {
-        ...subdepartmentData,
+        ...subDepartmentData,
         ...result.data
       };
 
@@ -181,7 +181,7 @@ const validateForm = () => {
   let isValid = true;
 
   if (!formData.value.name.trim()) {
-    errors.value.name = 'SubDepartment name is required';
+    errors.value.name = 'Sub Department name is required';
     isValid = false;
   }
 

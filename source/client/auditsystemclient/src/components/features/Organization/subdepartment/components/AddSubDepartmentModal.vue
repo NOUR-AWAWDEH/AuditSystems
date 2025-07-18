@@ -22,14 +22,14 @@
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <!-- SubDepartment Name Field -->
               <div>
-                <label for="subdepartment-name" class="block text-sm font-medium text-secondary-shade mb-1">
+                <label for="sub-department-name" class="block text-sm font-medium text-secondary-shade mb-1">
                   SubDepartment Name *
                 </label>
                 <BaseInput 
-                  id="subdepartment-name" 
+                  id="sub-department-name" 
                   v-model="formData.name"
-                  label="SubDepartment Name" 
-                  placeholder="Enter subdepartment name"
+                  label="Sub Department Name" 
+                  placeholder="Enter sub department name"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" 
                 />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
@@ -51,7 +51,7 @@
                   :disabled="!formData.name.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isCreating">Adding...</span>
-                  <span v-else>Add SubDepartment</span>
+                  <span v-else>Add Sub Department</span>
                 </button>
               </div>
             </form>
@@ -80,7 +80,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'subdepartment-added']);
+const emit = defineEmits(['close', 'sub-department-added']);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createSubDepartment, resetState } = useCreateSubDepartment();
@@ -125,26 +125,26 @@ const handleSubmit = async () => {
   }
 
   try {
-    const subdepartmentData = {
+    const subDepartmentData = {
       name: formData.value.name.trim(),
       departmentId: props.departmentId
     };
 
 
-    const result = await createSubDepartment(subdepartmentData);
+    const result = await createSubDepartment(subDepartmentData);
 
 
     if (result?.success) {
-      showNotification(`SubDepartment "${subdepartmentData.name}" has been added successfully!`, 'success');
-      emit('subdepartment-added', result.data);
+      showNotification(`SubDepartment "${subDepartmentData.name}" has been added successfully!`, 'success');
+      emit('sub-department-added', result.data);
       emit('close');
     } else {
       console.error('Create failed:', result);
-      showNotification(result?.message || 'Failed to create subdepartment', 'error');
+      showNotification(result?.message || 'Failed to create sub department', 'error');
     }
   } catch (error) {
     console.error('Error in handleSubmit:', error);
-    showNotification('Failed to add subdepartment. Please try again.', 'error');
+    showNotification('Failed to add sub department. Please try again.', 'error');
   }
 };
 
@@ -157,7 +157,7 @@ const validateForm = () => {
   let isValid = true;
 
   if (!formData.value.name.trim()) {
-    errors.value.name = 'SubDepartment name is required';
+    errors.value.name = 'Sub Department name is required';
     isValid = false;
   }
 

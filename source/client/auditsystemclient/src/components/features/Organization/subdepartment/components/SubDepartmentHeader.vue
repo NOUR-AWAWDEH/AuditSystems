@@ -4,9 +4,9 @@
         <div class="flex items-center">
             <div>
                 <h2 class="text-2xl font-bold text-secondary-base">
-                    SubDepartments
+                    Sub Departments
                 </h2>
-                <p class="text-sm text-gray-500 mt-1">Manage your organization subdepartments</p>
+                <p class="text-sm text-gray-500 mt-1">Manage your organization sub departments</p>
             </div>
         </div>
     </div>

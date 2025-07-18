@@ -5,48 +5,48 @@ export function useSubDepartmentActions(refreshData, showNotification) {
     const { deleteSubDepartment } = useDeleteSubDepartmentById();
     
     // Modal states
-    const showAddSubdepartmentModal = ref(false);
-    const showEditSubdepartmentModal = ref(false);
-    const subdepartmentToEdit = ref(null);
+    const showAddSubDepartmentModal = ref(false);
+    const showEditSubDepartmentModal = ref(false);
+    const subDepartmentToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
     const deleteDialogMessage = ref('');
     const itemToDelete = ref(null);
     
     // Action handlers
-    const handleAddSubdepartment = () => {
-        showAddSubdepartmentModal.value = true;
+    const handleAddSubDepartment = () => {
+        showAddSubDepartmentModal.value = true;
     };
     
-    const handleCloseAddSubdepartmentModal = () => {
-        showAddSubdepartmentModal.value = false;
+    const handleCloseAddSubDepartmentModal = () => {
+        showAddSubDepartmentModal.value = false;
     };
     
-    const handleSubdepartment = async (newSubdepartment) => {
+    const handleSubDepartment = async (newSubDepartment) => {
         await refreshData();
-        showNotification(`Subdepartment "${newSubdepartment.name}" has been added successfully!`, 'success');
-        handleCloseAddSubdepartmentModal();
+        showNotification(`Sub Department "${newSubDepartment.name}" has been added successfully!`, 'success');
+        handleCloseAddSubDepartmentModal();
     };
     
-    const handleEditSubdepartment = (subdepartment) => {
-        subdepartmentToEdit.value = subdepartment;
-        showEditSubdepartmentModal.value = true;
+    const handleEditSubDepartment = (subDepartment) => {
+        subDepartmentToEdit.value = subDepartment;
+        showEditSubDepartmentModal.value = true;
     };
     
-    const handleCloseEditSubdepartmentModal = () => {
-        showEditSubdepartmentModal.value = false;
-        subdepartmentToEdit.value = null;
+    const handleCloseEditSubDepartmentModal = () => {
+        showEditSubDepartmentModal.value = false;
+        subDepartmentToEdit.value = null;
     };
     
-    const handleSubdepartmentUpdated = async () => {
+    const handleSubDepartmentUpdated = async () => {
         await refreshData();
-        handleCloseEditSubdepartmentModal();
+        handleCloseEditSubDepartmentModal();
     };
     
-    const handleDeleteSubdepartment = (subdepartment) => {
-        itemToDelete.value = subdepartment;
-        deleteDialogTitle.value = 'Delete Subdepartment';
-        deleteDialogMessage.value = `Are you sure you want to delete "${subdepartment.name}"? This action cannot be undone.`;
+    const handleDeleteSubDepartment = (subDepartment) => {
+        itemToDelete.value = subDepartment;
+        deleteDialogTitle.value = 'Delete SubDepartment';
+        deleteDialogMessage.value = `Are you sure you want to delete "${subDepartment.name}"? This action cannot be undone.`;
         showDeleteDialog.value = true;
     };
     
@@ -55,7 +55,7 @@ export function useSubDepartmentActions(refreshData, showNotification) {
             const result = await deleteSubDepartment(itemToDelete.value.id);
             
             if (result.success) {
-                showNotification(`Subdepartment "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
+                showNotification(`SubDepartment "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
                 
                 setTimeout(async () => {
                     await refreshData();
@@ -74,20 +74,20 @@ export function useSubDepartmentActions(refreshData, showNotification) {
     };
     
     return {
-        showAddSubdepartmentModal,
-        showEditSubdepartmentModal,
-        subdepartmentToEdit,
+        showAddSubDepartmentModal,
+        showEditSubDepartmentModal,
+        subDepartmentToEdit,
         showDeleteDialog,
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
-        handleAddSubdepartment,
-        handleCloseAddSubdepartmentModal,
-        handleSubdepartment,
-        handleEditSubdepartment,
-        handleCloseEditSubdepartmentModal,
-        handleSubdepartmentUpdated,
-        handleDeleteSubdepartment,
+        handleAddSubDepartment,
+        handleCloseAddSubDepartmentModal,
+        handleSubDepartment,
+        handleEditSubDepartment,
+        handleCloseEditSubDepartmentModal,
+        handleSubDepartmentUpdated,
+        handleDeleteSubDepartment,
         confirmDelete,
         cancelDelete
     };

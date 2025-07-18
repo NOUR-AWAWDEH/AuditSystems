@@ -1,6 +1,6 @@
 <template>
     <div>
-        <!-- Subdepartment Table -->
+        <!-- SubDepartment Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
                 <!-- Header with Department Selection and Filters -->
@@ -33,7 +33,7 @@
                             <LocationIcon size="lg" custom-class="text-blue-600 mr-2" />
 
                             <p class="text-sm text-gray-700">
-                                Showing subdepartments for: &nbsp;&nbsp;
+                                Showing subDepartments for: &nbsp;&nbsp;
                                 <span class="font-semibold text-blue-800">
                                     <span v-if="isDepartmentLoading">Loading department...</span>
                                     <span v-else>{{ currentDepartment?.name || 'Loading...' }}</span>
@@ -41,34 +41,26 @@
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
                         </div>
-                        <button @click="$emit('add-subdepartment')"
+                        <button @click="$emit('add-sub-department')"
                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
                             <PlusIcon :stroke-width="3" />
-                            Add Subdepartment
+                            Add SubDepartment
                         </button>
                     </div>
                 </div>
 
                 <!-- Table Container - Show when department is selected -->
                 <div v-if="selectedDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="subdepartments" :columns="enhancedColumns" :is-loading="isLoading"
-                        :actions="[]" :no-data-message="noDataMessage" class="subdepartment-table"
-                        @row-click="handleRowClick">
+                    <ReusableTable :items="subDepartments" :columns="enhancedColumns" :is-loading="isLoading"
+                        :actions="[]" :no-data-message="noDataMessage" class="sub-department-table">
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                <button @click.stop="handleSelectSubdepartment(item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                                    :class="{ 'bg-green-200': selectedSubdepartmentId === item.id }">
-                                    <CheckIcon v-if="selectedSubdepartmentId === item.id" size="sm" custom-class="mr-1" />
-                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
-                                    {{ selectedSubdepartmentId === item.id ? 'Selected' : 'Select' }}
-                                </button>
-                                <button @click.stop="$emit('edit-subdepartment', item)"
+                                <button @click.stop="$emit('edit-sub-department', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
-                                <button @click.stop="$emit('delete-subdepartment', item)"
+                                <button @click.stop="$emit('delete-sub-department', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
                                     <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
@@ -78,7 +70,7 @@
                     </ReusableTable>
 
                     <!-- Clear Search Button (shown when no results and searching) -->
-                    <div v-if="searchQuery && subdepartments.length === 0 && !isLoading"
+                    <div v-if="searchQuery && subDepartments.length === 0 && !isLoading"
                         class="text-center py-4 border-t border-gray-200">
                         <button @click="handleSearch('')"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
@@ -93,12 +85,12 @@
                     <LocationIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
 
                     <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a department to view
-                        subdepartments</h3>
+                        sub departments</h3>
                     <p class="text-gray-500 mb-6">Choose a department from the dropdown above to get started</p>
 
                     <!-- No Departments Available -->
                     <div v-if="!departments || departments.length === 0" class="text-center">
-                        <p class="text-sm text-gray-400">Please add a department first to manage subdepartments</p>
+                        <p class="text-sm text-gray-400">Please add a department first to manage sub departments</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import DepartmentSelector from '@/components/features/Organization/department/components/DepartmentSelector.vue';
@@ -117,12 +109,10 @@ import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import CheckIcon from '@/components/common/icons/CheckIcon.vue';
-import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
     departments: Array,
-    subdepartments: Array,
+    subDepartments: Array,
     isLoading: Boolean,
     selectedDepartmentId: String,
     selectedDepartment: Object,
@@ -135,57 +125,25 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-    'add-subdepartment',
-    'edit-subdepartment',
-    'delete-subdepartment',
-    'subdepartment-selected'
+    'add-sub-department',
+    'edit-sub-department',
+    'delete-sub-department'
 ]);
 
-// Subdepartment selection state
-const selectedSubdepartmentId = ref(null);
-
-// Handle subdepartment selection from table row or button
-const handleSelectSubdepartment = (subdepartment) => {
-    selectedSubdepartmentId.value = subdepartment.id;
-    emit('subdepartment-selected', subdepartment.id);
-};
-
-// Handle row click to select subdepartment
-const handleRowClick = (subdepartment) => {
-    handleSelectSubdepartment(subdepartment);
-};
-
-// Watch for subdepartment changes to reset selection if subdepartment is deleted
-watch(() => props.subdepartments, (newSubdepartments) => {
-    if (selectedSubdepartmentId.value && newSubdepartments) {
-        const subdepartmentExists = newSubdepartments.some(sub => sub.id === selectedSubdepartmentId.value);
-        if (!subdepartmentExists) {
-            selectedSubdepartmentId.value = null;
-            emit('subdepartment-selected', null);
-        }
-    }
-}, { deep: true });
-
-// Reset selection when department changes
-watch(() => props.selectedDepartmentId, () => {
-    selectedSubdepartmentId.value = null;
-    emit('subdepartment-selected', null);
-});
-
-const subdepartmentColumns = [
+const subDepartmentColumns = [
     { key: 'name', label: 'Name' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
 const enhancedColumns = computed(() => {
-    return [...subdepartmentColumns, { key: 'actions', label: 'Actions' }];
+    return [...subDepartmentColumns, { key: 'actions', label: 'Actions' }];
 });
 
 const noDataMessage = computed(() => {
     if (props.searchQuery) {
-        return `No subdepartments found for "${props.searchQuery}".`;
+        return `No sub departments found for "${props.searchQuery}".`;
     }
-    return 'No subdepartments found for this department.';
+    return 'No sub departments found for this department.';
 });
 
 const validSelectedDepartment = computed(() => {
@@ -194,18 +152,18 @@ const validSelectedDepartment = computed(() => {
 </script>
 
 <style scoped>
-.subdepartment-table .table-row {
+.sub-department-table .table-row {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.subdepartment-table .table-row:hover {
+.sub-department-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.subdepartment-table .table-row.selected {
+.sub-department-table .table-row.selected {
     background-color: #eff6ff;
     border-left: 4px solid #3b82f6;
 }

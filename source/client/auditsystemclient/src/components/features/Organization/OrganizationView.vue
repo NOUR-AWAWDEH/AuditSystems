@@ -17,16 +17,16 @@
                     ref="subLocationViewRef" 
                     :locations="locations"
                     :selected-location-id="selectedLocationId"
-                    @sublocation-selected="handleSublocationSelected"
+                    @sub-location-selected="handleSubLocationSelected"
                 />
             </div>
             
             <!-- Department Management Section -->
-            <div v-if="effectiveSelectedSublocationId" class="mt-8">
+            <div v-if="effectiveSelectedSubLocationId" class="mt-8">
                 <DepartmentView 
                     ref="departmentViewRef" 
-                    :sub-locations="sublocations"
-                    :selected-sublocation-id="effectiveSelectedSublocationId"
+                    :sub-locations="subLocations"
+                    :selected-sub-location-id="effectiveSelectedSubLocationId"
                     @department-selected="handleDepartmentSelected"
                 />
             </div>
@@ -37,7 +37,7 @@
                     ref="subDepartmentViewRef" 
                     :departments="departments"
                     @selected-department-id="handleDepartmentSelected"
-                    @subdepartment-selected="handleSubDepartmentSelected"
+                    @sub-department-selected="handleSubDepartmentSelected"
                 />
             </div>
         </div>
@@ -60,7 +60,7 @@ const subDepartmentViewRef = ref(null);
 
 // State for hierarchical selection
 const selectedLocationId = ref(null);
-const selectedSublocationId = ref(null);
+const selectedSubLocationId = ref(null);
 const selectedDepartmentId = ref(null);
 const selectedSubDepartmentId = ref(null);
 
@@ -70,8 +70,8 @@ const locations = computed(() => {
 });
 
 // Get sublocations from SubLocationView
-const sublocations = computed(() => {
-    return subLocationViewRef.value?.sublocations || [];
+const subLocations = computed(() => {
+    return subLocationViewRef.value?.subLocations || [];
 });
 
 // Get departments from DepartmentView
@@ -80,19 +80,19 @@ const departments = computed(() => {
 });
 
 // Get the actual selected sublocation ID from SubLocationView
-const actualSelectedSublocationId = computed(() => {
+const actualSelectedSubLocationId = computed(() => {
     return subLocationViewRef.value?.selectedSubLocationId || null;
 });
 
 // Use the actual selected sublocation ID for DepartmentView
-const effectiveSelectedSublocationId = computed(() => {
-    return actualSelectedSublocationId.value || selectedSublocationId.value;
+const effectiveSelectedSubLocationId = computed(() => {
+    return actualSelectedSubLocationId.value || selectedSubLocationId.value;
 });
 
 // Handle location selection
 const handleLocationSelected = (locationId) => {
     selectedLocationId.value = locationId;
-    selectedSublocationId.value = null;
+    selectedSubLocationId.value = null;
     selectedDepartmentId.value = null;
     selectedSubDepartmentId.value = null;
     
@@ -109,8 +109,8 @@ const handleLocationSelected = (locationId) => {
 };
 
 // Handle sublocation selection
-const handleSublocationSelected = (sublocationId) => {
-    selectedSublocationId.value = sublocationId;
+const handleSubLocationSelected = (subLocationId) => {
+    selectedSubLocationId.value = subLocationId;
     selectedDepartmentId.value = null; // Reset department selection
     selectedSubDepartmentId.value = null; // Reset subdepartment selection
     

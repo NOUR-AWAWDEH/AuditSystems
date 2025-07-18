@@ -29,10 +29,10 @@ defineProps({
   }
 });
 
-const emit = defineEmits(['update:selectedSubLocation', 'sub-location-changed']);
+const emit = defineEmits(['update:selected-sub-location', 'sub-location-changed']);
 
 const handleSubLocationChange = (value) => {  
-    emit('update:selectedSubLocation', value);
+    emit('update:selected-sub-location', value);
     emit('sub-location-changed', value);
 };
 </script>

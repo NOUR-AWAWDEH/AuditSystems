@@ -114,7 +114,7 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
     if (!props.subLocationId) {
-        showNotification('sublocation is requered', 'error');
+        showNotification('sub location is requered', 'error');
         return;
     }
 

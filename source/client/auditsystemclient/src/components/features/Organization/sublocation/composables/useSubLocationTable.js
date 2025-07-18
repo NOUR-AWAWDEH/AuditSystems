@@ -28,7 +28,7 @@ export function useSubLocationTable(locations) {
     } = useSearchSubLocationByUserId();
     
     const { 
-        sublocations: allSublocations, 
+        subLocations: allSubLocations, 
         isLoading: isLoadingAll,
         getSubLocationsByUserId 
     } = useGetSubLocationsByUserId();
@@ -55,15 +55,14 @@ export function useSubLocationTable(locations) {
     // Add currentLocation computed property
     const currentLocation = computed(() => {
         const location = fetchedLocation.value || selectedLocation.value;
-        // Handle nested locationModel structure
         return location?.locationModel || location;
     });
     
-    const sublocations = computed(() => {
+    const subLocations = computed(() => {
         if (searchQuery.value.trim() || selectedLocationId.value) {
-            return searchResults.value;
+            return searchResults.value || [];
         } else {
-            return allSublocations.value;
+            return allSubLocations?.value || [];
         }
     });
     
@@ -126,7 +125,9 @@ export function useSubLocationTable(locations) {
     // Watch for selectedLocationId changes and fetch location details
     watch(selectedLocationId, async (newLocationId) => {
         clearSearch();
-        allSublocations.value = [];
+        if (allSubLocations?.value !== undefined) {
+            allSubLocations.value = [];
+        }
         
         if (!newLocationId) {
             clearLocation();
@@ -168,14 +169,15 @@ export function useSubLocationTable(locations) {
         }
     };
     
-    const handleSublocationAdded = async () => {
+    const handleSubLocationAdded = async () => {
         await refreshData();
     };
     
     const handleLocationChange = async (newLocationId) => {
-        
         clearSearch();
-        allSublocations.value = [];
+        if (allSubLocations?.value !== undefined) {
+            allSubLocations.value = [];
+        }
         
         selectedLocationId.value = newLocationId;
         
@@ -194,7 +196,9 @@ export function useSubLocationTable(locations) {
         searchQuery.value = '';
         currentPage.value = 1;
         clearSearch();
-        allSublocations.value = [];
+        if (allSubLocations?.value !== undefined) {
+            allSubLocations.value = [];
+        }
         clearLocation();
         isInitialized.value = false;
         isInitializing.value = false;
@@ -219,7 +223,7 @@ export function useSubLocationTable(locations) {
     });
     
     return {
-        sublocations,
+        subLocations,
         isLoading,
         selectedLocationId,
         selectedLocation, 
@@ -230,7 +234,7 @@ export function useSubLocationTable(locations) {
         pageSize,
         totalCount,
         refreshData,
-        handleSublocationAdded,
+        handleSubLocationAdded,
         handleLocationChange,
         handleSearch,
         resetToDefaultView,

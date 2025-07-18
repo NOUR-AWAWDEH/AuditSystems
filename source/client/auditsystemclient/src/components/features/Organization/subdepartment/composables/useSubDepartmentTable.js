@@ -12,26 +12,27 @@ export function useSubDepartmentTable(departments) {
     const isInitializing = ref(false);
     
     // Add useGetDepartmentById composable
+    // Add useGetDepartmentById composable
     const { 
-        department: fetchedDepartment,
-        isLoading: isDepartmentLoading,
+        department: fetchedDepartment = ref(null),
+        isLoading: isDepartmentLoading = ref(false),
         fetchDepartmentById,
         clearDepartment 
-    } = useGetDepartmentById();
+    } = useGetDepartmentById() || {};
     
     const {
-        searchResults,
-        isSearching,
-        totalCount,
+        searchResults = ref([]),
+        isSearching = ref(false),
+        totalCount = ref(0),
         searchSubDepartments,
         clearSearch
-    } = useSearchSubDepartmentByUserId();
+    } = useSearchSubDepartmentByUserId() || {};
     
     const { 
-        subdepartments: allSubDepartments, 
-        isLoading: isLoadingAll,
+        subDepartments: allSubDepartments = ref([]), 
+        isLoading: isLoadingAll = ref(false),
         getSubDepartmentsByUserId 
-    } = useGetSubDepartmentsByUserId();
+    } = useGetSubDepartmentsByUserId() || {};
     
     const departmentsRef = computed(() => {
         if (departments && typeof departments === 'object' && 'value' in departments) {
@@ -54,20 +55,24 @@ export function useSubDepartmentTable(departments) {
     
     // Add currentDepartment computed property
     const currentDepartment = computed(() => {
-        const department = fetchedDepartment.value || selectedDepartment.value;
-        // Handle nested departmentModel structure
+        const department = fetchedDepartment?.value || selectedDepartment?.value;
         return department?.departmentModel || department;
     });
     
-    const subdepartments = computed(() => {
-        if (searchQuery.value.trim() || selectedDepartmentId.value) {
-            return searchResults.value;
+    const subDepartments = computed(() => {
+        if (searchQuery?.value?.trim() || selectedDepartmentId?.value) {
+            return (searchResults && searchResults.value) ? searchResults.value : [];
         } else {
-            return allSubDepartments.value;
+            return (allSubDepartments && allSubDepartments.value) ? allSubDepartments.value : [];
         }
     });
     
-    const isLoading = computed(() => isSearching.value || isLoadingAll.value || isInitializing.value);
+    const isLoading = computed(() => {
+        const searching = (isSearching && isSearching.value) ? isSearching.value : false;
+        const loadingAll = (isLoadingAll && isLoadingAll.value) ? isLoadingAll.value : false;
+        const departmentLoading = (isDepartmentLoading && isDepartmentLoading.value) ? isDepartmentLoading.value : false;
+        return searching || loadingAll || departmentLoading || isInitializing.value;
+    });
     
     const initializeData = async () => {
         if (!selectedDepartmentId.value || isInitialized.value || isInitializing.value) {
@@ -219,7 +224,7 @@ export function useSubDepartmentTable(departments) {
     });
     
     return {
-        subdepartments,
+        subDepartments,
         isLoading,
         selectedDepartmentId,
         selectedDepartment,

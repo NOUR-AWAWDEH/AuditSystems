@@ -9,7 +9,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Sublocation</h3>
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Sub Location</h3>
             <button @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
               <CloseIcon size="md" />
             </button>
@@ -20,21 +20,21 @@
             <form @submit.prevent="handleSubmit" class="space-y-4">
               <!-- Sublocation Name Field -->
               <div>
-                <label for="edit-sublocation-name" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Sublocation Name *
+                <label for="edit-sub-location-name" class="block text-sm font-medium text-secondary-shade mb-1">
+                  Sub Location Name *
                 </label>
-                <BaseInput id="edit-sublocation-name" v-model="formData.name" placeholder="Enter sublocation name"
+                <BaseInput id="edit-sub-location-name" v-model="formData.name" placeholder="Enter sub location name"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
 
               <!-- Address Field -->
               <div>
-                <label for="edit-sublocation-address" class="block text-sm font-medium text-secondary-shade mb-1">
+                <label for="edit-sub-location-address" class="block text-sm font-medium text-secondary-shade mb-1">
                   Address
                 </label>
-                <BaseInput id="edit-sublocation-address" v-model="formData.address"
-                  placeholder="Enter sublocation address"
+                <BaseInput id="edit-sub-location-address" v-model="formData.address"
+                  placeholder="Enter sub location address"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
                 <p v-if="errors.address" class="text-error text-sm mt-1">{{ errors.address }}</p>
               </div>
@@ -53,7 +53,7 @@
                 <button type="submit" :disabled="!formData.name.trim() || isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isUpdating">Updating...</span>
-                  <span v-else>Update Sublocation</span>
+                  <span v-else>Update Sub Location</span>
                 </button>
               </div>
             </form>
@@ -77,7 +77,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  sublocation: {
+  subLocation: {
     type: Object,
     default: () => ({})
   }
@@ -100,8 +100,8 @@ const errors = ref({
 });
 
 // Reset form when modal opens/closes or sublocation changes
-watch([() => props.isVisible, () => props.sublocation], ([newVisible, newSublocation]) => {
-  if (newVisible && newSublocation) {
+watch([() => props.isVisible, () => props.subLocation], ([newVisible, newSubLocation]) => {
+  if (newVisible && newSubLocation) {
     resetForm();
     populateForm();
   }
@@ -121,10 +121,10 @@ const resetForm = () => {
 };
 
 const populateForm = () => {
-  if (props.sublocation) {
+  if (props.subLocation) {
     formData.value = {
-      name: props.sublocation.name || '',
-      address: props.sublocation.address || ''
+      name: props.subLocation.name || '',
+      address: props.subLocation.address || ''
     };
   }
 };
@@ -146,9 +146,9 @@ const handleSubmit = async () => {
   }
 
 
-  if (!props.sublocation?.id) {
-    console.error('Missing sublocation ID:', props.sublocation);
-    showNotification('Sublocation ID is required', 'error');
+  if (!props.subLocation?.id) {
+    console.error('Missing sub location ID:', props.subLocation);
+    showNotification('Sub Location ID is required', 'error');
     return;
   }
 
@@ -158,31 +158,31 @@ const handleSubmit = async () => {
   }
 
   try {
-    const sublocationData = {
-      id: props.sublocation.id,
+    const subLocationData = {
+      id: props.subLocation.id,
       name: formData.value.name.trim(),
       address: formData.value.address.trim(),
-      locationId: props.sublocation.locationId
+      locationId: props.subLocation.locationId
     };
 
-    const result = await updateSubLocation(sublocationData);
+    const result = await updateSubLocation(subLocationData);
 
 
     if (result?.success) {
       // Pass the updated sublocation data with the correct structure
-      const updatedSublocationData = {
-        ...sublocationData,
+      const updatedSubLocationData = {
+        ...subLocationData,
         ...result.data
       };
 
-      emit('updated', updatedSublocationData);
+      emit('updated', updatedSubLocationData);
       emit('close');
     } else {
       console.error('❌ Update failed - result not successful:', result);
     }
   } catch (error) {
     console.error('Error in handleSubmit:', error);
-    const errorMessage = error?.response?.data?.message || error.message ||'Failed to update sublocation. Please try again.';
+    const errorMessage = error?.response?.data?.message || error.message ||'Failed to update sub location. Please try again.';
     showNotification(errorMessage, 'error');
   }
 
@@ -197,7 +197,7 @@ const validateForm = () => {
   let isValid = true;
 
   if (!formData.value.name.trim()) {
-    errors.value.name = 'Sublocation name is required';
+    errors.value.name = 'Sub Location name is required';
     isValid = false;
   }
 

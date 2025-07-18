@@ -1,17 +1,17 @@
 import { ref, computed } from 'vue';
 
-export function useSubLocationFilters(sublocations) {
+export function useSubLocationFilters(subLocations) {
     const searchQuery = ref('');
     
-    const filteredSublocations = computed(() => {
-        let filtered = [...sublocations.value];
+    const filteredSubLocations = computed(() => {
+        let filtered = [...subLocations.value];
         
         // Apply search filter
         if (searchQuery.value.trim()) {
             const query = searchQuery.value.toLowerCase().trim();
-            filtered = filtered.filter(sublocation => 
-                sublocation.name.toLowerCase().includes(query) ||
-                (sublocation.address && sublocation.address.toLowerCase().includes(query))
+            filtered = filtered.filter(subLocation => 
+                subLocation.name.toLowerCase().includes(query) ||
+                (subLocation.address && subLocation.address.toLowerCase().includes(query))
             );
         }
         // Sort by name
@@ -20,6 +20,6 @@ export function useSubLocationFilters(sublocations) {
     
     return {
         searchQuery,
-        filteredSublocations
+        filteredSubLocations
     };
 }

@@ -1,9 +1,9 @@
 <template>
     <div class="space-y-6">
-        <!-- Sublocation Management -->
+        <!-- SubLocation Management -->
         <SubLocationTable
             :locations="locations"
-            :sublocations="sublocations"
+            :sub-locations="subLocations"
             :is-loading="isLoading"
             :selected-location-id="selectedLocationId"
             :selected-location="selectedLocation"
@@ -13,27 +13,27 @@
             :handle-location-change="handleLocationChange"
             :handle-search="handleSearch"
             :refresh-data="refreshData"
-            @add-sublocation="handleAddSublocation"
-            @edit-sublocation="handleEditSublocation"
-            @delete-sublocation="handleDeleteSublocation"
-            @sublocation-selected="handleSublocationSelected"
+            @add-sub-location="handleAddSubLocation"
+            @edit-sub-location="handleEditSubLocation"
+            @delete-sub-location="handleDeleteSubLocation"
+            @sub-location-selected="handleSubLocationSelected"
         />
 
-        <!-- Add Sublocation Modal -->
-        <AddSublocationModal
-            :is-visible="showAddSublocationModal"
+        <!-- Add SubLocation Modal -->
+        <AddSubLocationModal
+            :is-visible="showAddSubLocationModal"
             :location-id="selectedLocationId"
-            @close="handleCloseAddSublocationModal"
-            @sublocation-added="handleSublocationAdded"
+            @close="handleCloseAddSubLocationModal"
+            @sub-location-added="handleSubLocationAdded"
         />
 
         <!-- Edit Sublocation Modal -->
-        <EditSublocationModal
-            v-if="showEditSublocationModal"
-            :is-visible="showEditSublocationModal"
-            :sublocation="sublocationToEdit"
-            @close="handleCloseEditSublocationModal"
-            @updated="handleSublocationUpdated"
+        <EditSubLocationModal
+            v-if="showEditSubLocationModal"
+            :is-visible="showEditSubLocationModal"
+            :sub-location="subLocationToEdit"
+            @close="handleCloseEditSubLocationModal"
+            @updated="handleSubLocationUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -53,8 +53,8 @@
 <script setup>
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubLocationTable from './components/SubLocationTable.vue';
-import AddSublocationModal from './components/AddSublocationModal.vue';
-import EditSublocationModal from './components/EditSublocationModal.vue';
+import AddSubLocationModal from './components/AddSublocationModal.vue';
+import EditSubLocationModal from './components/EditSublocationModal.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
 import { useSubLocationActions } from './composables/useSubLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
@@ -67,13 +67,13 @@ const props = defineProps({
 });
 
 // Define emit to forward sublocation selection to parent
-const emit = defineEmits(['sublocation-selected']);
+const emit = defineEmits(['sub-location-selected']);
 
 const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 const {
-    sublocations,
+    subLocations,
     isLoading,
     selectedLocationId,
     selectedLocation,
@@ -81,45 +81,44 @@ const {
     isLocationLoading,
     searchQuery,
     refreshData,
-    handleSublocationAdded,
+    handleSubLocationAdded,
     handleLocationChange,
     handleSearch,
     resetToDefaultView,
 } = useSubLocationTable(props.locations);
 
 const {
-    showAddSublocationModal,
-    showEditSublocationModal,
-    sublocationToEdit,
+    showAddSubLocationModal,
+    showEditSubLocationModal,
+    subLocationToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    handleAddSublocation,
-    handleCloseAddSublocationModal,
-    handleEditSublocation,
-    handleCloseEditSublocationModal,
-    handleSublocationUpdated,
-    handleDeleteSublocation,
+    handleAddSubLocation,
+    handleCloseAddSubLocationModal,
+    handleEditSubLocation,
+    handleCloseEditSubLocationModal,
+    handleSubLocationUpdated,
+    handleDeleteSubLocation,
     confirmDelete,
     cancelDelete
 } = useSubLocationActions(refreshData, showNotification);
 
-// Handle sublocation selection and forward to parent
-const handleSublocationSelected = (sublocationId) => {
-    emit('sublocation-selected', sublocationId);
+// Handle SubLocation selection and forward to parent
+const handleSubLocationSelected = (subLocationId) => {
+    emit('sub-location-selected', subLocationId);
 };
 
-// In the script setup section, add:
 defineExpose({
-    sublocations,
-    selectedLocationId, // Expose selected location ID
+    subLocations,
+    selectedLocationId,
     resetToDefaultView
 });
 </script>
 
 <style scoped>
-.sublocation-table .table-row {
+.sub-location-table .table-row {
     transition: all 0.2s ease;
 }
 </style>

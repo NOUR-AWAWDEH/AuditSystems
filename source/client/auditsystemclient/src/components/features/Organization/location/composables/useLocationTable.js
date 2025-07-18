@@ -24,7 +24,7 @@ export function useLocationTable() {
     
     // Add sublocation management
     const { 
-        sublocations, 
+        subLocations, 
         getSubLocationsByUserId 
     } = useGetSubLocationsByUserId();
     
@@ -51,7 +51,7 @@ export function useLocationTable() {
     
     return {
         locations,
-        sublocations, // Add sublocations to return
+        subLocations,
         isLoading,
         searchQuery,
         sortBy,

@@ -9,7 +9,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Sublocation</h3>
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Sub Location</h3>
             <button 
               @click="$emit('close')" 
               class="text-gray-base hover:text-gray-shade focus:outline-none">
@@ -20,16 +20,16 @@
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Sublocation Name Field -->
+              <!-- SubLocation Name Field -->
               <div>
-                <label for="sublocation-name" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Sublocation Name *
+                <label for="sub-location-name" class="block text-sm font-medium text-secondary-shade mb-1">
+                  Sub Location Name *
                 </label>
                 <BaseInput 
-                  id="sublocation-name" 
+                  id="sub-location-name" 
                   v-model="formData.name"
-                  label="Sublocation Name" 
-                  placeholder="Enter sublocation name"
+                  label="sub-location Name" 
+                  placeholder="Enter sub location name"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" 
                 />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
@@ -37,10 +37,10 @@
 
               <!-- Address Field -->
               <div>
-                <label for="sublocation-address" class="block text-sm font-medium text-secondary-shade mb-1">
+                <label for="sub-location-address" class="block text-sm font-medium text-secondary-shade mb-1">
                   Address
                 </label>
-                <BaseInput id="sublocation-address" v-model="formData.address" placeholder="Enter sublocation address"
+                <BaseInput id="sub-location-address" v-model="formData.address" placeholder="Enter sub-location address"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.address ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
                 <p v-if="errors.address" class="text-error text-sm mt-1">{{ errors.address }}</p>
               </div>
@@ -61,7 +61,7 @@
                   :disabled="!formData.name.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isCreating">Adding...</span>
-                  <span v-else>Add Sublocation</span>
+                  <span v-else>Add Sub Location</span>
                 </button>
               </div>
             </form>
@@ -90,7 +90,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'sublocation-added']);
+const emit = defineEmits(['close', 'sub-location-added']);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createSubLocation, resetState } = useCreateSubLocation();
@@ -135,22 +135,22 @@ const handleSubmit = async () => {
   }
 
   try {
-    const sublocationData = {
+    const subLocationData = {
       name: formData.value.name.trim(),
       address: formData.value.address.trim(),
       locationId: props.locationId
     };
 
-    const result = await createSubLocation(sublocationData);
+    const result = await createSubLocation(subLocationData);
 
     if (result?.success) {
-      showNotification(`Sublocation "${sublocationData.name}" has been added successfully!`, 'success');
-      emit('sublocation-added', result.data);
+      showNotification(`SubLocation "${subLocationData.name}" has been added successfully!`, 'success');
+      emit('sub-location-added', result.data);
       emit('close');
     }
   } catch (error) {
     console.error('Error in handleSubmit:', error);
-    showNotification('Failed to add sublocation. Please try again.', 'error');
+    showNotification('Failed to add sub location. Please try again.', 'error');
   }
 };
 
@@ -163,7 +163,7 @@ const validateForm = () => {
   let isValid = true;
 
   if (!formData.value.name.trim()) {
-    errors.value.name = 'Sublocation name is required';
+    errors.value.name = 'Sub Location name is required';
     isValid = false;
   }
 

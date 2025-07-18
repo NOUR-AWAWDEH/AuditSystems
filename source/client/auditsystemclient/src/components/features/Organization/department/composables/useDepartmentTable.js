@@ -3,7 +3,7 @@ import { useSearchDepartmentByUserId } from '@/composables/organization/departme
 import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
 import { useGetSubLocationById } from '@/composables/organization/sublocation/useGetSubLocationById';
 
-export function useDepartmentTable(sublocations) {
+export function useDepartmentTable(subLocations) {
     const searchQuery = ref('');
     const selectedSubLocationId = ref('');
     const currentPage = ref(1);
@@ -12,61 +12,66 @@ export function useDepartmentTable(sublocations) {
     const isInitializing = ref(false);
     
     const { 
-        sublocation: fetchedSubLocation,
+        subLocation: fetchedSubLocation,
         isLoading: isSubLocationLoading,
         fetchSubLocationById,
         clearSubLocation
     } = useGetSubLocationById();
     
+    // Safer destructuring with default values
     const {
-        searchResults,
-        isSearching,
-        totalCount,
+        searchResults = ref([]),
+        isSearching = ref(false),
+        totalCount = ref(0),
         searchDepartments,
         clearSearch
-    } = useSearchDepartmentByUserId();
+    } = useSearchDepartmentByUserId() || {};
     
     const { 
-        departments: allDepartments,
-        isLoading: isLoadingAll,
+        departments: allDepartments = ref([]),
+        isLoading: isLoadingAll = ref(false),
         getDepartmentsByUserId 
-    } = useGetDepartmentsByUserId();
+    } = useGetDepartmentsByUserId() || {};
     
     
-    const sublocationsRef = computed(() => {
-        if (sublocations && typeof sublocations === 'object' && 'value' in sublocations) {
-            return sublocations.value || [];
+    const subLocationsRef = computed(() => {
+        if (subLocations && typeof subLocations === 'object' && 'value' in subLocations) {
+            return subLocations.value || [];
         }
-        return sublocations || [];
+        return subLocations || [];
     });
     
     const selectedSubLocation = computed(() => {
         const subLocationId = selectedSubLocationId.value;
-        const sublocationsList = sublocationsRef.value;
+        const subLocationsList = subLocationsRef.value;
         
-        if (!subLocationId || !sublocationsList || sublocationsList.length === 0) {
+        if (!subLocationId || !subLocationsList || subLocationsList.length === 0) {
             return null;
         }
         
-        const sublocation = sublocationsList.find(sub => sub.id === subLocationId);
-        return sublocation || null;
+        const subLocation = subLocationsList.find(sub => sub.id === subLocationId);
+        return subLocation || null;
     });
     
     // Add currentSubLocation computed property
     const currentSubLocation = computed(() => {
-        const sublocation = fetchedSubLocation.value || selectedSubLocation.value;
-        return sublocation;
+        const subLocation = fetchedSubLocation?.value || selectedSubLocation?.value;
+        return subLocation?.subLocationModel || subLocation;
     });
     
     const departments = computed(() => {
-        if (searchQuery.value.trim() || selectedSubLocationId.value) {
-            return searchResults.value || [];
+        if ((searchQuery?.value && searchQuery.value.trim()) || (selectedSubLocationId?.value)) {
+            return (searchResults && searchResults.value) ? searchResults.value : [];
         } else {
-            return allDepartments.value || [];
+            return (allDepartments && allDepartments.value) ? allDepartments.value : [];
         }
     });
     
-    const isLoading = computed(() => isSearching.value || isLoadingAll.value || isInitializing.value);
+    const isLoading = computed(() => {
+        const searching = (isSearching && isSearching.value) ? isSearching.value : false;
+        const loadingAll = (isLoadingAll && isLoadingAll.value) ? isLoadingAll.value : false;
+        return searching || loadingAll || isInitializing.value;
+    });
     
     const initializeData = async () => {
         if (!selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
@@ -74,15 +79,14 @@ export function useDepartmentTable(sublocations) {
         }
         
         try {
-           
-            
             isInitializing.value = true;
-            await searchDepartments({
-                subLocationId: selectedSubLocationId.value,
-                page: currentPage.value,
-                pageSize: pageSize.value
-            });
-            
+            if (searchDepartments) {
+                await searchDepartments({
+                    subLocationId: selectedSubLocationId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value
+                });
+            }
             isInitialized.value = true;
         } catch (error) {
             console.error('[Department] Failed to initialize data:', error);
@@ -91,13 +95,13 @@ export function useDepartmentTable(sublocations) {
         }
     };
     
-    watch(sublocationsRef, async (newSubLocations) => {
+    watch(subLocationsRef, async (newSubLocations) => {
         if (!newSubLocations?.length || !selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
             return;
         }
         
-        const sublocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
-        if (sublocationExists) {
+        const subLocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
+        if (subLocationExists) {
             await nextTick();
             await initializeData();
         } else {
@@ -109,63 +113,78 @@ export function useDepartmentTable(sublocations) {
         if (isInitializing.value) return;
         
         if (search.trim() || selectedSubLocationId.value) {
-            await searchDepartments({
-                searchTerm: search,
-                subLocationId: selectedSubLocationId.value,
-                page: currentPage.value,
-                pageSize: pageSize.value
-            });
+            if (searchDepartments) {
+                await searchDepartments({
+                    searchTerm: search,
+                    subLocationId: selectedSubLocationId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value
+                });
+            }
         } else {
-            clearSearch();
-            if (!selectedSubLocationId.value) {
+            if (clearSearch) {
+                clearSearch();
+            }
+            if (!selectedSubLocationId.value && getDepartmentsByUserId) {
                 await getDepartmentsByUserId();
             }
         }
     });
     
-    // Watch for selectedSubLocationId changes and fetch sublocation details
+    // Watch for selectedSubLocationId changes and fetch SubLocation details
     watch(selectedSubLocationId, async (newSubLocationId) => {
-        clearSearch();
-        allDepartments.value = [];
+        if (clearSearch) {
+            clearSearch();
+        }
+        if (allDepartments?.value !== undefined) {
+            allDepartments.value = [];
+        }
         
         if (!newSubLocationId) {
-            clearSubLocation();
+            if (clearSubLocation) {
+                clearSubLocation();
+            }
         }
         
         if (newSubLocationId) {
             try {
                 await fetchSubLocationById(newSubLocationId);
             } catch (error) {
-                console.error('[Department] Error fetching sublocation:', error);
+                console.error('[Department] Error fetching sub location:', error);
             }
         }
         
         if (!newSubLocationId) {
-            if (!searchQuery.value.trim()) {
+            if (!searchQuery.value.trim() && getDepartmentsByUserId) {
                 await getDepartmentsByUserId();
             }
             return;
         }
         
-        await searchDepartments({
-            searchTerm: searchQuery.value || '',
-            subLocationId: newSubLocationId,
-            page: currentPage.value,
-            pageSize: pageSize.value
-        });
-        
+        if (searchDepartments) {
+            await searchDepartments({
+                searchTerm: searchQuery.value || '',
+                subLocationId: newSubLocationId,
+                page: currentPage.value,
+                pageSize: pageSize.value
+            });
+        }
     });
     
     const refreshData = async () => {
         if (searchQuery.value.trim() || selectedSubLocationId.value) {
-            await searchDepartments({
-                searchTerm: searchQuery.value || '',
-                subLocationId: selectedSubLocationId.value,
-                page: currentPage.value,
-                pageSize: pageSize.value
-            });
+            if (searchDepartments) {
+                await searchDepartments({
+                    searchTerm: searchQuery.value || '',
+                    subLocationId: selectedSubLocationId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value
+                });
+            }
         } else {
-            await getDepartmentsByUserId();
+            if (getDepartmentsByUserId) {
+                await getDepartmentsByUserId();
+            }
         }
     };
     
@@ -174,9 +193,13 @@ export function useDepartmentTable(sublocations) {
     };
     
     const handleSubLocationChange = async (newSubLocationId) => {
-        clearSearch();
-        allDepartments.value = [];
-        selectedSubLocationId.value = newSubLocationId;        
+        if (clearSearch) {
+            clearSearch();
+        }
+        if (allDepartments?.value !== undefined) {
+            allDepartments.value = [];
+        }
+        selectedSubLocationId.value = newSubLocationId;
         
         if (newSubLocationId) {
             isInitialized.value = true;
@@ -192,9 +215,15 @@ export function useDepartmentTable(sublocations) {
         selectedSubLocationId.value = null;
         searchQuery.value = '';
         currentPage.value = 1;
-        clearSearch();
-        allDepartments.value = [];
-        clearSubLocation();
+        if (clearSearch) {
+            clearSearch();
+        }
+        if (allDepartments?.value !== undefined) {
+            allDepartments.value = [];
+        }
+        if (clearSubLocation) {
+            clearSubLocation();
+        }
         isInitialized.value = false;
         isInitializing.value = false;
     };
@@ -203,15 +232,15 @@ export function useDepartmentTable(sublocations) {
         await nextTick();
         
         if (selectedSubLocationId.value && !isInitialized.value && !isInitializing.value) {
-            if (sublocationsRef.value?.length > 0) {
-                const sublocationExists = sublocationsRef.value.some(sub => sub.id === selectedSubLocationId.value);
-                if (sublocationExists) {
+            if (subLocationsRef.value?.length > 0) {
+                const subLocationExists = subLocationsRef.value.some(sub => sub.id === selectedSubLocationId.value);
+                if (subLocationExists) {
                     await initializeData();
                 } else {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedSubLocationId.value && !searchQuery.value.trim()) {
+        } else if (!selectedSubLocationId.value && !searchQuery.value.trim() && getDepartmentsByUserId) {
             await getDepartmentsByUserId();
         }
     });

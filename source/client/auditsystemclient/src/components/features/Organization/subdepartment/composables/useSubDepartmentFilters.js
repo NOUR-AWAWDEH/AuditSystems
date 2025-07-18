@@ -1,16 +1,16 @@
 import { ref, computed } from 'vue';
 
-export function useSubDepartmentFilters(subdepartments) {
+export function useSubDepartmentFilters(subDepartments) {
     const searchQuery = ref('');
     
     const filteredSubDepartments = computed(() => {
-        let filtered = [...subdepartments.value];
+        let filtered = [...subDepartments.value];
         
         // Apply search filter
         if (searchQuery.value.trim()) {
             const query = searchQuery.value.toLowerCase().trim();
-            filtered = filtered.filter(subdepartment => 
-                subdepartment.name.toLowerCase().includes(query)
+            filtered = filtered.filter(subDepartment => 
+                subDepartment.name.toLowerCase().includes(query)
             );
         }
         // Sort by name

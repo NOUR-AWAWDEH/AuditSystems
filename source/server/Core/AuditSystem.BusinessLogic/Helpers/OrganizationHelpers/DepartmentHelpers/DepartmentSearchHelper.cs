@@ -59,7 +59,7 @@ public class DepartmentSearchHelper : IDepartmentSearch
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subLocationIdStr = subLocationId?.ToString() ?? "all";
+        var subLocationIdStr = subLocationId.ToString() ?? "all";
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
             CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr, page.Number, page.Size);

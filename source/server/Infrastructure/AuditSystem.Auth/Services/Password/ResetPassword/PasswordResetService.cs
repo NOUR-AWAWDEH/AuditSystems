@@ -1,6 +1,7 @@
 ﻿using AuditSystem.Auth.Services.Password.PasswordToken;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Services.Password.ResetPassword;
 

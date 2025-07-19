@@ -1,6 +1,7 @@
 using FluentValidation;
 
-namespace AuditSystem.Application.Features.Processes.AuditProcess.Get;
+namespace AuditSystem.Application.Features.Processes.AuditProcess.Get.GetById;
+
 
 public sealed class GetAuditProcessByIdQueryValidator : AbstractValidator<GetAuditProcessByIdQuery>
 {

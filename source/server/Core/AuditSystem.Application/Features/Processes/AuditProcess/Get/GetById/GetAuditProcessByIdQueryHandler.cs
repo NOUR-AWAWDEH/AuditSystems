@@ -2,7 +2,7 @@ using MediatR;
 using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 
-namespace AuditSystem.Application.Features.Processes.AuditProcess.Get;
+namespace AuditSystem.Application.Features.Processes.AuditProcess.Get.GetById;
 
 internal sealed class GetAuditProcessByIdQueryHandler(
     IAuditProcessService auditProcessService) : 

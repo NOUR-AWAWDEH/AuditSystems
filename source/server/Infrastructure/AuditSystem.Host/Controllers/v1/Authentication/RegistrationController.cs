@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 

@@ -61,6 +61,7 @@ internal sealed class DepartmentService(
         DepartmentValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retriving department {DepartmentId} for user {UserId}",id,userId);
+
         var cashedResult = await TryGetFromCacheWithValidationAsync<DepartmentModel>(
             id,
             userId,
@@ -150,7 +151,7 @@ internal sealed class DepartmentService(
             logger.LogDebug(DepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subLocationId,page, cacheKey,countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subLocationId, page, cacheKey, countCacheKey);
     }
     
     public async Task<PaginationResult<DepartmentModel>> SearchAsync(string? name, Page page)

@@ -1,4 +1,6 @@
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
+using AuditSystem.Domain.Entities.Users;
+
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
 
 public class UserSessionManager : IUserSessionManager

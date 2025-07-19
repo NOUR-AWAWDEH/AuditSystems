@@ -1,3 +1,5 @@
+using AuditSystem.Domain.Entities.Users;
+
 namespace AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 
 public interface IUserSessionManager

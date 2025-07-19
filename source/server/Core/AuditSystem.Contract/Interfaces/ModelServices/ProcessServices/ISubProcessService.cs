@@ -1,7 +1,7 @@
 ﻿using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;
 
-namespace AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+namespace AuditSystem.Contract.Interfaces.ModelServices.ProcessServices;
 
 public interface ISubProcessService
 {

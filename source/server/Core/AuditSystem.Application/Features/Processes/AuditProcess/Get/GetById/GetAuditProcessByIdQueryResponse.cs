@@ -1,5 +1,5 @@
 using AuditSystem.Contract.Models.Processes;
 
-namespace AuditSystem.Application.Features.Processes.AuditProcess.Get;
+namespace AuditSystem.Application.Features.Processes.AuditProcess.Get.GetById;
 
 public sealed record class GetAuditProcessByIdQueryResponse(AuditProcessModel AuditProcessModel);

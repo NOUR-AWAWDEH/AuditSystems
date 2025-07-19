@@ -36,8 +36,6 @@ public class RegisterDto
     [Required]
     public string RoleName { get; set; } = string.Empty;
 
-    public Guid? CompanyId { get; set; }
-    public Guid? DepartmentId { get; set; }
-    public Guid? SubDepartmentId { get; set; }
+    [Required]
+    public Guid CompanyId { get; set; }
 }
-

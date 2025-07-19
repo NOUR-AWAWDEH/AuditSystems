@@ -84,7 +84,7 @@ ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
         {
             Username = user.UserName,
             UserId = user.Id.ToString(),
-            CompanyId = user.CompanyId?.ToString(),
+            CompanyId = user.CompanyId.ToString(),
             Email = user.Email,
             Roles = string.Join(", ", roles),
             AuthenticationType = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",

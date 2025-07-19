@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Services.Account;
 

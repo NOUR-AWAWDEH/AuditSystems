@@ -1,6 +1,6 @@
 ﻿using AuditSystem.Application.Constants;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;

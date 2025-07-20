@@ -6,6 +6,13 @@ public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLoca
 {
     public CreateSubLocationValidator()
     {
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User Id must be a valid GUID.");
+
+
         RuleFor(x => x.LocationId)
             .NotEmpty()
             .WithMessage("Location Id is required.")
@@ -19,5 +26,9 @@ public sealed class CreateSubLocationValidator : AbstractValidator<CreateSubLoca
             .WithMessage("SubLocation Name must be at least 2 characters.")
             .MaximumLength(200)
             .WithMessage("SubLocation Name must not exceed 200 characters.");
+
+        RuleFor(x => x.Address)
+            .MaximumLength(500)
+            .WithMessage("Address must not exceed 500 characters.");
     }
 }

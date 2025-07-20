@@ -749,15 +749,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ProcessName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("RatingId")
+                    b.Property<Guid>("SubDepartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -765,7 +762,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RatingId");
+                    b.HasIndex("SubDepartmentId");
 
                     b.ToTable("AuditProcesses");
                 });
@@ -776,22 +773,23 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AuditProcessId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Particular")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ProcessId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProcessId");
+                    b.HasIndex("AuditProcessId");
 
                     b.ToTable("SubProcesses");
                 });
@@ -1419,6 +1417,125 @@ namespace AuditSystem.DataAccess.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CurrentSessionStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastLogin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastLogoutTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("PasswordResetCodeExpiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan>("TotalSessionTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("LastLogin");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Users.UserDesignation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1562,135 +1679,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CurrentSessionStart")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastLogoutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordResetCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("PasswordResetCodeExpiration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PasswordResetToken")
-                        .HasMaxLength(3000)
-                        .HasColumnType("nvarchar(3000)");
-
-                    b.Property<DateTime?>("PasswordResetTokenExpiration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("SubDepartmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<TimeSpan>("TotalSessionTime")
-                        .HasColumnType("time");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("LastLogin");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("SubDepartmentId");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditEngagement", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Location", "Location")
@@ -1756,7 +1744,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Auth.RefreshToken", b =>
                 {
-                    b.HasOne("User", "User")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1801,7 +1789,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("User", "Initiator")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "Initiator")
                         .WithMany()
                         .HasForeignKey("InitiatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1863,7 +1851,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("User", "User")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1898,29 +1886,29 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
                         .WithMany()
-                        .HasForeignKey("RatingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Rating");
+                    b.Navigation("SubDepartment");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.SubProcess", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Processes.AuditProcess", "Process")
+                    b.HasOne("AuditSystem.Domain.Entities.Processes.AuditProcess", "AuditProcess")
                         .WithMany("SubProcesses")
-                        .HasForeignKey("ProcessId")
+                        .HasForeignKey("AuditProcessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Process");
+                    b.Navigation("AuditProcess");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.AuditExceptionReport", b =>
                 {
-                    b.HasOne("User", "Creator")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1931,7 +1919,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.AuditPlanSummaryReport", b =>
                 {
-                    b.HasOne("User", "Creator")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1942,7 +1930,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.InternalAuditConsolidationReport", b =>
                 {
-                    b.HasOne("User", "PreparedByUser")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "PreparedByUser")
                         .WithMany()
                         .HasForeignKey("PreparedByUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1953,7 +1941,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.JobTimeAllocationReport", b =>
                 {
-                    b.HasOne("User", "Creator")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1964,7 +1952,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.PlanningReport", b =>
                 {
-                    b.HasOne("User", "Creator")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2081,7 +2069,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.SupportingDocs.SupportingDoc", b =>
                 {
-                    b.HasOne("User", "User")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2092,7 +2080,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Tasks.TaskManagement", b =>
                 {
-                    b.HasOne("User", "AssignedBy")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "AssignedBy")
                         .WithMany()
                         .HasForeignKey("AssignedById")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2101,9 +2089,28 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("AssignedBy");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.Company", "Company")
+                        .WithMany("Users")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AuditSystem.Domain.Entities.Users.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Users.UserDesignation", b =>
                 {
-                    b.HasOne("User", "User")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2123,7 +2130,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2132,7 +2139,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2147,7 +2154,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2156,43 +2163,11 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("User", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.Organization.Company", "Company")
-                        .WithMany("Users")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AuditSystem.Domain.Entities.Organization.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("AuditSystem.Domain.Entities.Users.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
-                        .WithMany()
-                        .HasForeignKey("SubDepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Company");
-
-                    b.Navigation("Department");
-
-                    b.Navigation("Role");
-
-                    b.Navigation("SubDepartment");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditUniverse", b =>
@@ -2232,7 +2207,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Skills");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

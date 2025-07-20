@@ -1,7 +1,8 @@
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Organization;
-using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+
+namespace AuditSystem.Domain.Entities.Users;
 
 public class User : IdentityUser<Guid>
 {
@@ -9,9 +10,7 @@ public class User : IdentityUser<Guid>
     public required string LastName { get; set; } = string.Empty;
 
     public required Guid RoleId { get; set; }
-    public Guid? CompanyId { get; set; }
-    public Guid? DepartmentId { get; set; }
-    public Guid? SubDepartmentId { get; set; }
+    public required Guid CompanyId { get; set; }
 
     public DateTime LastLogin { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
@@ -27,6 +26,4 @@ public class User : IdentityUser<Guid>
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public virtual Role Role { get; set; } = null!;
     public virtual Company? Company { get; set; }
-    public virtual Department? Department { get; set; }
-    public virtual SubDepartment? SubDepartment { get; set; }
 }

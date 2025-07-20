@@ -12,6 +12,12 @@ public sealed class UpdateDepartmentValidator : AbstractValidator<UpdateDepartme
             .Must(BeAValidGuid)
             .WithMessage("Id must not be empty.");
 
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User Id must be a valid GUID.");
+
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name is required.")

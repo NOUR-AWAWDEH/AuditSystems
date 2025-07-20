@@ -1,4 +1,5 @@
-﻿namespace AuditSystem.Auth.Authentication;
+﻿using AuditSystem.Domain.Entities.Users;
+namespace AuditSystem.Auth.Authentication;
 
 public interface ITokenService
 {

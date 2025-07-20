@@ -4,7 +4,7 @@ namespace AuditSystem.Application.Features.Organization.SubLocation.Delete;
 
 public sealed class DeleteSubLocationValidator : AbstractValidator<DeleteSubLocationCommand>
 {
-    public DeleteSubLocationValidator() 
+    public DeleteSubLocationValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty()
@@ -12,6 +12,11 @@ public sealed class DeleteSubLocationValidator : AbstractValidator<DeleteSubLoca
             .Must(IsValidGuid)
             .WithMessage("Sub Location Id must be a valid Id");
 
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(IsValidGuid)
+            .WithMessage("User Id must be a valid GUID.");
     }
 
     private bool IsValidGuid(Guid id) 

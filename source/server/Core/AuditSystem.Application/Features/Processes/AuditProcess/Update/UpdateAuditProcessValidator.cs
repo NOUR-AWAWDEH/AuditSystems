@@ -9,8 +9,8 @@ public sealed class UpdateAuditProcessValidator : AbstractValidator<UpdateAuditP
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("Id is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("Id must not be empty.");
+            .Must(BeAValidGuid)
+            .WithMessage("Id must be a valid Guid");
 
         RuleFor(x => x.ProcessName)
             .NotEmpty()
@@ -20,14 +20,21 @@ public sealed class UpdateAuditProcessValidator : AbstractValidator<UpdateAuditP
             .MaximumLength(100)
             .WithMessage("ProcessName must not exceed 100 characters.");
 
-        RuleFor(x => x.RatingId)
+        RuleFor(x => x.SubDepartmentId)
             .NotEmpty()
-            .WithMessage("RatingId is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("RatingId must not be empty.");
+            .WithMessage("SubDepartmentId is required")
+            .Must(BeAValidGuid)
+            .WithMessage("SubDepartmentId must be a valid Guid");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required")
+            .Must(BeAValidGuid)
+            .WithMessage("User Id must be a valid Guid");
+    }
 
-        RuleFor(x => x.Description)
-            .MaximumLength(500)
-            .WithMessage("Description must not exceed 500 characters.");
+    private static bool BeAValidGuid(Guid id)
+    {
+        return id != Guid.Empty;
     }
 }

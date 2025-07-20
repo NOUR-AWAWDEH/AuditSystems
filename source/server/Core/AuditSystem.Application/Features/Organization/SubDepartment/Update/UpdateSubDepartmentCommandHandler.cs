@@ -16,8 +16,8 @@ internal sealed class UpdateSubDepartmentCommandHandler(
     public async Task<Result> Handle(UpdateSubDepartmentCommand request, CancellationToken cancellationToken)
     {
         var subDepartmentModel = mapper.Map<SubDepartmentModel>(request);
-
         await subDepartmentService.UpdateSubDepartmentAsync(subDepartmentModel, request.UserId);
+        
         logger.LogInformation("Sub-Department With ID: {SubDepartmentId} updated by User ID: {UserId} successfully", request.Id, request.UserId);
         return Result.SuccessWithMessage("Sub-Department updated successfully");
     }

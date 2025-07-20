@@ -111,8 +111,6 @@ namespace AuditSystem.Auth.Services.Registration
                 LastName = request.LastName,
                 RoleId = role.Id,
                 CompanyId = request.CompanyId,
-                DepartmentId = request.DepartmentId,
-                SubDepartmentId = request.SubDepartmentId,
                 IsActive = true,
                 EmailConfirmed = false
             };

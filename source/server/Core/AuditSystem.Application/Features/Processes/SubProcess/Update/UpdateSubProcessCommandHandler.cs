@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Models.Processes;
 using AutoMapper;
 using MediatR;

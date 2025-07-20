@@ -32,7 +32,6 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
@@ -74,6 +73,10 @@ using Microsoft.Extensions.DependencyInjection;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices;
+using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -171,11 +174,17 @@ public static class BusinessLogicDependencies
             .AddScoped<ISubLocationValidation, SubLocationValidationHelper>()
             .AddScoped<ISubLocationSearch, SubLocationSearchHelper>()
 
-            // Processes
+            // Audit Process
             .AddScoped<IAuditProcessService, AuditProcessService>()
             .AddScoped<IUnifiedCacheService<Guid, AuditProcess, AuditProcessModel>, AuditProcessService>()
+            .AddScoped<IAuditProcessValidation, AuditProcessValidationHelper>()
+            .AddScoped<IAuditProcessSearch, AuditProcessSearchHelper>()
+
+            // Sub Process
             .AddScoped<ISubProcessService, SubProcessService>()
             .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
+            //.AddScoped<ISubProcessValidation, SubProcessValidationHelper>()
+            //.AddScoped<ISubProcessSearch, SubProcessSearchHelper>()
 
             // Reports
             .AddScoped<IAuditExceptionReportService, AuditExceptionRepotService>()

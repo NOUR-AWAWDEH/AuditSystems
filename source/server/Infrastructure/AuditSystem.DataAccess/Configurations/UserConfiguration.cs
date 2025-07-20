@@ -20,6 +20,9 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
         builder.Property(u => u.RoleId)
             .IsRequired();
 
+        builder.Property(u => u.CompanyId)
+            .IsRequired();
+
         // Optional properties with constraints
         builder.Property(u => u.PasswordResetCode)
             .HasMaxLength(100);
@@ -38,20 +41,6 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
             .HasForeignKey(u => u.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
-
-        builder.HasOne(u => u.Department)
-            .WithMany()
-            .HasForeignKey(u => u.DepartmentId)
-            .HasPrincipalKey(d => d.Id)  // Explicitly specify the principal key
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(u => u.SubDepartment)
-            .WithMany()
-            .HasForeignKey(u => u.SubDepartmentId)
-            .HasPrincipalKey(sd => sd.Id)  // Explicitly specify the principal key
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasMany(u => u.RefreshTokens)
             .WithOne(rt => rt.User)
             .HasForeignKey(rt => rt.UserId)
@@ -60,8 +49,6 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
         // Indexes
         builder.HasIndex(u => u.RoleId);
         builder.HasIndex(u => u.CompanyId);
-        builder.HasIndex(u => u.DepartmentId);
-        builder.HasIndex(u => u.SubDepartmentId);
         builder.HasIndex(u => u.LastLogin);
         builder.HasIndex(u => u.IsActive);
     }

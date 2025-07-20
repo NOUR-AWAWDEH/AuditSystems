@@ -15,6 +15,7 @@ internal sealed class GetSubDepartmentsByUserIdQueryHandler(
         CancellationToken cancellationToken)
     { 
         var subDepartments = await subDepartmentService.GetSubDepartmentsByUserIdAsync(request.UserId);
+        
         logger.LogDebug("Sub-Departments retrieved successfully for user {UserId}", request.UserId);
         return Result<GetSubDepartmentsByUserIdQueryResponse>.Success(
             new GetSubDepartmentsByUserIdQueryResponse(subDepartments),

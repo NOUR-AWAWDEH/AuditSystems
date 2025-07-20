@@ -1,6 +1,7 @@
 import DashboardIcon from '@/components/common/icons/DashboardIcon.vue'
 import DocumentIcon from '@/components/common/icons/DocumentIcon.vue'
 import LocationIcon from '@/components/common/icons/LocationIcon.vue'
+import RiskControlIcon from '@/components/common/icons/RiskControlIcon.vue'
 
 // Navigation items that correspond to your router.js routes
 export const navigationItems = [
@@ -23,6 +24,13 @@ export const navigationItems = [
     name: 'Locations',
     label: 'Locations',
     icon: LocationIcon,
+    requiresAuth: true
+  },
+  {
+    route: '/risk-control',
+    name: 'RiskControl',
+    label: 'Risk & Control',
+    icon: RiskControlIcon,
     requiresAuth: true
   }
   // Removed User Menu from sidebar navigation

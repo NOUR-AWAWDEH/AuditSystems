@@ -7,6 +7,7 @@ const SideBar = () => import('@/components/common/SideBar.vue');
 const Login = () => import('@/components/features/auth/LoginForm.vue');
 const SupportingDocManager = () => import('@/components/features/supportingDoc/SupportingDocumentsView.vue');
 const Location = () => import('@/components/features/Organization/OrganizationView.vue');
+const RiskControl = () => import('@/components/features/riskControl/RiskControl.vue');
 const routes = [
   {
     path: '/',
@@ -48,6 +49,12 @@ const routes = [
     path: '/sidebar',
     name: 'Sidebar',
     component: SideBar,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/risk-control',
+    name: 'RiskControl',
+    component: RiskControl,
     meta: { requiresAuth: true }
   },
   {

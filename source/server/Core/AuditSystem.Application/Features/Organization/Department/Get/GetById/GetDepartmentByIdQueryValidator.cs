@@ -11,6 +11,12 @@ public sealed class GetDepartmentByIdQueryValidator : AbstractValidator<GetDepar
             .WithMessage("Department Id is required")
             .Must(BeAValidGuid)
             .WithMessage("Department Id must be a valid Guid");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("User Id must be a valid GUID.");
     }
 
     private bool BeAValidGuid(Guid id)

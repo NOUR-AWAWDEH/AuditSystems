@@ -108,6 +108,8 @@ internal sealed class SubLocationService(
         var existingEntity = await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
 
         mapper.Map(subLocationModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
+
         await repository.UpdateAsync(existingEntity);
 
         await CacheEntityAsync(existingEntity);

@@ -9,5 +9,5 @@ public sealed record class SearchAuditProcessQuery(
     Guid SubDepartmentId
 ) : PaginationRequest<AuditProcessModel>, IUserAwareRequest
 {
-    public required Guid UserId { get; set; } = Guid.Empty;
+    public Guid UserId { get; set; } = Guid.Empty;
 }

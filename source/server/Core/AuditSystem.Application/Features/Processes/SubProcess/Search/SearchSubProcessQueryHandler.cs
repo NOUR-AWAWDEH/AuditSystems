@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;
 using MediatR;

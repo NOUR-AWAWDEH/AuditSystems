@@ -98,16 +98,21 @@ internal sealed class AuditProcessService(
     {
         ArgumentNullException.ThrowIfNull(processModel, nameof(processModel));
         AuditProcessValidationHelper.ValidateUserId(userId);
-
+    
         logger.LogInformation("Updating audit process {ProcessId} for user {UserId}", processModel.Id, userId);
-
+    
+        // Validate ownership of existing audit process
         var existingEntity = await _validationHelper.ValidateAuditProcessOwnerShipAsync(processModel.Id, userId);
         
+        // Validate ownership of the SubDepartment being assigned
+        await _validationHelper.ValidateSubDepartmentOwnerShipAsync(processModel.SubDepartmentId, userId);
+        
         mapper.Map(processModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
         await repository.UpdateAsync(existingEntity);
-
+    
         await CacheEntityAsync(existingEntity);
-
+    
         logger.LogInformation("Successfully updated audit process {ProcessId}", processModel.Id);
     }
     

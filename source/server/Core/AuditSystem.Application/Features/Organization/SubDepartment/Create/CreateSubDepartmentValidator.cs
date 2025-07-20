@@ -6,6 +6,12 @@ public sealed class CreateSubDepartmentValidator : AbstractValidator<CreateSubDe
 {
     public CreateSubDepartmentValidator()
     {
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User Id must be a valid GUID.");
+            
         RuleFor(x => x.DepartmentId)
             .NotEmpty()
             .WithMessage("Department Id is required.")

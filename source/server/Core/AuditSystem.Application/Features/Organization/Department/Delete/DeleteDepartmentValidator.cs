@@ -11,6 +11,12 @@ public sealed class DeleteDepartmentValidator : AbstractValidator<DeleteDepartme
             .WithMessage("Department ID is required.")
             .Must(IsValidGuid)
             .WithMessage("Department ID must be a valid GUID.");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(IsValidGuid)
+            .WithMessage("User Id must be a valid GUID.");
     }
 
     private bool IsValidGuid(Guid id)

@@ -12,8 +12,7 @@ public static class AuditProcessConstants
         d => d.SubDepartment,
         d => d.SubDepartment.Department,
         d => d.SubDepartment.Department.SubLocation,
-        d => d.SubDepartment.Department.SubLocation.Location,
-        d => d.SubDepartment.Department.SubLocation.Location.UserId,
+        d => d.SubDepartment.Department.SubLocation.Location
     ];
 
     public const string EntityName = "AuditProcess";

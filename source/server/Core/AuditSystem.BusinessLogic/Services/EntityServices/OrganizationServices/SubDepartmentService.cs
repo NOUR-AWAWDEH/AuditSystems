@@ -110,6 +110,8 @@ internal sealed class SubDepartmentService(
         var existingEntity = await _validationHelper.ValidateSubDepartmentOwnershipAsync(subDepartmentModel.Id, userId);
 
         mapper.Map(subDepartmentModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
+
         await repository.UpdateAsync(existingEntity);
 
         await CacheEntityAsync(existingEntity);

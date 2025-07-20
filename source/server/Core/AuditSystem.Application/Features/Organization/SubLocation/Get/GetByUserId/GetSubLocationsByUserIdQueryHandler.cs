@@ -15,9 +15,9 @@ internal sealed class GetSubLocationsByUserIdQueryHandler(
         CancellationToken cancellationToken)
     {
         var subLocations = await subLocationService.GetSubLocationsByUserIdAsync(request.UserId);
-        logger.LogDebug("Sub-locations retrieved successfully for user {UserId}", request.UserId);
-        return Result<GetSubLocationsByUserIdQueryResponse>.Success(
-            new GetSubLocationsByUserIdQueryResponse(subLocations), 
+        
+        logger.LogInformation("Sub-locations retrieved successfully for user {UserId}", request.UserId);
+        return Result<GetSubLocationsByUserIdQueryResponse>.Success(new(subLocations), 
             "Sub-locations retrieved successfully");
     }
 }

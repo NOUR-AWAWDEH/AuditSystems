@@ -1,8 +1,10 @@
+using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Contract.Models.Organization;
 using FluentValidation;
 
 namespace AuditSystem.Application.Features.Organization.Department.Search;
 
-public class SearchDepartmentQueryValidator : AbstractValidator<SearchDepartmentQuery>
+public class SearchDepartmentQueryValidator : PaginationRequestValidator<DepartmentModel, SearchDepartmentQuery>
 {
     public SearchDepartmentQueryValidator()
     {
@@ -13,10 +15,12 @@ public class SearchDepartmentQueryValidator : AbstractValidator<SearchDepartment
             .WithMessage("User ID must be a valid GUID.");
 
         RuleFor(x => x.SubLocationId)
-            .NotEmpty()
-            .WithMessage("SubLocation ID is required.")
             .Must(BeAValidGuid)
-            .WithMessage("SubLocation ID must be a valid GUID.");
+            .WithMessage("SubLocation ID must be a valid GUID");
+
+        RuleFor(x => x.SearchTerm)
+            .MaximumLength(200)
+            .WithMessage("Search term must not exceed 200 characters.");
     }
     
     private bool BeAValidGuid(Guid id)

@@ -749,15 +749,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ProcessName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("RatingId")
+                    b.Property<Guid>("SubDepartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -765,7 +762,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RatingId");
+                    b.HasIndex("SubDepartmentId");
 
                     b.ToTable("AuditProcesses");
                 });
@@ -776,22 +773,23 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AuditProcessId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Particular")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ProcessId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProcessId");
+                    b.HasIndex("AuditProcessId");
 
                     b.ToTable("SubProcesses");
                 });
@@ -1888,24 +1886,24 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
                         .WithMany()
-                        .HasForeignKey("RatingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Rating");
+                    b.Navigation("SubDepartment");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.SubProcess", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Processes.AuditProcess", "Process")
+                    b.HasOne("AuditSystem.Domain.Entities.Processes.AuditProcess", "AuditProcess")
                         .WithMany("SubProcesses")
-                        .HasForeignKey("ProcessId")
+                        .HasForeignKey("AuditProcessId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Process");
+                    b.Navigation("AuditProcess");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.AuditExceptionReport", b =>

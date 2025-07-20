@@ -16,8 +16,8 @@ internal sealed class UpdateSubLocationCommandHandler(
     public async Task<Result> Handle(UpdateSubLocationCommand request, CancellationToken cancellationToken)
     {
         var subLocationModel = mapper.Map<SubLocationModel>(request);
-
         await subLocationService.UpdateSubLocationAsync(subLocationModel, request.UserId);
+        
         logger.LogInformation("Sub-location with ID: {SubLocationId} updated by User ID: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("Sub-location updated successfully");
     }

@@ -12,16 +12,9 @@ internal sealed class DeleteLocationCommandHandler(
 {
     public async Task<Result> Handle(DeleteLocationCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await locationService.DeleteLocationAsync(request.Id, request.UserId);
-            logger.LogInformation("Deleting location with ID {Id}", request.Id);
-            return Result.SuccessWithMessage("Location deleted.");  
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error deleting location with ID {Id}", request.Id);
-            return Result.Error(ex.Message);
-        }  
+        await locationService.DeleteLocationAsync(request.Id, request.UserId);
+        
+        logger.LogInformation("Location with id: {Id} was delete by user with id: {UserId}", request.Id, request.UserId);
+        return Result.SuccessWithMessage("Location deleted.");  
     }
 }

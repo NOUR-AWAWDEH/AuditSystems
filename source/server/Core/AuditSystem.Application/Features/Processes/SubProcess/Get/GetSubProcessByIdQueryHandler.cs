@@ -1,6 +1,6 @@
 using MediatR;
 using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 
 namespace AuditSystem.Application.Features.Processes.SubProcess.Get;
 

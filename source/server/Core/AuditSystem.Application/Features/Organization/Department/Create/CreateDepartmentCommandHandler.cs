@@ -17,7 +17,8 @@ internal sealed class CreateDepartmentCommandHandler(
     {
         var departmentModel = mapper.Map<DepartmentModel>(request);
         var departmentId = await departmentService.CreateDepartmentAsync(departmentModel, request.UserId);
-        logger.LogInformation("Department with Name {DepartmentName} has been created.", request.Name);
+        
+        logger.LogInformation("Department with Name {DepartmentName} has been created by user with id: {UserId}", request.Name, request.UserId);
 
         return Result<CreateDepartmentCommandResponse>.Created(new(departmentId), "Department created.");
     }

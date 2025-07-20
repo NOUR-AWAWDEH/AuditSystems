@@ -14,6 +14,7 @@ internal sealed class DeleteSubDepartmentCommandHandler(
     {
         
         await subDepartmentService.DeleteSubDepartmentAsync(request.Id, request.UserId);
+        
         logger.LogInformation("Sub-Department with ID: {Id} deleted by User ID: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("Sub-Department was deleted. Successfully.");  
     }

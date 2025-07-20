@@ -12,6 +12,12 @@ public sealed class GetAuditProcessByIdQueryValidator : AbstractValidator<GetAud
             .WithMessage("Audit Process Id is required")
             .Must(BeAValidGuid)
             .WithMessage("Audit Process Id must be a valid Guid");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required")
+            .Must(BeAValidGuid)
+            .WithMessage("User Id must be a valid Guid");
     }
 
     private bool BeAValidGuid(Guid id)

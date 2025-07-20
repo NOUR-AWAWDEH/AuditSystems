@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessesServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
+
 
 namespace AuditSystem.Application.Features.Processes.SubProcess.Delete;
 internal sealed class DeleteSubProcessCommandHandler(

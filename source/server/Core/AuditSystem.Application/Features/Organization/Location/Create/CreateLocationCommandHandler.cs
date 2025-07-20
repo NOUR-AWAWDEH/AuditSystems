@@ -17,8 +17,8 @@ internal sealed class CreateLocationCommandHandler(
     {
         var locationModel = mapper.Map<LocationModel>(request);
         var locationId = await locationService.CreateLocationAsync(locationModel, request.UserId);
-        logger.LogInformation("Location with Name {LocationName} has been created.", request.Name);
-
+        
+        logger.LogInformation("Location with Name {LocationName} has been created by user with id: {UserId}", request.Name, request.UserId);
         return Result<CreateLocationCommandResponse>.Created(new(locationId), "Location created.");
     }
 }

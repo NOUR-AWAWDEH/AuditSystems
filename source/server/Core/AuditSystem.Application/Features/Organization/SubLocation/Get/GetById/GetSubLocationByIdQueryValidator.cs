@@ -11,6 +11,12 @@ public sealed class GetSubLocationByIdQueryValidator : AbstractValidator<GetSubL
             .WithMessage("Sub Location Id is required")
             .Must(BeAValidGuid)
             .WithMessage("Sub Location Id must be a valid Guid");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("User Id must be a valid GUID.");
     }
 
     private bool BeAValidGuid(Guid id)

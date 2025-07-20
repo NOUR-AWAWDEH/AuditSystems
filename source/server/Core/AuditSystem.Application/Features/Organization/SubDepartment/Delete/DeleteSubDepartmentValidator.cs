@@ -11,6 +11,12 @@ public sealed class DeleteSubDepartmentValidator : AbstractValidator<DeleteSubDe
             .WithMessage("Sub Department Id is required")
             .Must(IsValidId)
             .WithMessage("Sub Department Id is not valid");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(IsValidId)
+            .WithMessage("User Id must be a valid GUID.");
     }
 
     private bool IsValidId(Guid id)

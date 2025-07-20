@@ -12,6 +12,6 @@ where TPaginationRequest : PaginationRequest<TResponseModel>
 
         RuleFor(command => command.PageSize)
             .GreaterThan(0)
-            .WithMessage("Page sized must be greater than 0.");
+            .WithMessage("Page size must be greater than 0.");
     }
 }

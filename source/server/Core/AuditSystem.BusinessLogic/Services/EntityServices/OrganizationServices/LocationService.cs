@@ -111,6 +111,7 @@ internal sealed class LocationService(
     
         // Map the model to the existing tracked entity
         mapper.Map(locationModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
         
         await repository.UpdateAsync(existingEntity);
     

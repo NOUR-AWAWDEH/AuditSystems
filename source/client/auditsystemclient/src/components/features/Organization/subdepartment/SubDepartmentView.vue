@@ -58,11 +58,16 @@ import EditSubDepartmentModal from './components/EditSubDepartmentModal.vue';
 import { useSubDepartmentTable } from './composables/useSubDepartmentTable';
 import { useSubDepartmentActions } from './composables/useSubDepartmentActions';
 import { useNotification } from '@/composables/notification/useNotification';
+import { watch } from 'vue';
 
 const props = defineProps({
     departments: {
         type: Array,
         default: () => []
+    },
+    selectedDepartmentId: {
+        type: [String, Number],
+        default: null
     }
 });
 
@@ -74,7 +79,7 @@ const { showNotification } = useNotification();
 const {
     subDepartments,
     isLoading,
-    selectedDepartmentId,
+    selectedDepartmentId: internalSelectedDepartmentId,
     selectedDepartment,
     currentDepartment,
     isDepartmentLoading,
@@ -85,6 +90,13 @@ const {
     handleSearch,
     resetToDefaultView,
 } = useSubDepartmentTable(props.departments);
+
+// Watch for prop changes and update internal state
+watch(() => props.selectedDepartmentId, (newDepartmentId) => {
+    if (newDepartmentId !== internalSelectedDepartmentId.value) {
+        handleDepartmentChange(newDepartmentId);
+    }
+}, { immediate: true });
 
 const {
     showAddSubDepartmentModal,
@@ -112,7 +124,7 @@ const handleSubDepartmentSelected = (subdepartmentId) => {
 // Expose necessary properties and methods
 defineExpose({
     subDepartments,
-    selectedDepartmentId,
+    selectedDepartmentId: internalSelectedDepartmentId,
     resetToDefaultView
 });
 </script>

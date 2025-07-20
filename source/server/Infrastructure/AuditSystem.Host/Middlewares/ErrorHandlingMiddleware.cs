@@ -1,6 +1,7 @@
 using FluentValidation;
 using System.Text.Json;
 using AuditSystem.Contract.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.Host.Middlewares;
 
@@ -59,11 +60,12 @@ public class ErrorHandlingMiddleware
         {
             KeyNotFoundException => ApiResponse.NotFound(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
             UnauthorizedAccessException => ApiResponse.Forbidden(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
-            InvalidOperationException or ArgumentNullException or ArgumentException => ApiResponse.BadRequest(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
+            DbUpdateException dbEx when dbEx.InnerException?.Message.Contains("REFERENCE constraint") == true => 
+                ApiResponse.BadRequest(new List<ApiErrorResponse> { new ApiErrorResponse("Cannot delete this item because it has related data. Please delete all related items first.") }),
+            InvalidOperationException or ArgumentNullException or ArgumentException => 
+                ApiResponse.BadRequest(new List<ApiErrorResponse> { new ApiErrorResponse(ex.Message) }),
             _ => ApiResponse.InternalServerError(_env.IsDevelopment() ? ex.Message : "An unexpected error occurred.")
         };
-
- 
 
         context.Response.StatusCode = response.StatusCode;
         await WriteJsonResponse(context, response);

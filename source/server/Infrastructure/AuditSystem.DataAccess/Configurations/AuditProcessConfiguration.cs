@@ -28,6 +28,10 @@ public class AuditProcessConfiguration : IEntityTypeConfiguration<AuditProcess>
         builder.HasMany(ap => ap.SubProcesses)
                .WithOne(sp => sp.AuditProcess)
                .HasForeignKey(sp => sp.AuditProcessId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
+       
+        builder.HasIndex(ap => ap.SubDepartmentId);
+        builder.HasIndex(ap => ap.ProcessName);
+        
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-6">
+    <div class="bg-white border border-gray-200 shadow-sm rounded-lg  p-3 sm:p-4 md:p-6 mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <h2 class="text-lg font-semibold text-secondary-base">
                 Add New Location

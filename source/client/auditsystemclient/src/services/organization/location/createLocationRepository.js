@@ -2,7 +2,7 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const LOCATION_BASE_ENDPOINT = 'api/Location';
+const LOCATION_BASE_ENDPOINT = '/api/Location';
 const CREATE_LOCATION_ENDPOINT = '/create-location';
 
 export const createLocationRepository = {

@@ -3,7 +3,7 @@ import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
 const DEPARTMENT_BASE_ENDPOINT = '/api/department';
-const UPDATE_DEPARTMENT_BY_ID_ENDPOINT = '/update-department'; // Fixed: removed '-by-id'
+const UPDATE_DEPARTMENT_BY_ID_ENDPOINT = '/update-department';
 
 export const updateDepartmentByIdRepository = {
     async updateDepartmentById(departmentData) {

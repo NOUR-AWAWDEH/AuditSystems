@@ -1,174 +1,187 @@
 <template>
-    <div class="flex min-h-[calc(100vh-4rem)] bg-gray-50">
-        <!-- Main Content with full height -->
-        <div class="flex-1 min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-6">
-            <!-- Organization Header -->
-            <OrganizationHeader />
-            
-            <!-- Location Management Section -->
-            <LocationView 
-                ref="locationViewRef"
-                @location-selected="handleLocationSelected"
-            />
-            
-            <!-- Sublocation Management Section -->
-            <div v-if="selectedLocationId" class="mt-8">
-                <SubLocationView 
-                    ref="subLocationViewRef" 
-                    :locations="locations"
-                    :selected-location-id="selectedLocationId"
-                    @sub-location-selected="handleSubLocationSelected"
-                />
-            </div>
-            
-            <!-- Department Management Section -->
-            <div v-if="effectiveSelectedSubLocationId" class="mt-8">
-                <DepartmentView 
-                    ref="departmentViewRef" 
-                    :sub-locations="subLocations"
-                    :selected-sub-location-id="effectiveSelectedSubLocationId"
-                    @department-selected="handleDepartmentSelected"
-                />
-            </div>
-            
-            <!-- SubDepartment Management Section -->
-            <div v-if="selectedDepartmentId" class="mt-8">
-                <SubDepartmentView 
-                    ref="subDepartmentViewRef" 
-                    :departments="departments"
-                    @selected-department-id="handleDepartmentSelected"
-                    @sub-department-selected="handleSubDepartmentSelected"
-                />
-            </div>
-        </div>
+  <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-4 md:p-6">
+    <!-- Header -->
+    <OrganizationHeader />
+
+    <!-- Tabs Navigation -->
+    <div class="mb-6 border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8 overflow-x-auto">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          @click="activeTab = tab.id"
+          :class="[
+            'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
+            activeTab === tab.id
+              ? 'border-primary-base text-primary-base'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          {{ tab.name }}
+        </button>
+      </nav>
     </div>
+
+    <!-- Tab Panels -->
+    <div class="rounded-xl shadow-sm border border-gray-200">
+      <!-- Locations -->
+      <div v-if="activeTab === 'locations'" class="p-6 bg-white">
+        <LocationView ref="locationViewRef" @location-selected="onLocationSelected" />
+      </div>
+
+      <!-- Sub-Locations -->
+      <div v-if="activeTab === 'sublocations'" class="p-6 bg-white">
+        <template v-if="!selectedLocationId">
+          <div class="text-center py-8">
+            <p class="text-gray-500 text-lg">Please select a location first from the Locations tab</p>
+            <button
+              @click="activeTab = 'locations'"
+              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
+            >
+              Go to Locations
+            </button>
+          </div>
+        </template>
+        <template v-else>
+          <SubLocationView
+            ref="subLocationViewRef"
+            :locations="locations"
+            :selected-location-id="selectedLocationId"
+            @sub-location-selected="onSubLocationSelected"
+          />
+        </template>
+      </div>
+
+      <!-- Departments -->
+      <div v-if="activeTab === 'departments'" class="p-6 bg-white">
+        <template v-if="!effectiveSelectedSubLocationId">
+          <div class="text-center py-8">
+            <p class="text-gray-500 text-lg">Please select a sub-location first from the Sub-Locations tab</p>
+            <button
+              @click="activeTab = 'sublocations'"
+              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
+            >
+              Go to Sub-Locations
+            </button>
+          </div>
+        </template>
+        <template v-else>
+          <DepartmentView
+            ref="departmentViewRef"
+            :sub-locations="subLocations"
+            :selected-sub-location-id="effectiveSelectedSubLocationId"
+            @department-selected="onDepartmentSelected"
+          />
+        </template>
+      </div>
+
+      <!-- Sub-Departments -->
+      <div v-if="activeTab === 'subdepartments'" class="p-6 bg-white">
+        <template v-if="!selectedDepartmentId">
+          <div class="text-center py-8">
+            <p class="text-gray-500 text-lg">Please select a department first from the Departments tab</p>
+            <button
+              @click="activeTab = 'departments'"
+              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
+            >
+              Go to Departments
+            </button>
+          </div>
+        </template>
+        <template v-else>
+          <SubDepartmentView
+            ref="subDepartmentViewRef"
+            :departments="departments"
+            :selected-department-id="selectedDepartmentId"
+            @sub-department-selected="onSubDepartmentSelected"
+          />
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
+
 import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
 import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
 import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
-import { ref, computed } from 'vue';
 
-// Component refs
+// Tab State
+const activeTab = ref('locations');
+const tabs = [
+  { id: 'locations', name: 'Locations' },
+  { id: 'sublocations', name: 'Sub-Locations' },
+  { id: 'departments', name: 'Departments' },
+  { id: 'subdepartments', name: 'Sub-Departments' }
+];
+
+// View Refs
 const locationViewRef = ref(null);
 const subLocationViewRef = ref(null);
 const departmentViewRef = ref(null);
 const subDepartmentViewRef = ref(null);
 
-// State for hierarchical selection
+// Hierarchical Selection State
 const selectedLocationId = ref(null);
 const selectedSubLocationId = ref(null);
 const selectedDepartmentId = ref(null);
 const selectedSubDepartmentId = ref(null);
 
-// Get locations from LocationView
-const locations = computed(() => {
-    return locationViewRef.value?.locations || [];
-});
+// Computed Reactive Data
+const locations = computed(() => locationViewRef.value?.locations || []);
+const subLocations = computed(() => subLocationViewRef.value?.subLocations || []);
+const departments = computed(() => departmentViewRef.value?.departments || []);
+const effectiveSelectedSubLocationId = computed(() =>
+  selectedSubLocationId.value || subLocationViewRef.value?.selectedLocationId
+);
 
-// Get sublocations from SubLocationView
-const subLocations = computed(() => {
-    return subLocationViewRef.value?.subLocations || [];
-});
+// Helper function to reset all lower components
+function resetViews(...refs) {
+  refs.forEach(r => r?.value?.resetToDefaultView?.());
+}
 
-// Get departments from DepartmentView
-const departments = computed(() => {
-    return departmentViewRef.value?.departments || [];
-});
+// Event Handlers
+const onLocationSelected = (locationId) => {
+  console.log('Selected Location ID:', locationId); // Add this
+  selectedLocationId.value = locationId;
+  selectedSubLocationId.value = null;
+  selectedDepartmentId.value = null;
+  selectedSubDepartmentId.value = null;
 
-// Get the actual selected sublocation ID from SubLocationView
-const actualSelectedSubLocationId = computed(() => {
-    return subLocationViewRef.value?.selectedSubLocationId || null;
-});
-
-// Use the actual selected sublocation ID for DepartmentView
-const effectiveSelectedSubLocationId = computed(() => {
-    return actualSelectedSubLocationId.value || selectedSubLocationId.value;
-});
-
-// Handle location selection
-const handleLocationSelected = (locationId) => {
-    selectedLocationId.value = locationId;
-    selectedSubLocationId.value = null;
-    selectedDepartmentId.value = null;
-    selectedSubDepartmentId.value = null;
-    
-    // Reset child views
-    if (subLocationViewRef.value?.resetToDefaultView) {
-        subLocationViewRef.value.resetToDefaultView();
-    }
-    if (departmentViewRef.value?.resetToDefaultView) {
-        departmentViewRef.value.resetToDefaultView();
-    }
-    if (subDepartmentViewRef.value?.resetToDefaultView) {
-        subDepartmentViewRef.value.resetToDefaultView();
-    }
+  resetViews(subLocationViewRef, departmentViewRef, subDepartmentViewRef);
+  activeTab.value = 'sublocations';
 };
 
-// Handle sublocation selection
-const handleSubLocationSelected = (subLocationId) => {
-    selectedSubLocationId.value = subLocationId;
-    selectedDepartmentId.value = null; // Reset department selection
-    selectedSubDepartmentId.value = null; // Reset subdepartment selection
-    
-    if (departmentViewRef.value?.resetToDefaultView) {
-        departmentViewRef.value.resetToDefaultView();
-    }
-    if (subDepartmentViewRef.value?.resetToDefaultView) {
-        subDepartmentViewRef.value.resetToDefaultView();
-    }
+const onSubLocationSelected = (subLocationId) => {
+  console.log('Selected SubLocation ID:', subLocationId); // Add this
+  selectedSubLocationId.value = subLocationId;
+  selectedDepartmentId.value = null;
+  selectedSubDepartmentId.value = null;
+
+  resetViews(departmentViewRef, subDepartmentViewRef);
+  activeTab.value = 'departments';
 };
 
-// Handle department selection
-const handleDepartmentSelected = (departmentId) => {
-    selectedDepartmentId.value = departmentId;
-    selectedSubDepartmentId.value = null; // Reset subdepartment selection
-    
-    if (subDepartmentViewRef.value?.resetToDefaultView) {
-        subDepartmentViewRef.value.resetToDefaultView();
-    }
+const onDepartmentSelected = (departmentId) => {
+  selectedDepartmentId.value = departmentId;
+  selectedSubDepartmentId.value = null;
+
+  resetViews(subDepartmentViewRef);
+  activeTab.value = 'subdepartments';
 };
 
-// Handle subdepartment selection
-const handleSubDepartmentSelected = (subdepartmentId) => {
-    selectedSubDepartmentId.value = subdepartmentId;
+const onSubDepartmentSelected = (subDepartmentId) => {
+  selectedSubDepartmentId.value = subDepartmentId;
 };
 </script>
 
 <style scoped>
 .min-h-\[calc\(100vh-4rem\)\] {
-    min-height: calc(100vh - 4rem);
-    min-height: calc(100dvh - 4rem);
-}
-
-@media (max-width: 640px) {
-    .p-3 {
-        padding: 0.75rem;
-    }
-    
-    .space-y-6 > * + * {
-        margin-top: 1rem;
-    }
-    
-    .mt-8 {
-        margin-top: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .p-3 {
-        padding: 0.5rem;
-    }
-    
-    .space-y-6 > * + * {
-        margin-top: 0.75rem;
-    }
-    
-    .mt-8 {
-        margin-top: 1rem;
-    }
+  min-height: calc(100vh - 4rem);
+  min-height: calc(100dvh - 4rem);
 }
 </style>

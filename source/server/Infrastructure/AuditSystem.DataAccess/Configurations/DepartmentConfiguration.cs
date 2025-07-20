@@ -8,19 +8,28 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
     public void Configure(EntityTypeBuilder<Department> builder)
     {
-        builder.ToTable("Department");
+        // Table configuration
+        builder.ToTable("Departments");
 
+        // Primary Key
+        builder.HasKey(d => d.Id);
+
+        // Required properties
         builder.Property(d => d.Name)
-            .HasMaxLength(100)
-            .IsRequired();
+            .IsRequired()
+            .HasMaxLength(200);
 
         builder.Property(d => d.SubLocationId)
             .IsRequired();
 
-        // RelationShips
+        // Relationships
         builder.HasOne(d => d.SubLocation)
             .WithMany(sl => sl.Departments)
             .HasForeignKey(d => d.SubLocationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Indexes for performance
+        builder.HasIndex(d => d.SubLocationId);
+        builder.HasIndex(d => d.Name);
     }
 }

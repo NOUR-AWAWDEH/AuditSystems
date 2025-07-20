@@ -58,11 +58,16 @@ import EditSubLocationModal from './components/EditSublocationModal.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
 import { useSubLocationActions } from './composables/useSubLocationActions';
 import { useNotification } from '@/composables/notification/useNotification';
+import { watch } from 'vue';
 
 const props = defineProps({
     locations: {
         type: Array,
         default: () => []
+    },
+    selectedLocationId: {
+        type: [String, Number],
+        default: null
     }
 });
 
@@ -75,7 +80,7 @@ const { showNotification } = useNotification();
 const {
     subLocations,
     isLoading,
-    selectedLocationId,
+    selectedLocationId: internalSelectedLocationId,
     selectedLocation,
     currentLocation,
     isLocationLoading,
@@ -86,6 +91,13 @@ const {
     handleSearch,
     resetToDefaultView,
 } = useSubLocationTable(props.locations);
+
+// Watch for prop changes and update internal state
+watch(() => props.selectedLocationId, (newLocationId) => {
+    if (newLocationId !== internalSelectedLocationId.value) {
+        handleLocationChange(newLocationId);
+    }
+}, { immediate: true });
 
 const {
     showAddSubLocationModal,
@@ -112,7 +124,7 @@ const handleSubLocationSelected = (subLocationId) => {
 
 defineExpose({
     subLocations,
-    selectedLocationId,
+    selectedLocationId: internalSelectedLocationId,
     resetToDefaultView
 });
 </script>

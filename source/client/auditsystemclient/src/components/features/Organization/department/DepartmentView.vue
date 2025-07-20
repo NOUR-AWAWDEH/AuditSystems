@@ -3,7 +3,7 @@
         <!-- Add Department Modal -->
         <AddDepartmentModal
             :is-visible="showAddDepartmentModal"
-            :sub-location-id="selectedSubLocationId"
+            :sub-location-id="internalSelectedSubLocationId"
             @close="handleCloseAddDepartmentModal"
             @department-added="handleDepartmentAdded"
         />
@@ -13,7 +13,7 @@
             :sub-locations="subLocations"
             :departments="departments"
             :is-loading="isLoading"
-            :selected-sub-location-id="selectedSubLocationId"
+            :selected-sub-location-id="internalSelectedSubLocationId"
             :selected-sub-location="selectedSubLocation"
             :current-sub-location="currentSubLocation"
             :is-sub-location-loading="isSubLocationLoading"
@@ -58,15 +58,18 @@ import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
 import { useDepartmentActions } from './composables/useDepartmentActions';
 import { useNotification } from '@/composables/notification/useNotification';
+import { watch } from 'vue';
 
 const props = defineProps({
     subLocations: {
         type: Array,
         default: () => []
+    },
+    selectedSubLocationId: {
+        type: [String, Number],
+        default: null
     }
 });
-
-
 
 // Define emit first
 const emit = defineEmits(['department-selected']);
@@ -77,7 +80,7 @@ const { showNotification } = useNotification();
 const {
     departments,
     isLoading,
-    selectedSubLocationId,
+    selectedSubLocationId: internalSelectedSubLocationId,
     selectedSubLocation,
     currentSubLocation,
     isSubLocationLoading,
@@ -88,6 +91,19 @@ const {
     handleSearch,
     resetToDefaultView,
 } = useDepartmentTable(props.subLocations);
+
+// Watch for prop changes and update internal state
+watch(() => props.selectedSubLocationId, (newSubLocationId) => {
+    if (newSubLocationId !== internalSelectedSubLocationId.value) {
+        handleSubLocationChange(newSubLocationId);
+    }
+}, { immediate: true });
+
+// Watch for subLocations prop changes
+watch(() => props.subLocations, (newSubLocations) => {
+    // The composable should handle this automatically, but we can add logging here if needed
+    console.log('SubLocations updated:', newSubLocations);
+}, { immediate: true, deep: true });
 
 const {
     showAddDepartmentModal,
@@ -114,6 +130,7 @@ const handleDepartmentSelected = (departmentId) => {
 
 defineExpose({
     departments,
+    selectedSubLocationId: internalSelectedSubLocationId,
     resetToDefaultView
 });
 </script>

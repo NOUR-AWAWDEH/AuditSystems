@@ -15,10 +15,9 @@ internal sealed class GetDepartmentsByUserIdQueryHandler(
         CancellationToken cancellationToken)
     {
         var departments = await departmentService.GetDepartmentsByUserIdAsync(request.UserId);
-        
-        logger.LogDebug("Departments retrived successfully for user {UserID}", request.UserId);
+        logger.LogDebug("Departments retrieved successfully for user {UserId}", request.UserId);
         return Result<GetDepartmentsByUserIdQueryResponse>.Success(
             new(departments),
-            "Departments retrived successfully");
+            "Departments retrieved successfully");
     }
 }

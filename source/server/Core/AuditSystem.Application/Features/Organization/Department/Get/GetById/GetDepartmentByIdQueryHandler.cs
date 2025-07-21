@@ -14,10 +14,8 @@ internal sealed class GetDepartmentByIdQueryHandler(
     public async Task<Result<GetDepartmentByIdQueryResponse>> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
     {
         var department = await departmentService.GetDepartmentByIdAsync(request.Id, request.UserId);
-        if (department == null)
-            return Result.NotFound();
         
-        logger.LogInformation("Department with id: {DepartmentId} has been retrived successfully by user with id: {UserId}", request.Id, request.UserId);
-        return Result<GetDepartmentByIdQueryResponse>.Success(new GetDepartmentByIdQueryResponse(department), "Department retrived successfully");
+        logger.LogInformation("Department with id: {DepartmentId} has been retrieved successfully by user with id: {UserId}", request.Id, request.UserId);
+        return Result<GetDepartmentByIdQueryResponse>.Success(new GetDepartmentByIdQueryResponse(department), "Department retrieved successfully");
     }
 }

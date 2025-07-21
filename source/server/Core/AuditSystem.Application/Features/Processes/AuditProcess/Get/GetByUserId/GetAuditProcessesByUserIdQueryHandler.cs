@@ -16,8 +16,6 @@ internal sealed class GetAuditProcessesByUserIdQueryHandler(
         CancellationToken cancellationToken)
     {
         var auditProcesses = await auditProcessService.GetAuditProcessesByUserIdAsync(request.UserId);
-        if (auditProcesses == null || auditProcesses.Count == 0)
-            return Result<GetAuditProcessesByUserIdQueryResponse>.NotFound();
 
         logger.LogInformation("Audit processes with user id: {UserId} was retrieved", request.UserId);
         return Result<GetAuditProcessesByUserIdQueryResponse>.Success(new GetAuditProcessesByUserIdQueryResponse(auditProcesses.ToList()), "Audit Processes retrieved successfully");

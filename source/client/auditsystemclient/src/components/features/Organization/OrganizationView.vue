@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 
 import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
@@ -131,10 +131,105 @@ const selectedSubLocationId = ref(null);
 const selectedDepartmentId = ref(null);
 const selectedSubDepartmentId = ref(null);
 
-// Computed Reactive Data
-const locations = computed(() => locationViewRef.value?.locations || []);
-const subLocations = computed(() => subLocationViewRef.value?.subLocations || []);
-const departments = computed(() => departmentViewRef.value?.departments || []);
+// Replace computed properties with reactive refs
+const locations = ref([]);
+const subLocations = ref([]);
+const departments = ref([]);
+
+// Watch for locationViewRef changes and update locations
+watch(
+  () => locationViewRef.value,
+  async (newLocationViewRef) => {
+    if (newLocationViewRef) {
+      await nextTick();
+      const checkLocations = () => {
+        const currentLocations = newLocationViewRef.locations;
+        if (currentLocations && currentLocations.length > 0) {
+          locations.value = currentLocations;
+        } else {
+          setTimeout(checkLocations, 100);
+        }
+      };
+      checkLocations();
+    }
+  },
+  { immediate: true }
+);
+
+// Watch for direct changes to locationViewRef.locations
+watch(
+  () => locationViewRef.value?.locations,
+  (newLocations) => {
+    if (newLocations && newLocations.length > 0) {
+      locations.value = newLocations;
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+// Watch for subLocationViewRef changes and update subLocations
+watch(
+  () => subLocationViewRef.value,
+  async (newSubLocationViewRef) => {
+    if (newSubLocationViewRef) {
+      await nextTick();
+      const checkSubLocations = () => {
+        const currentSubLocations = newSubLocationViewRef.subLocations;
+        if (currentSubLocations && currentSubLocations.length > 0) {
+          subLocations.value = currentSubLocations;
+        } else {
+          setTimeout(checkSubLocations, 100);
+        }
+      };
+      checkSubLocations();
+    }
+  },
+  { immediate: true }
+);
+
+// Watch for direct changes to subLocationViewRef.subLocations
+watch(
+  () => subLocationViewRef.value?.subLocations,
+  (newSubLocations) => {
+    if (newSubLocations && newSubLocations.length > 0) {
+      subLocations.value = newSubLocations;
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+// Watch for departmentViewRef changes and update departments
+watch(
+  () => departmentViewRef.value,
+  async (newDepartmentViewRef) => {
+    if (newDepartmentViewRef) {
+      await nextTick();
+      const checkDepartments = () => {
+        const currentDepartments = newDepartmentViewRef.departments;
+        if (currentDepartments && currentDepartments.length > 0) {
+          departments.value = currentDepartments;
+        } else {
+          setTimeout(checkDepartments, 100);
+        }
+      };
+      checkDepartments();
+    }
+  },
+  { immediate: true }
+);
+
+// Watch for direct changes to departmentViewRef.departments
+watch(
+  () => departmentViewRef.value?.departments,
+  (newDepartments) => {
+    if (newDepartments && newDepartments.length > 0) {
+      departments.value = newDepartments;
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+// Keep this computed property for effectiveSelectedSubLocationId
 const effectiveSelectedSubLocationId = computed(() =>
   selectedSubLocationId.value || subLocationViewRef.value?.selectedLocationId
 );
@@ -146,18 +241,19 @@ function resetViews(...refs) {
 
 // Event Handlers
 const onLocationSelected = (locationId) => {
-  console.log('Selected Location ID:', locationId); // Add this
   selectedLocationId.value = locationId;
   selectedSubLocationId.value = null;
   selectedDepartmentId.value = null;
   selectedSubDepartmentId.value = null;
 
   resetViews(subLocationViewRef, departmentViewRef, subDepartmentViewRef);
-  activeTab.value = 'sublocations';
+  
+  if (locationId) {
+    activeTab.value = 'sublocations';
+  }
 };
 
 const onSubLocationSelected = (subLocationId) => {
-  console.log('Selected SubLocation ID:', subLocationId); // Add this
   selectedSubLocationId.value = subLocationId;
   selectedDepartmentId.value = null;
   selectedSubDepartmentId.value = null;

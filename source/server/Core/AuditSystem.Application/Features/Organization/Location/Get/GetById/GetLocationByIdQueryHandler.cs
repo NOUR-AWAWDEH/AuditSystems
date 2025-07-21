@@ -12,11 +12,9 @@ internal sealed class GetLocationByIdQueryHandler(
 {
     public async Task<Result<GetLocationByIdQueryResponse>> Handle(GetLocationByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await locationService.GetLocationByIdAsync(request.Id, request.UserId);
-        if (result == null)
-            return Result.NotFound();
+        var location = await locationService.GetLocationByIdAsync(request.Id, request.UserId);   
         
         logger.LogInformation("Location with id: {Id} was retrieved by user with id: {UserId}", request.Id, request.UserId);
-        return Result<GetLocationByIdQueryResponse>.Success(new GetLocationByIdQueryResponse(result));
+        return Result<GetLocationByIdQueryResponse>.Success(new GetLocationByIdQueryResponse(location), "Location retrieved successfully");
     }
 }

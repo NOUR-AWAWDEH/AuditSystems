@@ -43,6 +43,7 @@
 </template>
 
 <script setup>
+import { defineEmits, defineExpose, watch } from 'vue';
 import LocationTable from './components/LocationTable.vue';
 import AddLocationForm from './components/AddLocationForm.vue';
 import EditLocationModal from './components/EditLocationModal.vue';
@@ -93,4 +94,8 @@ defineExpose({
     locations,
     refreshData
 });
+
+// Add more detailed watching
+watch(locations, (val) => {
+}, { immediate: true, deep: true });
 </script>

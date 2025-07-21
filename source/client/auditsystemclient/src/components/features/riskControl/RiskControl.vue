@@ -10,6 +10,19 @@
           <p class="text-gray-600 text-lg">
             Manage processes, risks, controls, and observations
           </p>
+          <!-- Selected SubDepartment Info -->
+          <div v-if="selectedSubDepartment" class="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+            <div class="flex items-center">
+              <LocationIcon size="md" custom-class="text-blue-600 mr-2" />
+              <p class="text-sm text-gray-700">
+                The Selected SubDepartment: &nbsp;&nbsp;
+                <span class="font-semibold text-blue-800">
+                  <span v-if="isLoadingSubDepartment">Loading...</span>
+                  <span v-else>{{ selectedSubDepartment?.name || 'Unknown SubDepartment' }}</span>
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
         <div class="mt-4 md:mt-0 flex gap-3">
           <button class="bg-primary-base text-white px-6 py-3 rounded-lg hover:bg-primary-shade transition-colors duration-200 font-medium">
@@ -321,10 +334,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
+import LocationIcon from '@/components/common/icons/LocationIcon.vue';
+
+const route = useRoute();
+
+// SubDepartment management
+const { 
+  subdepartment: selectedSubDepartment, 
+  isLoading: isLoadingSubDepartment, 
+  fetchSubDepartmentById 
+} = useGetSubDepartmentById();
 
 // Active tab state
 const activeTab = ref('processes');
+
+// Watch for route query changes to load subdepartment
+watch(
+  () => route.query.subDepartmentId,
+  async (newSubDepartmentId) => {
+    if (newSubDepartmentId) {
+      await fetchSubDepartmentById(newSubDepartmentId);
+    }
+  },
+  { immediate: true }
+);
+
+// Load subdepartment on component mount if ID is in query
+onMounted(async () => {
+  const subDepartmentId = route.query.subDepartmentId;
+  if (subDepartmentId) {
+    await fetchSubDepartmentById(subDepartmentId);
+  }
+});
 
 // Tab configuration
 const tabs = ref([

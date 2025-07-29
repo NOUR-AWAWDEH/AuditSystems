@@ -21,29 +21,34 @@ export const searchSupportingDocsByUserIdRepository = {
         }
       });
 
-      if (response.data && response.status === 200) {
-        if (response.data.success && response.data.result) {
-            return ApiResponseT.ok(response.data.result, response.data.message || 'Successfully retrieved supporting documents.');
-        } else if (response.data.success === false) {
-            return ApiResponseT.badRequest(response.data.errors || [{ message: response.data.message || 'Failed to search documents.' }], response.data.message || 'Failed to search documents.');
+      if (response && response.status === 200) {
+        if (response.success && response.result) {
+            return ApiResponseT.ok(response.result, response.successMessage || 'Successfully retrieved supporting documents.');
+        } else if (response.success === false) {
+            return ApiResponseT.badRequest(
+                response?.errors || [{ message: 'Failed to search supporting documents.' }],
+                response?.data?.successMessage || 'Failed to search supporting documents.'
+            );
         }
 
         return ApiResponseT.ok({ items: [], totalCount: 0, pageNumber: 1, pageSize: 10 }, 'Successfully retrieved supporting documents, but response structure might differ.');
       } else {
         return ApiResponseT.badRequest(
-          [{ message: response.data?.message || 'Failed to search supporting documents.' }],
-          response.data?.message || 'Failed to search supporting documents.'
+          [{ message: response?.message || 'Failed to search supporting documents.' }],
+          response?.message || 'Failed to search supporting documents.'
         );
       }
     } catch (error) {
       let errorMessage = 'Failed to search supporting documents.';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0
-          ? error.response.data.errors
-          : [{ message: errorMessage }];
+      if (error?.response) {
+        errorMessage = error.response?.data?.successMessage || errorMessage;
+        errors = error.response?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
+        return ApiResponseT.badRequest(
+            errors,
+            error.response?.data?.successMessage || 'Bad request'
+        );
       } else if (error?.message) {
         errorMessage = error.message;
         errors = [{ message: errorMessage }];

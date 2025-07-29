@@ -10,7 +10,7 @@ export function useDeleteSubLocationById() {
 
   const handleDeleteSuccess = (response) => {
     deletedSubLocation.value = true;
-    const message = response.message || 'SubLocation deleted successfully!';
+    const message = response?.successMessage || 'SubLocation deleted successfully!';
     showNotification(message, 'success');
     return { success: true, message };
   };

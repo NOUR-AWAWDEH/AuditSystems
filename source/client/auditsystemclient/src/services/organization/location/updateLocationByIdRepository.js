@@ -30,14 +30,18 @@ export const updateLocationByIdRepository = {
 
       if (response.data && response.status === 200) {
         if (response.data.success) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'Location updated successfully.');
-        } else if (response.data.success === false) {
+          return ApiResponseT.ok(
+            null,
+            response.data.successMessage || 'Location updated successfully.'
+          );
+        } else {
           return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to update location.' }], 
-            response.data.message || 'Failed to update location.'
+            response.data.errors || [{ message: response.data.successMessage || 'Failed to update location.' }],
+            response.data.successMessage || 'Failed to update location.'
           );
         }
       }
+
 
       return ApiResponseT.badRequest(
         [{ message: 'Unexpected response format' }],
@@ -55,8 +59,8 @@ export const updateLocationByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        const errors = error.response?.errors || [{ message: error.response?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.message || 'Bad request');
       }
       
       if (error.response?.status === 404) {

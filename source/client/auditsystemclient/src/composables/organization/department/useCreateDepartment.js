@@ -10,7 +10,7 @@ export function useCreateDepartment() {
 
     const handleCreateSuccess = (response) => {
         createdDepartment.value = response.result;
-        showNotification(response.message || 'Department created successfully.', 'success');
+        showNotification(response?.successMessage || 'Department created successfully.', 'success');
         return { success: true, data: response.result };
     };
 

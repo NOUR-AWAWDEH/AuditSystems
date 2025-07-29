@@ -10,8 +10,8 @@ public class ChecklistManagementConfiguration : IEntityTypeConfiguration<Checkli
     {
         builder.HasMany(clm => clm.Checklists)
                // Each Checklist has one reference to its ChecklistCollection.
-               .WithOne(c => c.ChecklistCollection)
-               .HasForeignKey(c => c.ChecklistCollectionId)
-               .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(c => c.ChecklistCollection)
+                .HasForeignKey(c => c.ChecklistCollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
     }
 }

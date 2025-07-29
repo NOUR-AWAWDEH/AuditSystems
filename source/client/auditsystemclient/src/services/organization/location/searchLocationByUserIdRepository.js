@@ -6,61 +6,71 @@ const LOCATION_BASE_ENDPOINT = '/api/Location';
 const SEARCH_LOCATION_BY_USER_ID_ENDPOINT = '/search-location-by-user-id';
 
 export const searchLocationByUserIdRepository = {
-
   async searchLocationsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10) {
     try {
       const token = authService.getLocalToken();
-      
-      const params = {
-        searchTerm: searchTerm || '',
-        page: pageNumber,        // Change from pageNumber to page
-        pageSize: pageSize,      // Keep pageSize
-        sortBy: 'name'          // Add sortBy parameter
-      };
-      
-      const response = await api.get(
-        `${LOCATION_BASE_ENDPOINT}${SEARCH_LOCATION_BY_USER_ID_ENDPOINT}`, {
-        
-        params,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
 
-      if (response.data && response.status === 200) {
-        if (response.data.success && response.data.result) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'Locations searched successfully.');
-        } else if (response.data.success === false) {
-          return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to search locations.' }], 
-            response.data.message || 'Failed to search locations.'
+      const params = {
+        searchTerm,
+        page: pageNumber,
+        pageSize,
+        sortBy: 'name'
+      };
+
+      const response = await api.get(
+        `${LOCATION_BASE_ENDPOINT}${SEARCH_LOCATION_BY_USER_ID_ENDPOINT}`,
+        {
+          params,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const { data, status } = response;
+      
+      if (status === 200 && data?.success) {
+        const result = data.result;
+
+        // Defensive check in case the result structure changes
+        if (result?.items && typeof result.totalCount === 'number') {
+          return ApiResponseT.ok(
+            result, // includes items and totalCount
+            data.successMessage || 'Locations fetched successfully.'
           );
         }
+
+        return ApiResponseT.badRequest(
+          [{ message: 'Missing or invalid result structure.' }],
+          'Invalid response format'
+        );
       }
 
       return ApiResponseT.badRequest(
-        [{ message: 'Unexpected response format' }],
+        [{ message: 'Unexpected response format.' }],
         'Failed to search locations'
       );
 
     } catch (error) {
       console.error('Search locations error:', error);
-      
+
+      const responseData = error.response?.data;
+
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],
-          'Authentication required'
+          'Unauthorized'
         );
       }
-      
+
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
       }
-      
+
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while searching locations.' }],
+        [{ message: error.message || 'An unexpected error occurred.' }],
         'Server error'
       );
     }

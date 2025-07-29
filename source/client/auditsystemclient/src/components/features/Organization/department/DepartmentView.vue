@@ -100,7 +100,7 @@ watch(() => props.selectedSubLocationId, (newSubLocationId) => {
 }, { immediate: true });
 
 // Watch for subLocations prop changes
-watch(() => props.subLocations, (newSubLocations) => {
+watch(() => props.subLocations, () => {
     // The composable should handle this automatically, but we can add logging here if needed
 }, { immediate: true, deep: true });
 

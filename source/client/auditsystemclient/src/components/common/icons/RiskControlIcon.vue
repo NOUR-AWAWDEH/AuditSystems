@@ -1,6 +1,6 @@
 <template>
   <svg 
-    class="w-6 h-6" 
+    :class="[sizeClass, customClass]" 
     fill="none" 
     stroke="currentColor" 
     viewBox="0 0 24 24" 
@@ -10,7 +10,7 @@
     <path 
       stroke-linecap="round" 
       stroke-linejoin="round" 
-      stroke-width="1.5" 
+      :stroke-width="strokeWidth" 
       d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4z"
     />
 
@@ -18,7 +18,7 @@
     <path 
       stroke-linecap="round" 
       stroke-linejoin="round" 
-      stroke-width="1.5" 
+      :stroke-width="strokeWidth" 
       d="M9 12l2 2 4-4"
     />
 
@@ -26,7 +26,7 @@
     <path 
       stroke-linecap="round" 
       stroke-linejoin="round" 
-      stroke-width="1.5" 
+      :stroke-width="strokeWidth" 
       d="M12 6v2M12 10v.01"
     />
   </svg>

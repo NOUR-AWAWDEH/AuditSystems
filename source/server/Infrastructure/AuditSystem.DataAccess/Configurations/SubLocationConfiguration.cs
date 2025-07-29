@@ -35,7 +35,7 @@ public class SubLocationConfiguration : IEntityTypeConfiguration<SubLocation>
         builder.HasMany(sl => sl.Departments)
             .WithOne(d => d.SubLocation)
             .HasForeignKey(d => d.SubLocationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict); // Change from Cascade to Restrict
 
         // Indexes for performance
         builder.HasIndex(sl => sl.LocationId);

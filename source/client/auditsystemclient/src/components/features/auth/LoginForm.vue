@@ -10,7 +10,6 @@ import PasswordInput from '@/components/base/PasswordInput.vue';
 import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/common/AuditLogo.vue';
-import authStorage from '@/services/auth/authRepos/authService.js';
 
 // Composables
 const { login, error } = useLogin();
@@ -63,23 +62,28 @@ const validateForm = () => {
 };
 
 const handleLogin = async () => {
-  if (!validateForm()) return;
+  
+  if (!validateForm()) {
+    return;
+  }
+  
   isLoading.value = true;
-  const response = await login(username.value, password.value);
-  isLoading.value = false;
+  
+  try {
+    const response = await login(username.value, password.value);
+    
+    isLoading.value = false;
 
-  if (response?.success) {
-    // Use the auth service consistently for token management
-    if (response.result?.jwtToken) {
-      // Store both tokens using the auth service
-      authStorage.setLocalToken(response.result.jwtToken);
-      if (response.result.refreshToken) {
-        authStorage.setLocalRefreshToken(response.result.refreshToken);
-      }
-      // Initialize token refresh scheduling
-      authStorage.initializeTokenRefresh();
+    if (response?.success) {
+      router.replace('/dashboard');
     }
-    router.replace('/dashboard'); // Changed from '/sidebar' to '/dashboard'
+  } catch (error) {
+    console.error('💥 [LOGIN FORM] Caught error during login:', {
+      error,
+      message: error?.message,
+      stack: error?.stack
+    });
+    isLoading.value = false;
   }
 };
 

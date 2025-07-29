@@ -1,7 +1,8 @@
 import { ref, watch, onMounted } from 'vue';
 import { useSearchLocationByUserId } from '@/composables/organization/location/useSearchLocationByUserId';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
-import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
+// Remove this import as it's not needed on location page
+// import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 
 export function useLocationTable() {
   const searchQuery = ref('');
@@ -21,10 +22,11 @@ export function useLocationTable() {
     fetchLocationsByUserId
   } = useGetLocationsByUserId();
 
-  const {
-    subLocations,
-    getSubLocationsByUserId
-  } = useGetSubLocationsByUserId();
+  // Remove sublocation-related code
+  // const {
+  //   subLocations,
+  //   getSubLocationsByUserId
+  // } = useGetSubLocationsByUserId();
 
   // 🔁 This handles live search or manual refresh
   const refreshData = async () => {
@@ -32,16 +34,12 @@ export function useLocationTable() {
       await searchLocations(searchQuery.value, currentPage.value, pageSize.value);
     } else {
       await fetchLocationsByUserId();
-      // ✅ Assign after confirming data is fetched
-      if (allLocations.value?.length) {
-        locations.value = allLocations.value;
-      } else {
-        locations.value = []; // fallback to empty
-      }
+      // Fix: Always assign the fetched locations, don't check length
+      locations.value = allLocations.value || [];
     }
 
-    // Also refresh sublocations
-    await getSubLocationsByUserId();
+    // Remove this line - no need to fetch sublocations on location page
+    // await getSubLocationsByUserId();
   };
 
   // ✅ Ensure refresh happens as soon as composable is used
@@ -50,13 +48,14 @@ export function useLocationTable() {
   });
 
   // 🔍 Optional: refresh on search changes (e.g., when typing)
-  watch([searchQuery, currentPage], async ([search, page]) => {
+  watch([searchQuery, currentPage], async () => {
     await refreshData();
   });
 
   return {
     locations,
-    subLocations,
+    // Remove subLocations from return
+    // subLocations,
     isLoading,
     searchQuery,
     sortBy,
@@ -65,4 +64,4 @@ export function useLocationTable() {
     totalCount,
     refreshData
   };
-} 
+}

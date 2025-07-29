@@ -6,7 +6,6 @@ const LOCATION_BASE_ENDPOINT = '/api/Location';
 const GET_LOCATIONS_BY_USER_ID_ENDPOINT = '/get-locations-by-user-id';
 
 export const getLocationsByUserIdRepository = {
-  // Get locations by user ID (UserAware - no userId parameter needed)
   async getLocationsByUserId() { 
     try {
       const token = authService.getLocalToken();
@@ -22,23 +21,30 @@ export const getLocationsByUserIdRepository = {
         }
       });
 
-      if (response.data && response.status === 200) {
-        if (response.data.success && response.data.result) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'Locations fetched successfully.');
-        } else if (response.data.success === false) {
-          return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to fetch locations.' }], 
-            response.data.message || 'Failed to fetch locations.'
-          );
-        }
+      if (response.status === 200) {
+        const locations = response.data?.result?.locations || [];
+
+        return ApiResponseT.ok(
+          locations,
+          response.data?.successMessage || 'Locations fetched successfully.'
+        );
       }
 
+
+      // Handle non-200 responses
       return ApiResponseT.badRequest(
-        [{ message: 'Unexpected response format' }],
-        'Failed to fetch locations'
+        response?.errors || [{ message: response?.data?.successMessage || 'Failed to fetch locations.' }],
+        response?.data?.successMessage || 'Failed to fetch locations.'
       );
 
     } catch (error) {
+      if (error.response?.status === 400) {
+        return ApiResponseT.badRequest(
+          error.response?.data?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }],
+          error.response?.data?.successMessage || 'Bad request'
+        );
+      }
+      
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],

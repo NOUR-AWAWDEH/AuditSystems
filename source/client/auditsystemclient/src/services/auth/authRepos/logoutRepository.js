@@ -9,25 +9,23 @@ export const logoutRepository = {
     try {
       const response = await api.post(LOGOUT_ENDPOINT, { refreshToken });
 
-      if (!response?.data?.success) {
-        const errors = Array.isArray(response?.data?.errors)
-          ? response.data.errors
-          : [{ message: response?.data?.message || 'Logout failed' }];
-        return ApiResponseT.badRequest(errors, response?.data?.message);
+      if (response.status === 200 || response?.success !== false) {
+        return ApiResponseT.ok(null, response.successMessage || 'Logout successful');
       }
 
-      this.clearAuthHeader();
-      return ApiResponseT.ok(null, response.data.message || 'Successfully logged out');
-
+      return ApiResponseT.badRequest(
+        response.errors || [{ message: 'Logout failed' }],
+        response.successMessage || 'Logout failed'
+      );
     } catch (error) {
       console.error('Logout error:', error);
       let errorMessage = 'Logout failed';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = Array.isArray(error.response.data.errors)
-          ? error.response.data.errors
+      if (error?.response) {
+        errorMessage = error.response?.data?.successMessage || 'Logout failed';
+        errors = Array.isArray(error.response.errors)
+          ? error.response.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;

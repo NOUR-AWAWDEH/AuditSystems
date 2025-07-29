@@ -97,7 +97,7 @@ const handleResetPassword = async () => {
   const response = await resetPasswordAction(email, resetToken, newPassword.value, confirmPassword.value);
 
   if (response?.success) {
-    successMessage.value = response.message || 'Password reset successfully!';
+    successMessage.value = response?.successMessage || 'Password reset successfully!';
     isSuccessVisible.value = true;
     setTimeout(() => {
       isSuccessVisible.value = false;

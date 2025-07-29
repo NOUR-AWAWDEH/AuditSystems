@@ -27,21 +27,14 @@ export const createDepartmentRepository = {
                 }
             });
 
-            if (response.data && response.status === 201) {
-                if (response.data.success && response.data.result) {
-                    return ApiResponseT.ok(response.data.result, response.data.message || 'Department created successfully.');
-                } else if (response.data.success === false) {
-                    return ApiResponseT.badRequest(
-                        response.data.errors || [{ message: response.data.message || 'Failed to create department.' }],
-                        response.data.message || 'Failed to create department.'
-                    );
-                }
+            if (response.status === 201 || response?.success !== false) {
+                return ApiResponseT.ok(response.result, response.successMessage || 'Department created successfully');
             }
 
-            return ApiResponseT.badRequest(
-                [{ message: 'Unexpected response format' }],
-                'Failed to create department.'
-            );
+            const errors = Array.isArray(response?.errors)
+                ? response.errors
+                : [{ message: response?.data?.successMessage || 'Creation failed' }];
+            return ApiResponseT.badRequest(errors, response?.data?.successMessage);
         } catch (error) {
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
@@ -51,12 +44,14 @@ export const createDepartmentRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-                return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+                const errors = error.response?.errors ||
+                    [{ message: error.response?.data?.successMessage || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
             }
 
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while creating department.' }], 'Server error'
+                [{ message: error.message || 'An unexpected error occurred while creating department.' }],
+                'Server error'
             );
         }
     }

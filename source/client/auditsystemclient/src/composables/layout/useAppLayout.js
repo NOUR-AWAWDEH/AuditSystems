@@ -17,7 +17,13 @@ export function useAppLayout() {
     return isAuthenticated.value && !hideNavBarRoutes.includes(route.name);
   });
   
-  const transitionName = computed(() => route.meta.transition || 'fade');
+  const transitionName = computed(() => {
+    // Disable transitions in development to prevent HMR issues
+    if (import.meta.env.DEV) {
+      return '';
+    }
+    return route.meta.transition || 'fade';
+  });
   
   return {
     shouldShowNavBar,

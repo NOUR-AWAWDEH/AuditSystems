@@ -1848,7 +1848,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasOne("AuditSystem.Domain.Entities.Organization.SubLocation", "SubLocation")
                         .WithMany("Departments")
                         .HasForeignKey("SubLocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("SubLocation");

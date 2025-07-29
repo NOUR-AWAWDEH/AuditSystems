@@ -12,10 +12,10 @@ export function useResetPassword() {
       const response = await resetPasswordRepository(email, token, newPassword, confirmNewPassword);
 
       if (response?.success) {
-        successMessage.value = response.message;
+        successMessage.value = response?.successMessage || 'Password reset successfully';
         return { success: true };
       } else {
-        error.value = response?.errors?.[0]?.message || response.message || 'Password reset failed';
+        error.value = response?.errors?.[0]?.message || response?.successMessage || 'Password reset failed';
         return { success: false, message: error.value, errors: response?.errors || [{ message: error.value }] };
       }
     } catch (err) {

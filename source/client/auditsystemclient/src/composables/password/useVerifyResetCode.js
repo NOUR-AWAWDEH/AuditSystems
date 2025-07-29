@@ -11,7 +11,7 @@ export function useVerifyResetCode() {
     return {
       success: true,
       data: response.result,
-      message: response.successMessage || response.result.successMessage,
+      message: response.successMessage || response.result.successMessage || 'Verification successful',
     };
   };
 

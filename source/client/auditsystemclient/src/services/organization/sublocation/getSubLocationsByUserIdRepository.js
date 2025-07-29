@@ -20,13 +20,15 @@ export const getSubLocationsByUserIdRepository = {
         }
       );
 
-      if (response.data?.success && response.data?.result) {
-        return ApiResponseT.ok(response.data.result, response.data.message || 'SubLocations retrieved successfully');
+      console.log(response.data);
+      if (response.status === 200) {
+        const subLocations = response.data?.result?.subLocations || [];
+        return ApiResponseT.ok(subLocations, response?.data?.successMessage || 'SubLocations retrieved successfully');
       }
 
       return ApiResponseT.badRequest(
-        response.data?.errors || [{ message: 'Failed to retrieve sublocations' }],
-        response.data?.message || 'Failed to retrieve sublocations'
+        response?.errors || [{ message: response?.data?.successMessage || 'Failed to retrieve sublocations' }],
+        response?.data?.successMessage || 'Failed to retrieve sublocations'
       );
 
     } catch (error) {
@@ -38,9 +40,9 @@ export const getSubLocationsByUserIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || 
-          [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        const errors = error.response?.errors || 
+          [{ message: error.response?.data?.successMessage || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
       }
       
       return ApiResponseT.serverError(

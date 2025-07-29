@@ -15,7 +15,7 @@ export function useLogin() {
     token.value = newToken;
     refreshToken.value = newRefreshToken;
     user.value = { username };
-    isAuthenticated.value = true; // This will now update globally
+    isAuthenticated.value = true;
     authService.setLocalToken(token.value);
     authService.setLocalRefreshToken(refreshToken.value);
   };
@@ -26,28 +26,39 @@ export function useLogin() {
   };
 
   const handleLoginFailure = (response, defaultErrorMessage = 'Authentication failed') => {
+    
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : defaultErrorMessage;
     error.value = errorMessage;
-    return {
+
+    const failureResult = {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
     };
+
+    return failureResult;
   };
 
   const login = async (username, password) => {
     try {
       error.value = null;
+
       const response = await loginRepository.loginRequest(username, password);
+
       if (response?.success) {
         return handleLoginSuccess(response, username);
       } else {
         return handleLoginFailure(response);
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('💥 [USE LOGIN] Caught error during login:', {
+        err,
+        message: err?.message,
+        stack: err?.stack
+      });
+
       return handleLoginFailure(err, err.message || 'Authentication failed');
     }
   };
@@ -58,7 +69,7 @@ export function useLogin() {
     user.value = null;
     token.value = null;
     refreshToken.value = null;
-    authService.removeLocalToken();
+    authService.removeLocalTokens();
     authService.removeLocalRefreshToken();
   };
 

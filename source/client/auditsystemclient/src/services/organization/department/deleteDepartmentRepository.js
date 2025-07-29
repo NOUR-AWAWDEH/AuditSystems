@@ -20,14 +20,14 @@ export const deleteDepartmentByIdRepository = {
                 }
             });
 
-            if (response.status === 204 || response?.data?.success !== false) {
+            if (response.status === 204 || response?.success !== false) {
                 return ApiResponseT.ok(null, 'Department deleted successfully');
             }
 
-            const errors = Array.isArray(response?.data?.errors)
-                ? response.data.errors
-                : [{ message: response?.data?.message || 'Delete failed' }];
-            return ApiResponseT.badRequest(errors, response?.data?.message);
+            const errors = Array.isArray(response.errors)
+                ? response.errors
+                : [{ message: response.successMessage || 'Delete failed' }];
+            return ApiResponseT.badRequest(errors, response.successMessage);
 
         } catch (error) {
             if (error.response?.status === 401) {
@@ -38,9 +38,9 @@ export const deleteDepartmentByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response.data?.errors ||
-                    [{ message: error.response.data?.message || 'Bad request' }];
-                return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+                const errors = error.response?.errors ||
+                    [{ message: error.response?.data?.successMessage || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
             }
 
             if (error.response?.status === 404) {

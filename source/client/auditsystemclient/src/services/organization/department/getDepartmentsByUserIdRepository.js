@@ -19,14 +19,15 @@ export const getDepartmentByUserIdRepository = {
                 }
             });
 
-            if (response.data?.success && response.data?.result) {
-                return ApiResponseT.ok(response.data.result, response.data.message || 'Department retrieved successfully.');
+            if (response?.success && response?.result) {
+                return ApiResponseT.ok(response.result, response.successMessage || 'Department retrieved successfully.');
             }
 
             return ApiResponseT.badRequest(
-                [{ message: 'Unexpected response format' }],
-                'Failed to retrieve department.'
+                response?.errors || [{ message: 'Failed to retrieve department.' }],
+                response?.data?.successMessage || 'Failed to retrieve department.'
             );
+            
         } catch (error) {
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
@@ -36,14 +37,14 @@ export const getDepartmentByUserIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response.data?.errors ||
+                const errors = error.response?.errors ||
                     [{
-                        message: error.response.data?.message ||
+                        message: error.response?.data?.successMessage ||
                             'Bad request'
                     }];
                 return ApiResponseT.badRequest(
                     errors,
-                    error.response.data?.message || 'Bad request'
+                    error.response?.data?.successMessage || 'Bad request'
                 );
             }
 

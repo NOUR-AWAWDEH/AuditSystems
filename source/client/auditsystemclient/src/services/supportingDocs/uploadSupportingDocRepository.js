@@ -1,9 +1,8 @@
 import { ApiResponseT } from '@/utils/ApiResponse';
-import axios from 'axios';
 import api from '@/services/api/api';
 
 const SUPPORTING_DOCS_BASE_ENDPOINT = 'api/supportingdocs';
-const UPLOAD_SUPPORTING_DOC_ENDPOINT = '/upload-supporting-document'; // Changed from '/upload-supporting-doc'
+const UPLOAD_SUPPORTING_DOC_ENDPOINT = '/upload-supporting-document';
 
 export const uploadSupportingDocRepository = {
   async uploadSupportingDoc({ file, userId, fileName, token }) {
@@ -14,34 +13,35 @@ export const uploadSupportingDocRepository = {
       formData.append('UserId', userId);
       formData.append('FileName', fileName);
 
-      // Use direct axios call to ensure proper headers
-      const response = await axios({
-        method: 'post',
-        url: `${api.defaults.baseURL}/${SUPPORTING_DOCS_BASE_ENDPOINT}${UPLOAD_SUPPORTING_DOC_ENDPOINT}`,
-        data: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+      // Use custom api service with proper headers
+      const response = await api.post(
+        `${SUPPORTING_DOCS_BASE_ENDPOINT}${UPLOAD_SUPPORTING_DOC_ENDPOINT}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
         }
-      });
+      );
 
-      if (!response?.data?.success) {
-        const errors = Array.isArray(response?.data?.errors)
-          ? response.data.errors
-          : [{ message: response?.data?.message || 'Upload failed' }];
-        return ApiResponseT.badRequest(errors, response?.data?.message);
+      if (!response?.success) {
+        const errors = Array.isArray(response?.errors)
+          ? response.errors
+          : [{ message: response?.data?.successMessage || 'Upload failed' }];
+        return ApiResponseT.badRequest(errors, response?.data?.successMessage);
       }
 
-      return ApiResponseT.ok(response.data.result, response.data.message);
+      return ApiResponseT.ok(response?.result, response?.data?.successMessage);
 
     } catch (error) {
       let errorMessage = 'Upload failed';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = Array.isArray(error.response.data.errors)
-          ? error.response.data.errors
+      if (error?.response) {
+        errorMessage = error.response.successMessage || errorMessage;
+        errors = Array.isArray(error.response.errors)
+          ? error.response.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;

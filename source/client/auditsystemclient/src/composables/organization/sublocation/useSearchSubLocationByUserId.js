@@ -2,6 +2,8 @@ import { ref } from 'vue';
 import { searchSubLocationByUserIdRepository } from '@/services/organization/sublocation/searchSubLocationByUserIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
+export function useSearchSubLocationByUserId() {
+
 // Create singleton state outside the function
 const searchResults = ref([]);
 const isSearching = ref(false);
@@ -9,25 +11,12 @@ const error = ref(null);
 const totalCount = ref(0);
 const currentPage = ref(1);
 const pageSize = ref(10);
-const searchTerm = ref('');
-// Persist locationId in localStorage
+const searchTerm = ref(''); // Added missing searchTerm
+const { showNotification } = useNotification();
+
 const locationId = ref(localStorage.getItem('searchLocationId') || null);
 
-export function useSearchSubLocationByUserId() {
-  const { showNotification } = useNotification();
-
-  const handleSearchSuccess = (response) => {
-    const items = response.result?.result?.items || response.result?.items || [];
-    const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
-        
-    const isValidArray = Array.isArray(items);
-    
-    searchResults.value = isValidArray ? items : [];
-    totalCount.value = extractedTotalCount;
-        
-    return { success: true, data: response.result };
-  };
-  
+  // Added missing handleSearchFailure function
   const handleSearchFailure = (response, defaultErrorMessage = 'Failed to search sublocations') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
@@ -43,44 +32,67 @@ export function useSearchSubLocationByUserId() {
     };
   };
 
-  const searchSubLocations = async (searchParams = {}) => {
-    try {
+  const searchSubLocations = async (params = {}) => {
+      const {
+          searchTerm = '',
+          locationId = null,
+          page = 1,
+          pageSize: pageSizeParam = 10
+      } = params;
+      
       isSearching.value = true;
       error.value = null;
+      currentPage.value = page;
+      pageSize.value = pageSizeParam;
+  
+      try {
+          // Create the search parameters object for the repository
+          const searchParams = {
+              searchTerm,
+              locationId,
+              page,
+              pageSize: pageSizeParam
+          };
+          
+          const result = await searchSubLocationByUserIdRepository.searchSubLocationsByUserId(
+              searchParams
+          );
+          
 
-      const params = {
-        searchTerm: searchParams.searchTerm || searchTerm.value,
-        locationId: searchParams.locationId || locationId.value,
-        page: searchParams.page || currentPage.value,
-        pageSize: searchParams.pageSize || pageSize.value
-      };
-
-      // Update local state and persist locationId
-      if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
-      if (searchParams.locationId !== undefined) {
-        locationId.value = searchParams.locationId;
-        // Persist to localStorage
-        if (searchParams.locationId) {
-          localStorage.setItem('searchLocationId', searchParams.locationId);
-        } else {
-          localStorage.removeItem('searchLocationId');
-        }
+          if (result.success) {
+            const subLocations = result.result?.items || result.result || [];
+            const fetchedTotalCount = result.result?.totalCount || 0;
+  
+            searchResults.value = subLocations;
+            totalCount.value = fetchedTotalCount;
+  
+            return { 
+              success: true, 
+              message: result.message || 'Search completed successfully',
+              data: {
+                subLocations: searchResults.value,
+                totalCount: totalCount.value,
+                currentPage: currentPage.value,
+                pageSize: pageSize.value
+              }
+            };
+          } else {
+              const errorMsg = result.message || 'Search failed';
+              error.value = errorMsg;
+              searchResults.value = [];
+              totalCount.value = 0;
+              
+              if (result.errors && result.errors.length > 0) {
+                  showNotification(errorMsg, 'error');
+              }
+              
+              return { success: false, message: errorMsg, errors: result.errors };
+          }
+      } catch (err) {
+        return handleSearchFailure(err, err.message || 'Failed to search sublocations');
+      } finally {
+        isSearching.value = false;
       }
-      if (searchParams.page !== undefined) currentPage.value = searchParams.page;
-      if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
-
-      const response = await searchSubLocationByUserIdRepository.searchSubLocationsByUserId(params);
-
-      if (response?.success) {
-        return handleSearchSuccess(response);
-      } else {
-        return handleSearchFailure(response);
-      }
-    } catch (err) {
-      return handleSearchFailure(err, err.message || 'Failed to search sublocations');
-    } finally {
-      isSearching.value = false;
-    }
   };
 
   const clearSearch = () => {

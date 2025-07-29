@@ -46,32 +46,51 @@ export const searchSubDepartmentByUserIdRepository = {
       const url = `${SUBDEPARTMENT_BASE_ENDPOINT}${SUBDEPARTMENT_SEARCH_BY_USER_ID_ENDPOINT}${
         queryString ? `?${queryString}` : ""
       }`;
+      
       const response = await api.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+          headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+          },
       });
+      
+      // Fix: Access response.data and response.status correctly
+      const { data, status } = response;
 
-      if (response.data && response.status === 200) {
-        return ApiResponseT.ok(response.data, "Subdepartments retrieved successfully");
+      if (status === 200 && data?.success) {
+          return ApiResponseT.ok(
+              data.result, 
+              data.successMessage || "Subdepartments retrieved successfully"
+          );
       }
 
       return ApiResponseT.badRequest(
-        response.data?.errors || [{ message: "Failed to retrieve subdepartments" }],
-        response.data?.message || "Failed to retrieve subdepartments"
+          data?.errors || [{ message: data?.message || "Failed to retrieve subdepartments" }],
+          data?.message || "Failed to retrieve subdepartments"
       );
-
+      
     } catch (error) {
-      console.error("Error searching subdepartments:", error);
+        console.error("Error searching subdepartments:", error);
+        
+        const responseData = error.response?.data;
 
-      if (error.response?.status === 401) {
-        return ApiResponseT.unauthorized("Unauthorized: Please login again");
-      }
+        if (error.response?.status === 401) {
+            return ApiResponseT.unauthorized(
+                [{ message: "Authentication required. Please log in again." }],
+                "Authentication required"
+            );
+        }
+        
+        if (error.response?.status === 400) {
+            const errors = responseData?.errors || 
+                [{ message: responseData?.message || "Bad request" }];
+            return ApiResponseT.badRequest(errors, responseData?.message || "Bad request");
+        }
 
-      return ApiResponseT.internalServerError(
-        error.response?.data?.message || error.message || "Failed to search subdepartments"
-      );
+        return ApiResponseT.serverError(
+            [{ message: error.message || "An unexpected error occurred while searching subdepartments." }],
+            "Server error"
+        );
     }
   }
 };

@@ -35,14 +35,14 @@ const refreshToken = async () => {
                 },
             }
         );
-        if (response.data.success && response.data.result) {
-            const { jwtToken, refreshToken: newRefreshToken } = response.data.result;
+        if (response.success && response.result) {
+            const { jwtToken, refreshToken: newRefreshToken } = response.result; 
             setLocalToken(jwtToken);
             setLocalRefreshToken(newRefreshToken);
             scheduleRefreshToken();
             return true;
         } else {
-            console.error('Failed to refresh token:', response.data);
+            console.error('Failed to refresh token:', response); 
             redirectToLogin();
             return false;
         }

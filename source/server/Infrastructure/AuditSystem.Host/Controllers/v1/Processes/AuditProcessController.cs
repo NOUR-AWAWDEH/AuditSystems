@@ -61,7 +61,7 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Audit Process
-    [HttpGet("search-audit-process-by-user-id")]
+    [HttpGet("search-audit-processes-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditProcessModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchAuditProcess([FromQuery] SearchAuditProcessQuery query) =>

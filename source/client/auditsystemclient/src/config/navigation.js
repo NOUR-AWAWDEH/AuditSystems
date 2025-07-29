@@ -1,7 +1,7 @@
 import DashboardIcon from '@/components/common/icons/DashboardIcon.vue'
-import DocumentIcon from '@/components/common/icons/DocumentIcon.vue'
 import LocationIcon from '@/components/common/icons/LocationIcon.vue'
 import RiskControlIcon from '@/components/common/icons/RiskControlIcon.vue'
+import DocumentIcon from '@/components/common/icons/DocumentIcon.vue'
 
 // Navigation items that correspond to your router.js routes
 export const navigationItems = [

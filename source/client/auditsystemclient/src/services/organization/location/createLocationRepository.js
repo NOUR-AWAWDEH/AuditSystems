@@ -24,21 +24,14 @@ export const createLocationRepository = {
         }
       });
 
-      if (response.data && response.status === 201) {
-        if (response.data.success && response.data.result) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'Location created successfully.');
-        } else if (response.data.success === false) {
-          return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to create location.' }], 
-            response.data.message || 'Failed to create location.'
-          );
-        }
+      if (response.status === 201 || response?.success !== false) {
+        return ApiResponseT.ok(response.result, response?.data?.successMessage || 'Location created successfully');
       }
 
-      return ApiResponseT.badRequest(
-        [{ message: 'Unexpected response format' }],
-        'Failed to create location'
-      );
+      const errors = Array.isArray(response?.errors)
+          ? response.errors
+          : [{ message: response?.data?.successMessage || 'Creation failed' }];
+      return ApiResponseT.badRequest(errors, response?.data?.successMessage);
 
     } catch (error) {
       console.error('Create location error:', error);
@@ -51,8 +44,9 @@ export const createLocationRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        const errors = error.response?.errors ||
+            [{ message: error.response?.data?.successMessage || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
       }
       
       return ApiResponseT.serverError(

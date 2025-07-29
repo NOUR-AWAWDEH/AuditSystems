@@ -22,8 +22,8 @@ export const getSupportingDocSignedUrlRepository = {
         }
       });
             
-      if (response.status === 200 && response.data?.success) {
-        return ApiResponseT.ok(response.data.result, 'Signed URL retrieved successfully.');
+      if (response.status === 200 && response?.success) {
+        return ApiResponseT.ok(response.result, response?.data?.successMessage || 'Signed URL retrieved successfully.');
       }
       
       return ApiResponseT.badRequest(
@@ -35,10 +35,10 @@ export const getSupportingDocSignedUrlRepository = {
       let errorMessage = 'Failed to get signed URL.';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0
-          ? error.response.data.errors
+      if (error?.response) {
+        errorMessage = error.response?.data?.successMessage || errorMessage;
+        errors = error.response?.errors && Array.isArray(error.response?.errors) && error.response?.errors.length > 0
+          ? error.response?.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;

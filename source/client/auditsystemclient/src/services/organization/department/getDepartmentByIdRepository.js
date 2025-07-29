@@ -12,7 +12,6 @@ export const getDepartmentByIdRepository = {
 
             const response = await api.get(
                 `${DEPARTMENT_BASE_ENDPOINT}${GET_DEPARTMENT_BY_ID_ENDPOINT}`, {
-
                 params: { id: departmentId },
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -20,16 +19,27 @@ export const getDepartmentByIdRepository = {
                 }
             });
 
-            if (response.data && response.status === 200) {
-                return ApiResponseT.ok(response.data.result, response.data.message || 'Department retrived successfully.');
+            // Fix: Access response.data and response.status correctly
+            const { data, status } = response;
+
+            if (status === 200 && data?.success && data?.result) {
+                return ApiResponseT.ok(
+                    data.result, 
+                    data.successMessage || 'Department retrieved successfully.'
+                );
             }
 
             return ApiResponseT.badRequest(
-                response.data?.errors || [{ message: 'Failed to retrieve department.' }],
-                response.data?.message || 'Failed to retrieve department.'
+                data?.errors || [{ message: data?.message || 'Failed to retrieve department.' }],
+                data?.message || 'Failed to retrieve department.'
             );
 
         } catch (error) {
+            console.error('Error fetching department:', error);
+            
+            // Fix: Define responseData from error.response?.data
+            const responseData = error.response?.data;
+
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
@@ -38,10 +48,11 @@ export const getDepartmentByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
+                const errors = responseData?.errors || 
+                    [{ message: responseData?.message || 'Bad request' }];
                 return ApiResponseT.badRequest(
                     errors,
-                    error.response.data?.message || 'Bad request'
+                    responseData?.message || 'Bad request'
                 );
             }
 
@@ -51,8 +62,9 @@ export const getDepartmentByIdRepository = {
                     'Department not found.'
                 );
             }
+            
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while retriving department.' }],
+                [{ message: error.message || 'An unexpected error occurred while retrieving department.' }],
                 'Server error'
             );
         }

@@ -8,15 +8,15 @@ const verifyResetCode = async (email, code) => {
   try {
     const response = await api.post(AUTH_ENDPOINT, { email, code });
 
-    if (!response?.data?.success) {
-      const errors = Array.isArray(response?.data?.errors)
-        ? response.data.errors
-        : [{ message: response?.data?.message || 'Verification failed' }];
-      return ApiResponseT.badRequest(errors, response?.data?.message);
+    if (!response?.success) {
+      const errors = Array.isArray(response?.errors)
+        ? response.errors
+        : [{ message: response?.message || 'Verification failed' }];
+      return ApiResponseT.badRequest(errors, response?.message);
     }
 
-    const result = response.data.result; // Return the `result` object
-    return ApiResponseT.ok(result, response.data.successMessage);
+    const result = response.result; // Return the `result` object
+    return ApiResponseT.ok(result, response.successMessage);
   } catch (error) {
     console.error('verifyResetCode error:', error);
     console.error('Error response:', error.response?.data);
@@ -24,10 +24,10 @@ const verifyResetCode = async (email, code) => {
     let errorMessage = 'Verification failed';
     let errors = [{ message: errorMessage }];
 
-    if (error?.response?.data) {
-      errorMessage = error.response.data.message || errorMessage;
-      errors = Array.isArray(error.response.data.errors)
-        ? error.response.data.errors
+    if (error?.response) {
+      errorMessage = error.response.successMessage || errorMessage;
+      errors = Array.isArray(error.response.errors)
+        ? error.response.errors
         : [{ message: errorMessage }];
     } else if (error?.message) {
       errorMessage = error.message;

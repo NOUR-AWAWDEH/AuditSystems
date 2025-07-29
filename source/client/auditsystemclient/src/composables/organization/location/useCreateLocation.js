@@ -10,7 +10,7 @@ export function useCreateLocation() {
 
   const handleCreateSuccess = (response) => {
     createdLocation.value = response.result;
-    showNotification(response.message || 'Location created successfully!', 'success');
+    showNotification(response?.successMessage || 'Location created successfully!', 'success');
     return { success: true, data: response.result };
   };
   
@@ -52,7 +52,7 @@ export function useCreateLocation() {
       }
 
       const result = await createLocationRepository.createLocation(locationData);
-      
+
       if (result.success) {
         return handleCreateSuccess(result);
       } else {

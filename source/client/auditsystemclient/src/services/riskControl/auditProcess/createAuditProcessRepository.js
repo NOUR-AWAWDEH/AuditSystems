@@ -6,44 +6,43 @@ const AUDIT_PROCESS_API_ENDPOINT = '/api/AuditProcess';
 const CREATE_AUDIT_PROCESS_API_ENDPOINT = '/create-audit-process';
 
 export const createAuditProcessRepository = {
-  async createAuditProcess(AuditProcessData) {
-    try {
-        const token = authService.getLocalToken();
+    async createAuditProcess(AuditProcessData) {
+        try {
+            const token = authService.getLocalToken();
 
-        const payload = {
-            processName: AuditProcessData.processName,
-            SubDepartmentId: typeof AuditProcessData.subDepartmentId === 'object' 
-                ? AuditProcessData.subDepartmentId.value || AuditProcessData.subDepartmentId.id
-                : AuditProcessData.subDepartmentId
-        };
+            const payload = {
+                processName: AuditProcessData.processName,
+                SubDepartmentId: typeof AuditProcessData.subDepartmentId === 'object' 
+                    ? AuditProcessData.subDepartmentId.value || AuditProcessData.subDepartmentId.id
+                    : AuditProcessData.subDepartmentId
+            };
 
-        const response = await api.post(
-            `${AUDIT_PROCESS_API_ENDPOINT}${CREATE_AUDIT_PROCESS_API_ENDPOINT}`,
-            payload, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
+            const response = await api.post(
+                `${AUDIT_PROCESS_API_ENDPOINT}${CREATE_AUDIT_PROCESS_API_ENDPOINT}`,
+                payload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        if (response && response.status === 201) {
-            if(response.success && response.result) {
-                return ApiResponseT.ok(response.result, response.successMessage || 'Process created successfully');
-            } else if (response.success === false) {
-                return ApiResponseT.badRequest(
-                    response.errors || [{ message: response.successMessage || 'Failed to create process' }],
-                    response.successMessage || 'Failed to create process.'
-                );
+            const { data, status } = response;
+            console.log('Create audit process response:', { data, status });
+
+            if (status === 201 && data?.success) {
+                return ApiResponseT.ok(data.result, data.successMessage || 'Process created successfully');
             }
-        }
 
-        return ApiResponseT.badRequest(
-            [{ message: response.successMessage || 'Unexpected response format from server' }],
-            response.successMessage || 'Failed to create process.'
-        );
-    }
-    catch (error) {
-        if (error.response?.status === 401) {
+            return ApiResponseT.badRequest(
+                data?.errors || [{ message: data?.successMessage || 'Failed to create process' }],
+                data?.successMessage || 'Failed to create process.'
+            );
+        }
+        catch (error) {
+            console.error('Create audit process error:', error);
+            const responseData = error.response?.data;
+            
+            if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
                     'Authentication required'
@@ -51,13 +50,13 @@ export const createAuditProcessRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
-                return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
+                const errors = responseData?.errors || [{ message: responseData?.successMessage || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, responseData?.successMessage || 'Bad request');
             }
 
             return ApiResponseT.serverError(
                 [{ message: error.message || 'An unexpected error occurred while creating process.' }], 'Server error'
             );
+        }
     }
-  }
 };

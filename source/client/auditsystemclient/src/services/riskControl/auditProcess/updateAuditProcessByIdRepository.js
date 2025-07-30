@@ -7,6 +7,7 @@ const AUDIT_PROCESS_API_ENDPOINT_ID = '/update-audit-process';
 
 export const updateAuditProcessByIdRepository = {
     async updateAuditProcessById(auditProcessData) {
+        let responseData = null; // Declare responseData here
         try {
             const token = authService.getLocalToken();
 
@@ -33,16 +34,23 @@ export const updateAuditProcessByIdRepository = {
                 }
             );
 
-            if (response.status === 200 || response?.success !== false) {
-                return ApiResponseT.ok(null, response?.data?.successMessage || 'Process updated successfully.');
+            const { data, status } = response; // Destructure data and status
+            responseData = data; // Assign data to responseData
+
+            if (status === 200 && data?.success !== false) { // Check data.success
+                console.log('Audit process updated successfully:', data);
+                return ApiResponseT.ok(null, data?.successMessage || 'Process updated successfully.');
             }
 
-            const errors = Array.isArray(response?.errors)
-            ? response.errors
-            : [{ message: response?.data?.successMessage || 'Update failed' }];
-
-            return ApiResponseT.badRequest( errors, response?.data?.successMessage || 'Failed to update process.');
+            const errors = Array.isArray(data?.errors)
+                ? data.errors
+                : [{ message: data?.successMessage || 'Update failed' }];
+            console.error('Update process failed with errors:', errors);
+            return ApiResponseT.badRequest(errors, data?.successMessage || 'Failed to update process.');
+            
         } catch (error) {
+            responseData = error.response?.data; // Assign error response data to responseData
+            console.error('Error updating audit process:', error);
 
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
@@ -52,8 +60,8 @@ export const updateAuditProcessByIdRepository = {
             }
         
             if (error.response?.status === 400) {
-                const errors = error.response?.errors || [{ message: error.response?.message || 'Bad request' }];
-                return ApiResponseT.badRequest(errors, error.response?.message || 'Bad request');
+                const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
             }
         
             if (error.response?.status === 404) {

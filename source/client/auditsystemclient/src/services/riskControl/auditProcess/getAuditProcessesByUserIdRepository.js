@@ -4,8 +4,10 @@ import authService from '@/services/auth/authRepos/authService';
 
 const AUDIT_PROCESS_API_ENDPOINT = '/api/AuditProcess';
 const AUDIT_PROCESS_API_ENDPOINT_ID = '/get-audit-processes-by-user-id';
+
 export const getAuditProcessesByUserIdRepository = {
     async getAuditProcessesByUserId(userId) {
+        let responseData = null; // Declare responseData here
         try {
             const token = authService.getLocalToken();
 
@@ -19,16 +21,27 @@ export const getAuditProcessesByUserIdRepository = {
                 }
             );
             
-            if (response.status === 200 || response?.success !== false) {
-                return ApiResponseT.ok(response?.result, response?.data?.successMessage || 'Processes retrieved successfully'); 
+            const { data, status } = response; // Destructure data and status
+            responseData = data; // Assign data to responseData
+            
+            if (status === 200 && data?.success !== false) { // Check data.success
+                console.log('Audit processes retrieved successfully:', data);
+                return ApiResponseT.ok(data?.result, data?.successMessage || 'Processes retrieved successfully'); 
             }
 
-             return ApiResponseT.badRequest(
-                response?.errors || [{ message: 'Failed to retrieve processes.' }],
-                response?.data?.successMessage || 'Failed to retrieve processes.'
+            const errors = Array.isArray(data?.errors)
+                ? data.errors
+                : [{ message: 'Failed to retrieve processes.' }];
+            console.error('Retrieve processes failed with errors:', errors);
+            return ApiResponseT.badRequest(
+                errors,
+                data?.successMessage || 'Failed to retrieve processes.'
             );
 
         } catch (error) {
+            responseData = error.response?.data; // Assign error response data to responseData
+            console.error('Error retrieving audit processes:', error);
+
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
@@ -37,14 +50,14 @@ export const getAuditProcessesByUserIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response?.errors ||
+                const errors = responseData?.errors ||
                     [{
-                        message: error.response?.data?.successMessage ||
+                        message: responseData?.successMessage ||
                             'Bad request'
                     }];
                 return ApiResponseT.badRequest(
                     errors,
-                    error.response?.data?.successMessage || 'Bad request'
+                    responseData?.successMessage || 'Bad request'
                 );
             }
 

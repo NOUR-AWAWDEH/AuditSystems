@@ -82,7 +82,6 @@ export function useUpdateDepartmentById() {
         isUpdating,
         error,
         updatedDepartment,
-        
         updateDepartment,
         resetState,
     };

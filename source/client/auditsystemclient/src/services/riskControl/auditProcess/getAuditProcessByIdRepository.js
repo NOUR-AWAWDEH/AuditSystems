@@ -7,6 +7,7 @@ const AUDIT_PROCESS_API_ENDPOINT_ID = '/get-audit-process-by-id';
 
 export const getAuditProcessByIdRepository = {
     async getAuditProcessById(auditProcessId) {
+        let responseData = null; // Declare responseData here
         try {
             const token = authService.getLocalToken();
 
@@ -19,16 +20,27 @@ export const getAuditProcessByIdRepository = {
                     },
                 });
             
-            if (response.status === 200 || response?.success !== false) {
-                return ApiResponseT.ok(response?.result, response?.data?.successMessage || 'Audit process retrieved successfully');
+            const { data, status } = response; // Destructure data and status
+            responseData = data; // Assign data to responseData
+            
+            if (status === 200 && data?.success !== false) { // Check data.success
+                console.log('Audit process retrieved successfully:', data);
+                return ApiResponseT.ok(data?.result, data?.successMessage || 'Audit process retrieved successfully');
             }
 
+            const errors = Array.isArray(data?.errors)
+                ? data.errors
+                : [{ message: 'Failed to retrieve process.' }];
+            console.error('Retrieve process failed with errors:', errors);
             return ApiResponseT.badRequest(
-                response?.errors || [{ message: 'Failed to retrieve process.' }],
-                response?.data?.successMessage || 'Failed to retrieve process.'
+                errors,
+                data?.successMessage || 'Failed to retrieve process.'
             );
 
         } catch (error) {
+            responseData = error.response?.data; // Assign error response data to responseData
+            console.error('Error retrieving audit process:', error);
+
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
@@ -37,10 +49,11 @@ export const getAuditProcessByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
+                const errors = responseData?.errors || 
+                    [{ message: responseData?.successMessage || 'Bad request' }];
                 return ApiResponseT.badRequest(
                     errors,
-                    error.response?.data?.successMessage || 'Bad request'
+                    responseData?.successMessage || 'Bad request'
                 );
             }
 
@@ -51,7 +64,7 @@ export const getAuditProcessByIdRepository = {
                 );
             }
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while retriving process.' }],
+                [{ message: error.message || 'An unexpected error occurred while retrieving process.' }],
                 'Retrieve process failed'
             );
         }

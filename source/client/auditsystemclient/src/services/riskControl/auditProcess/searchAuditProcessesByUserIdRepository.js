@@ -6,62 +6,77 @@ const AUDIT_PROCESS_BASE_ENDPOINT = '/api/AuditProcess';
 const SEARCH_AUDIT_PROCESS_BY_USER_ID_ENDPOINT = '/search-audit-processes-by-user-id';
 
 export const searchAuditProcessesByUserIdRepository = {
-    async searchAuditProcessesByUserId(searchParams = {}) {
+    async searchAuditProcessesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, subDepartment = '') {
         try {
             const token = authService.getLocalToken();
 
-            if (!token) {
-                throw new Error('Authentication token not found');
+            const params = {
+                searchTerm,
+                page: pageNumber,
+                pageSize,
+                sortBy: 'name'
+            };
+
+            // Add subDepartment only if provided
+            if (subDepartment) {
+                params.subDepartment = subDepartment;
             }
 
-            const queryParams = new URLSearchParams();
-
-            if (searchParams.searchTerm) {
-                queryParams.append('searchTerm', searchParams.searchTerm);
-            }
-
-            if (searchParams.subDepartment) {
-                queryParams.append('subDepartment', searchParams.subDepartment);
-            }
-
-            if (searchParams.page) {
-                queryParams.append('page', searchParams.page);
-            }
-
-            if (searchParams.pageSize) {
-                queryParams.append('pageSize', searchParams.pageSize);
-            }
-
-            const queryString = queryParams.toString();
-            const url = `${AUDIT_PROCESS_BASE_ENDPOINT}${SEARCH_AUDIT_PROCESS_BY_USER_ID_ENDPOINT}${queryString ? `?${queryString}` : ''}`;
-            const response = await api.get(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            const response = await api.get(
+                `${AUDIT_PROCESS_BASE_ENDPOINT}${SEARCH_AUDIT_PROCESS_BY_USER_ID_ENDPOINT}`,
+                {
+                    params,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
-            });
+            );
 
-            if (response?.success && response.status === 200) {
-                return ApiResponseT.ok(response?.result, response?.data?.successMessage || 'Processes retrieved successfully.');
+            const { data, status } = response;
+
+            if (status === 200 && data?.success) {
+                const result = data.result;
+
+                // Defensive check in case the result structure changes
+                if (result?.items && typeof result.totalCount === 'number') {
+                    return ApiResponseT.ok(
+                        result, // includes items and totalCount
+                        data.successMessage || 'Audit processes fetched successfully.'
+                    );
+                }
+
+                return ApiResponseT.badRequest(
+                    [{ message: 'Missing or invalid result structure.' }],
+                    'Invalid response format'
+                );
             }
 
             return ApiResponseT.badRequest(
-                response?.errors || [{ message: 'Failed to search processes.' }],
-                response?.data?.successMessage || 'Failed to search processes.'
+                [{ message: 'Unexpected response format.' }],
+                'Failed to search audit processes'
             );
 
         } catch (error) {
-            console.error("Error searching processes:", error);
-            
+            console.error('Search audit processes error:', error);
+
+            const responseData = error.response?.data;
+
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
-                    'Authentication required'
+                    'Unauthorized'
                 );
             }
-            
-            return ApiResponseT.internalServerError(
-                error.response?.data?.message || error.message || "Failed to retrieve processes."
+
+            if (error.response?.status === 400) {
+                const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
+            }
+
+            return ApiResponseT.serverError(
+                [{ message: error.message || 'An unexpected error occurred.' }],
+                'Server error'
             );
         }
     }

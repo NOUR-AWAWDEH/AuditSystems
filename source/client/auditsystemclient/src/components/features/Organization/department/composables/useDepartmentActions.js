@@ -40,6 +40,7 @@ export function useDepartmentActions(refreshData, showNotification) {
     
     const handleDepartmentUpdated = async () => {
         await refreshData();
+        showNotification(`Department "${departmentToEdit.value.name}" has been updated successfully!`, 'success');
         handleCloseEditDepartmentModal();
     };
     

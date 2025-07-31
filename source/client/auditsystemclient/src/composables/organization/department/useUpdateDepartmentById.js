@@ -10,7 +10,7 @@ export function useUpdateDepartmentById() {
 
     const handleUpdateSuccess = (response) => {
         updatedDepartment.value = response.result;
-        const message = response.message || 'Department updated successfully';
+        const message = response?.successMessage || 'Department updated successfully';
         showNotification(message, 'success');
         return { success: true, data: response.result };
     };
@@ -18,7 +18,7 @@ export function useUpdateDepartmentById() {
     const handleUpdateFailure = (response, defaultErrorMessage = 'Failed to update department') => {
         const errorMessage = response?.errors?.length
             ? response.errors[0]?.message
-            : response.message || defaultErrorMessage;
+            : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
@@ -82,7 +82,6 @@ export function useUpdateDepartmentById() {
         isUpdating,
         error,
         updatedDepartment,
-        
         updateDepartment,
         resetState,
     };

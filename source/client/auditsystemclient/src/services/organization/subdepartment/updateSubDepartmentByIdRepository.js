@@ -31,15 +31,15 @@ export const updateSubDepartmentByIdRepository = {
       );
 
 
-      if (response.status === 200 || response?.data?.success !== false) {
-        return ApiResponseT.ok(null, response.data?.message || 'SubDepartment updated successfully');
+      if (response.status === 200 || response?.success !== false) {
+        return ApiResponseT.ok(null, response?.data?.successMessage || 'SubDepartment updated successfully');
       }
 
       console.error('API call failed - bad response');
-      const errors = Array.isArray(response?.data?.errors)
-        ? response.data.errors
-        : [{ message: response?.data?.message || 'Update failed' }];
-      return ApiResponseT.badRequest(errors, response?.data?.message);
+      const errors = Array.isArray(response?.errors)
+        ? response.errors
+        : [{ message: response?.data?.successMessage || 'Update failed' }];
+      return ApiResponseT.badRequest(errors, response?.data?.successMessage);
 
     } catch (error) {
       
@@ -52,9 +52,9 @@ export const updateSubDepartmentByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        console.error(' Bad Request:', error.response.data);
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        console.error(' Bad Request:', error.response);
+        const errors = error.response?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
       }
       
       if (error.response?.status === 404) {

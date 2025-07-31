@@ -2,7 +2,7 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const LOCATION_BASE_ENDPOINT = 'api/Location';
+const LOCATION_BASE_ENDPOINT = '/api/Location';
 const DELETE_LOCATION_ENDPOINT = '/delete-location-by-id';
 
 export const deleteLocationByIdRepository = {
@@ -17,31 +17,49 @@ export const deleteLocationByIdRepository = {
           'Content-Type': 'application/json'
         }
       });
-
-      if (response.status === 204 || response?.data?.success !== false) {
-        return ApiResponseT.ok(null, 'Location deleted successfully');
+      
+      const { data, status } = response;
+      
+      if (status === 204 || (status === 200 && data?.success !== false)) {
+        return ApiResponseT.ok(null, data?.successMessage || 'Location deleted successfully');
       }
 
-      const errors = Array.isArray(response?.data?.errors)
-        ? response.data.errors
-        : [{ message: response?.data?.message || 'Delete failed' }];
-      return ApiResponseT.badRequest(errors, response?.data?.message);
+      // Handle unsuccessful deletion with server message
+      const errors = data?.errors || [{ message: data?.message || 'Delete failed' }];
+      return ApiResponseT.badRequest(errors, data?.message || 'Delete failed');
 
     } catch (error) {
-      let errorMessage = 'Delete failed';
-      let errors = [{ message: errorMessage }];
-
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = Array.isArray(error.response.data.errors)
-          ? error.response.data.errors
-          : [{ message: errorMessage }];
-      } else if (error?.message) {
-        errorMessage = error.message;
-        errors = [{ message: errorMessage }];
+      console.error('Error deleting location:', error);
+      
+      const responseData = error.response?.data;
+      
+      if (error.response?.status === 401) {
+        return ApiResponseT.unauthorized(
+          [{ message: 'Authentication required. Please log in again.' }],
+          'Authentication required'
+        );
       }
-
-      return ApiResponseT.badRequest(errors, errorMessage);
+      
+      if (error.response?.status === 404) {
+        return ApiResponseT.notFound(
+          [{ message: 'Location not found' }],
+          'Location not found'
+        );
+      }
+      
+      if (error.response?.status === 400) {
+        // Show server error message for failed deletion
+        const serverMessage = responseData?.message || responseData?.successMessage || 'Bad request';
+        const errors = responseData?.errors || [{ message: serverMessage }];
+        return ApiResponseT.badRequest(errors, serverMessage);
+      }
+      
+      // Handle other server errors and show server message
+      const serverMessage = responseData?.message || error.message || 'An unexpected error occurred while deleting location.';
+      return ApiResponseT.serverError(
+        [{ message: serverMessage }],
+        'Server error'
+      );
     }
   }
 };

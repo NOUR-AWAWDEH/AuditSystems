@@ -3,7 +3,7 @@
         
         
         <!-- Location Table -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
                 <!-- Header with Title and Filters -->
                 <div class="flex flex-col gap-4 mb-6">

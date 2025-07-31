@@ -15,23 +15,23 @@ export const deleteSupportingDocByIdRepository = {
         }
       });
 
-      if (response.status === 204 || response?.data?.success !== false) {
+      if (response.status === 204 || response?.success !== false) {
         return ApiResponseT.ok(null, 'Document deleted successfully');
       }
 
-      const errors = Array.isArray(response?.data?.errors)
-        ? response.data.errors
-        : [{ message: response?.data?.message || 'Delete failed' }];
-      return ApiResponseT.badRequest(errors, response?.data?.message);
+      const errors = Array.isArray(response?.errors)
+        ? response.errors
+        : [{ message: response?.data?.successMessage || 'Delete failed' }];
+      return ApiResponseT.badRequest(errors, response?.data?.successMessage);
 
     } catch (error) {
       let errorMessage = 'Delete failed';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = Array.isArray(error.response.data.errors)
-          ? error.response.data.errors
+      if (error?.response) {
+        errorMessage = error.response?.data?.successMessage || errorMessage;
+        errors = Array.isArray(error.response?.errors)
+          ? error.response?.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;

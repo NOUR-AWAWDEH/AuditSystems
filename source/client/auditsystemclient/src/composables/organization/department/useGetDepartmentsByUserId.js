@@ -3,7 +3,7 @@ import { useNotification } from '@/composables/notification/useNotification';
 import { getDepartmentByUserIdRepository } from '@/services/organization/department/getDepartmentsByUserIdRepository';
 
 export function useGetDepartmentsByUserId() {
-    const departments = ref([]); // Changed from ref(null) to ref([])
+    const departments = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
     const { showNotification } = useNotification();
@@ -50,12 +50,9 @@ export function useGetDepartmentsByUserId() {
     };
 
     return {
-        // State
         departments,
         isLoading,
         error,
-
-        // Actions
         getDepartmentsByUserId,
     }
 }

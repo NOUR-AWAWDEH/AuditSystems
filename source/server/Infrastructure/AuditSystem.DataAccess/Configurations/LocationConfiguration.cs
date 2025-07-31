@@ -37,6 +37,12 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Location to SubLocations relationship with Restrict delete behavior
+        builder.HasMany(l => l.SubLocations)
+            .WithOne(sl => sl.Location)
+            .HasForeignKey(sl => sl.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes for performance
         builder.HasIndex(l => l.CompanyId);
         builder.HasIndex(l => l.UserId);

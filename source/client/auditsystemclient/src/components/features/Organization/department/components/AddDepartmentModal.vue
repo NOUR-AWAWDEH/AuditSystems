@@ -11,7 +11,7 @@
                         <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Department</h3>
                         <button 
                             @click="$emit('close')"
-                            class="test-gray-base hover:text-gray-shade focus:outline-none">
+                            class="text-gray-base hover:text-gray-shade focus:outline-none">
                             <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
                         </button>
                     </div>

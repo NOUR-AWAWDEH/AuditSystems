@@ -45,7 +45,7 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
         await ProcessRequestToActionResultAsync(query);
 
     //Get Audit Process By User Id
-    [HttpGet("get-audit-process-by-user-id")]
+    [HttpGet("get-audit-processes-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<GetAuditProcessesByUserIdQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -61,7 +61,7 @@ public sealed class AuditProcessController(IMediator mediator) : ApiControllerBa
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Audit Process
-    [HttpGet("search-audit-process-by-user-id")]
+    [HttpGet("search-audit-processes-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditProcessModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchAuditProcess([FromQuery] SearchAuditProcessQuery query) =>

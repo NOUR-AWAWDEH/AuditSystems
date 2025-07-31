@@ -33,16 +33,10 @@ export const searchDepartmentByUserIdRepository = {
                 queryParams.append('pageSize', searchParams.pageSize);
             }
 
-            if (searchParams.sortBy) {
-                queryParams.append('sortBy', searchParams.sortBy);
-            }
-
-            if (searchParams.sortDirection) {
-                queryParams.append('sortDirection', searchParams.sortDirection);
-            }
 
             const queryString = queryParams.toString();
             const url = `${DEPARTMENT_BASE_ENDPOINT}${SEARCH_DEPARTMENT_BY_USER_ID_ENDPOINT}${queryString ? `?${queryString}` : ''}`;
+            
             const response = await api.get(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -50,17 +44,25 @@ export const searchDepartmentByUserIdRepository = {
                 }
             });
 
-            if (response.data && response.status === 200) {
-                return ApiResponseT.ok(response.data.result, response.data.message || 'Departments retrived successfully.');
+            // Fix: Access response.data and response.status correctly
+            const { data, status } = response;
+            
+            if (status === 200 && data?.success) {
+                return ApiResponseT.ok(
+                    data.result, 
+                    data.successMessage || 'Departments retrieved successfully.'
+                );
             }
 
             return ApiResponseT.badRequest(
-                response.data?.errors || [{ message: 'Failed to retrieve department.' }],
-                response.data?.message || 'Failed to retrieve departments.'
+                data?.errors || [{ message: 'Failed to retrieve departments.' }],
+                data?.message || 'Failed to retrieve departments.'
             );
 
         } catch (error) {
             console.error("Error searching department:", error);
+            
+            const responseData = error.response?.data;
             
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
@@ -69,8 +71,14 @@ export const searchDepartmentByUserIdRepository = {
                 );
             }
             
-            return ApiResponseT.internalServerError(
-                error.response?.data?.message || error.message || "Failed to retrieve departments."
+            if (error.response?.status === 400) {
+                const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
+                return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
+            }
+            
+            return ApiResponseT.serverError(
+                [{ message: error.message || 'An unexpected error occurred.' }],
+                'Server error'
             );
         }
     }

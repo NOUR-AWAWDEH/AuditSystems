@@ -10,7 +10,7 @@ export function useGetDepartmentById() {
 
     const handleFetchSuccess = (response) => {
         department.value = response.result;
-        const message = response.message || 'Department fetched successfully!';
+        const message = response?.successMessage || 'Department fetched successfully!';
         showNotification(message, 'success');
         return { success: true, data: response.result };
     };
@@ -56,6 +56,7 @@ export function useGetDepartmentById() {
             } else {
                 return handleFetchFailure(response);
             }
+
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch department' );
 

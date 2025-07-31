@@ -10,7 +10,7 @@ export function useDeleteSubDepartmentById() {
 
   const handleDeleteSuccess = (response) => {
     deletedSubDepartment.value = true;
-    const message = response.message || 'SubDepartment deleted successfully!';
+    const message = response?.successMessage || 'SubDepartment deleted successfully!';
     showNotification(message, 'success');
     return { success: true, message };
   };

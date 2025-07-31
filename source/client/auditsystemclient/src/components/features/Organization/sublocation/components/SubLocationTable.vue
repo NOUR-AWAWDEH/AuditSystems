@@ -13,6 +13,8 @@
                             <LocationSelector 
                                 :locations="locations" 
                                 :selected-location-id="selectedLocationId"
+                                value-key="id"
+                                label-key="name"
                                 @location-changed="handleLocationChange" />
                         </div>
                         <div v-if="validSelectedLocation" class="w-full sm:w-auto">

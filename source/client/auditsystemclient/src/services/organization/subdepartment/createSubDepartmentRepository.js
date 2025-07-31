@@ -2,10 +2,8 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-
 const SUBDEPARTMENT_BASE_ENDPOINT = '/api/SubDepartment';
 const CREATE_SUBDEPARTMENT_ENDPOINT = '/create-sub-department';
-
 
 export const createSubDepartmentRepository = {
   async createSubDepartment(subDepartmentData) {
@@ -31,39 +29,43 @@ export const createSubDepartmentRepository = {
         }
       );
 
-      if (response.data && response.status === 201) {
-        if (response.data.success && response.data.result) {
-          return ApiResponseT.ok(response.data.result, response.data.message || 'SubDepartment created successfully.');
-        } else if (response.data.success === false) {
-          return ApiResponseT.badRequest(
-            response.data.errors || [{ message: response.data.message || 'Failed to create subdepartment.' }], 
-            response.data.message || 'Failed to create subdepartment.'
+      // Fix: Access response.data and response.status correctly
+      const { data, status } = response;
+
+      if (status === 201 && data?.success) {
+          return ApiResponseT.ok(
+              data.result, 
+              data.successMessage || 'SubDepartment created successfully.'
           );
-        }
       }
 
       return ApiResponseT.badRequest(
-        [{ message: 'Unexpected response format' }],
-        'Failed to create subdepartment'
+          data?.errors || [{ message: data?.message || 'Failed to create subdepartment.' }],
+          data?.message || 'Failed to create subdepartment.'
       );
 
     } catch (error) {
+      console.error('Error creating subdepartment:', error);
+      
+      const responseData = error.response?.data;
+
       if (error.response?.status === 401) {
-        return ApiResponseT.unauthorized(
-          [{ message: 'Authentication required. Please log in again.' }],
-          'Authentication required'
-        );
+          return ApiResponseT.unauthorized(
+              [{ message: 'Authentication required. Please log in again.' }],
+              'Authentication required'
+          );
       }
-      
+
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+          const errors = responseData?.errors || 
+              [{ message: responseData?.message || 'Bad request' }];
+          return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
       }
-      
+
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while creating subdepartment.' }],
-        'Server error'
+          [{ message: error.message || 'An unexpected error occurred while creating subdepartment.' }],
+          'Server error'
       );
     }
-  }
+  },
 };

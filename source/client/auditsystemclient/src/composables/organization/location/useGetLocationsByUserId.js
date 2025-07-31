@@ -12,17 +12,20 @@ export function useGetLocationsByUserId() {
     error.value = null;
 
     try {
-      // Fixed: Remove userId parameter due to UserAware pattern
+      
       const result = await getLocationsByUserIdRepository.getLocationsByUserId();
       
       if (result.success) {
-        locations.value = result.result?.locations || [];
+        locations.value = result.result || [];
       } else {
         const errorMsg = result.message || 'Failed to fetch locations';
         error.value = errorMsg;
+        console.error('Failed to fetch locations:', errorMsg);
+        console.error('Full error result:', result); // Add this line
       }
     } catch (err) {
       error.value = err.message || 'An error occurred while fetching locations';
+      console.error('Error fetching locations:', err);
     } finally {
       isLoading.value = false;
     }

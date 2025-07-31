@@ -8,35 +8,58 @@ const BEARER_PREFIX = 'Bearer ';
 
 export const loginRepository = {
   async loginRequest(username, password) {
+
     try {
       const response = await api.post(AUTH_ENDPOINT, { username, password });
+      
+      const responseData = response.data;
 
-      if (!response?.data?.success) {
-        const errors = Array.isArray(response?.data?.errors)
-          ? response.data.errors
-          : [{ message: response?.data?.message || 'Authentication failed' }];
-        return ApiResponseT.badRequest(errors, response?.data?.message);
+
+      if (!responseData?.success) {
+        console.warn('❌ [LOGIN REPOSITORY] Login failed - response.success is false', {
+          success: responseData?.success,
+          message: responseData?.successMessage,
+          errors: responseData?.errors,
+          fullResponse: responseData
+        });
+        return ApiResponseT.badRequest(
+            responseData?.errors || [{ message: responseData?.successMessage || 'Login failed' }],
+            responseData?.successMessage || 'Login failed'
+        );
       }
 
       const result = {
-        jwtToken: response.data.result.jwtToken,
-        refreshToken: response.data.result.refreshToken,
-        isEmailVerified: response.data.result.isEmailVerified,
+        jwtToken: responseData.result.jwtToken,
+        refreshToken: responseData.result.refreshToken,
+        isEmailVerified: responseData.result.isEmailVerified,
       };
+      
       this.setAuthHeader(result.jwtToken);
-      return ApiResponseT.ok(result, response.data.message);
+      // Return only the actual properties from the server
+      return ApiResponseT.ok(result, responseData?.successMessage || 'Login successful');
 
     } catch (error) {
-      console.error('Login error:', error);
-      let errorMessage = 'Authentication failed';
+      console.error('💥 [LOGIN REPOSITORY] Login error caught:', {
+        error,
+        errorMessage: error?.message,
+        errorResponse: error?.response,
+        errorResponseData: error?.response?.data,
+        stack: error?.stack
+      });
+      
+      let errorMessage = 'Login failed';
       let errors = [{ message: errorMessage }];
 
       if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = Array.isArray(error.response.data.errors)
-          ? error.response.data.errors
+        // Handle server error response - FIX: Access error.response.data
+        const errorData = error.response.data;
+
+        errorMessage = errorData.successMessage || 'Login failed';
+        errors = Array.isArray(errorData.errors)
+          ? errorData.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
+        // Handle network or other errors
         errorMessage = error.message;
         errors = [{ message: errorMessage }];
       }
@@ -52,4 +75,8 @@ export const loginRepository = {
       delete api.defaults.headers.common[AUTHORIZATION_HEADER];
     }
   },
+
+  removeAuthHeader() {
+    delete api.defaults.headers.common[AUTHORIZATION_HEADER];
+  }
 };

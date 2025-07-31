@@ -12,11 +12,9 @@ internal sealed class GetAuditProcessByIdQueryHandler(
 {
     public async Task<Result<GetAuditProcessByIdQueryResponse>> Handle(GetAuditProcessByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await auditProcessService.GetAuditProcessByIdAsync(request.Id, request.UserId);
-        if (result == null)
-            return Result.NotFound();
-        
+        var auditProcess = await auditProcessService.GetAuditProcessByIdAsync(request.Id, request.UserId);
+       
         logger.LogInformation("Audit process with id: {Id} was retrieved by user with id: {UserId}", request.Id, request.UserId);
-        return Result<GetAuditProcessByIdQueryResponse>.Success(new GetAuditProcessByIdQueryResponse(result));
+        return Result<GetAuditProcessByIdQueryResponse>.Success(new GetAuditProcessByIdQueryResponse(auditProcess));
     }
 }

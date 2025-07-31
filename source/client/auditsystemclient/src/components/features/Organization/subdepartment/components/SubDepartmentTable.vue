@@ -52,9 +52,16 @@
                 <!-- Table Container - Show when department is selected -->
                 <div v-if="selectedDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable :items="subDepartments" :columns="enhancedColumns" :is-loading="isLoading"
-                        :actions="[]" :no-data-message="noDataMessage" class="sub-department-table">
+                        :actions="[]" :no-data-message="noDataMessage" class="sub-department-table" @row-click="handleRowClick">
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
+                                <button @click.stop="handleSelectSubDepartment(item)"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                    :class="{ 'bg-green-200': selectedSubDepartmentId === item.id }">
+                                    <CheckIcon v-if="selectedSubDepartmentId === item.id" size="sm" custom-class="mr-1" />
+                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
+                                    {{ selectedSubDepartmentId === item.id ? 'Selected' : 'Select' }}
+                                </button>
                                 <button @click.stop="$emit('edit-sub-department', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
@@ -99,7 +106,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import DepartmentSelector from '@/components/features/Organization/department/components/DepartmentSelector.vue';
@@ -109,6 +117,11 @@ import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
+import CheckIcon from '@/components/common/icons/CheckIcon.vue';
+import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+
+// Initialize router at the top level
+const router = useRouter();
 
 const props = defineProps({
     departments: Array,
@@ -127,8 +140,46 @@ const props = defineProps({
 const emit = defineEmits([
     'add-sub-department',
     'edit-sub-department',
-    'delete-sub-department'
+    'delete-sub-department',
+    'sub-department-selected'
 ]);
+
+// SubDepartment selection state
+const selectedSubDepartmentId = ref(null);
+
+// Handle subdepartment selection from table row or button
+const handleSelectSubDepartment = (subDepartment) => {
+    selectedSubDepartmentId.value = subDepartment.id;
+    emit('sub-department-selected', subDepartment.id);
+    
+    // Navigate to RiskControl with selected subdepartment
+    router.push({
+        path: '/risk-control',
+        query: { subDepartmentId: subDepartment.id }
+    });
+};
+
+// Handle row click to select subdepartment
+const handleRowClick = (subDepartment) => {
+    handleSelectSubDepartment(subDepartment);
+};
+
+// Watch for subdepartment changes to reset selection if subdepartment is deleted
+watch(() => props.subDepartments, (newSubDepartments) => {
+    if (selectedSubDepartmentId.value && newSubDepartments) {
+        const subDepartmentExists = newSubDepartments.some(subDept => subDept.id === selectedSubDepartmentId.value);
+        if (!subDepartmentExists) {
+            selectedSubDepartmentId.value = null;
+            emit('sub-department-selected', null);
+        }
+    }
+}, { deep: true });
+
+// Reset selection when department changes
+watch(() => props.selectedDepartmentId, () => {
+    selectedSubDepartmentId.value = null;
+    emit('sub-department-selected', null);
+});
 
 const subDepartmentColumns = [
     { key: 'name', label: 'Name' },

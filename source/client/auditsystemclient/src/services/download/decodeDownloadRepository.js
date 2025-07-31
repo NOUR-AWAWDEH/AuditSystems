@@ -21,7 +21,7 @@ export const decodeDownloadRepository = {
 
       const response = await api.get(DECODE_DOWNLOAD_BASE_ENDPOINT, config);
 
-      if (response.data && response.status === 200) {
+      if (response && response.status === 200) {
         let filename = null;
 
         // Try headers directly
@@ -87,18 +87,18 @@ export const decodeDownloadRepository = {
         return ApiResponseT.ok({ filename }, 'File downloaded successfully');
       } else {
         return ApiResponseT.badRequest(
-          [{ message: response.data?.message || 'Failed to download file.' }],
-          response.data?.message || 'Failed to download file.'
+          [{ message: response?.data?.successMessage || 'Failed to download file.' }],
+          response?.data?.successMessage || 'Failed to download file.'
         );
       }
     } catch (error) {
       let errorMessage = 'Failed to download file.';
       let errors = [{ message: errorMessage }];
 
-      if (error?.response?.data) {
-        errorMessage = error.response.data.message || errorMessage;
-        errors = error.response.data.errors?.length
-          ? error.response.data.errors
+      if (error?.response) {
+        errorMessage = error.response.successMessage || errorMessage;
+        errors = error.response.errors?.length
+          ? error.response.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;

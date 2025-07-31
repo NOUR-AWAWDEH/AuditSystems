@@ -26,30 +26,24 @@ export function useSearchLocationByUserId() {
             pageSizeParam
         );
         
+
         if (result.success) {
-            // Try multiple possible data locations
-            const locations1 = result.result?.result?.items;
-            const locations2 = result.result?.locations;
-            const locations3 = result.result?.items;
-            const extractedTotalCount1 = result.result?.result?.totalCount;
-            const extractedTotalCount2 = result.result?.totalCount;
-            
-            const finalLocations = locations1 || locations2 || locations3 || [];
-            const finalTotalCount = extractedTotalCount1 || extractedTotalCount2 || 0;
-            
-            searchResults.value = finalLocations;
-            totalCount.value = finalTotalCount;
-            
-            return { 
-                success: true, 
-                message: result.message || 'Search completed successfully',
-                data: {
-                    locations: searchResults.value,
-                    totalCount: totalCount.value,
-                    currentPage: currentPage.value,
-                    pageSize: pageSize.value
-                }
-            };
+          const locations = result.result?.items || result.result || [];
+          const fetchedTotalCount = result.result?.totalCount || 0;
+
+          searchResults.value = locations;
+          totalCount.value = fetchedTotalCount;
+
+          return { 
+            success: true, 
+            message: result.message || 'Search completed successfully',
+            data: {
+              locations: searchResults.value,
+              totalCount: totalCount.value,
+              currentPage: currentPage.value,
+              pageSize: pageSize.value
+            }
+          };
         } else {
             const errorMsg = result.message || 'Search failed';
             error.value = errorMsg;

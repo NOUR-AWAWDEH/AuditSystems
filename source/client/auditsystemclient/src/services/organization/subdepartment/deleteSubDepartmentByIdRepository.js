@@ -27,7 +27,7 @@ export const deleteSubDepartmentByIdRepository = {
       }
 
       const errors = Array.isArray(response?.data?.errors)
-        ? response.data.errors
+        ? response?.data?.errors
         : [{ message: response?.data?.message || 'Delete failed' }];
       return ApiResponseT.badRequest(errors, response?.data?.message);
 
@@ -40,8 +40,8 @@ export const deleteSubDepartmentByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response.data?.errors || [{ message: error.response.data?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response.data?.message || 'Bad request');
+        const errors = error.response?.errors || [{ message: error.response?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.message || 'Bad request');
       }
       
       if (error.response?.status === 404) {

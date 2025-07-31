@@ -1,7 +1,7 @@
 <template>
-  <Teleport to="body">
+  <Teleport to="body" :disabled="!isMounted">
     <Transition name="modal">
-      <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div v-if="isVisible && isMounted" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div 
           class="absolute inset-0 bg-gray-shade bg-opacity-80 transition-opacity"
@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -79,6 +79,15 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'confirm', 'cancel']);
 
 const isVisible = ref(props.modelValue);
+const isMounted = ref(false);
+
+onMounted(() => {
+  isMounted.value = true;
+});
+
+onUnmounted(() => {
+  isMounted.value = false;
+});
 
 // Format message to highlight specific text in red
 const formattedMessage = computed(() => {

@@ -122,7 +122,7 @@ const handleSubmit = async () => {
       isLoading.value = false;
 
       if (response.success) {
-        successMessage.value = response.message || 'A reset code has been sent to your email.';
+        successMessage.value = response.successMessage || 'A reset code has been sent to your email.';
         showMessage(isSuccessVisible, 5000);
         isCodeInputVisible.value = true;
 
@@ -131,7 +131,7 @@ const handleSubmit = async () => {
           isCodeInputVisible.value = false;
         }, resetCodeExpirationTime);
       } else {
-        validationErrors.value.push(response.message || 'Failed to send reset code. Please try again.');
+        validationErrors.value.push(response.successMessage || 'Failed to send reset code. Please try again.');
         showMessage(isValidationErrorVisible, 6000);
       }
     } catch (error) {
@@ -155,7 +155,7 @@ const handleSubmit = async () => {
       isLoading.value = false;
 
       if (response.success) {
-        const resetTokenValue = response.data?.resetToken;
+        const resetTokenValue = response.result?.resetToken;
         if (!resetTokenValue) {
           validationErrors.value.push('Invalid response from server: No reset token provided.');
           showMessage(isValidationErrorVisible, 6000);
@@ -171,7 +171,7 @@ const handleSubmit = async () => {
           showMessage(isValidationErrorVisible, 6000);
         });
       } else {
-        validationErrors.value.push(response.message || 'Invalid or expired code. Please try again.');
+        validationErrors.value.push(response.successMessage || 'Invalid or expired code. Please try again.');
         showMessage(isValidationErrorVisible, 6000);
       }
     } catch (error) {

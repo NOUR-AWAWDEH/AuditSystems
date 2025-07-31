@@ -10,7 +10,7 @@ export function useCreateSubDepartment() {
 
   const handleCreateSuccess = (response) => {
     createdSubDepartment.value = response.result;
-    const message = response.message || 'SubDepartment created successfully!';
+    const message = response?.successMessage || 'SubDepartment created successfully!';
     showNotification(message, 'success');
     return { success: true, data: response.result };
   };

@@ -8,14 +8,17 @@
     "dev": "vite",
     "lint": "eslint --ext .js,.vue src",
     "serve": "serve dist",
-    "start": "serve -s dist"
+    "start": "serve -s dist",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.5",
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "lint": "^1.1.2",
-    "serve": "^10.0.2",
     "tailwindcss": "^4.1.5",
     "vue": "^3.5.13",
     "vue-router": "^4.5.1"
@@ -23,11 +26,15 @@
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^9.22.0",
     "eslint-plugin-vue": "~10.0.0",
     "globals": "^16.0.0",
+    "happy-dom": "^15.11.7",
+    "http-server": "^14.1.1",
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
+    "vitest": "^3.2.4",
     "vue-eslint-parser": "^10.1.3"
   }
 }

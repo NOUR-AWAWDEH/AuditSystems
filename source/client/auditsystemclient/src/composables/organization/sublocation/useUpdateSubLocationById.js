@@ -10,7 +10,7 @@ export function useUpdateSubLocationById() {
 
   const handleUpdateSuccess = (response) => {
     updatedSubLocation.value = response.result;
-    const message = response.message || 'SubLocation updated successfully!';
+    const message = response?.successMessage || 'SubLocation updated successfully!';
     showNotification(message, 'success');
     return { success: true, data: response.result };
   };

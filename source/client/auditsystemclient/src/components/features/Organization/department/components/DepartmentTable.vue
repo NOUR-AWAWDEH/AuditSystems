@@ -71,7 +71,7 @@
                                 </button>
                                 <button @click.stop="$emit('delete-department', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
-                                    <DeleteIcon size="sm" custom-class="mr1" />
+                                    <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
                                 </button>
                             </div>

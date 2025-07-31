@@ -8,69 +8,81 @@ const SUBLOCATION_SEARCH_BY_USER_ID_ENDPOINT = "/search-sub-location-by-user-id"
 export const searchSubLocationByUserIdRepository = {
   async searchSubLocationsByUserId(searchParams = {}) {
     try {
+      const {
+        searchTerm = '',
+        locationId = null,
+        page = 1,
+        pageSize = 10
+      } = searchParams;
+      
       const token = authService.getLocalToken();
-
-      if (!token) {
-        throw new Error("Authentication token not found");
+      const params = {
+        searchTerm,
+        page,
+        pageSize,
+        sortBy: 'name'
+      };
+      
+      // Add locationId to params if provided
+      if (locationId) {
+        params.locationId = locationId;
       }
+      
+      const response = await api.get(
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_SEARCH_BY_USER_ID_ENDPOINT}`,
+        {
+          params,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      const queryParams = new URLSearchParams();
+      const { data, status } = response;
+      
+      if (status === 200 && data?.success) {
+        const result = data.result;
 
-      // Add search parameters
-      if (searchParams.searchTerm) {
-        queryParams.append("searchTerm", searchParams.searchTerm);
-      }
+        // Defensive check in case the result structure changes
+        if (result?.items && typeof result.totalCount === 'number') {
+          return ApiResponseT.ok(
+            result, // includes items and totalCount
+            data.successMessage || 'Sublocations fetched successfully.'
+          );
+        }
 
-      // Add locationId parameter for server-side filtering
-      if (searchParams.locationId) {
-        queryParams.append("locationId", searchParams.locationId);
-      }
-
-      // Pagination parameters
-      if (searchParams.page) {
-        queryParams.append("page", searchParams.page);
-      }
-      if (searchParams.pageSize) {
-        queryParams.append("pageSize", searchParams.pageSize);
-      }
-
-      // Sorting parameters
-      if (searchParams.sortBy) {
-        queryParams.append("sortBy", searchParams.sortBy);
-      }
-      if (searchParams.sortDirection) {
-        queryParams.append("sortDirection", searchParams.sortDirection);
-      }
-
-      const queryString = queryParams.toString();
-      const url = `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_SEARCH_BY_USER_ID_ENDPOINT}${
-        queryString ? `?${queryString}` : ""
-      }`;
-      const response = await api.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.data && response.status === 200) {
-        return ApiResponseT.ok(response.data, "Sublocations retrieved successfully");
+        return ApiResponseT.badRequest(
+          [{ message: 'Missing or invalid result structure.' }],
+          'Invalid response format'
+        );
       }
 
       return ApiResponseT.badRequest(
-        response.data?.errors || [{ message: "Failed to retrieve sublocations" }],
-        response.data?.message || "Failed to retrieve sublocations"
+        [{ message: 'Unexpected response format.' }],
+        'Failed to search sublocations'
       );
 
-    } catch (error) {
-      console.error("Error searching sublocations:", error);
+    } catch(error) { 
+      console.error('Search sublocations error:', error);
+
+      const responseData = error.response?.data;
 
       if (error.response?.status === 401) {
-        return ApiResponseT.unauthorized("Unauthorized: Please login again");
+        return ApiResponseT.unauthorized(
+          [{ message: 'Authentication required. Please log in again.' }],
+          'Unauthorized'
+        );
       }
 
-      return ApiResponseT.internalServerError(
-        error.response?.data?.message || error.message || "Failed to search sublocations"
+      if (error.response?.status === 400) {
+        const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
+      }
+
+      return ApiResponseT.serverError(
+        [{ message: error.message || 'An unexpected error occurred.' }],
+        'Server error'
       );
     }
   }

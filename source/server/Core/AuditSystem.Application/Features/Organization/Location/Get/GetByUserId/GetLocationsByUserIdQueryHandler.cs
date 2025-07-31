@@ -14,9 +14,7 @@ internal sealed class GetLocationsByUserIdQueryHandler(
     public async Task<Result<GetLocationsByUserIdQueryResponse>> Handle(GetLocationsByUserIdQuery request, CancellationToken cancellationToken)
     {
         var locations = await locationService.GetLocationsByUserIdAsync(request.UserId);
-        if (locations == null || locations.Count == 0)
-            return Result<GetLocationsByUserIdQueryResponse>.NotFound(); 
-
+        
         logger.LogInformation("Locations with user id: {UserId} were retrieved successfully.", request.UserId);
         return Result<GetLocationsByUserIdQueryResponse>.Success(new(locations), "Locations retrieved successfully.");
     }

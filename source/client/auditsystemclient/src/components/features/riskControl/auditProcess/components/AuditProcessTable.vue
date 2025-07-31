@@ -166,12 +166,6 @@ const handleRowClick = (auditProcess) => {
     handleSelectAuditProcess(auditProcess);
 };
 
-// Add correct watcher for auditProcesses if needed
-watch(() => props.auditProcesses, (newAuditProcesses) => {
-    // Handle audit processes changes if needed
-    console.log('Audit processes updated:', newAuditProcesses);
-});
-
 const auditProcessColumns = [
     { key: 'processName', label: 'Name' },        // Changed from 'processName'
     { key: 'createdAt', label: 'Created Date', type: 'date' }  // Changed from 'createdAt'

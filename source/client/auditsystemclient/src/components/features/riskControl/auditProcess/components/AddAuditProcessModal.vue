@@ -81,6 +81,7 @@ const props = defineProps({
         default: null
     }
 });
+
 const emit = defineEmits(['close', 'audit-process-added']);
 
 const { showNotification } = useNotification();

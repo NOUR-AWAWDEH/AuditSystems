@@ -44,15 +44,17 @@ export function useAuditProcessModals(refreshData) {
     };
 
     const handleAuditProcessUpdated = async () => {
+        // Store the process name before clearing the reference
+        const processName = auditProcessToEdit.value?.processName || 'Unknown Process';
         await refreshData();
-        showNotification(`Process "${auditProcessToEdit.value.name}" has been updated successfully!`, 'success');
+        showNotification(`Process "${processName}" has been updated successfully!`, 'success');
         handleCloseEditAuditProcessModal();
     };
 
     const handleDeleteAuditProcess = (auditProcess) => {
         itemToDelete.value = auditProcess;
         deleteDialogTitle.value = 'Delete Process';
-        deleteDialogMessage.value = `Are you sure you want to delete the process "${auditProcess.name}"?`;
+        deleteDialogMessage.value = `Are you sure you want to delete the process "${auditProcess.processName}"?`;
         showDeleteDialog.value = true;
     };
 
@@ -60,7 +62,7 @@ export function useAuditProcessModals(refreshData) {
         if (itemToDelete.value) {
             const result = await deleteAuditProcess(itemToDelete.value.id);
             if (result.success) {
-                showNotification(`Process "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
+                showNotification(`Process "${itemToDelete.value.processName}" has been deleted successfully!`, 'success');
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);

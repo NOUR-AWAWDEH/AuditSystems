@@ -15,11 +15,24 @@ export function useSubDepartmentManagement(subDepartments) {
     });
 
     const {
-        subDepartment: fetchSubDepartment,
+        subdepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
         fetchSubDepartmentById,
         clearSubDepartment
     } = useGetSubDepartmentById();
+
+    // Add watcher to fetch SubDepartment details when selectedSubDepartmentId changes
+    watch(selectedSubDepartmentId, async (newSubDepartmentId) => {
+        if (newSubDepartmentId) {
+            try {
+                await fetchSubDepartmentById(newSubDepartmentId);
+            } catch (error) {
+                console.error('Error fetching SubDepartment details:', error);
+            }
+        } else {
+            clearSubDepartment();
+        }
+    }, { immediate: true });
 
     const subDepartmentsRef = computed(() => {
         if (subDepartments && typeof subDepartments === 'object' && 'value' in subDepartments) {

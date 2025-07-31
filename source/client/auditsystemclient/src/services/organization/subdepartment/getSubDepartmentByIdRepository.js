@@ -13,7 +13,9 @@ export const getSubDepartmentByIdRepository = {
             const response = await api.get(
                 `${SUBDEPARTMENT_BASE_ENDPOINT}${SUBDEPARTMENT_GET_BY_ID_ENDPOINT}`,
                 {
-                    params: { id: subDepartmentId },
+                    params: { 
+                        id: subDepartmentId
+                    },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'

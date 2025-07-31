@@ -17,9 +17,8 @@ export const searchAuditProcessesByUserIdRepository = {
                 sortBy: 'name'
             };
 
-            // Add subDepartment only if provided
             if (subDepartment) {
-                params.subDepartment = subDepartment;
+                params.subDepartmentId = subDepartment;
             }
 
             const response = await api.get(

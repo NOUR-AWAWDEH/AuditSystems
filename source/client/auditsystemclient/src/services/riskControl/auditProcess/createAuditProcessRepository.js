@@ -27,7 +27,6 @@ export const createAuditProcessRepository = {
             });
 
             const { data, status } = response;
-            console.log('Create audit process response:', { data, status });
 
             if (status === 201 && data?.success) {
                 return ApiResponseT.ok(data.result, data.successMessage || 'Process created successfully');

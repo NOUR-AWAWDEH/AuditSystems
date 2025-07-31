@@ -6,14 +6,16 @@ const AUDIT_PROCESS_API_ENDPOINT = '/api/AuditProcess';
 const AUDIT_PROCESS_API_ENDPOINT_ID = '/get-audit-processes-by-user-id';
 
 export const getAuditProcessesByUserIdRepository = {
-    async getAuditProcessesByUserId(userId) {
-        let responseData = null; // Declare responseData here
+    async getAuditProcessesByUserId() {
+        let responseData = null;
         try {
             const token = authService.getLocalToken();
 
             const response = await api.get(
                 `${AUDIT_PROCESS_API_ENDPOINT}${AUDIT_PROCESS_API_ENDPOINT_ID}`, {
-                    data: { userId },
+                    params: {
+                        UserId: '00000000-0000-0000-0000-000000000000' // Placeholder GUID, will be overridden by server
+                    },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -25,7 +27,6 @@ export const getAuditProcessesByUserIdRepository = {
             responseData = data; // Assign data to responseData
             
             if (status === 200 && data?.success !== false) { // Check data.success
-                console.log('Audit processes retrieved successfully:', data);
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Processes retrieved successfully'); 
             }
 

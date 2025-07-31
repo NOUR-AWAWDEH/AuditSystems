@@ -20,7 +20,6 @@ export const getSubLocationsByUserIdRepository = {
         }
       );
 
-      console.log(response.data);
       if (response.status === 200) {
         const subLocations = response.data?.result?.subLocations || [];
         return ApiResponseT.ok(subLocations, response?.data?.successMessage || 'SubLocations retrieved successfully');

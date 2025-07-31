@@ -38,7 +38,6 @@ export const updateAuditProcessByIdRepository = {
             responseData = data; // Assign data to responseData
 
             if (status === 200 && data?.success !== false) { // Check data.success
-                console.log('Audit process updated successfully:', data);
                 return ApiResponseT.ok(null, data?.successMessage || 'Process updated successfully.');
             }
 

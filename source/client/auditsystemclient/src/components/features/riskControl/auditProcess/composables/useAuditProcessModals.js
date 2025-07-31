@@ -1,50 +1,53 @@
 import { ref } from 'vue';
-import { useDeleteAuditProcessById } from '@composables/riskControl/auditProcess/useDeleteAuditProcessById';
+import { useDeleteAuditProcessById } from '@/composables/riskControl/auditProcess/useDeleteAuditProcessById';
+import { useNotification } from '@/composables/notification/useNotification';
 
-export function useAuditProcessActions(refreshData, showNotification) {
+export function useAuditProcessModals(refreshData) {
     const { deleteAuditProcess } = useDeleteAuditProcessById();
+    const { showNotification } = useNotification();
 
-    const showAddAuditProcessModel = ref(false);
-    const showEditAuditProcessModel = ref(false);
+    const showAddAuditProcessModal = ref(false);
+    const showEditAuditProcessModal = ref(false);
     const auditProcessToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
     const deleteDialogMessage = ref('');
     const itemToDelete = ref(null);
 
-    //Add
-    const handleAddAuditProcess =() => {
-        showAddAuditProcessModel.value = true;
+    const handleAddAuditProcess = () => {
+        showAddAuditProcessModal.value = true;
     };
 
-    const handleCloseAddAuditProcessModel = () => {
-        showAddAuditProcessModel.value = false;
+    const handleCloseAddAuditProcessModal = () => {
+        showAddAuditProcessModal.value = false;
     };
 
     const handleAuditProcessAdded = async (newAuditProcess) => {
-        await refreshData();
-        showNotification(`Process "${newAuditProcess.name}" has been added successfully!`, 'success');
-        handleCloseAddAuditProcessModel();
+        try {
+            await refreshData();
+            showNotification(`Process "${newAuditProcess.name}" has been added successfully!`, 'success');
+            handleCloseAddAuditProcessModal();
+        } catch (error) {
+            console.error('Error in handleAuditProcessAdded:', error);
+            showNotification('Failed to refresh data after adding process', 'error');
+        }
     };
 
-    //Edit
     const handleEditAuditProcess = (auditProcess) => {
         auditProcessToEdit.value = auditProcess;
-        showEditAuditProcessModel.value = true;
+        showEditAuditProcessModal.value = true;
     };
 
-    const handleCloseEditAuditProcessModel = () => {
-        showEditAuditProcessModel.value = false;
+    const handleCloseEditAuditProcessModal = () => {
+        showEditAuditProcessModal.value = false;
         auditProcessToEdit.value = null;
     };
 
     const handleAuditProcessUpdated = async () => {
         await refreshData();
         showNotification(`Process "${auditProcessToEdit.value.name}" has been updated successfully!`, 'success');
-        handleCloseEditAuditProcessModel();
-    }
-
-    //Delete
+        handleCloseEditAuditProcessModal();
+    };
 
     const handleDeleteAuditProcess = (auditProcess) => {
         itemToDelete.value = auditProcess;
@@ -58,17 +61,15 @@ export function useAuditProcessActions(refreshData, showNotification) {
             const result = await deleteAuditProcess(itemToDelete.value.id);
             if (result.success) {
                 showNotification(`Process "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
-                
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);
             }
-
-            CancelDelete();
+            cancelDelete();
         }
     };
 
-    const CancelDelete = () => {
+    const cancelDelete = () => {
         showDeleteDialog.value = false;
         itemToDelete.value = null;
         deleteDialogTitle.value = '';
@@ -76,21 +77,21 @@ export function useAuditProcessActions(refreshData, showNotification) {
     };
 
     return {
-        showAddAuditProcessModel,
-        showEditAuditProcessModel,
+        showAddAuditProcessModal,
+        showEditAuditProcessModal,
         auditProcessToEdit,
         showDeleteDialog,
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
         handleAddAuditProcess,
-        handleCloseAddAuditProcessModel,
+        handleCloseAddAuditProcessModal,
         handleAuditProcessAdded,
         handleEditAuditProcess,
-        handleCloseEditAuditProcessModel,
+        handleCloseEditAuditProcessModal,
         handleAuditProcessUpdated,
         handleDeleteAuditProcess,
         confirmDelete,
-        CancelDelete,
+        cancelDelete,
     };
 }

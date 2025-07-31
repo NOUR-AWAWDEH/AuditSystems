@@ -93,7 +93,7 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.name === 'Login' && isAuthenticated) {
-    next('/sidebar');
+    next('/dashboard');
     return;
   }
 

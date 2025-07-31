@@ -20,7 +20,6 @@ export const deleteAuditProcessByIdRepository = {
             });
             
             const { data, status } = response;
-            console.log('Delete audit process response:', { data, status });
             
             if (status === 204 || (status === 200 && data?.success !== false)) {
                 return ApiResponseT.ok(null, 'Audit process deleted successfully');

@@ -3,10 +3,7 @@
     <!-- Header Section -->
     <div class="mb-4 sm:mb-6 md:mb-8">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-        <RiskControlHeader 
-          :selected-sub-department="selectedSubDepartment"
-          :is-loading-sub-department="isLoadingSubDepartment"
-        />
+        <RiskControlHeader />
       </div>
     </div>
 
@@ -35,12 +32,11 @@
     <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
       <!-- Process Management -->
       <div v-if="activeTab === 'processes'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Process Management</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Process
-          </button>
-        </div>
+        <AuditProcess
+          :sub-departments="subDepartments"
+          :selected-sub-department-id="selectedSubDepartmentId"
+          @audit-process-selected="handleAuditProcessSelected"
+        />
       </div>
 
       <!-- Sub Process Management -->
@@ -118,40 +114,78 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
-import RiskControlHeader from './RiskControlHeader.vue';
+import RiskControlHeader from './components/RiskControlHeader.vue';
+import AuditProcess from './auditProcess/AuditProcess.vue';
 
 const route = useRoute();
+const router = useRouter();
 
 // SubDepartment management
 const { 
   subdepartment: selectedSubDepartment, 
-  isLoading: isLoadingSubDepartment, 
   fetchSubDepartmentById 
 } = useGetSubDepartmentById();
 
 // Active tab state
 const activeTab = ref('processes');
 
+// Props for AuditProcess component
+const subDepartments = ref([]);
+// Initialize from localStorage
+const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
+
+// Watch for selectedSubDepartmentId changes and persist to localStorage
+watch(selectedSubDepartmentId, (newValue) => {
+  if (newValue) {
+    localStorage.setItem('riskControlSelectedSubDepartmentId', newValue);
+  } else {
+    localStorage.removeItem('riskControlSelectedSubDepartmentId');
+  }
+});
+
 // Watch for route query changes to load subdepartment
 watch(
   () => route.query.subDepartmentId,
   async (newSubDepartmentId) => {
     if (newSubDepartmentId) {
+      selectedSubDepartmentId.value = newSubDepartmentId;
       await fetchSubDepartmentById(newSubDepartmentId);
+      // Update subDepartments array if needed
+      if (selectedSubDepartment.value) {
+        subDepartments.value = [selectedSubDepartment.value];
+      }
+      
+      // Redirect to clean URL after processing the subDepartmentId
+      router.replace({ path: '/risk-control' });
     }
   },
   { immediate: true }
 );
 
-// Load subdepartment on component mount if ID is in query
+// Load subdepartment on component mount
 onMounted(async () => {
-  const subDepartmentId = route.query.subDepartmentId;
+  const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
   if (subDepartmentId) {
+    selectedSubDepartmentId.value = subDepartmentId;
     await fetchSubDepartmentById(subDepartmentId);
+    if (selectedSubDepartment.value) {
+      subDepartments.value = [selectedSubDepartment.value];
+    }
+    
+    // Only redirect if we came from a query parameter
+    if (route.query.subDepartmentId) {
+      router.replace({ path: '/risk-control' });
+    }
   }
 });
+
+// Handle audit process selection
+const handleAuditProcessSelected = (auditProcessId) => {
+  console.log('Audit process selected:', auditProcessId);
+  // Handle audit process selection logic here
+};
 
 // Tab configuration
 const tabs = ref([
@@ -164,7 +198,6 @@ const tabs = ref([
   { id: 'controls', name: 'Control Design' },
   { id: 'observations', name: 'Observations' }
 ]);
-
 </script>
 
 <style scoped>

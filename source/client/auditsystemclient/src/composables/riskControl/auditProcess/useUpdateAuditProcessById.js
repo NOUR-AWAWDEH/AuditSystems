@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { updateAuditProcessByIdRepository } from '@/services/organization/auditProcess/updateAuditProcessByIdRepository';
+import { updateAuditProcessByIdRepository } from '@/services/riskControl/auditProcess/updateAuditProcessByIdRepository';
 
 export function useUpdateAuditProcessById() {
     const isUpdating =ref(false);

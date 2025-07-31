@@ -1,8 +1,8 @@
 import { ref } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { searchAuditProcessByUserIdRepository } from '@/services/riskControl/auditProcess/searchAuditProcessByUserIdRepository';
+import { searchAuditProcessesByUserIdRepository } from '@/services/riskControl/auditProcess/searchAuditProcessesByUserIdRepository';
 
-export function useSearchAuditProcessByUserId() {
+export function useSearchAuditProcessesByUserId() {
     const searchResults = ref([]);
     const isSearching = ref(false);
     const error = ref(null);
@@ -57,7 +57,13 @@ export function useSearchAuditProcessByUserId() {
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-            const response = await searchAuditProcessByUserIdRepository.searchAuditProcessByUserId(params);
+            // Fix: Pass individual parameters instead of params object
+            const response = await searchAuditProcessesByUserIdRepository.searchAuditProcessesByUserId(
+                params.searchTerm,
+                params.page,
+                params.pageSize,
+                params.subDepartmentId
+            );
             
             if (response?.success) {
                 return handleSearchSuccess(response);

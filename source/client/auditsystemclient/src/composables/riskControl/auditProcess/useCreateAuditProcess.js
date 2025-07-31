@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { createAuditProcessRepository } from '@/services/riskControl/auditProcess/createAuditProcessRepository';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateAuditProcess() {
     const isCreating = ref(false);
@@ -37,7 +37,8 @@ export function useCreateAuditProcess() {
             error.value = null;
             createdAuditProcess.value = null;
 
-            const response = await createAuditProcessRepository(auditProcessData);
+            // Fix: Call the method on the repository object
+            const response = await createAuditProcessRepository.createAuditProcess(auditProcessData);
 
             if (response?.success) {
                 return handleCreateSuccess(response);

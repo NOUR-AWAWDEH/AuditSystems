@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
 import { getAuditProcessesByUserIdRepository } from '@/services/riskControl/auditProcess/getAuditProcessesByUserIdRepository';
 
 export function useGetAuditProcessesByUserId() {

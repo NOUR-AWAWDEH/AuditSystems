@@ -24,7 +24,6 @@ export const getAuditProcessByIdRepository = {
             responseData = data; // Assign data to responseData
             
             if (status === 200 && data?.success !== false) { // Check data.success
-                console.log('Audit process retrieved successfully:', data);
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Audit process retrieved successfully');
             }
 

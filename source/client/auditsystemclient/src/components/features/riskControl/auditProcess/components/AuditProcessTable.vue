@@ -17,9 +17,9 @@
                         <div class="flex-1 sm:flex-initial">
                             <SearchFilter
                                 :search-query="searchQuery"
+                                :search-placeholder="'Search audit processes...'"
                                 :handle-search="handleSearch"
-                                placeholder="Search audit processes..."
-                                class="w-full sm:w-64"
+                                class="w-full sm:w-auto"
                             />
                         </div>
                     </div>

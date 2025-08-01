@@ -19,13 +19,14 @@ export const getDepartmentByUserIdRepository = {
                 }
             });
 
-            if (response?.success && response?.result) {
-                return ApiResponseT.ok(response.result, response.successMessage || 'Department retrieved successfully.');
+            // Fix: Access data through response.data
+            if (response.data?.success && response.data?.result) {
+                return ApiResponseT.ok(response.data.result, response.data.successMessage || 'Department retrieved successfully.');
             }
 
             return ApiResponseT.badRequest(
-                response?.errors || [{ message: 'Failed to retrieve department.' }],
-                response?.data?.successMessage || 'Failed to retrieve department.'
+                response.data?.errors || [{ message: 'Failed to retrieve department.' }],
+                response.data?.successMessage || 'Failed to retrieve department.'
             );
             
         } catch (error) {
@@ -37,7 +38,7 @@ export const getDepartmentByUserIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response?.errors ||
+                const errors = error.response?.data?.errors ||
                     [{
                         message: error.response?.data?.successMessage ||
                             'Bad request'

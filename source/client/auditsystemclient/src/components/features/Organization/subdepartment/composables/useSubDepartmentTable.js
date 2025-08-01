@@ -110,10 +110,9 @@ export function useSubDepartmentTable(departments) {
         }
     }, { immediate: true });
     
-    watch(searchQuery, async (search) => {
-        if (isInitializing.value) return;
-        
-        if (search.trim() || selectedDepartmentId.value) {
+    watch(searchQuery, async (search) => {        
+    if (search.trim()) {
+            // Perform search when there's a search term
             await searchSubDepartments({
                 searchTerm: search,
                 departmentId: selectedDepartmentId.value,
@@ -121,9 +120,22 @@ export function useSubDepartmentTable(departments) {
                 pageSize: pageSize.value
             });
         } else {
+            // Clear search results
             clearSearch();
-            if (!selectedDepartmentId.value) {
+            
+            // Reload sub-departments based on current state
+            if (selectedDepartmentId.value) {
+                // If a department is selected, reload sub-departments for that department
+                await searchSubDepartments({
+                    searchTerm: '',
+                    departmentId: selectedDepartmentId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value
+                });
+            } else {
+                // If no department is selected, load all sub-departments
                 await getSubDepartmentsByUserId();
+                searchResults.value = allSubDepartments.value || [];
             }
         }
     });
@@ -170,6 +182,7 @@ export function useSubDepartmentTable(departments) {
             });
         } else {
             await getSubDepartmentsByUserId();
+            searchResults.value = allSubDepartments.value || [];
         }
     };
     
@@ -220,6 +233,8 @@ export function useSubDepartmentTable(departments) {
             }
         } else if (!selectedDepartmentId.value && !searchQuery.value.trim()) {
             await getSubDepartmentsByUserId();
+            // Add this line to ensure the table shows data on initial load
+            searchResults.value = allSubDepartments.value || [];
         }
     });
     
@@ -240,7 +255,6 @@ export function useSubDepartmentTable(departments) {
         handleSearch,
         resetToDefaultView,
         initializeData,
-        // Add the missing functions
         fetchDepartmentById,
         clearDepartment
     };

@@ -60,12 +60,14 @@ export function useDepartmentTable(subLocations) {
     });
     
     const departments = computed(() => {
-        if ((searchQuery?.value && searchQuery.value.trim()) || (selectedSubLocationId?.value)) {
-            return (searchResults && searchResults.value) ? searchResults.value : [];
-        } else {
-            return (allDepartments && allDepartments.value) ? allDepartments.value : [];
-        }
-    });
+    if (searchQuery?.value && searchQuery.value.trim()) {
+        return (searchResults && searchResults.value) ? searchResults.value : [];
+    } else if (selectedSubLocationId?.value) {
+        return (searchResults && searchResults.value) ? searchResults.value : [];
+    } else {
+        return (allDepartments && allDepartments.value) ? allDepartments.value : [];
+    }
+});
     
     const isLoading = computed(() => {
         const searching = (isSearching && isSearching.value) ? isSearching.value : false;
@@ -95,41 +97,40 @@ export function useDepartmentTable(subLocations) {
         }
     };
     
-    watch(subLocationsRef, async (newSubLocations) => {
-        if (!newSubLocations?.length || !selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
-            return;
-        }
-        
-        const subLocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
-        if (subLocationExists) {
-            await nextTick();
-            await initializeData();
-        } else {
-            resetToDefaultView();
-        }
-    }, { immediate: true });
+   watch(searchQuery, async (search) => {
+    if (isInitializing.value) return;
     
-    watch(searchQuery, async (search) => {
-        if (isInitializing.value) return;
+    if (search.trim()) {
+        // Perform search when there's a search term
+        if (searchDepartments) {
+            await searchDepartments({
+                searchTerm: search,
+                subLocationId: selectedSubLocationId.value,
+                page: currentPage.value,
+                pageSize: pageSize.value
+            });
+        }
+    } else {
+        // Clear search results
+        clearSearch();
         
-        if (search.trim() || selectedSubLocationId.value) {
+        // Reload departments based on current state
+        if (selectedSubLocationId.value) {
+            // If a sub-location is selected, reload departments for that sub-location
             if (searchDepartments) {
                 await searchDepartments({
-                    searchTerm: search,
+                    searchTerm: '',
                     subLocationId: selectedSubLocationId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value
                 });
             }
         } else {
-            if (clearSearch) {
-                clearSearch();
-            }
-            if (!selectedSubLocationId.value && getDepartmentsByUserId) {
-                await getDepartmentsByUserId();
-            }
+            // If no sub-location is selected, load all departments
+            await getDepartmentsByUserId();
         }
-    });
+    }
+});
     
     // Watch for selectedSubLocationId changes and fetch SubLocation details
     watch(selectedSubLocationId, async (newSubLocationId) => {
@@ -182,6 +183,9 @@ export function useDepartmentTable(subLocations) {
                 });
             }
         } else {
+            if (clearSearch) {
+                clearSearch();
+            }
             if (getDepartmentsByUserId) {
                 await getDepartmentsByUserId();
             }
@@ -240,7 +244,7 @@ export function useDepartmentTable(subLocations) {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedSubLocationId.value && !searchQuery.value.trim() && getDepartmentsByUserId) {
+        } else if (!selectedSubLocationId.value && !searchQuery.value.trim()) {
             await getDepartmentsByUserId();
         }
     });

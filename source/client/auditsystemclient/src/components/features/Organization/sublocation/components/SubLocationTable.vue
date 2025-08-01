@@ -19,7 +19,8 @@
                         </div>
                         <div v-if="validSelectedLocation" class="w-full sm:w-auto">
                             <SearchFilter 
-                                :search="searchQuery" 
+                                :search="searchQuery"
+                                :searchPlaceholder="'Search sub locations...'" 
                                 @update:search="handleSearch" 
                                 @refresh="refreshData" 
                             />

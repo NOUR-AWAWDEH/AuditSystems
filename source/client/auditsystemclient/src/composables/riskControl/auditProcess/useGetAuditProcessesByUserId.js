@@ -45,6 +45,7 @@ export function useGetAuditProcessesByUserId() {
 
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch processes');
+            
         } finally {
             isLoading.value = false;
         }

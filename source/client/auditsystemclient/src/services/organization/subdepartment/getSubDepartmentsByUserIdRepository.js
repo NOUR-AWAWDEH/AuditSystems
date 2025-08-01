@@ -20,13 +20,16 @@ export const getSubDepartmentsByUserIdRepository = {
         }
       );
 
-      if (response?.success && response?.result) {
-        return ApiResponseT.ok(response.result, response.successMessage || 'SubDepartments retrieved successfully');
+      // Fix: Access response.data and response.status correctly
+      const { data, status } = response;
+
+      if (status === 200 && data?.success && data?.result) {
+        return ApiResponseT.ok(data.result, data.successMessage || 'SubDepartments retrieved successfully');
       }
 
       return ApiResponseT.badRequest(
-        response?.errors || [{ message: 'Failed to retrieve subdepartments' }],
-        response?.message || 'Failed to retrieve subdepartments'
+        data?.errors || [{ message: 'Failed to retrieve subdepartments' }],
+        data?.message || 'Failed to retrieve subdepartments'
       );
 
     } catch (error) {
@@ -38,9 +41,9 @@ export const getSubDepartmentsByUserIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response?.errors || 
-          [{ message: error.response?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response?.message || 'Bad request');
+        const errors = error.response?.data?.errors || 
+          [{ message: error.response?.data?.message || 'Bad request' }];
+        return ApiResponseT.badRequest(errors, error.response?.data?.message || 'Bad request');
       }
       
       return ApiResponseT.serverError(

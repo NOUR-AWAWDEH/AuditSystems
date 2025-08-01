@@ -6,12 +6,10 @@
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
                         <SubDepartmentSelector
-                            :sub-departments="subDepartments"
-                            :selected-sub-department-id="internalSelectedSubDepartmentId"
-                            :selected-sub-department="selectedSubDepartment"
-                            :current-sub-department="currentSubDepartment"
-                            :is-sub-department-loading="isSubDepartmentLoading"
-                            @sub-department-change="(id) => internalSelectedSubDepartmentId = id"
+                            :subDepartments="subDepartments"
+                            :selectedSubDepartmentId="internalSelectedSubDepartmentId"
+                            @update:selectedSubDepartment="(id) => internalSelectedSubDepartmentId = id"
+                            @sub-department-changed="(id) => internalSelectedSubDepartmentId = id"
                         />
                     </div>
 
@@ -112,7 +110,6 @@ import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import SubDepartmentSelector from '@/components/features/Organization/subdepartment/components/SubDepartmentSelector.vue';
-import AuditProcessHeader from './AuditProcessHeader.vue';
 import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
@@ -167,8 +164,8 @@ const handleRowClick = (auditProcess) => {
 };
 
 const auditProcessColumns = [
-    { key: 'processName', label: 'Name' },        // Changed from 'processName'
-    { key: 'createdAt', label: 'Created Date', type: 'date' }  // Changed from 'createdAt'
+    { key: 'processName', label: 'Name' },
+    { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
 const enhancedColumns = computed(() => {

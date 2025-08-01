@@ -22,6 +22,7 @@ export function useCreateAuditProcess() {
         const errorMessage = response?.errors?.length
             ? response.errors[0].message
             : response?.message || defaultErrorMessage;
+        
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
         return {
@@ -37,7 +38,6 @@ export function useCreateAuditProcess() {
             error.value = null;
             createdAuditProcess.value = null;
 
-            // Fix: Call the method on the repository object
             const response = await createAuditProcessRepository.createAuditProcess(auditProcessData);
 
             if (response?.success) {
@@ -45,9 +45,11 @@ export function useCreateAuditProcess() {
             } else {
                 return handleCreateFailure(response);
             }
+
         } catch (err) {
             console.error('useCreateAuditProcess: Create error:', err);
             return handleCreateFailure(err, err.message || 'Failed to create audit process');
+            
         } finally {
             isCreating.value = false;
         }

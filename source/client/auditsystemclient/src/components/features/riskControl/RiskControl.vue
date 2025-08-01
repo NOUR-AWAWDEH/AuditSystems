@@ -118,15 +118,20 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
+import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 
 const route = useRoute();
 const router = useRouter();
 
-// SubDepartment management
 const { 
   subdepartment: selectedSubDepartment, 
   fetchSubDepartmentById 
 } = useGetSubDepartmentById();
+
+const { 
+  subdepartments: allSubDepartments,
+  getSubDepartmentsByUserId 
+} = useGetSubDepartmentsByUserId();
 
 // Active tab state
 const activeTab = ref('processes');
@@ -145,6 +150,18 @@ watch(selectedSubDepartmentId, (newValue) => {
   }
 });
 
+// Function to fetch all subdepartments for the user
+const fetchAllSubDepartments = async () => {
+  try {
+    const result = await getSubDepartmentsByUserId();
+    if (result?.success) {
+      subDepartments.value = allSubDepartments.value; // Now contains ALL subdepartments
+    }
+  } catch (error) {
+    console.error('Error fetching subdepartments:', error);
+  }
+};
+
 // Watch for route query changes to load subdepartment
 watch(
   () => route.query.subDepartmentId,
@@ -152,10 +169,9 @@ watch(
     if (newSubDepartmentId) {
       selectedSubDepartmentId.value = newSubDepartmentId;
       await fetchSubDepartmentById(newSubDepartmentId);
-      // Update subDepartments array if needed
-      if (selectedSubDepartment.value) {
-        subDepartments.value = [selectedSubDepartment.value];
-      }
+      
+      // Fetch all subdepartments instead of just the selected one
+      await fetchAllSubDepartments();
       
       // Redirect to clean URL after processing the subDepartmentId
       router.replace({ path: '/risk-control' });
@@ -166,13 +182,13 @@ watch(
 
 // Load subdepartment on component mount
 onMounted(async () => {
+  // Always fetch all subdepartments first
+  await fetchAllSubDepartments();
+  
   const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
   if (subDepartmentId) {
     selectedSubDepartmentId.value = subDepartmentId;
     await fetchSubDepartmentById(subDepartmentId);
-    if (selectedSubDepartment.value) {
-      subDepartments.value = [selectedSubDepartment.value];
-    }
     
     // Only redirect if we came from a query parameter
     if (route.query.subDepartmentId) {

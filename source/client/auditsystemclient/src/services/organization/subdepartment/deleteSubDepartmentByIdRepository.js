@@ -23,7 +23,6 @@ export const deleteSubDepartmentByIdRepository = {
 
       if (response.status === 204 || response?.data?.success !== false) {
         return ApiResponseT.ok(null, 'SubDepartment deleted successfully');
-
       }
 
       const errors = Array.isArray(response?.data?.errors)
@@ -40,8 +39,11 @@ export const deleteSubDepartmentByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        const errors = error.response?.errors || [{ message: error.response?.message || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response?.message || 'Bad request');
+        // Extract server error message properly
+        const responseData = error.response?.data;
+        const serverMessage = responseData?.message || responseData?.title || responseData?.detail || 'Bad request';
+        const errors = responseData?.errors || [{ message: serverMessage }];
+        return ApiResponseT.badRequest(errors, serverMessage);
       }
       
       if (error.response?.status === 404) {
@@ -51,8 +53,11 @@ export const deleteSubDepartmentByIdRepository = {
         );
       }
       
+      // Handle other server errors
+      const responseData = error.response?.data;
+      const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting subdepartment.';
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while deleting subdepartment.' }],
+        [{ message: serverMessage }],
         'Server error'
       );
     }

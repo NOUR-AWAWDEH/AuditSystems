@@ -48,14 +48,14 @@ export const deleteLocationByIdRepository = {
       }
       
       if (error.response?.status === 400) {
-        // Show server error message for failed deletion
-        const serverMessage = responseData?.message || responseData?.successMessage || 'Bad request';
+        // Extract server error message properly
+        const serverMessage = responseData?.message || responseData?.title || responseData?.detail || 'Bad request';
         const errors = responseData?.errors || [{ message: serverMessage }];
         return ApiResponseT.badRequest(errors, serverMessage);
       }
       
-      // Handle other server errors and show server message
-      const serverMessage = responseData?.message || error.message || 'An unexpected error occurred while deleting location.';
+      // Handle other server errors
+      const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting location.';
       return ApiResponseT.serverError(
         [{ message: serverMessage }],
         'Server error'

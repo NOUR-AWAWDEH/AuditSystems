@@ -239,7 +239,7 @@ function resetViews(...refs) {
   refs.forEach(r => r?.value?.resetToDefaultView?.());
 }
 
-// Event Handlers
+// Event Handlers - Modified to NOT automatically change tabs
 const onLocationSelected = (locationId) => {
   selectedLocationId.value = locationId;
   selectedSubLocationId.value = null;
@@ -259,7 +259,10 @@ const onSubLocationSelected = (subLocationId) => {
   selectedSubDepartmentId.value = null;
 
   resetViews(departmentViewRef, subDepartmentViewRef);
-  activeTab.value = 'departments';
+  
+  if(subLocationId) {
+    activeTab.value = 'departments';
+  }
 };
 
 const onDepartmentSelected = (departmentId) => {
@@ -267,7 +270,9 @@ const onDepartmentSelected = (departmentId) => {
   selectedSubDepartmentId.value = null;
 
   resetViews(subDepartmentViewRef);
-  activeTab.value = 'subdepartments';
+  if (departmentId) {
+    activeTab.value = 'subdepartments';
+  }
 };
 
 const onSubDepartmentSelected = (subDepartmentId) => {

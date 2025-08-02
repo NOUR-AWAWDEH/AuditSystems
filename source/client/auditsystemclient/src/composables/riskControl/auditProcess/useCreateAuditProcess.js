@@ -10,7 +10,6 @@ export function useCreateAuditProcess() {
 
     const handleCreateSuccess = (response) => {
         createdAuditProcess.value = response.result;
-        showNotification(response.successMessage || 'Process created successfully.', 'success');
         return {
             success: true,
             data: response.result,

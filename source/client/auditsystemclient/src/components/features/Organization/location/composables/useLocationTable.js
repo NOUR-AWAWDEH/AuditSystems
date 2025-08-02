@@ -34,12 +34,8 @@ export function useLocationTable() {
       await searchLocations(searchQuery.value, currentPage.value, pageSize.value);
     } else {
       await fetchLocationsByUserId();
-      // Fix: Always assign the fetched locations, don't check length
       locations.value = allLocations.value || [];
     }
-
-    // Remove this line - no need to fetch sublocations on location page
-    // await getSubLocationsByUserId();
   };
 
   // ✅ Ensure refresh happens as soon as composable is used

@@ -7,7 +7,7 @@ const AUDIT_PROCESS_API_ENDPOINT_ID = '/update-audit-process';
 
 export const updateAuditProcessByIdRepository = {
     async updateAuditProcessById(auditProcessData) {
-        let responseData = null; // Declare responseData here
+        let responseData = null;
         try {
             const token = authService.getLocalToken();
 
@@ -34,10 +34,10 @@ export const updateAuditProcessByIdRepository = {
                 }
             );
 
-            const { data, status } = response; // Destructure data and status
-            responseData = data; // Assign data to responseData
+            const { data, status } = response;
+            responseData = data;
 
-            if (status === 200 && data?.success !== false) { // Check data.success
+            if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(null, data?.successMessage || 'Process updated successfully.');
             }
 
@@ -48,7 +48,7 @@ export const updateAuditProcessByIdRepository = {
             return ApiResponseT.badRequest(errors, data?.successMessage || 'Failed to update process.');
             
         } catch (error) {
-            responseData = error.response?.data; // Assign error response data to responseData
+            responseData = error.response?.data;
             console.error('Error updating audit process:', error);
 
             if (error.response?.status === 401) {

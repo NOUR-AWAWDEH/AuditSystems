@@ -25,7 +25,6 @@ export function useAuditProcessModals(refreshData) {
     const handleAuditProcessAdded = async (newAuditProcess) => {
         try {
             await refreshData();
-            showNotification(`Process "${newAuditProcess.name}" has been added successfully!`, 'success');
             handleCloseAddAuditProcessModal();
         } catch (error) {
             console.error('Error in handleAuditProcessAdded:', error);

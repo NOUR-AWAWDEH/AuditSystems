@@ -12,6 +12,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-end gap-3">
                         <Filters
                             :search="search"
+                            :searchPlaceholder="'Search locations...'"
                             @update:search="$emit('update:search', $event)"
                             @refresh="$emit('refresh')"
                         />

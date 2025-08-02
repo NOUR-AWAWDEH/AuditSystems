@@ -38,9 +38,11 @@ export const deleteDepartmentByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = error.response?.errors ||
-                    [{ message: error.response?.data?.successMessage || 'Bad request' }];
-                return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
+                // Extract server error message properly
+                const responseData = error.response?.data;
+                const serverMessage = responseData?.message || responseData?.title || responseData?.detail || 'Bad request';
+                const errors = responseData?.errors || [{ message: serverMessage }];
+                return ApiResponseT.badRequest(errors, serverMessage);
             }
 
             if (error.response?.status === 404) {
@@ -49,8 +51,11 @@ export const deleteDepartmentByIdRepository = {
                 );
             }
 
+            // Handle other server errors
+            const responseData = error.response?.data;
+            const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting department.';
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while deleting department.' }],
+                [{ message: serverMessage }],
                 'Server error'
             );
         }

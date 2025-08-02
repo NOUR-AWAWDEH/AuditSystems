@@ -35,21 +35,40 @@ export function useAuditProcessWatchers({
 
     // Watch search query
     watch(searchQuery, async (search) => {
-        if (searchAuditProcesses) {
-            await searchAuditProcesses({
-                searchTerm: search,
-                subDepartmentId: selectedSubDepartmentId.value,
-                page: currentPage.value,
-                pageSize: pageSize.value,
-            });
-        } else {
-            if (clearSearch) {
-                clearSearch();
+            if (search.trim()) {
+                // Perform search when there's a search term
+                if (searchAuditProcesses) {
+                    await searchAuditProcesses({
+                        searchTerm: search,
+                        subDepartmentId: selectedSubDepartmentId.value,
+                        page: currentPage.value,
+                        pageSize: pageSize.value,
+                    });
+                }
+            } else {
+                // Clear search results
+                if (clearSearch) {
+                    clearSearch();
+                }
+                
+                // Reload audit processes based on current state
+                if (selectedSubDepartmentId.value) {
+                    // If a sub-department is selected, reload audit processes for that sub-department
+                    if (searchAuditProcesses) {
+                        await searchAuditProcesses({
+                            searchTerm: '',
+                            subDepartmentId: selectedSubDepartmentId.value,
+                            page: currentPage.value,
+                            pageSize: pageSize.value,
+                        });
+                    }
+                } else {
+                    // If no sub-department is selected, load all audit processes
+                    if (getAuditProcessesByUserId) {
+                        await getAuditProcessesByUserId();
+                    }
+                }
             }
-            if (!selectedSubDepartment.value && getAuditProcessesByUserId) {
-                await getAuditProcessesByUserId();
-            }
-        }
     });
 
     // Watch selected sub department

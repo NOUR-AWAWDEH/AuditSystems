@@ -1,6 +1,5 @@
 <template>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
-        <!-- Left side - Title and Description -->
         <div class="flex items-center">
             <div>
                 <h2 class="text-2xl font-bold text-secondary-base">

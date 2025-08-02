@@ -10,16 +10,22 @@ export function useAuditProcessComputed({
     isInitializing
 }) {
     const auditProcesses = computed(() => {
-        if ((searchQuery?.value && searchQuery.value.trim()) || selectedSubDepartmentId?.value) {
+        // If there's an active search query, always return search results
+        if (searchQuery?.value && searchQuery.value.trim()) {
             return (searchResults && searchResults.value)
                 ? searchResults.value
                 : [];
         }
-        else {
-            return (allAuditProcesses && allAuditProcesses.value)
-                ? allAuditProcesses.value
+        
+        if (selectedSubDepartmentId?.value) {
+            return (searchResults && searchResults.value)
+                ? searchResults.value
                 : [];
         }
+        
+        return (allAuditProcesses && allAuditProcesses.value)
+            ? allAuditProcesses.value
+            : [];
     });
 
     const isLoading = computed(() => {

@@ -13,9 +13,6 @@ export const getAuditProcessesByUserIdRepository = {
 
             const response = await api.get(
                 `${AUDIT_PROCESS_API_ENDPOINT}${AUDIT_PROCESS_API_ENDPOINT_ID}`, {
-                    params: {
-                        UserId: '00000000-0000-0000-0000-000000000000' // Placeholder GUID, will be overridden by server
-                    },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -23,10 +20,10 @@ export const getAuditProcessesByUserIdRepository = {
                 }
             );
             
-            const { data, status } = response; // Destructure data and status
-            responseData = data; // Assign data to responseData
+            const { data, status } = response;
+            responseData = data;
             
-            if (status === 200 && data?.success !== false) { // Check data.success
+            if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Processes retrieved successfully'); 
             }
 
@@ -40,7 +37,7 @@ export const getAuditProcessesByUserIdRepository = {
             );
 
         } catch (error) {
-            responseData = error.response?.data; // Assign error response data to responseData
+            responseData = error.response?.data;
             console.error('Error retrieving audit processes:', error);
 
             if (error.response?.status === 401) {

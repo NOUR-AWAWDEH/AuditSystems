@@ -17,7 +17,8 @@
                         </div>
                         <div v-if="validSelectedDepartment" class="w-full sm:w-auto">
                             <SearchFilter 
-                                :search="searchQuery" 
+                                :search="searchQuery"
+                                :searchPlaceholder="'Search sub departments...'" 
                                 @update:search="handleSearch" 
                                 @refresh="refreshData" 
                             />

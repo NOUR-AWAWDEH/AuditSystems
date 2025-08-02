@@ -42,7 +42,7 @@ defineProps({
     },
     searchPlaceholder: {
         type: String,
-        default: 'Search locations...'
+        default: 'Search...'
     }
 });
 defineEmits(['update:search','refresh']);

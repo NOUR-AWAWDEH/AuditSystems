@@ -57,7 +57,6 @@ export function useSearchAuditProcessesByUserId() {
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-            // Fix: Pass individual parameters instead of params object
             const response = await searchAuditProcessesByUserIdRepository.searchAuditProcessesByUserId(
                 params.searchTerm,
                 params.page,
@@ -73,6 +72,7 @@ export function useSearchAuditProcessesByUserId() {
             
         } catch (err) {
             return handleSearchFailure(err, err.message || 'Failed to search processes');
+
         } finally {
             isSearching.value = false;
         }
@@ -99,7 +99,6 @@ export function useSearchAuditProcessesByUserId() {
     };
 
     return {
-        // State
         searchResults,
         isSearching,
         error,
@@ -107,7 +106,6 @@ export function useSearchAuditProcessesByUserId() {
         currentPage,
         pageSize,
         searchTerm,
-        // Actions
         searchAuditProcesses,
         clearSearch,
         resetState

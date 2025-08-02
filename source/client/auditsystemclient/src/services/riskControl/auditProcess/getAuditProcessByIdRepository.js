@@ -7,7 +7,7 @@ const AUDIT_PROCESS_API_ENDPOINT_ID = '/get-audit-process-by-id';
 
 export const getAuditProcessByIdRepository = {
     async getAuditProcessById(auditProcessId) {
-        let responseData = null; // Declare responseData here
+        let responseData = null;
         try {
             const token = authService.getLocalToken();
 
@@ -20,10 +20,10 @@ export const getAuditProcessByIdRepository = {
                     },
                 });
             
-            const { data, status } = response; // Destructure data and status
-            responseData = data; // Assign data to responseData
+            const { data, status } = response;
+            responseData = data;
             
-            if (status === 200 && data?.success !== false) { // Check data.success
+            if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Audit process retrieved successfully');
             }
 
@@ -31,13 +31,14 @@ export const getAuditProcessByIdRepository = {
                 ? data.errors
                 : [{ message: 'Failed to retrieve process.' }];
             console.error('Retrieve process failed with errors:', errors);
+            
             return ApiResponseT.badRequest(
                 errors,
                 data?.successMessage || 'Failed to retrieve process.'
             );
 
         } catch (error) {
-            responseData = error.response?.data; // Assign error response data to responseData
+            responseData = error.response?.data;
             console.error('Error retrieving audit process:', error);
 
             if (error.response?.status === 401) {

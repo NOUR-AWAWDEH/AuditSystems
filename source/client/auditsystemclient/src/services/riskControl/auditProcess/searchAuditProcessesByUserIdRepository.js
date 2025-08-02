@@ -6,20 +6,16 @@ const AUDIT_PROCESS_BASE_ENDPOINT = '/api/AuditProcess';
 const SEARCH_AUDIT_PROCESS_BY_USER_ID_ENDPOINT = '/search-audit-processes-by-user-id';
 
 export const searchAuditProcessesByUserIdRepository = {
-    async searchAuditProcessesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, subDepartment = '') {
+    async searchAuditProcessesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, subDepartmentId = '') {
         try {
             const token = authService.getLocalToken();
 
             const params = {
                 searchTerm,
+                subDepartmentId: subDepartmentId,
                 page: pageNumber,
-                pageSize,
-                sortBy: 'name'
+                pageSize
             };
-
-            if (subDepartment) {
-                params.subDepartmentId = subDepartment;
-            }
 
             const response = await api.get(
                 `${AUDIT_PROCESS_BASE_ENDPOINT}${SEARCH_AUDIT_PROCESS_BY_USER_ID_ENDPOINT}`,

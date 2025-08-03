@@ -1,5 +1,5 @@
 using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
-using AuditSystem.Application.Constants.Processes;
+using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;

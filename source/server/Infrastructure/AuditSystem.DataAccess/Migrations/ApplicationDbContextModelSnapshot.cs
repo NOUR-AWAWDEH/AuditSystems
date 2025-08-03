@@ -1911,7 +1911,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasOne("AuditSystem.Domain.Entities.Processes.AuditProcess", "AuditProcess")
                         .WithMany("SubProcesses")
                         .HasForeignKey("AuditProcessId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AuditProcess");
@@ -1975,9 +1975,9 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Processes.SubProcess", "SubProcess")
-                        .WithMany()
+                        .WithMany("RiskControlMatrices")
                         .HasForeignKey("SubProcessId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("SubProcess");
@@ -2216,6 +2216,11 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>
                 {
                     b.Navigation("SubProcesses");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.SubProcess", b =>
+                {
+                    b.Navigation("RiskControlMatrices");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Skills.SkillSet", b =>

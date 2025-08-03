@@ -6,9 +6,14 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProce
 
 public interface ISubProcessService
 {
-    public Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel);
-    public Task UpdateSubProcessAsync(SubProcessModel subProcessModel);
-    public Task DeleteSubProcessAsync(Guid subProcessId);
-    public Task<SubProcessModel> GetSubProcessByIdAsync(Guid id);
-    public Task<PaginationResult<SubProcessModel>> SearchAsync(string? name, Page page);
+    Task<Guid> CreateSubProcessAsync(SubProcessModel subProcessModel, Guid userId);
+    Task UpdateSubProcessAsync(SubProcessModel subProcessModel, Guid userId);
+    Task DeleteSubProcessAsync(Guid subProcessId, Guid userId);
+    Task<SubProcessModel> GetSubProcessByIdAsync(Guid id, Guid userId);
+    Task<ICollection<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId);
+    
+    Task<PaginationResult<SubProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page? page);
+    
+    // The existing SearchAsync for admin/system use if needed
+    Task<PaginationResult<SubProcessModel>> SearchAsync(string? name, Page page);
 }

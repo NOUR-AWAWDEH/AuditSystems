@@ -16,9 +16,10 @@ internal sealed class UpdateSubProcessCommandHandler(
     public async Task<Result> Handle(UpdateSubProcessCommand request, CancellationToken cancellationToken)
     {
         var subProcessModel = mapper.Map<SubProcessModel>(request);
-        await subProcessService.UpdateSubProcessAsync(subProcessModel);
 
-        logger.LogInformation("SubProcess updated successfully");
+        await subProcessService.UpdateSubProcessAsync(subProcessModel, request.UserId);
+
+        logger.LogInformation("SubProcess updated successfully with Id: {SubProcessId} by User: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("SubProcess updated successfully");
     }
 }

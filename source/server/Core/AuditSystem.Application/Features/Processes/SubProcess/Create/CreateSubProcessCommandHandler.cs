@@ -16,9 +16,9 @@ internal sealed class CreateSubProcessCommandHandler(
     public async Task<Result<CreateSubProcessCommandResponse>> Handle(CreateSubProcessCommand request, CancellationToken cancellationToken)
     {
         var subProcessModel = mapper.Map<SubProcessModel>(request);
-        var subProcessId = await subProcessService.CreateSubProcessAsync(subProcessModel);
-        logger.LogInformation("SubProcess with  Particular {SubProcessParticular} has been created.", request.Particular);
+        var subProcessId = await subProcessService.CreateSubProcessAsync(subProcessModel, request.UserId);
 
+        logger.LogInformation("SubProcess with  Particular {SubProcessParticular} has been created by User id: {UserId}", request.Particular, request.UserId);
         return Result<CreateSubProcessCommandResponse>.Created(new CreateSubProcessCommandResponse(subProcessId), "SubProcess created.");
     }
 }

@@ -12,16 +12,9 @@ internal sealed class DeleteSubProcessCommandHandler(
 {
     public async Task<Result> Handle(DeleteSubProcessCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            await subProcessService.DeleteSubProcessAsync(request.Id);
-            logger.LogInformation("Sub process with id: {Id} was deleted", request.Id);
-            return Result.SuccessWithMessage("Sub process deleted");  
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error while deleting sub process with id: {Id}", request.Id);
-            return Result.Error(ex.Message);
-        }  
+        await subProcessService.DeleteSubProcessAsync(request.Id, request.UserId);
+        
+        logger.LogInformation("Sub process with id: {Id} was deleted by User id: {UserId}", request.Id, request.UserId);
+        return Result.SuccessWithMessage("Sub process deleted"); 
     }
 }

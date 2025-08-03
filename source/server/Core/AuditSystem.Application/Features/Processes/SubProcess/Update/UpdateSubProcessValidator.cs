@@ -17,13 +17,24 @@ public sealed class UpdateSubProcessValidator : AbstractValidator<UpdateSubProce
             .WithMessage("Particular is required.")
             .MinimumLength(2)
             .WithMessage("Particular must be at least 2 characters long.")
-            .MaximumLength(100)
-            .WithMessage("Particular must not exceed 100 characters.");
+            .MaximumLength(500)
+            .WithMessage("Particular must not exceed 500 characters.");
 
-        RuleFor(x => x.ProcessId)
+        RuleFor(x => x.AuditProcessId)
             .NotEmpty()
-            .WithMessage("ProcessId is required.")
+            .WithMessage("AuditProcessId is required.")
             .Must(id => id != Guid.Empty)
-            .WithMessage("ProcessId must not be empty.");
+            .WithMessage("AuditProcessId must not be empty.");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("UserId is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("UserId must not be empty.");
+    }
+
+    private bool BeAValidGuid(Guid id)
+    {
+        return id != Guid.Empty;
     }
 }

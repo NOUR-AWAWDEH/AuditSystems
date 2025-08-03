@@ -18,4 +18,3 @@ internal sealed class DeleteAuditProcessCommandHandler(
         return Result.SuccessWithMessage("Audit process deleted");  
     }
 }
-

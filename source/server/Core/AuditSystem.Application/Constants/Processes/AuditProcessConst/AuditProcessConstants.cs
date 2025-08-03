@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using AuditSystem.Domain.Entities.Processes;
 
-namespace AuditSystem.Application.Constants.Processes;
+namespace AuditSystem.Application.Constants.Processes.AuditProcessConst;
 
 public static class AuditProcessConstants
 {

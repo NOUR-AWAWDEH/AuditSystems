@@ -68,15 +68,14 @@ using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices;
 using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
+using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -183,8 +182,8 @@ public static class BusinessLogicDependencies
             // Sub Process
             .AddScoped<ISubProcessService, SubProcessService>()
             .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
-            //.AddScoped<ISubProcessValidation, SubProcessValidationHelper>()
-            //.AddScoped<ISubProcessSearch, SubProcessSearchHelper>()
+            .AddScoped<ISubProcessValidation, SubProcessValidationHelper>()
+            .AddScoped<ISubProcessSearch, SubProcessSearchHelper>()
 
             // Reports
             .AddScoped<IAuditExceptionReportService, AuditExceptionRepotService>()

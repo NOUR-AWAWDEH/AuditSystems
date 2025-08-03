@@ -66,8 +66,10 @@ public static class InfrastructureDependencies
         var connectionString = configuration[ConfigurationKeys.DefaultConnectionString] ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
         return services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString)
-                   .EnableSensitiveDataLogging(!isProduction)
-                   .LogTo(Console.WriteLine, LogLevel.Information));
+                   .EnableSensitiveDataLogging(false)
+                   .LogTo(Console.WriteLine, LogLevel.Information)
+                   .ConfigureWarnings(warnings => warnings.Ignore(
+                        Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.SavepointsDisabledBecauseOfMARS)));
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>

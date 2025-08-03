@@ -15,7 +15,7 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification'; // Path will be created next
+import { useNotification } from '@/composables/notification/useNotification';
 
 const { notification, hideNotification } = useNotification();
 
@@ -26,9 +26,9 @@ const notificationTypeClass = computed(() => {
     case 'error':
       return 'bg-[var(--color-soft-error)] text-[var(--color-error)]';
     case 'warning':
-      return 'bg-[var(--color-tertiary-tint)] text-[var(--color-tertiary-shade)]'; // Using tertiary for warning
+      return 'bg-[var(--color-tertiary-tint)] text-[var(--color-tertiary-shade)]';
     case 'info':
-      return 'bg-[var(--color-primary-tint)] text-[var(--color-primary-base)]'; // Using primary for info
+      return 'bg-[var(--color-primary-tint)] text-[var(--color-primary-base)]';
     default:
       return 'bg-[var(--color-gray-tint)] text-[var(--color-gray-base)]';
   }
@@ -56,5 +56,4 @@ const closeNotification = () => {
 </script>
 
 <style scoped>
-/* Add any specific styles if needed */
 </style>

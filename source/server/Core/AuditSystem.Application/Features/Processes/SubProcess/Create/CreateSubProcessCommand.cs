@@ -3,8 +3,7 @@ using AuditSystem.Application.Base;
 
 namespace AuditSystem.Application.Features.Processes.SubProcess.Create;
 
-public sealed record class CreateSubProcessCommand : ICommand<Result<CreateSubProcessCommandResponse>>
-{
-    public required string Particular { get; set; } = string.Empty;
-    public required Guid ProcessId { get; set; }
-}
+public sealed record class CreateSubProcessCommand(
+    string Particular,
+    Guid AuditProcessId
+) : UserAwareCommand<Result<CreateSubProcessCommandResponse>>;

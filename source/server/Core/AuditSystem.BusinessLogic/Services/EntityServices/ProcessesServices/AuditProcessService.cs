@@ -8,7 +8,7 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
-using AuditSystem.Application.Constants.Processes;
+using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 
@@ -81,7 +81,7 @@ internal sealed class AuditProcessService(
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
         
-        logger.LogInformation("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
+        logger.LogDebug("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
 
         await _validationHelper.ValidateAuditProcessOwnerShipAsync(processId, userId);
         
@@ -89,7 +89,7 @@ internal sealed class AuditProcessService(
 
         await ClearEntityCacheAsync(processId);
         
-        await ClearUserRelatedCachesAsync(userId, "AuditProcess");
+        await ClearUserRelatedCachesAsync(userId, AuditProcessConstants.EntityName);
 
         logger.LogInformation("Successfully deleted audit process {ProcessId}", processId);
     }
@@ -101,10 +101,8 @@ internal sealed class AuditProcessService(
     
         logger.LogInformation("Updating audit process {ProcessId} for user {UserId}", processModel.Id, userId);
     
-        // Validate ownership of existing audit process
         var existingEntity = await _validationHelper.ValidateAuditProcessOwnerShipAsync(processModel.Id, userId);
         
-        // Validate ownership of the SubDepartment being assigned
         await _validationHelper.ValidateSubDepartmentOwnerShipAsync(processModel.SubDepartmentId, userId);
         
         mapper.Map(processModel, existingEntity);
@@ -133,6 +131,8 @@ internal sealed class AuditProcessService(
                 Id = ap.Id,
                 ProcessName = ap.ProcessName,
                 SubDepartmentId = ap.SubDepartmentId,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt,
             });
         
         var processes = await query.ToListAsync();

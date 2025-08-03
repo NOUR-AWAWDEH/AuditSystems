@@ -20,10 +20,10 @@ public sealed class UpdateSubProcessValidator : AbstractValidator<UpdateSubProce
             .MaximumLength(100)
             .WithMessage("Particular must not exceed 100 characters.");
 
-        RuleFor(x => x.ProcessId)
+        RuleFor(x => x.AuditProcessId)
             .NotEmpty()
-            .WithMessage("ProcessId is required.")
+            .WithMessage("AuditProcessId is required.")
             .Must(id => id != Guid.Empty)
-            .WithMessage("ProcessId must not be empty.");
+            .WithMessage("AuditProcessId must not be empty.");
     }
 }

@@ -10,7 +10,7 @@ internal sealed class GetSubProcessByIdQueryHandler(
 {
     public async Task<Result<GetSubProcessByIdQueryResponse>> Handle(GetSubProcessByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await subProcessService.GetSubProcessByIdAsync(request.Id);
+        var result = await subProcessService.GetSubProcessByIdAsync(request.Id, request.UserId);
         if (result == null)
         {
             return Result.NotFound();

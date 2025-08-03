@@ -14,7 +14,7 @@ internal sealed class DeleteSubProcessCommandHandler(
     {
         try
         {
-            await subProcessService.DeleteSubProcessAsync(request.Id);
+            await subProcessService.DeleteSubProcessAsync(request.Id, request.UserId);
             logger.LogInformation("Sub process with id: {Id} was deleted", request.Id);
             return Result.SuccessWithMessage("Sub process deleted");  
         }

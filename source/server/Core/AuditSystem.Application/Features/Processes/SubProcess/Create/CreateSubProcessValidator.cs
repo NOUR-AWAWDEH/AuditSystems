@@ -6,11 +6,11 @@ public sealed class CreateSubProcessValidator : AbstractValidator<CreateSubProce
 {
     public CreateSubProcessValidator()
     {
-        RuleFor(x => x.ProcessId)
+        RuleFor(x => x.AuditProcessId)
             .NotEmpty()
-            .WithMessage("Process Id is required.")
+            .WithMessage("Audit Process Id is required.")
             .Must(x => x != Guid.Empty)
-            .WithMessage("Process Id must be a valid GUID.");
+            .WithMessage("Audit Process Id must be a valid GUID.");
 
         RuleFor(x => x.Particular)
             .NotEmpty()

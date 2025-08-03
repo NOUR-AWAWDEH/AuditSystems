@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Processes;
+using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -70,7 +70,6 @@ public class AuditProcessSearchHelper : IAuditProcessSearch
         return (cacheKey, countCacheKey);
     }
 
-    // Add the missing method required by interface
     public async Task<PaginationResult<AuditProcessModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Guid subDepartmentId, Page page, string cacheKey, string countCacheKey)
     {

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace AuditSystem.Application.Features.Processes.SubProcess.Create;
 
@@ -17,7 +18,13 @@ public sealed class CreateSubProcessValidator : AbstractValidator<CreateSubProce
             .WithMessage("Particular is required.")
             .MinimumLength(2)
             .WithMessage("Particular must be at least 2 characters long.")
-            .MaximumLength(200)
-            .WithMessage("Particular must not exceed 200 characters.");
+            .MaximumLength(500)
+            .WithMessage("Particular must not exceed 500 characters.");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User Id must be a valid GUID.");
     }
 }

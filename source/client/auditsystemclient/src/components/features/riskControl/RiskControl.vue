@@ -41,12 +41,11 @@
 
       <!-- Sub Process Management -->
       <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Sub Process Management</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Sub Process
-          </button>
-        </div>
+        <SubProcess
+          :audit-processes="allAuditProcesses?.auditProcesses || []"
+          :selected-audit-process-id="selectedAuditProcessId"
+          @sub-process-selected="handleSubProcessSelected"
+        />
       </div>
 
       <!-- Risk Control Matrix -->
@@ -118,7 +117,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
+import SubProcess from './subProcess/SubProcess.vue';
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
+import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
 
 const route = useRoute();
 const router = useRouter();
@@ -133,6 +134,11 @@ const {
   getSubDepartmentsByUserId 
 } = useGetSubDepartmentsByUserId();
 
+const {
+  auditProcesses: allAuditProcesses,
+  getAuditProcessesByUserId
+} = useGetAuditProcessesByUserId();
+
 // Active tab state
 const activeTab = ref('processes');
 
@@ -141,12 +147,25 @@ const subDepartments = ref([]);
 // Initialize from localStorage
 const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
 
+// Props for SubProcess component - use the reactive ref directly from composable
+// Initialize from localStorage
+const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
+
 // Watch for selectedSubDepartmentId changes and persist to localStorage
 watch(selectedSubDepartmentId, (newValue) => {
   if (newValue) {
     localStorage.setItem('riskControlSelectedSubDepartmentId', newValue);
   } else {
     localStorage.removeItem('riskControlSelectedSubDepartmentId');
+  }
+});
+
+// Watch for selectedAuditProcessId changes and persist to localStorage
+watch(selectedAuditProcessId, (newValue) => {
+  if (newValue) {
+    localStorage.setItem('riskControlSelectedAuditProcessId', newValue);
+  } else {
+    localStorage.removeItem('riskControlSelectedAuditProcessId');
   }
 });
 
@@ -159,6 +178,15 @@ const fetchAllSubDepartments = async () => {
     }
   } catch (error) {
     console.error('Error fetching subdepartments:', error);
+  }
+};
+
+// Function to fetch all audit processes for the user
+const fetchAllAuditProcesses = async () => {
+  try {
+    await getAuditProcessesByUserId();
+  } catch (error) {
+    console.error('Error fetching audit processes:', error);
   }
 };
 
@@ -180,10 +208,30 @@ watch(
   { immediate: true }
 );
 
+// Watch for route query changes to load audit process
+watch(
+  () => route.query.auditProcessId,
+  async (newAuditProcessId) => {
+    if (newAuditProcessId) {
+      selectedAuditProcessId.value = newAuditProcessId;
+      
+      // Fetch all audit processes
+      await fetchAllAuditProcesses();
+      
+      // Redirect to clean URL after processing the auditProcessId
+      router.replace({ path: '/risk-control' });
+    }
+  },
+  { immediate: true }
+);
+
 // Load subdepartment on component mount
 onMounted(async () => {
   // Always fetch all subdepartments first
   await fetchAllSubDepartments();
+  
+  // Always fetch all audit processes
+  await fetchAllAuditProcesses();
   
   const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
   if (subDepartmentId) {
@@ -195,12 +243,29 @@ onMounted(async () => {
       router.replace({ path: '/risk-control' });
     }
   }
+  
+  const auditProcessId = route.query.auditProcessId || selectedAuditProcessId.value;
+  if (auditProcessId) {
+    selectedAuditProcessId.value = auditProcessId;
+    
+    // Only redirect if we came from a query parameter
+    if (route.query.auditProcessId) {
+      router.replace({ path: '/risk-control' });
+    }
+  }
 });
 
 // Handle audit process selection
 const handleAuditProcessSelected = (auditProcessId) => {
-  console.log('Audit process selected:', auditProcessId);
-  // Handle audit process selection logic here
+  selectedAuditProcessId.value = auditProcessId;
+  // Switch to sub processes tab when an audit process is selected
+  activeTab.value = 'subprocesses';
+};
+
+// Handle sub process selection
+const handleSubProcessSelected = (subProcessId) => {
+  console.log('Sub process selected:', subProcessId);
+  // Handle sub process selection logic here
 };
 
 // Tab configuration

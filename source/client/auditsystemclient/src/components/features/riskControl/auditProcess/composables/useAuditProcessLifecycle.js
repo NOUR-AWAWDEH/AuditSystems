@@ -40,15 +40,18 @@ export function useAuditProcessLifecycle({
 
         if (selectedSubDepartmentId.value && !isInitialized.value && !isInitializing.value) {
             if (subDepartmentsRef.value?.length > 0) {
-                const subDepartmentExists = subDepartmentsRef.value.some(sub => sub.id === selectedSubDepartmentId.value);
+                const subDepartmentExists = subDepartmentsRef.value.some(
+                    sub => sub.id === selectedSubDepartmentId.value);
                 if (subDepartmentExists) {
                     await initializeData();
                 } else {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedSubDepartmentId.value && !searchQuery.value.trim() && getAuditProcessesByUserId) {
-            await getAuditProcessesByUserId();
+        } else if (!selectedSubDepartmentId.value 
+            && !searchQuery.value.trim() 
+            && getAuditProcessesByUserId) {
+                await getAuditProcessesByUserId();
         }
     });
 

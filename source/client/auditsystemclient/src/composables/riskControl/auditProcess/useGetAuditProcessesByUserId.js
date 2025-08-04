@@ -9,7 +9,7 @@ export function useGetAuditProcessesByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const auditProcessesData = response.result?.auditProcesses || [];
+        const auditProcessesData = response.result || [];
         auditProcesses.value = auditProcessesData;
         return { success: true, data: auditProcessesData };
     };

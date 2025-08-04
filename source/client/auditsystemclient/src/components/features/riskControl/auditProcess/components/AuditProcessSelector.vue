@@ -5,7 +5,7 @@
     label="Select Process"
     placeholder="Choose a process"
     value-key="id"
-    label-key="name"
+    label-key="processName"
     :error="auditProcessError"
     @update:modelValue="handleAuditProcessChange"
   />

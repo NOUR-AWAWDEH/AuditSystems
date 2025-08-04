@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { getAuditProcessByIdRepository } from '@/services/riskControl/auditProcess/getAuditProcessByIdRepository';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetAuditProcessById() {
     const auditProcess = ref(null);

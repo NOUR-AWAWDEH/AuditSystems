@@ -13,7 +13,7 @@ export const getAuditProcessByIdRepository = {
 
             const response = await api.get(
                 `${AUDIT_PROCESS_API_ENDPOINT}${AUDIT_PROCESS_API_ENDPOINT_ID}`, {
-                    data: { id: auditProcessId },
+                    params: { id: auditProcessId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export function useAuditProcessModals(refreshData) {
         showAddAuditProcessModal.value = false;
     };
 
-    const handleAuditProcessAdded = async (newAuditProcess) => {
+    const handleAuditProcessAdded = async () => {
         try {
             await refreshData();
             handleCloseAddAuditProcessModal();

@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.Common.Rating.Update;
 
 internal sealed class UpdateRatingCommandHandler(
-    IRatingService ratingService,
+    IRateService ratingService,
     IMapper mapper,
     ILogger<UpdateRatingCommandHandler> logger)
     : IRequestHandler<UpdateRatingCommand, Result>
 {
     public async Task<Result> Handle(UpdateRatingCommand request, CancellationToken cancellationToken)
     {
-        var ratingModel = mapper.Map<RatingModel>(request);
+        var ratingModel = mapper.Map<RateModel>(request);
         await ratingService.UpdateRatingAsync(ratingModel);
 
         logger.LogInformation("Rating updated successfully");

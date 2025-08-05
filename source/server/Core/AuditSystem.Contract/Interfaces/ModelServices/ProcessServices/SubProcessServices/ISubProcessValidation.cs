@@ -4,6 +4,6 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProce
 
 public interface ISubProcessValidation
 {
-    Task<SubProcess> ValidateSubProcessOwnerShipAsync(Guid subProcessId, Guid userId);
-    Task<AuditProcess> ValidateAuditProcessOwnerShipAsync(Guid auditProcessId, Guid userId);
+    Task<SubProcess> ValidateSubProcessOwnershipAsync(Guid subProcessId, Guid userId);
+    Task<AuditProcess> ValidateAuditProcessOwnershipAsync(Guid auditProcessId, Guid userId);
 }

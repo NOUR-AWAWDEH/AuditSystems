@@ -76,6 +76,8 @@ using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcess
 using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
+using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -129,8 +131,8 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, Remark, RemarkModel>, RemarkService>()
 
             // Common
-            .AddScoped<IRatingService, RatingService>()
-            .AddScoped<IUnifiedCacheService<Guid, Rating, RatingModel>, RatingService>()
+            .AddScoped<IRateService, RatingService>()
+            .AddScoped<IUnifiedCacheService<Guid, Rate, RateModel>, RatingService>()
 
             // Compliance
             .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()
@@ -199,11 +201,17 @@ public static class BusinessLogicDependencies
             .AddScoped<IReportingFollowUpService, ReportingFollowUpService>()
             .AddScoped<IUnifiedCacheService<Guid, ReportingFollowUp, ReportingFollowUpModel>, ReportingFollowUpService>()
 
-            // Risk Controls
+            // Risk Control Matrix
             .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()
             .AddScoped<IUnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>, RiskControlMatrixService>()
+            .AddScoped<IRiskControlMatrixSearch, RiskControlMatrixSearchHelper>()
+            .AddScoped<IRiskControlMatrixValidation, RiskControlMatrixValidationHelper>()
+
+            // Risk Controls
             .AddScoped<IRiskControlService, RiskControlService>()
             .AddScoped<IUnifiedCacheService<Guid, RiskControls, RiskControlsModel>, RiskControlService>()
+
+            // Risk Programs
             .AddScoped<IRiskProgramService, RiskProgramService>()
             .AddScoped<IUnifiedCacheService<Guid, RiskProgram, RiskProgramModel>, RiskProgramService>()
 

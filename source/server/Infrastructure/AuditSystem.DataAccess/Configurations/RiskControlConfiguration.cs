@@ -22,7 +22,7 @@ public class RiskControlConfiguration : IEntityTypeConfiguration<RiskControls>
                .HasForeignKey(rc => rc.RiskId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        // Relationship with Rating (Optional, could also be NoAction)
+        // Relationship with Rating (Restrict delete to prevent cascade path)
         builder.HasOne(rc => rc.Rating)
                .WithMany()
                .HasForeignKey(rc => rc.RatingId)

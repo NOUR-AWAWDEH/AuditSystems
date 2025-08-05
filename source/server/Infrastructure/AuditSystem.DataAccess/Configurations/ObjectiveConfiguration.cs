@@ -21,10 +21,5 @@ public void Configure(EntityTypeBuilder<Objective> builder)
               .WithMany()
               .HasForeignKey(o => o.RiskControlMatrixId)
               .OnDelete(DeleteBehavior.Restrict);
-
-       builder.HasOne(o => o.Rating)
-              .WithMany()
-              .HasForeignKey(o => o.RatingId)
-              .OnDelete(DeleteBehavior.Restrict);
 }
 }

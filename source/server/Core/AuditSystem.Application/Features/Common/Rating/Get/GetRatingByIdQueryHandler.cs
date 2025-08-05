@@ -5,7 +5,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 namespace AuditSystem.Application.Features.Common.Rating.Get;
 
 internal sealed class GetRatingByIdQueryHandler(
-    IRatingService ratingService) : 
+    IRateService ratingService) : 
     IRequestHandler<GetRatingByIdQuery, Result<GetRatingByIdQueryResponse>>
 {
     public async Task<Result<GetRatingByIdQueryResponse>> Handle(GetRatingByIdQuery request, CancellationToken cancellationToken)

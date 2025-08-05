@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Models.RiskControls;
 using AutoMapper;
 using MediatR;
@@ -16,9 +16,9 @@ internal sealed class CreateRiskControlMatrixCommandHandler(
     public async Task<Result<CreateRiskControlMatrixCommandResponse>> Handle(CreateRiskControlMatrixCommand request, CancellationToken cancellationToken)
     {
         var riskControlMatrixModel = mapper.Map<RiskControlMatrixModel>(request);
-        var riskControlMatrixId = await riskControlMatrixService.CreateRiskControlMatrixAsync(riskControlMatrixModel);
-        logger.LogInformation("Risk Control Matrix with SubProcessID {RiskControlMatrixImpact} has been created.", request.SubProcessId);
-
+        var riskControlMatrixId = await riskControlMatrixService.CreateRiskControlMatrixAsync(riskControlMatrixModel, request.UserId);
+        
+        logger.LogInformation("Risk Control Matrix has been created by UserID {UserId}.", request.UserId);
         return Result<CreateRiskControlMatrixCommandResponse>.Created(new CreateRiskControlMatrixCommandResponse(riskControlMatrixId), "Risk Control Matrix created.");
     }
 }

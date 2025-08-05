@@ -7,9 +7,11 @@ public class Risk : Entity<Guid>
 {
     public required Guid ObjectiveId { get; set; }
     public required string RiskName { get; set; } = string.Empty;
-    public required Guid RatingId { get; set; }
+    public required Guid RateId { get; set; }
     public string Description { get; set; } = string.Empty;
 
-    public virtual Rating Rating { get; set; } = null!;
+    // Navigation properties
+    public virtual Rate Rate { get; set; } = null!;
     public virtual Objective Objective { get; set; } = null!;
+    public virtual ICollection<ExitRisk> ExitRisks { get; set; } = new HashSet<ExitRisk>();
 }

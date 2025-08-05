@@ -27,7 +27,8 @@ public class SubProcessSearchHelper : ISubProcessSearch
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
-    public Expression<Func<SubProcess, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProcessId)
+    public Expression<Func<SubProcess, bool>> BuildUserSearchPredicate(
+        Guid userId, string? searchTerm, Guid auditProcessId)
     {
         return sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || sp.Particular.Contains(searchTerm)) &&
@@ -35,13 +36,15 @@ public class SubProcessSearchHelper : ISubProcessSearch
     }
 
     // Original method for backward compatibility
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Page page)
     {
         return GetUserSearchCacheKeys(userId, searchTerm, null, page);
     }
 
     // Method with required Guid auditProcessId (not nullable) - matches interface
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid auditProcessId, Page page)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid auditProcessId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var auditProcessIdStr = auditProcessId.ToString();
@@ -56,7 +59,8 @@ public class SubProcessSearchHelper : ISubProcessSearch
     }
 
     // Updated method with nullable auditProcessId support (for internal use)
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? auditProcessId, Page page)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid? auditProcessId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var auditProcessIdStr = auditProcessId?.ToString() ?? "all";

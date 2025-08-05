@@ -1,5 +1,5 @@
 ﻿using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Models.RiskControls;
 using AutoMapper;
 using MediatR;
@@ -16,9 +16,10 @@ internal sealed class UpdateRiskControlMatrixCommandHandler(
     public async Task<Result> Handle(UpdateRiskControlMatrixCommand request, CancellationToken cancellationToken)
     {
         var riskControlMatrixModel = mapper.Map<RiskControlMatrixModel>(request);
-        await riskControlMatrixService.UpdateRiskControlMatrixAsync(riskControlMatrixModel);
 
-        logger.LogInformation("Risk control matrix updated successfully");
+        await riskControlMatrixService.UpdateRiskControlMatrixAsync(riskControlMatrixModel, request.UserId);
+
+        logger.LogInformation("Risk control matrix updated successfully with id: {Id} by User: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("Risk control matrix updated successfully");
     }
 }

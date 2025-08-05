@@ -21,7 +21,7 @@ public class SubProcessValidationHelper : ISubProcessValidation
             throw new ArgumentException(SubProcessConstants.UserIdEmptyMessage, nameof(userId));
     }
 
-    public async Task<SubProcess> ValidateSubProcessOwnerShipAsync(Guid subProcessId, Guid userId)
+    public async Task<SubProcess> ValidateSubProcessOwnershipAsync(Guid subProcessId, Guid userId)
     {
         var subProcess = await _repository.GetByIdAsync(subProcessId, SubProcessConstants.IncludeHierarchy)
             ?? throw new KeyNotFoundException(string.Format(SubProcessConstants.SubProcessNotFoundMessage, subProcessId));
@@ -32,7 +32,7 @@ public class SubProcessValidationHelper : ISubProcessValidation
         return subProcess;
     }
 
-    public async Task<AuditProcess> ValidateAuditProcessOwnerShipAsync(Guid auditProcessId, Guid userId)
+    public async Task<AuditProcess> ValidateAuditProcessOwnershipAsync(Guid auditProcessId, Guid userId)
     {
         var auditProcess = await _repository.GetByIdAsync(auditProcessId, AuditProcessConstants.IncludeHierarchy)
             ?? throw new KeyNotFoundException(string.Format(AuditProcessConstants.AuditProcessNotFoundMessage, auditProcessId));

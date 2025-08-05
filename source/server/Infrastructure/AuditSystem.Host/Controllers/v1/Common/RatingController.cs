@@ -52,7 +52,7 @@ public sealed class RatingController(IMediator mediator) : ApiControllerBase(med
     //Search Rating
     [HttpGet("search-rating")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RatingModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RateModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchRating([FromQuery] SearchRatingQuery query) =>
         await ProcessRequestToActionResultAsync(query);
 }

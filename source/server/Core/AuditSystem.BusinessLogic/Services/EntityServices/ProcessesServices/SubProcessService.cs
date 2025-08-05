@@ -44,7 +44,7 @@ internal sealed class SubProcessService(
 
         logger.LogDebug("Creating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
         
-        await _validationHelper.ValidateAuditProcessOwnerShipAsync(subProcessModel.AuditProcessId, userId);
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(subProcessModel.AuditProcessId, userId);
 
         var entity = mapper.Map<SubProcess>(subProcessModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -74,7 +74,7 @@ internal sealed class SubProcessService(
             return cachedResult;
         }
 
-        var entity = await _validationHelper.ValidateSubProcessOwnerShipAsync(id, userId);
+        var entity = await _validationHelper.ValidateSubProcessOwnershipAsync(id, userId);
         await CacheEntityAsync(entity);
         return mapper.Map<SubProcessModel>(entity);
     }
@@ -85,7 +85,7 @@ internal sealed class SubProcessService(
 
         logger.LogDebug("Deleting sub process {SubProcessId} for user {UserId}", subProcessId, userId);
 
-        await _validationHelper.ValidateSubProcessOwnerShipAsync(subProcessId, userId);
+        await _validationHelper.ValidateSubProcessOwnershipAsync(subProcessId, userId);
         await repository.DeleteAsync(subProcessId);
         await ClearEntityCacheAsync(subProcessId);
         await ClearUserRelatedCachesAsync(userId, SubProcessConstants.EntityName);
@@ -100,9 +100,8 @@ internal sealed class SubProcessService(
 
         logger.LogInformation("Updating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
 
-        var existingEntity = await _validationHelper.ValidateSubProcessOwnerShipAsync(subProcessModel.Id, userId);
-        
-        await _validationHelper.ValidateAuditProcessOwnerShipAsync(existingEntity.AuditProcessId, userId);
+        var existingEntity = await _validationHelper.ValidateSubProcessOwnershipAsync(subProcessModel.Id, userId);
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(existingEntity.AuditProcessId, userId);
 
         mapper.Map(subProcessModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;

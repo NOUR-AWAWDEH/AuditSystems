@@ -12,29 +12,29 @@ using AuditSystem.BusinessLogic.Services.CacheServices;
 namespace AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
 
 internal sealed class RatingService(
-    IRepository<Guid, Rating> repository,
+    IRepository<Guid, Rate> repository,
     IMapper mapper,
     ICacheService cacheService,
     ILogger<RatingService> logger) :
-    UnifiedCacheService<Guid, Rating, RatingModel>(
+    UnifiedCacheService<Guid, Rate, RateModel>(
         repository,
         mapper,
         cacheService,
         logger,
-        CacheKeys.Rating,
+        CacheKeys.Rate,
         RatingTags,
         ListTags
     ), 
-    IRatingService
+    IRateService
 {
     private static readonly string[] RatingTags = ["ratings", "rating-list"];
     private static readonly string[] ListTags = ["rating-list"];
 
-    public async Task<Guid> CreateRatingAsync(RatingModel ratingModel)
+    public async Task<Guid> CreateRatingAsync(RateModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
 
-        var entity = mapper.Map<Rating>(ratingModel);
+        var entity = mapper.Map<Rate>(ratingModel);
         var createdEntity = await repository.CreateAsync(entity);
 
         var cacheKey = GetCacheKey(createdEntity.Id);
@@ -54,40 +54,40 @@ internal sealed class RatingService(
         await ClearCacheAsync(cacheKey);
     }
     
-    public async Task<RatingModel> GetRatingByIdAsync(Guid id)
+    public async Task<RateModel> GetRatingByIdAsync(Guid id)
     {
         var cacheKey = GetCacheKey(id);
        
-        var cachedEntity = await cacheService.GetAsync<Rating>(cacheKey);
+        var cachedEntity = await cacheService.GetAsync<Rate>(cacheKey);
         if (cachedEntity is not null)
-            return mapper.Map<RatingModel>(cachedEntity);
+            return mapper.Map<RateModel>(cachedEntity);
 
         var entity = await repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Rating with ID '{id}' not found.");
 
         await SetCacheAsync(cacheKey, entity);
         
-        return mapper.Map<RatingModel>(entity);
+        return mapper.Map<RateModel>(entity);
     }
 
-    public async Task<PaginationResult<RatingModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<RateModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
-        var cachedResult = await GetFromCacheAsync<RatingModel>(cacheKey, countCacheKey, page);
+        var cachedResult = await GetFromCacheAsync<RateModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
             return cachedResult;
 
-        return await GetFromRepositoryAsync<RatingModel>(cacheKey, countCacheKey, page, name);
+        return await GetFromRepositoryAsync<RateModel>(cacheKey, countCacheKey, page, name);
     }
 
-    public async Task UpdateRatingAsync(RatingModel ratingModel)
+    public async Task UpdateRatingAsync(RateModel ratingModel)
     {
         ArgumentNullException.ThrowIfNull(ratingModel, nameof(ratingModel));
 
-        var entity = mapper.Map<Rating>(ratingModel);
+        var entity = mapper.Map<Rate>(ratingModel);
         await repository.UpdateAsync(entity);
 
         var cacheKey = GetCacheKey(entity.Id);

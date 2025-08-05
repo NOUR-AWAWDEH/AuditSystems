@@ -12,6 +12,6 @@ public class JobPrioritization : Entity<Guid>
     public required Guid BusinessObjectiveId { get; set; }
     public required Guid RatingId { get; set; }
 
-    public virtual Rating Rating { get; set; } = null!;
+    public virtual Rate Rating { get; set; } = null!;
     public virtual BusinessObjective BusinessObjective { get; set; } = null!;
 }

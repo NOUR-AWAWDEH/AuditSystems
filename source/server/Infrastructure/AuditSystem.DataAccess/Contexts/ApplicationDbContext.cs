@@ -26,7 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     }
 
     // Common
-    public required DbSet<Rating> Ratings { get; set; }
+    public required DbSet<Rate> Rates { get; set; }
 
     // Audit
     public required DbSet<AuditEngagement> AuditEngagements { get; set; }

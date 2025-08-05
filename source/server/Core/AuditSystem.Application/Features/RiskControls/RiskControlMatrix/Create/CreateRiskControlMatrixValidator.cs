@@ -15,5 +15,11 @@ public sealed class CreateRiskControlMatrixValidator : AbstractValidator<CreateR
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User Id must be a valid GUID.");
     }
 }

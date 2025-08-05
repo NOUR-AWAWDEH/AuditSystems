@@ -11,6 +11,12 @@ public sealed class DeleteRiskControlMatrixValidator : AbstractValidator<DeleteR
            .WithMessage("Risk Control Matrix Id is required")
            .Must(IsValidGuid)
            .WithMessage("Invalid Risk Control Matrix Id format");
+        
+        RuleFor(x => x.UserId)
+           .NotEmpty()
+           .WithMessage("UserId is required")
+           .Must(IsValidGuid)
+           .WithMessage("Invalid UserId format");
     }
 
     private bool IsValidGuid(Guid id)

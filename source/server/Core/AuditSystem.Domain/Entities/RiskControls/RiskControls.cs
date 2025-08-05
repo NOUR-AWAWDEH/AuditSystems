@@ -9,6 +9,6 @@ public class RiskControls : Entity<Guid>
     public required Guid RatingId { get; set; }
     public string Description { get; set; } = string.Empty;
 
-    public virtual Rating Rating { get; set; } = null!;
+    public virtual Rate Rating { get; set; } = null!;
     public virtual Risk Risk { get; set; } = null!;
 }

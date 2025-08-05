@@ -26,7 +26,7 @@ public static class CacheKeys
     public const string Remark = "remark";
 
     //Common
-    public const string Rating = "rating";
+    public const string Rate = "rate";
 
     //Compliance
     public const string ComplianceAuditLink = "compliance-auditLink";

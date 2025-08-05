@@ -7,14 +7,14 @@ using MediatR;
 
 namespace AuditSystem.Application.Features.Common.Rating.Search;
 
-internal sealed class SearchRatingQueryHandler(IRatingService ratingService)
-    : IRequestHandler<SearchRatingQuery, Result<PaginationRequestResponse<RatingModel>>>
+internal sealed class SearchRatingQueryHandler(IRateService ratingService)
+    : IRequestHandler<SearchRatingQuery, Result<PaginationRequestResponse<RateModel>>>
 {
-    public async Task<Result<PaginationRequestResponse<RatingModel>>> Handle(SearchRatingQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginationRequestResponse<RateModel>>> Handle(SearchRatingQuery request, CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
         var searchResult = await ratingService.SearchAsync(request.SearchTerm, page);
-        var response = new PaginationRequestResponse<RatingModel>(searchResult.Items, searchResult.TotalCount);
+        var response = new PaginationRequestResponse<RateModel>(searchResult.Items, searchResult.TotalCount);
         return Result.Success(response);
     }
 }

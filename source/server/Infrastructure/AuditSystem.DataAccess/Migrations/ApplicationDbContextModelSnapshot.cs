@@ -235,9 +235,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("RatingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("RiskControlMatrixId")
                         .HasColumnType("uniqueidentifier");
 
@@ -245,8 +242,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("RatingId");
 
                     b.HasIndex("RiskControlMatrixId");
 
@@ -405,7 +400,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("Remarks");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Common.Rating", b =>
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Common.Rate", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -423,7 +418,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Rates");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Compliance.ComplianceAuditLink", b =>
@@ -802,6 +797,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("AuditProcessId");
 
+                    b.HasIndex("Particular");
+
                     b.ToTable("SubProcesses");
                 });
 
@@ -1029,8 +1026,8 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<Guid>("SubProcessId")
                         .HasColumnType("uniqueidentifier");
@@ -1040,9 +1037,11 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Description");
+
                     b.HasIndex("SubProcessId");
 
-                    b.ToTable("RiskControlMatrices");
+                    b.ToTable("RiskControlMatrices", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControls", b =>
@@ -1112,6 +1111,35 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("RiskPrograms");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.ExitRisk", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("NotEnough")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("RiskId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RiskId");
+
+                    b.ToTable("ExitRisk");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1128,7 +1156,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("ObjectiveId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("RatingId")
+                    b.Property<Guid>("RateId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RiskName")
@@ -1142,7 +1170,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("ObjectiveId");
 
-                    b.HasIndex("RatingId");
+                    b.HasIndex("RateId");
 
                     b.ToTable("Risks");
                 });
@@ -1725,19 +1753,11 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
-                        .WithMany()
-                        .HasForeignKey("RatingId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", "RiskControlMatrix")
-                        .WithMany()
+                        .WithMany("Objectives")
                         .HasForeignKey("RiskControlMatrixId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Rating");
 
                     b.Navigation("RiskControlMatrix");
                 });
@@ -1832,7 +1852,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rating")
                         .WithMany()
                         .HasForeignKey("RatingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1985,7 +2005,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControls", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rating")
                         .WithMany()
                         .HasForeignKey("RatingId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -2004,7 +2024,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskProgram", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rating")
                         .WithMany()
                         .HasForeignKey("RatingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2021,23 +2041,34 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("RiskControl");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.ExitRisk", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Risks.Risk", "Risk")
+                        .WithMany("ExitRisks")
+                        .HasForeignKey("RiskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Risk");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Audit.Objective", "Objective")
-                        .WithMany()
+                        .WithMany("Risks")
                         .HasForeignKey("ObjectiveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rating", "Rating")
+                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rate")
                         .WithMany()
-                        .HasForeignKey("RatingId")
+                        .HasForeignKey("RateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Objective");
 
-                    b.Navigation("Rating");
+                    b.Navigation("Rate");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.SpecificRiskFactor", b =>
@@ -2186,6 +2217,11 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("SpecialProject");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
+                {
+                    b.Navigation("Risks");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Checklists.ChecklistCollection", b =>
                 {
                     b.Navigation("Checklists");
@@ -2221,6 +2257,16 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.SubProcess", b =>
                 {
                     b.Navigation("RiskControlMatrices");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>
+                {
+                    b.Navigation("Objectives");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
+                {
+                    b.Navigation("ExitRisks");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Skills.SkillSet", b =>

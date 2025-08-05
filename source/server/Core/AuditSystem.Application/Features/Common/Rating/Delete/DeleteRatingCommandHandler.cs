@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.Common.Rating.Delete;
 
 internal sealed class DeleteRatingCommandHandler(
-    IRatingService ratingService,
+    IRateService ratingService,
     ILogger<DeleteRatingCommandHandler> logger) :
     IRequestHandler<DeleteRatingCommand, Result>
 {

@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.Application.Features.Common.Rating.Create;
 
 internal sealed class CreateRatingCommandHandler(
-    IRatingService ratingService,
+    IRateService ratingService,
     IMapper mapper,
     ILogger<CreateRatingCommandHandler> logger)
     : IRequestHandler<CreateRatingCommand, Result<CreateRatingCommandResponse>>
 {
     public async Task<Result<CreateRatingCommandResponse>> Handle(CreateRatingCommand request, CancellationToken cancellationToken)
     {
-        var ratingModel = mapper.Map<RatingModel>(request);
+        var ratingModel = mapper.Map<RateModel>(request);
         var ratingId = await ratingService.CreateRatingAsync(ratingModel);
         logger.LogInformation("Rating with Level {RatingLevel} has been created.", request.Level);
 

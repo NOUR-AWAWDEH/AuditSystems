@@ -21,6 +21,6 @@ internal sealed class  SearchSubProcessQueryHandler(
         
         logger.LogInformation("Sub Process with user Id: {UserId} was retrieved", request.UserId);
         var response = new PaginationRequestResponse<SubProcessModel>(searchResult.Items, searchResult.TotalCount);
-        return Result.Success(response);
+        return Result.Success(response, "Sub Process retrieved successfully");
     }
 }

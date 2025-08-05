@@ -88,7 +88,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Checklist>()
         .AddRepository<Guid, Remark>()
         //Common
-        .AddRepository<Guid, Rating>()
+        .AddRepository<Guid, Rate>()
         //Compliance
         .AddRepository<Guid, ComplianceChecklist>()
         //Jobs

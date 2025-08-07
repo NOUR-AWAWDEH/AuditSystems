@@ -26,16 +26,14 @@ export const searchSupportingDocsByUserIdRepository = {
             return ApiResponseT.ok(response.result, response.successMessage || 'Successfully retrieved supporting documents.');
         } else if (response.success === false) {
             return ApiResponseT.badRequest(
-                response?.errors || [{ message: 'Failed to search supporting documents.' }],
-                response?.data?.successMessage || 'Failed to search supporting documents.'
+                response?.errors || [{ message: 'Failed to search supporting documents.' }]
             );
         }
 
         return ApiResponseT.ok({ items: [], totalCount: 0, pageNumber: 1, pageSize: 10 }, 'Successfully retrieved supporting documents, but response structure might differ.');
       } else {
         return ApiResponseT.badRequest(
-          [{ message: response?.message || 'Failed to search supporting documents.' }],
-          response?.message || 'Failed to search supporting documents.'
+          [{ message: response?.successMessage || 'Failed to search supporting documents.' }]
         );
       }
     } catch (error) {
@@ -43,17 +41,14 @@ export const searchSupportingDocsByUserIdRepository = {
       let errors = [{ message: errorMessage }];
 
       if (error?.response) {
-        errorMessage = error.response?.data?.successMessage || errorMessage;
-        errors = error.response?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
-        return ApiResponseT.badRequest(
-            errors,
-            error.response?.data?.successMessage || 'Bad request'
-        );
+        errorMessage = error.response?.data?.successMessage || error.response.statusText || errorMessage;
+        errors = error.response?.data?.errors || [{ message: error.response?.data?.successMessage || 'Bad request' }];
+        return ApiResponseT.badRequest(errors);
       } else if (error?.message) {
         errorMessage = error.message;
         errors = [{ message: errorMessage }];
       }
-      return ApiResponseT.badRequest(errors, errorMessage);
+      return ApiResponseT.badRequest(errors);
     }
   }
 };

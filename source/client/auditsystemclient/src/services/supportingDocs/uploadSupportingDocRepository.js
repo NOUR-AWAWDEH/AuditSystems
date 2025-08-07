@@ -25,30 +25,32 @@ export const uploadSupportingDocRepository = {
         }
       );
 
-      if (!response?.success) {
-        const errors = Array.isArray(response?.errors)
-          ? response.errors
-          : [{ message: response?.data?.successMessage || 'Upload failed' }];
-        return ApiResponseT.badRequest(errors, response?.data?.successMessage);
+      const { data, status } = response;
+      
+      if (status !== 200) {
+        const errors = Array.isArray(data?.errors)
+          ? data.errors
+          : [{ message: data?.successMessage || 'Upload failed' }];
+        return ApiResponseT.badRequest(errors);
       }
 
-      return ApiResponseT.ok(response?.result, response?.data?.successMessage);
+      return ApiResponseT.ok(data?.result, data?.successMessage);
 
     } catch (error) {
       let errorMessage = 'Upload failed';
       let errors = [{ message: errorMessage }];
 
       if (error?.response) {
-        errorMessage = error.response.successMessage || errorMessage;
-        errors = Array.isArray(error.response.errors)
-          ? error.response.errors
+        errorMessage = error.response.data?.successMessage || error.response.statusText || errorMessage;
+        errors = Array.isArray(error.response.data?.errors)
+          ? error.response.data.errors
           : [{ message: errorMessage }];
       } else if (error?.message) {
         errorMessage = error.message;
         errors = [{ message: errorMessage }];
       }
 
-      return ApiResponseT.badRequest(errors, errorMessage);
+      return ApiResponseT.badRequest(errors);
     }
   }
 };

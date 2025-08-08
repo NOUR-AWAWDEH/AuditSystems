@@ -9,8 +9,29 @@ export function useGetAuditProcessesByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const auditProcessesData = response.result || [];
+        let auditProcessesData = response.result || [];
+        
+        // Normalize to a flat array
+        if (!Array.isArray(auditProcessesData)) {
+            if (auditProcessesData.processes && Array.isArray(auditProcessesData.processes)) {
+                // Handle case: { processes: [...] }
+                auditProcessesData = auditProcessesData.processes;
+            } else if (auditProcessesData && typeof auditProcessesData === 'object') {
+                // Handle case: { "id1": {...}, "id2": {...} }
+                auditProcessesData = Object.values(auditProcessesData);
+            } else {
+                // Fallback to empty array
+                auditProcessesData = [];
+            }
+        }
+
+        // Flatten the array if nested (e.g., [ [ {...} ] ] -> [ {...} ])
+        auditProcessesData = Array.isArray(auditProcessesData) 
+            ? auditProcessesData.flat()
+            : [];
+
         auditProcesses.value = auditProcessesData;
+        console.log('Normalized auditProcesses:', auditProcessesData); // Debug log
         return { success: true, data: auditProcessesData };
     };
 
@@ -36,6 +57,7 @@ export function useGetAuditProcessesByUserId() {
             auditProcesses.value = [];
 
             const response = await getAuditProcessesByUserIdRepository.getAuditProcessesByUserId();
+            console.log('Raw API response:', response); // Debug log
 
             if (response?.success) {
                 return handleFetchSuccess(response);

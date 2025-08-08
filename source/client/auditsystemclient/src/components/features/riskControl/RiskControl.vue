@@ -5,7 +5,6 @@
       <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <RiskControlHeader />
       </div>
-
     </div>
 
     <!-- Navigation Tabs -->
@@ -47,11 +46,14 @@
           />
         </div>
 
-        
         <!-- SubProcess component -->
         <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
+          <div v-if="!normalizedAuditProcesses.length" class="text-center text-gray-500">
+            No audit processes available.
+          </div>
           <SubProcess
-            :audit-processes="auditProcesses"
+            v-else
+            :audit-processes="normalizedAuditProcesses"
             :selected-audit-process-id="selectedAuditProcessId"
             @sub-process-selected="handleSubProcessSelected"
           />
@@ -60,7 +62,7 @@
         <!-- Risk Control Matrix -->
         <div v-if="activeTab === 'matrix'" class="p-3 sm:p-4 md:p-6">
           <RiskControlMatrix
-            :sub-processes="subProcesses"
+            :sub-processes="[]"
             :selected-sub-process-id="selectedSubProcessId"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
           />
@@ -121,12 +123,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
-import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess/useGetSubProcessesByUserId';
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
@@ -155,12 +156,25 @@ const {
   error: auditProcError 
 } = useGetAuditProcessesByUserId();
 
-const { 
-  getSubProcessesByUserId, 
-  subProcesses, 
-  isLoading: isSubProcLoading, 
-  error: subProcError 
-} = useGetSubProcessesByUserId();
+// Normalize auditProcesses to ensure flat array
+const normalizedAuditProcesses = computed(() => {
+  const data = auditProcesses.value;
+  const normalized = Array.isArray(data) ? data.flat() : [];
+  console.log('Computing normalizedAuditProcesses:', normalized); // Debug log
+  return normalized;
+});
+
+watch(() => normalizedAuditProcesses.value, (newValue) => {
+  console.log('Normalized Audit Processes in RiskControl:', newValue);
+});
+
+// Remove useGetSubProcessesByUserId to avoid conflict
+// const { 
+//   getSubProcessesByUserId, 
+//   subProcesses, 
+//   isLoading: isSubProcLoading, 
+//   error: subProcError 
+// } = useGetSubProcessesByUserId();
 
 const { getSubDepartmentById } = useGetSubDepartmentById();
 
@@ -186,11 +200,12 @@ const fetchData = async () => {
   errorMessage.value = null;
 
   try {
-    const [subDeptResult, auditResult, subProcResult] = await Promise.all([
+    const [subDeptResult, auditResult] = await Promise.all([
       getSubDepartmentsByUserId(),
-      getAuditProcessesByUserId(),
-      getSubProcessesByUserId()
+      getAuditProcessesByUserId()
     ]);
+
+    console.log('Audit Processes Result:', auditResult.data); // Debug log
 
     if (!subDeptResult?.success) {
       throw new Error('Failed to fetch subdepartments');
@@ -198,10 +213,6 @@ const fetchData = async () => {
 
     if (!auditResult?.success || auditResult.data?.length === 0) {
       throw new Error('No audit processes found in database');
-    }
-
-    if (!subProcResult?.success) {
-      throw new Error('Failed to fetch sub processes');
     }
   } catch (error) {
     errorMessage.value = error.message || 'An error occurred while fetching data';
@@ -217,8 +228,12 @@ const selectAuditProcess = (auditProcessId) => {
   localStorage.setItem('riskControlSelectedAuditProcessId', auditProcessId || '');
 };
 
-const handleAuditProcessSelected = (auditProcessId) => {
+const handleAuditProcessSelected = async (auditProcessId) => {
   selectAuditProcess(auditProcessId);
+  // Ensure data is fetched before switching to subprocesses tab
+  if (!normalizedAuditProcesses.value.length) {
+    await fetchData();
+  }
   setActiveTab('subprocesses');
 };
 
@@ -234,6 +249,15 @@ const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
 
 // Tab navigation
 const setActiveTab = (tabId) => {
+  // Prevent switching to subprocesses or matrix tabs if data is not ready
+  if (tabId === 'subprocesses' && !normalizedAuditProcesses.value.length) {
+    console.log('Cannot switch to subprocesses: no audit processes available');
+    return;
+  }
+  if (tabId === 'matrix' && !selectedSubProcessId.value) {
+    console.log('Cannot switch to matrix: no sub process selected');
+    return;
+  }
   activeTab.value = tabId;
 };
 
@@ -271,6 +295,13 @@ const handleRouteQueries = async () => {
   if (subDepartmentId || auditProcessId || subProcessId) {
     await router.replace({ path: '/risk-control' });
   }
+
+  // Set active tab based on selections after data is fetched
+  if (auditProcessId && normalizedAuditProcesses.value.length) {
+    setActiveTab('subprocesses');
+  } else if (subProcessId && selectedSubProcessId.value) {
+    setActiveTab('matrix');
+  }
 };
 
 // Initialize
@@ -281,10 +312,10 @@ onMounted(async () => {
 
 // Watch for route changes
 watch(() => route.query, handleRouteQueries, { immediate: true });
-
 </script>
 
 <style scoped>
+/* Existing styles remain unchanged */
 .min-h-\[calc\(100vh-4rem\)\] {
   min-height: calc(100vh - 4rem);
   min-height: calc(100dvh - 4rem);

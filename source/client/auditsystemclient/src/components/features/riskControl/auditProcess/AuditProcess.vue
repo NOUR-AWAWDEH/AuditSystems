@@ -162,9 +162,6 @@ const {
     cancelDelete
 } = useAuditProcessModals(refreshData, showNotification);
 
-// Remove the incorrect destructuring from useAuditProcessActions
-// Keep only the actions that are actually returned by useAuditProcessActions
-
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {
     emit('audit-process-selected', auditProcessId);

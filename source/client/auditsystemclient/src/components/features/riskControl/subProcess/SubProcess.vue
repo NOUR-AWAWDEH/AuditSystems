@@ -10,8 +10,8 @@
 
         <!-- Show SubProcessTable only when audit processes exist -->
         <SubProcessTable
-            v-if="hasAuditProcesses"
-            :audit-processes="auditProcessesForComposable"
+            v-if="props.subProcesses && props.subProcesses.length > 0"
+            :audit-processes="props.auditProcesses"
             :sub-processes="subProcesses"
             :is-loading="isLoading"
             :selected-audit-process-id="internalSelectedAuditProcessId"
@@ -28,7 +28,7 @@
             @sub-process-selected="handleSubProcessSelected"
         />
 
-        <!-- Show big department icon when no audit processes exist -->
+        <!-- Show big Process icon when no audit processes exist -->
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
@@ -100,80 +100,9 @@ const props = defineProps({
     }
 });
 
-const hasAuditProcesses = computed(() => {
-    const processes = props.auditProcesses;
-    console.log('Received audit processes:', processes); // Debug logging
-    
-    // Handle direct arrays - this is the most common case
-    if (Array.isArray(processes)) {
-        return processes.length > 0;
-    }
-    
-    // Handle reactive ref objects that contain an auditProcesses array
-    if (processes && typeof processes === 'object') {
-        // Check if it has a nested auditProcesses array (from composable)
-        if (processes.auditProcesses && Array.isArray(processes.auditProcesses)) {
-            return processes.auditProcesses.length > 0;
-        }
-        
-        // Check if it's a reactive ref with value property
-        if ('value' in processes) {
-            const value = processes.value;
-            if (Array.isArray(value)) {
-                return value.length > 0;
-            }
-            // Check nested auditProcesses in value
-            if (value && value.auditProcesses && Array.isArray(value.auditProcesses)) {
-                return value.auditProcesses.length > 0;
-            }
-        }
-    }
-    
-    // Last resort - ensure empty arrays always return false
-    return Boolean(processes) && 
-           (!Array.isArray(processes) || processes.length > 0) && 
-           (!processes?.auditProcesses || !Array.isArray(processes.auditProcesses) || processes.auditProcesses.length > 0);
-});
-
-
-// Define emit first
 const emit = defineEmits(['sub-process-selected']);
 
 const { showNotification } = useNotification();
-
-// Use composables - now with integrated backend search
-// Pass the reactive ref or array properly
-const auditProcessesForComposable = computed(() => {
-    const processes = props.auditProcesses;
-    
-    // Handle direct arrays
-    if (Array.isArray(processes)) {
-        return processes;
-    }
-    
-    // Handle object with nested auditProcesses array
-    if (processes && typeof processes === 'object') {
-        // Check for nested auditProcesses array (from composable)
-        if (processes.auditProcesses && Array.isArray(processes.auditProcesses)) {
-            return processes.auditProcesses;
-        }
-        
-        // Check if it's a reactive ref with value property
-        if ('value' in processes) {
-            const value = processes.value;
-            if (Array.isArray(value)) {
-                return value;
-            }
-            // Check nested auditProcesses in value
-            if (value && value.auditProcesses && Array.isArray(value.auditProcesses)) {
-                return value.auditProcesses;
-            }
-        }
-    }
-    
-    // Fallback to empty array
-    return [];
-});
 
 const {
     subProcesses,
@@ -188,13 +117,13 @@ const {
     handleSubProcessChange,
     handleSearch,
     resetToDefaultView,
-} = useSubProcessTable(auditProcessesForComposable);
+} = useSubProcessTable(props.auditProcesses);
 
-// Add onMounted to refresh data on page load
 onMounted(async () => {
-    // If there's a selected audit process, refresh the data
+    console.log("Mounted: Checking selected audit process ID", internalSelectedAuditProcessId.value);
     if (internalSelectedAuditProcessId.value) {
         await refreshData();
+        console.log("Data refreshed for audit process ID:", internalSelectedAuditProcessId.value);
     }
 });
 
@@ -206,7 +135,7 @@ watch(() => props.selectedAuditProcessId, (newAuditProcessId) => {
 }, { immediate: true });
 
 // Watch for auditProcesses prop changes
-watch(() => props.auditProcesses, (newProcesses) => {
+watch(() => props.auditProcesses, () => {
     // Watch for changes in audit processes
 }, { immediate: true, deep: true });
 

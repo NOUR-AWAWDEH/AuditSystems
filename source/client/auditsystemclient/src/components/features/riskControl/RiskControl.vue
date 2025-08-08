@@ -5,6 +5,7 @@
       <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <RiskControlHeader />
       </div>
+
     </div>
 
     <!-- Navigation Tabs -->
@@ -46,6 +47,7 @@
           />
         </div>
 
+        
         <!-- SubProcess component -->
         <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
           <SubProcess
@@ -138,10 +140,10 @@ const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSub
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
 const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
 
-// Composable Destructuring - This is the key change 💡
+// Composable Destructuring
 const { 
   getSubDepartmentsByUserId, 
-  subDepartments, // Renaming for clarity in this component
+  subDepartments, 
   isLoading: isSubDeptLoading, 
   error: subDeptError 
 } = useGetSubDepartmentsByUserId();
@@ -184,15 +186,12 @@ const fetchData = async () => {
   errorMessage.value = null;
 
   try {
-    // Await all fetches. The composables handle their own loading/error states.
-    // The reactive variables (subDepartments, auditProcesses, etc.) will be populated automatically.
     const [subDeptResult, auditResult, subProcResult] = await Promise.all([
       getSubDepartmentsByUserId(),
       getAuditProcessesByUserId(),
       getSubProcessesByUserId()
     ]);
 
-    // Check for success or specific error conditions
     if (!subDeptResult?.success) {
       throw new Error('Failed to fetch subdepartments');
     }
@@ -213,9 +212,13 @@ const fetchData = async () => {
 };
 
 // Handle selections
-const handleAuditProcessSelected = (auditProcessId) => {
+const selectAuditProcess = (auditProcessId) => {
   selectedAuditProcessId.value = auditProcessId;
   localStorage.setItem('riskControlSelectedAuditProcessId', auditProcessId || '');
+};
+
+const handleAuditProcessSelected = (auditProcessId) => {
+  selectAuditProcess(auditProcessId);
   setActiveTab('subprocesses');
 };
 
@@ -257,7 +260,7 @@ const handleRouteQueries = async () => {
   }
   
   if (auditProcessId) {
-    selectedAuditProcessId.value = auditProcessId;
+    selectAuditProcess(auditProcessId);
   }
   
   if (subProcessId) {

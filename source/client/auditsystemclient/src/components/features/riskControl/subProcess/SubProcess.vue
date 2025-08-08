@@ -32,7 +32,7 @@
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
-                    <DepartmentIcon size="xxxl" custom-class="text-primary-shade" />
+                    <ProcessIcon size="xxxl" custom-class="text-primary-shade" />
                 </div>
                 <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Processes Available</h3>
                 <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create processes first before you can manage sub processes</p>
@@ -47,7 +47,7 @@
                             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
                             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
                                 <li>Navigate to the Risk Control section</li>
-                                <li>Create or select an audit process</li>
+                                <li>Create or select an process</li>
                                 <li>Return here to manage sub processes</li>
                             </ol>
                         </div>
@@ -87,7 +87,7 @@ import AddSubProcessModal from './components/AddSubProcessModal.vue';
 import EditSubProcessModal from './components/EditSubProcessModal.vue';
 import { useSubProcessTable } from './composables/useSubProcessTable';
 import { useSubProcessModals } from './composables/useSubProcessModals';
-import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
+import ProcessIcon from '@/components/common/icons/ProcessIcon.vue';
 
 const props = defineProps({
     auditProcesses: {
@@ -102,8 +102,9 @@ const props = defineProps({
 
 const hasAuditProcesses = computed(() => {
     const processes = props.auditProcesses;
+    console.log('Received audit processes:', processes); // Debug logging
     
-    // Handle direct arrays
+    // Handle direct arrays - this is the most common case
     if (Array.isArray(processes)) {
         return processes.length > 0;
     }
@@ -128,7 +129,10 @@ const hasAuditProcesses = computed(() => {
         }
     }
     
-    return false;
+    // Last resort - ensure empty arrays always return false
+    return Boolean(processes) && 
+           (!Array.isArray(processes) || processes.length > 0) && 
+           (!processes?.auditProcesses || !Array.isArray(processes.auditProcesses) || processes.auditProcesses.length > 0);
 });
 
 

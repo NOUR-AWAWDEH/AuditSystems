@@ -13,7 +13,7 @@ export const getSubProcessByIdRepository = {
 
             const response = await api.get(
                 `${SUB_PROCESS_API_ENDPOINT}${SUB_PROCESS_API_ENDPOINT_ID}`, {
-                    data: { id: subProcessId },
+                    params: { id: subProcessId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',

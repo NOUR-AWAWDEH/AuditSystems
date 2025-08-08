@@ -42,7 +42,7 @@
       <!-- Sub Process Management -->
       <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
         <SubProcess
-          :audit-processes="allAuditProcesses?.auditProcesses || []"
+          :audit-processes="allAuditProcesses.value"
           :selected-audit-process-id="selectedAuditProcessId"
           @sub-process-selected="handleSubProcessSelected"
         />
@@ -50,12 +50,11 @@
 
       <!-- Risk Control Matrix -->
       <div v-if="activeTab === 'matrix'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Risk Control Matrix</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Matrix Entry
-          </button>
-        </div>
+        <RiskControlMatrix
+          :sub-processes="allSubProcesses.value?.subProcesses || []"
+          :selected-sub-process-id="selectedSubProcessId"
+          @risk-control-matrix-selected="handleRiskControlMatrixSelected"
+        />
       </div>
 
       <!-- Objectives -->
@@ -118,8 +117,10 @@ import { useGetSubDepartmentById } from '@/composables/organization/subdepartmen
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
+import RiskControlMatrix from './riskControlMatrix/RiskControlMatrix.vue';
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
+import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess/useGetSubProcessesByUserId';
 
 const route = useRoute();
 const router = useRouter();
@@ -139,6 +140,11 @@ const {
   getAuditProcessesByUserId
 } = useGetAuditProcessesByUserId();
 
+const {
+  subProcesses: allSubProcesses,
+  getSubProcessesByUserId
+} = useGetSubProcessesByUserId();
+
 // Active tab state
 const activeTab = ref('processes');
 
@@ -150,6 +156,10 @@ const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSub
 // Props for SubProcess component - use the reactive ref directly from composable
 // Initialize from localStorage
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
+
+// Props for RiskControlMatrix component
+// Initialize from localStorage
+const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
 
 // Watch for selectedSubDepartmentId changes and persist to localStorage
 watch(selectedSubDepartmentId, (newValue) => {
@@ -166,6 +176,15 @@ watch(selectedAuditProcessId, (newValue) => {
     localStorage.setItem('riskControlSelectedAuditProcessId', newValue);
   } else {
     localStorage.removeItem('riskControlSelectedAuditProcessId');
+  }
+});
+
+// Watch for selectedSubProcessId changes and persist to localStorage
+watch(selectedSubProcessId, (newValue) => {
+  if (newValue) {
+    localStorage.setItem('riskControlSelectedSubProcessId', newValue);
+  } else {
+    localStorage.removeItem('riskControlSelectedSubProcessId');
   }
 });
 
@@ -187,6 +206,15 @@ const fetchAllAuditProcesses = async () => {
     await getAuditProcessesByUserId();
   } catch (error) {
     console.error('Error fetching audit processes:', error);
+  }
+};
+
+// Function to fetch all sub processes for the user
+const fetchAllSubProcesses = async () => {
+  try {
+    await getSubProcessesByUserId();
+  } catch (error) {
+    console.error('Error fetching sub processes:', error);
   }
 };
 
@@ -225,6 +253,23 @@ watch(
   { immediate: true }
 );
 
+// Watch for route query changes to load sub process
+watch(
+  () => route.query.subProcessId,
+  async (newSubProcessId) => {
+    if (newSubProcessId) {
+      selectedSubProcessId.value = newSubProcessId;
+      
+      // Fetch all sub processes
+      await fetchAllSubProcesses();
+      
+      // Redirect to clean URL after processing the subProcessId
+      router.replace({ path: '/risk-control' });
+    }
+  },
+  { immediate: true }
+);
+
 // Load subdepartment on component mount
 onMounted(async () => {
   // Always fetch all subdepartments first
@@ -232,6 +277,9 @@ onMounted(async () => {
   
   // Always fetch all audit processes
   await fetchAllAuditProcesses();
+  
+  // Always fetch all sub processes
+  await fetchAllSubProcesses();
   
   const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
   if (subDepartmentId) {
@@ -253,6 +301,16 @@ onMounted(async () => {
       router.replace({ path: '/risk-control' });
     }
   }
+  
+  const subProcessId = route.query.subProcessId || selectedSubProcessId.value;
+  if (subProcessId) {
+    selectedSubProcessId.value = subProcessId;
+    
+    // Only redirect if we came from a query parameter
+    if (route.query.subProcessId) {
+      router.replace({ path: '/risk-control' });
+    }
+  }
 });
 
 // Handle audit process selection
@@ -264,8 +322,15 @@ const handleAuditProcessSelected = (auditProcessId) => {
 
 // Handle sub process selection
 const handleSubProcessSelected = (subProcessId) => {
-  console.log('Sub process selected:', subProcessId);
-  // Handle sub process selection logic here
+  selectedSubProcessId.value = subProcessId;
+  // Switch to risk control matrix tab when a sub process is selected
+  activeTab.value = 'matrix';
+};
+
+// Handle risk control matrix selection
+const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
+  console.log('Risk control matrix selected:', riskControlMatrixId);
+  // Handle risk control matrix selection logic here
 };
 
 // Tab configuration

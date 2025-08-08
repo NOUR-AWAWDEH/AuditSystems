@@ -11,14 +11,15 @@
         <!-- Show RiskControlMatrixTable only when sub processes exist -->
         <RiskControlMatrixTable
             v-if="hasSubProcesses"
-            :sub-processes="subProcesses"
+            :sub-processes="subProcessesForComposable"
+            :risk-control-matrices="riskControlMatrices"
             :is-loading="isLoading"
             :selected-sub-process-id="internalSelectedSubProcessId"
             :selected-sub-process="selectedSubProcess"
             :current-sub-process="currentSubProcess"
             :is-sub-process-loading="isSubProcessLoading"
             :search-query="searchQuery"
-            :handle-sub-process-change="handleSubProcessChange"
+            :handle-sub-process-change="handleRiskControlMatrixChange"
             :handle-search="handleSearch"
             :refresh-data="refreshData"
             @add-risk-control-matrix="handleAddRiskControlMatrix"
@@ -84,8 +85,8 @@ import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
 import AddRiskControlMatrixModal from './components/AddRiskControlMatrixModal.vue';
 import EditRiskControlMatrixModal from './components/EditRiskControlMatrixModal.vue';
-import { useRiskControlMatrixTable } from '../composables/useRiskControlMatrixTable';
-import { useRiskControlMatrixModals } from '../composables/useRiskControlMatrixModals';
+import { useRiskControlMatrixTable } from './composables/useRiskControlMatrixTable';
+import { useRiskControlMatrixModals } from './composables/useRiskControlMatrixModals';
 import ProcessIcon from '@/components/common/icons/ProcessIcon.vue';
 
 const props = defineProps({
@@ -100,33 +101,23 @@ const props = defineProps({
 });
 
 const hasSubProcesses = computed(() => {
-    const subProcesses = props.subProcesses;
-    
-    // Handle direct arrays
-    if (Array.isArray(subProcesses)) {
-        return subProcesses.length > 0;
+    let sp = props.subProcesses;
+
+    // If it's a ref, unwrap it
+    if (sp && typeof sp === 'object' && 'value' in sp) {
+        sp = sp.value;
     }
-    
-    // Handle reactive ref objects that contain an subProcesses array
-    if (subProcesses && typeof subProcesses === 'object') {
-        // Check if it has a nested subProcesses array (from composable)
-        if (subProcesses.subProcesses && Array.isArray(subProcesses.subProcesses)) {
-            return subProcesses.subProcesses.length > 0;
-        }
-        
-        // Check if it's a reactive ref with value property
-        if ('value' in subProcesses) {
-            const value = subProcesses.value;
-            if (Array.isArray(value)) {
-                return value.length > 0;
-            }
-            // Check nested subProcesses in value
-            if (value && value.subProcesses && Array.isArray(value.subProcesses)) {
-                return value.subProcesses.length > 0;
-            }
-        }
+
+    // If object with subProcesses array
+    if (sp && typeof sp === 'object' && Array.isArray(sp.subProcesses)) {
+        return sp.subProcesses.length > 0;
     }
-    
+
+    // Direct array
+    if (Array.isArray(sp)) {
+        return sp.length > 0;
+    }
+
     return false;
 });
 

@@ -1,41 +1,40 @@
 <template>
     <div class="space-y-6">
-        <!-- Add SubProcess Modal -->
-        <AddSubProcessModal
-            :is-visible="showAddSubProcessModal"
-            :audit-process-id="internalSelectedAuditProcessId"
-            @close="handleCloseAddSubProcessModal"
-            @sub-process-added="handleSubProcessAdded"
+        <!-- Add RiskControlMatrix Modal -->
+        <AddRiskControlMatrixModal
+            :is-visible="showAddRiskControlMatrixModal"
+            :sub-process-id="internalSelectedSubProcessId"
+            @close="handleCloseAddRiskControlMatrixModal"
+            @risk-control-matrix-added="handleRiskControlMatrixAdded"
         />
 
-        <!-- Show SubProcessTable only when audit processes exist -->
-        <SubProcessTable
-            v-if="hasAuditProcesses"
-            :audit-processes="auditProcessesForComposable"
+        <!-- Show RiskControlMatrixTable only when sub processes exist -->
+        <RiskControlMatrixTable
+            v-if="hasSubProcesses"
             :sub-processes="subProcesses"
             :is-loading="isLoading"
-            :selected-audit-process-id="internalSelectedAuditProcessId"
-            :selected-audit-process="selectedAuditProcess"
-            :current-audit-process="currentAuditProcess"
-            :is-audit-process-loading="isAuditProcessLoading"
+            :selected-sub-process-id="internalSelectedSubProcessId"
+            :selected-sub-process="selectedSubProcess"
+            :current-sub-process="currentSubProcess"
+            :is-sub-process-loading="isSubProcessLoading"
             :search-query="searchQuery"
-            :handle-audit-process-change="handleSubProcessChange"
+            :handle-sub-process-change="handleSubProcessChange"
             :handle-search="handleSearch"
             :refresh-data="refreshData"
-            @add-sub-process="handleAddSubProcess"
-            @edit-sub-process="handleEditSubProcess"
-            @delete-sub-process="handleDeleteSubProcess"
-            @sub-process-selected="handleSubProcessSelected"
+            @add-risk-control-matrix="handleAddRiskControlMatrix"
+            @edit-risk-control-matrix="handleEditRiskControlMatrix"
+            @delete-risk-control-matrix="handleDeleteRiskControlMatrix"
+            @risk-control-matrix-selected="handleRiskControlMatrixSelected"
         />
 
-        <!-- Show big department icon when no audit processes exist -->
+        <!-- Show big process icon when no sub processes exist -->
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
-                    <DepartmentIcon size="xxxl" custom-class="text-primary-shade" />
+                    <ProcessIcon size="xxxl" custom-class="text-primary-shade" />
                 </div>
-                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Processes Available</h3>
-                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create processes first before you can manage sub processes</p>
+                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Sub Processes Available</h3>
+                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create sub processes first before you can manage risk control matrices</p>
                 <div class="bg-white border border-tertiary-shade rounded-lg p-6">
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
@@ -47,21 +46,21 @@
                             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
                             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
                                 <li>Navigate to the Risk Control section</li>
-                                <li>Create or select an audit process</li>
-                                <li>Return here to manage sub processes</li>
+                                <li>Create or select a sub process</li>
+                                <li>Return here to manage risk control matrices</li>
                             </ol>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Edit Sub Process Modal -->
-        <EditSubProcessModal
-            v-if="showEditSubProcessModal"
-            :is-visible="showEditSubProcessModal"
-            :sub-process="subProcessToEdit"
-            @close="handleCloseEditSubProcessModal"
-            @updated="handleSubProcessUpdated"
+        <!-- Edit RiskControlMatrix Modal -->
+        <EditRiskControlMatrixModal
+            v-if="showEditRiskControlMatrixModal"
+            :is-visible="showEditRiskControlMatrixModal"
+            :risk-control-matrix="riskControlMatrixToEdit"
+            @close="handleCloseEditRiskControlMatrixModal"
+            @updated="handleRiskControlMatrixUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -69,7 +68,7 @@
             v-model="showDeleteDialog"
             :title="deleteDialogTitle"
             :message="deleteDialogMessage"
-            :highlight-text="itemToDelete?.particular || ''"
+            :highlight-text="itemToDelete?.description || ''"
             :confirm-text="'Delete'"
             :cancel-text="'Cancel'"
             @confirm="confirmDelete"
@@ -82,48 +81,48 @@
 import { watch, onMounted, computed } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import SubProcessTable from './components/RiskControlMatrixTable.vue';
-import AddSubProcessModal from './components/AddRiskControlMatrixModal.vue';
-import EditSubProcessModal from './components/EditRiskControlMatrixModal.vue';
-import { useSubProcessTable } from '../composables/useSubProcessTable';
-import { useSubProcessModals } from '../composables/useSubProcessModals';
-import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
+import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
+import AddRiskControlMatrixModal from './components/AddRiskControlMatrixModal.vue';
+import EditRiskControlMatrixModal from './components/EditRiskControlMatrixModal.vue';
+import { useRiskControlMatrixTable } from '../composables/useRiskControlMatrixTable';
+import { useRiskControlMatrixModals } from '../composables/useRiskControlMatrixModals';
+import ProcessIcon from '@/components/common/icons/ProcessIcon.vue';
 
 const props = defineProps({
-    auditProcesses: {
+    subProcesses: {
         type: Array,
         default: () => []
     },
-    selectedAuditProcessId: {
+    selectedSubProcessId: {
         type: [String, Number],
         default: null
     }
 });
 
-const hasAuditProcesses = computed(() => {
-    const processes = props.auditProcesses;
+const hasSubProcesses = computed(() => {
+    const subProcesses = props.subProcesses;
     
     // Handle direct arrays
-    if (Array.isArray(processes)) {
-        return processes.length > 0;
+    if (Array.isArray(subProcesses)) {
+        return subProcesses.length > 0;
     }
     
-    // Handle reactive ref objects that contain an auditProcesses array
-    if (processes && typeof processes === 'object') {
-        // Check if it has a nested auditProcesses array (from composable)
-        if (processes.auditProcesses && Array.isArray(processes.auditProcesses)) {
-            return processes.auditProcesses.length > 0;
+    // Handle reactive ref objects that contain an subProcesses array
+    if (subProcesses && typeof subProcesses === 'object') {
+        // Check if it has a nested subProcesses array (from composable)
+        if (subProcesses.subProcesses && Array.isArray(subProcesses.subProcesses)) {
+            return subProcesses.subProcesses.length > 0;
         }
         
         // Check if it's a reactive ref with value property
-        if ('value' in processes) {
-            const value = processes.value;
+        if ('value' in subProcesses) {
+            const value = subProcesses.value;
             if (Array.isArray(value)) {
                 return value.length > 0;
             }
-            // Check nested auditProcesses in value
-            if (value && value.auditProcesses && Array.isArray(value.auditProcesses)) {
-                return value.auditProcesses.length > 0;
+            // Check nested subProcesses in value
+            if (value && value.subProcesses && Array.isArray(value.subProcesses)) {
+                return value.subProcesses.length > 0;
             }
         }
     }
@@ -133,36 +132,36 @@ const hasAuditProcesses = computed(() => {
 
 
 // Define emit first
-const emit = defineEmits(['sub-process-selected']);
+const emit = defineEmits(['risk-control-matrix-selected']);
 
 const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 // Pass the reactive ref or array properly
-const auditProcessesForComposable = computed(() => {
-    const processes = props.auditProcesses;
+const subProcessesForComposable = computed(() => {
+    const subProcesses = props.subProcesses;
     
     // Handle direct arrays
-    if (Array.isArray(processes)) {
-        return processes;
+    if (Array.isArray(subProcesses)) {
+        return subProcesses;
     }
     
-    // Handle object with nested auditProcesses array
-    if (processes && typeof processes === 'object') {
-        // Check for nested auditProcesses array (from composable)
-        if (processes.auditProcesses && Array.isArray(processes.auditProcesses)) {
-            return processes.auditProcesses;
+    // Handle object with nested subProcesses array
+    if (subProcesses && typeof subProcesses === 'object') {
+        // Check for nested subProcesses array (from composable)
+        if (subProcesses.subProcesses && Array.isArray(subProcesses.subProcesses)) {
+            return subProcesses.subProcesses;
         }
         
         // Check if it's a reactive ref with value property
-        if ('value' in processes) {
-            const value = processes.value;
+        if ('value' in subProcesses) {
+            const value = subProcesses.value;
             if (Array.isArray(value)) {
                 return value;
             }
-            // Check nested auditProcesses in value
-            if (value && value.auditProcesses && Array.isArray(value.auditProcesses)) {
-                return value.auditProcesses;
+            // Check nested subProcesses in value
+            if (value && value.subProcesses && Array.isArray(value.subProcesses)) {
+                return value.subProcesses;
             }
         }
     }
@@ -172,73 +171,73 @@ const auditProcessesForComposable = computed(() => {
 });
 
 const {
-    subProcesses,
+    riskControlMatrices,
     isLoading,
-    selectedAuditProcessId: internalSelectedAuditProcessId,
-    selectedAuditProcess,
-    currentAuditProcess,
-    isAuditProcessLoading,
+    selectedSubProcessId: internalSelectedSubProcessId,
+    selectedSubProcess,
+    currentSubProcess,
+    isSubProcessLoading,
     searchQuery,
     refreshData,
-    handleSubProcessAdded,
-    handleSubProcessChange,
+    handleRiskControlMatrixAdded,
+    handleRiskControlMatrixChange,
     handleSearch,
     resetToDefaultView,
-} = useSubProcessTable(auditProcessesForComposable);
+} = useRiskControlMatrixTable(subProcessesForComposable);
 
 // Add onMounted to refresh data on page load
 onMounted(async () => {
-    // If there's a selected audit process, refresh the data
-    if (internalSelectedAuditProcessId.value) {
+    // If there's a selected sub process, refresh the data
+    if (internalSelectedSubProcessId.value) {
         await refreshData();
     }
 });
 
 // Watch for prop changes and update internal state
-watch(() => props.selectedAuditProcessId, (newAuditProcessId) => {
-    if (newAuditProcessId !== internalSelectedAuditProcessId.value) {
-        handleSubProcessChange(newAuditProcessId); // Changed from handleAuditProcessChange
+watch(() => props.selectedSubProcessId, (newSubProcessId) => {
+    if (newSubProcessId !== internalSelectedSubProcessId.value) {
+        handleRiskControlMatrixChange(newSubProcessId);
     }
 }, { immediate: true });
 
-// Watch for auditProcesses prop changes
-watch(() => props.auditProcesses, (newProcesses) => {
-    // Watch for changes in audit processes
+// Watch for subProcesses prop changes
+watch(() => props.subProcesses, (newSubProcesses) => {
+    // Watch for changes in sub processes
 }, { immediate: true, deep: true });
 
 // Use modal composable for dialog management
 const {
-    showAddSubProcessModal,
-    showEditSubProcessModal,
-    subProcessToEdit,
+    showAddRiskControlMatrixModal,
+    showEditRiskControlMatrixModal,
+    riskControlMatrixToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    handleAddSubProcess,
-    handleCloseAddSubProcessModal,
-    handleEditSubProcess,
-    handleCloseEditSubProcessModal,
-    handleSubProcessUpdated,
-    handleDeleteSubProcess,
+    handleAddRiskControlMatrix,
+    handleCloseAddRiskControlMatrixModal,
+    handleEditRiskControlMatrix,
+    handleCloseEditRiskControlMatrixModal,
+    handleRiskControlMatrixUpdated,
+    handleDeleteRiskControlMatrix,
     confirmDelete,
     cancelDelete
-} = useSubProcessModals(refreshData, showNotification);
+} = useRiskControlMatrixModals(refreshData, showNotification);
 
-// Handle sub process selection and forward to parent
-const handleSubProcessSelected = (subProcessId) => {
-    emit('sub-process-selected', subProcessId);
+// Handle risk control matrix selection and forward to parent
+const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
+    emit('risk-control-matrix-selected', riskControlMatrixId);
 };
 
 defineExpose({
-    subProcesses,
-    selectedAuditProcessId: internalSelectedAuditProcessId,
+    riskControlMatrices,
+    selectedSubProcessId: internalSelectedSubProcessId,
     resetToDefaultView
 });
 </script>
 
 <style scoped>
-.sub-process-table .table-row {
+.risk-control-matrix-table .table-row {
     transition: all 0.2s ease;
 }
 </style>

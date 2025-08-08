@@ -12,19 +12,19 @@ export function useRiskControlMatrixData() {
     } = useSearchRiskControlMatricesByUserId() || {};
 
     const {
-        subProcesses: allSubProcesses = ref([]),
+        riskControlMatrices: allRiskControlMatrices = ref([]),
         isLoading: isLoadingAll = ref(false),
-        getSubProcessesByUserId
-    } = useGetSubProcessesByUserId() || {};
+        getRiskControlMatricesByUserId
+    } = useGetRiskControlMatricesByUserId() || {};
 
     return {
         searchResults,
-        allSubProcesses,
+        allRiskControlMatrices,
         isSearching,
         isLoadingAll,
         totalCount,
-        searchSubProcesses,
+        searchRiskControlMatrices,
         clearSearch,
-        getSubProcessesByUserId
+        getRiskControlMatricesByUserId
     };
 }

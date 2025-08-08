@@ -197,7 +197,7 @@ onMounted(async () => {
 // Watch for prop changes and update internal state
 watch(() => props.selectedAuditProcessId, (newAuditProcessId) => {
     if (newAuditProcessId !== internalSelectedAuditProcessId.value) {
-        handleSubProcessChange(newAuditProcessId); // Changed from handleAuditProcessChange
+        handleSubProcessChange(newAuditProcessId);
     }
 }, { immediate: true });
 

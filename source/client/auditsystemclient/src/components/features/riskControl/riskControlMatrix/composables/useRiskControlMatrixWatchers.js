@@ -1,31 +1,31 @@
 import { watch, nextTick } from 'vue';
 
-export function useSubProcessWatchers({
-    auditProcessesRef,
-    selectedAuditProcess,
-    selectedAuditProcessId,
+export function useRiskControlMatrixWatchers({
+    subProcessesRef,
+    selectedSubProcess,
+    selectedSubProcessId,
     searchQuery,
     currentPage,
     pageSize,
     isInitialized,
     isInitializing,
-    searchSubProcesses,
+    searchRiskControlMatrices,
     clearSearch,
-    getSubProcessesByUserId,
-    allSubProcesses,
-    clearAuditProcess,
-    fetchAuditProcessById,
+    getRiskControlMatricesByUserId,
+    allRiskControlMatrices,
+    clearSubProcess,
+    fetchSubProcessById,
     initializeData,
     resetToDefaultView
 }) {
-    // Watch Audit Process
-    watch(auditProcessesRef, async (newAuditProcesses) => {
-        if (!newAuditProcesses?.length || !selectedAuditProcess.value || isInitialized.value || isInitializing.value) {
+    // Watch Sub Process
+    watch(subProcessesRef, async (newSubProcesses) => {
+        if (!newSubProcesses?.length || !selectedSubProcess.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
-        const auditProcessExists = newAuditProcesses.some(sub => sub.id === selectedAuditProcessId.value);
-        if (auditProcessExists) {
+        const subProcessExists = newSubProcesses.some(sub => sub.id === selectedSubProcessId.value);
+        if (subProcessExists) {
             await nextTick();
             await initializeData();
         } else {
@@ -37,10 +37,10 @@ export function useSubProcessWatchers({
     watch(searchQuery, async (search) => {
             if (search.trim()) {
                 // Perform search when there's a search term
-                if (searchSubProcesses) {
-                    await searchSubProcesses({
+                if (searchRiskControlMatrices) {
+                    await searchRiskControlMatrices({
                         searchTerm: search,
-                        auditProcessId: selectedAuditProcessId.value,
+                        subProcessId: selectedSubProcessId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -51,61 +51,61 @@ export function useSubProcessWatchers({
                     clearSearch();
                 }
                 
-                // Reload audit processes based on current state
-                if (selectedAuditProcessId.value) {
-                    // If a audit process is selected, reload audit processes for that audit process
-                    if (searchSubProcesses) {
-                        await searchSubProcesses({
+                // Reload sub processes based on current state
+                if (selectedSubProcessId.value) {
+                    // If a sub process is selected, reload sub processes for that sub process
+                    if (searchRiskControlMatrices) {
+                        await searchRiskControlMatrices({
                             searchTerm: '',
-                            auditProcessId: selectedAuditProcessId.value,
+                            subProcessId: selectedSubProcessId.value,
                             page: currentPage.value,
                             pageSize: pageSize.value,
                         });
                     }
                 } else {
-                    // If no audit process is selected, load all audit processes
-                    if (getSubProcessesByUserId) {
-                        await getSubProcessesByUserId();
+                    // If no sub process is selected, load all sub processes
+                    if (getRiskControlMatricesByUserId) {
+                        await getRiskControlMatricesByUserId();
                     }
                 }
             }
     });
 
-    // Watch selected audit process
-    watch(selectedAuditProcessId, async (newAuditProcessId) => {
+    // Watch selected sub process
+    watch(selectedSubProcessId, async (newSubProcessId) => {
         if (clearSearch) {
             clearSearch();
         }
 
-        if (allSubProcesses?.value !== undefined) {
-            allSubProcesses.value = [];
+        if (allRiskControlMatrices?.value !== undefined) {
+            allRiskControlMatrices.value = [];
         }
 
-        if (!newAuditProcessId) {
-            if (clearAuditProcess) {
-                clearAuditProcess();
+        if (!newSubProcessId) {
+            if (clearSubProcess) {
+                clearSubProcess();
             }
         }
         
-        if (newAuditProcessId) {
+        if (newSubProcessId) {
             try {
-                await fetchAuditProcessById(newAuditProcessId);
+                await fetchSubProcessById(newSubProcessId);
             } catch (error) {
-                console.error('[Process] Error fetching audit process:', error);
+                console.error('[SubProcess] Error fetching sub process:', error);
             }
         }
 
-        if (!newAuditProcessId) {
-            if (!searchQuery.value.trim() && getSubProcessesByUserId) {
-                getSubProcessesByUserId();
+        if (!newSubProcessId) {
+            if (!searchQuery.value.trim() && getRiskControlMatricesByUserId) {
+                getRiskControlMatricesByUserId();
             }
             return;
         }
 
-        if (newAuditProcessId) {
-            await searchSubProcesses({
+        if (newSubProcessId) {
+            await searchRiskControlMatrices({
                 searchTerm: searchQuery.value || '',
-                auditProcessId: newAuditProcessId,
+                subProcessId: newSubProcessId,
                 page: currentPage.value,
                 pageSize: pageSize.value,
             });

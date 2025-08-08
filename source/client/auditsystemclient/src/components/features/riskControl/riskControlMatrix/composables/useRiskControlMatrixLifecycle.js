@@ -1,28 +1,28 @@
 import { ref, onMounted, nextTick } from 'vue';
 
-export function useSubProcessLifecycle({
-    selectedAuditProcessId,
+export function useRiskControlMatrixLifecycle({
+    selectedSubProcessId,
     currentPage,
     pageSize,
-    searchSubProcesses,
-    auditProcessesRef,
+    searchRiskControlMatrices,
+    subProcessesRef,
     searchQuery,
-    getSubProcessesByUserId,
+    getRiskControlMatricesByUserId,
     resetToDefaultView
 }) {
     const isInitialized = ref(false);
     const isInitializing = ref(false);
 
     const initializeData = async () => {
-        if (!selectedAuditProcessId.value || isInitialized.value || isInitializing.value) {
+        if (!selectedSubProcessId.value || isInitialized.value || isInitializing.value) {
+
             return;
         }
 
         try {
-            isInitializing.value = true;
-            if (searchSubProcesses) {
-                await searchSubProcesses({
-                    auditProcessId: selectedAuditProcessId.value,
+            if (searchRiskControlMatrices) {
+                await searchRiskControlMatrices({
+                    subProcessId: selectedSubProcessId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });
@@ -38,20 +38,20 @@ export function useSubProcessLifecycle({
     onMounted(async () => {
         await nextTick();
 
-        if (selectedAuditProcessId.value && !isInitialized.value && !isInitializing.value) {
-            if (auditProcessesRef.value?.length > 0) {
-                const auditProcessExists = auditProcessesRef.value.some(
-                    auditProcess => auditProcess.id === selectedAuditProcessId.value);
-                if (auditProcessExists) {
+        if (selectedSubProcessId.value && !isInitialized.value && !isInitializing.value) {
+            if (subProcessesRef.value?.length > 0) {
+                const subProcessExists = subProcessesRef.value.some(
+                    subProcess => subProcess.id === selectedSubProcessId.value);
+                if (subProcessExists) {
                     await initializeData();
                 } else {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedAuditProcessId.value 
+        } else if (!selectedSubProcessId.value 
             && !searchQuery.value.trim() 
-            && getSubProcessesByUserId) {
-                await getSubProcessesByUserId();
+            && getRiskControlMatricesByUserId) {
+                await getRiskControlMatricesByUserId();
         }
     });
 

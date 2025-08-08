@@ -8,7 +8,7 @@
                 <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Sub Process</h3>
+                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Risk Control Matrix</h3>
                         <button
                             @click="$emit('close')"
                             class="text-gray-base hover:text-gray-shade focus:outline-none">
@@ -19,19 +19,19 @@
                     <!-- Content -->
                     <div class="p-4">
                         <form @submit.prevent="handleSubmit" class="space-y-4">
-                            <!--  Sub Process Particular Field -->
+                            <!--  Risk Control Matrix description Field -->
                             <div>
-                                <label for="sub-process-particular" class="block text-sm font-medium text-gray-700">
-                                    Sub Process Particular *
+                                <label for="risk-control-matrix-description" class="block text-sm font-medium text-gray-700">
+                                    Risk Control Matrix Description *
                                 </label>
                                 <BaseInput
-                                    id="sub-process-particular"
-                                    v-model="formData.particular"
-                                    label="Sub Process Particular"
-                                    placeholder="Enter Sub Process Particular"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.particular ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
+                                    id="risk-control-matrix-description"
+                                    v-model="formData.description"
+                                    label="Risk Control Matrix Description"
+                                    placeholder="Enter Risk Control Matrix Description"
+                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
-                                <p v-if="errors.particular" class="text-error text-sm mt-1">{{ errors.particular }}</p>
+                                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
                             </div>
 
                             <!--Error Display -->
@@ -51,10 +51,10 @@
 
                                 <button
                                     type="submit"
-                                    :disabled="!formData.particular.trim() || isCreating"
+                                    :disabled="!formData.description.trim() || isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     <span v-if="isCreating">Adding...</span>
-                                    <span v-else>Add Sub Process</span>
+                                    <span v-else>Add Risk Control Matrix</span>
                                 </button>
                             </div>
                         </form>
@@ -68,7 +68,7 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import { useCreateSubProcess } from '@/composables/riskControl/subProcess/useCreateSubProcess';
+import { useCreateRiskControlMatrix } from '@/composables/riskControl/riskControlMatrix/useCreateRiskControlMatrix';
 import { useNotification } from '@/composables/notification/useNotification';
 
 const props = defineProps({
@@ -76,23 +76,23 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    auditProcessId: {
+    subProcessId: {
         type: [String, Number],
         default: null
     }
 });
 
-const emit = defineEmits(['close', 'sub-process-added']);
+const emit = defineEmits(['close', 'risk-control-matrix-added']);
 
 const { showNotification } = useNotification();
-const { isCreating, error, createSubProcess, resetState } = useCreateSubProcess();
+const { isCreating, error, createRiskControlMatrix, resetState } = useCreateRiskControlMatrix();
 
 const formData = ref({
-    particular: ''
+    description: ''
 });
 
 const errors = ref({
-    particular: ''
+    description: ''
 });
 
 watch(() => props.isVisible, (newValue) => {
@@ -103,18 +103,18 @@ watch(() => props.isVisible, (newValue) => {
 
 const resetForm = () => {
     formData.value = {
-        particular: ''
+        description: ''
     };
     errors.value = {
-        particular: ''
+        description: ''
     };
 
     resetState();
 };
 
 const handleSubmit = async () => {
-    if (!props.auditProcessId) {
-        showNotification('audit process is required', 'error');
+    if (!props.subProcessId) {
+        showNotification('sub process is required', 'error');
         return;
     }
 
@@ -123,36 +123,36 @@ const handleSubmit = async () => {
     }
 
     try {
-        const subProcessData = {
-            particular: formData.value.particular.trim(),
-            auditProcessId: props.auditProcessId
+        const riskControlMatrixData = {
+            description: formData.value.description.trim(),
+            subProcessId: props.subProcessId
         };
 
-        const result = await createSubProcess(subProcessData);
+        const result = await createRiskControlMatrix(riskControlMatrixData);
 
         if (result?.success) {
-            showNotification(`Sub Process "${formData.value.particular}" has been added successfully!`, 'success');
-            emit('sub-process-added', result.data);
+            showNotification(`Risk Control Matrix "${formData.value.description}" has been added successfully!`, 'success');
+            emit('risk-control-matrix-added', result.data);
             emit('close');
         } else {
-             showNotification(result?.message || 'Failed to create sub process', 'error');
+             showNotification(result?.message || 'Failed to create risk control matrix', 'error');
         }
 
     } catch (error) {
-        console.error('Error creating sub process:', error);
-        showNotification('Failed to create sub process. Please try again.', 'error');
+        console.error('Error creating risk control matrix:', error);
+        showNotification('Failed to create risk control matrix. Please try again.', 'error');
     }
 };
 
 const validateForm = () => {
     errors.value = {
-        particular: ''
+        description: ''
     };
 
     let isValid = true;
 
-    if (!formData.value.particular.trim()) {
-        errors.value.particular = 'Sub Process particular is required';
+    if (!formData.value.description.trim()) {
+        errors.value.description = 'Risk Control Matrix description is required';
         isValid = false;
     }
 

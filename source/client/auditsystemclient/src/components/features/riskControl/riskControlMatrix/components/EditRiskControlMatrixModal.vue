@@ -9,7 +9,7 @@
         <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Sub Process</h3>
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Risk Control Matrix</h3>
             <button @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
               <CloseIcon size="md" />
             </button>
@@ -18,17 +18,17 @@
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Sub Process Particular Field -->
+              <!-- Risk Control Matrix Description Field -->
               <div>
-                <label for="edit-sub-process-particular" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Sub Process Particular *
+                <label for="edit-risk-control-matrix-description" class="block text-sm font-medium text-secondary-shade mb-1">
+                  Risk Control Matrix Description *
                 </label>
                 <BaseInput 
-                  id="edit-sub-process-particular"
-                  v-model="formData.particular"
-                  placeholder="Enter Sub Process particular"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.particular ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
-                <p v-if="errors.particular" class="text-error text-sm mt-1">{{ errors.particular }}</p>
+                  id="edit-risk-control-matrix-description"
+                  v-model="formData.description"
+                  placeholder="Enter Risk Control Matrix description"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
               </div>
               <!-- Error Display -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -41,10 +41,10 @@
                   Cancel
                 </button>
 
-                <button type="submit" :disabled="!formData.particular.trim() || isUpdating"
+                <button type="submit" :disabled="!formData.description.trim() || isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isUpdating">Updating...</span>
-                  <span v-else>Update Sub Process</span>
+                  <span v-else>Update Risk Control Matrix</span>
                 </button>
               </div>
             </form>
@@ -58,7 +58,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { useUpdateSubProcessById } from '@/composables/riskControl/subProcess/useUpdateSubProcessById';
+import { useUpdateRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useUpdateRiskControlMatrixById';
 import { useNotification } from '@/composables/notification/useNotification';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
@@ -68,7 +68,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  subProcess: {
+  riskControlMatrix: {
     type: Object,
     default: () => ({})
   }
@@ -77,20 +77,20 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated']);
 
 const { showNotification } = useNotification();
-const { isUpdating, error, updateSubProcess, resetState } = useUpdateSubProcessById();
+const { isUpdating, error, updateRiskControlMatrix, resetState } = useUpdateRiskControlMatrixById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
 
 const formData = ref({
-  particular: ''
+  description: ''
 });
 
 const errors = ref({
-  particular: ''
+  description: ''
 });
 
-// Reset form when modal opens/closes or sub process changes
-watch([() => props.isVisible, () => props.subProcess], ([newVisible, newSubProcess]) => {
-  if (newVisible && newSubProcess) {
+// Reset form when modal opens/closes or risk control matrix changes
+watch([() => props.isVisible, () => props.riskControlMatrix], ([newVisible, newRiskControlMatrix]) => {
+  if (newVisible && newRiskControlMatrix) {
     resetForm();
     populateForm();
   }
@@ -98,19 +98,19 @@ watch([() => props.isVisible, () => props.subProcess], ([newVisible, newSubProce
 
 const resetForm = () => {
   formData.value = {
-    particular: ''
+    description: ''
   };
   errors.value = {
-    particular: ''
+    description: ''
   };
 
   resetState();
 };
 
 const populateForm = () => {
-  if (props.subProcess) {
+  if (props.riskControlMatrix) {
     formData.value = {
-      particular: props.subProcess.particular || '',
+      description: props.riskControlMatrix.description || '',
     };
   }
 };
@@ -130,9 +130,9 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (!props.subProcess?.id) {
-    console.error('Missing sub process ID:', props.subProcess);
-    showNotification('Sub Process ID is required', 'error');
+  if (!props.riskControlMatrix?.id) {
+    console.error('Missing risk control matrix ID:', props.riskControlMatrix);
+    showNotification('Risk Control Matrix ID is required', 'error');
     return;
   }
 
@@ -142,42 +142,42 @@ const handleSubmit = async () => {
   }
 
   try {
-    const subProcessData = {
-      id: props.subProcess?.id,
-      particular: formData.value.particular.trim(),
-      auditProcessId: props.subProcess?.auditProcessId
+    const riskControlMatrixData = {
+      id: props.riskControlMatrix?.id,
+      description: formData.value.description.trim(),
+      subProcessId: props.riskControlMatrix?.subProcessId
     };
 
-    const result = await updateSubProcess(subProcessData);
+    const result = await updateRiskControlMatrix(riskControlMatrixData);
 
     if (result?.success) {
-      const updatedSubProcessData = {
-        ...subProcessData,
+      const updatedRiskControlMatrixData = {
+        ...riskControlMatrixData,
         ...result.data
       };
 
-      emit('updated', updatedSubProcessData);
+      emit('updated', updatedRiskControlMatrixData);
       emit('close');
     } else {
-      const errorMessage = result?.message || error.value || 'Failed to update sub process. Please try again.';
+      const errorMessage = result?.message || error.value || 'Failed to update risk control matrix. Please try again.';
       showNotification(errorMessage, 'error');
     }
   } catch (err) {
     console.error('Error in handleSubmit:', err);
-    const errorMessage = err.response?.data?.message || err.message || 'Failed to update sub process. Please try again.';
+    const errorMessage = err.response?.data?.message || err.message || 'Failed to update risk control matrix. Please try again.';
     showNotification(errorMessage, 'error');
   }
 };
 
 const validateForm = () => {
   errors.value = {
-    particular: ''
+    description: ''
   };
 
   let isValid = true;
 
-  if (!formData.value.particular.trim()) {
-    errors.value.particular = 'Sub Process particular is required';
+  if (!formData.value.description.trim()) {
+    errors.value.description = 'Risk Control Matrix description is required';
     isValid = false;
   }
 

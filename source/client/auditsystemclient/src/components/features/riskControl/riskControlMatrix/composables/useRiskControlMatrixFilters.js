@@ -1,15 +1,15 @@
 import { ref, computed } from 'vue';
 
-export function useSubProcessFilters(subProcesses) {
+export function useRiskControlMatrixFilters(riskControlMatrices) {
     const searchQuery = ref('');
 
-    const filteredSubProcesses = computed(() => {
-        let filtered = subProcesses.value;
+    const filteredRiskControlMatrices = computed(() => {
+        let filtered = riskControlMatrices.value;
 
         if (searchQuery.value.trim()) {
             const query = searchQuery.value.toLowerCase().trim();
-            filtered = filtered.filter((subProcess) =>
-                subProcess.particular.toLowerCase().includes(query)
+            filtered = filtered.filter((riskControlMatrix) =>
+                riskControlMatrix.description.toLowerCase().includes(query)
             );
         }
 
@@ -18,6 +18,6 @@ export function useSubProcessFilters(subProcesses) {
 
     return {
         searchQuery,
-        filteredSubProcesses
+        filteredRiskControlMatrices
     };
 }

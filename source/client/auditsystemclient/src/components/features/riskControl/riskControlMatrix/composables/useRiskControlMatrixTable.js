@@ -1,65 +1,65 @@
-import { useSubProcessData } from './useRiskControlMatrixData';
-import { useAuditProcessManagement } from './useSubProcessManagement';
+import { useRiskControlMatrixData } from './useRiskControlMatrixData';
+import { useSubProcessManagement } from './useSubProcessManagement';
 import { useSearchAndPagination } from './useSearchAndPagination';
-import { useSubProcessActions } from './useRiskControlMatrixActions';
-import { useSubProcessWatchers } from './useRiskControlMatrixWatchers';
-import { useSubProcessLifecycle } from './useRiskControlMatrixLifecycle';
-import { useSubProcessComputed } from './useRiskControlMatrixComputed';
-import { useSubProcessModals } from './useRiskControlMatrixModals';
+import { useRiskControlMatrixActions } from './useRiskControlMatrixActions';
+import { useRiskControlMatrixWatchers } from './useRiskControlMatrixWatchers';
+import { useRiskControlMatrixLifecycle } from './useRiskControlMatrixLifecycle';
+import { useRiskControlMatrixComputed } from './useRiskControlMatrixComputed';
+import { useRiskControlMatrixModals } from './useRiskControlMatrixModals';
 
-export function useSubProcessTable(auditProcesses, showNotification) {
+export function useRiskControlMatrixTable(subProcesses, showNotification) {
 
-    const dataComposable = useSubProcessData();
-    const auditProcessComposable = useAuditProcessManagement(auditProcesses);
+    const dataComposable = useRiskControlMatrixData();
+    const subProcessComposable = useSubProcessManagement(subProcesses);
     const searchComposable = useSearchAndPagination();
 
-    const actionsComposable = useSubProcessActions({
+    const actionsComposable = useRiskControlMatrixActions({
         ...dataComposable,
-        ...auditProcessComposable,
+        ...subProcessComposable,
         ...searchComposable
     });
 
-    const lifecycleComposable = useSubProcessLifecycle({
+    const lifecycleComposable = useRiskControlMatrixLifecycle({
         ...dataComposable,
-        ...auditProcessComposable,
+        ...subProcessComposable,
         ...searchComposable,
         ...actionsComposable
     });
 
-    const computedComposable = useSubProcessComputed({
+    const computedComposable = useRiskControlMatrixComputed({
         ...dataComposable,
-        ...auditProcessComposable,
+        ...subProcessComposable,
         ...searchComposable,
         ...lifecycleComposable
     });
 
-    useSubProcessWatchers({
+    useRiskControlMatrixWatchers({
         ...dataComposable,
-        ...auditProcessComposable,
+        ...subProcessComposable,
         ...searchComposable,
         ...actionsComposable,
         ...lifecycleComposable
     });
 
-    const modalComposable = useSubProcessModals(
+    const modalComposable = useRiskControlMatrixModals(
         actionsComposable.refreshData,
         showNotification
     );
 
     return {
-        subProcesses: computedComposable.subProcesses,
+        riskControlMatrices: computedComposable.riskControlMatrices,
         isLoading: computedComposable.isLoading,
-        selectedAuditProcessId: auditProcessComposable.selectedAuditProcessId,
-        selectedAuditProcess: auditProcessComposable.selectedAuditProcess,
-        currentAuditProcess: auditProcessComposable.currentAuditProcess,
-        isAuditProcessLoading: auditProcessComposable.isAuditProcessLoading,
+        selectedSubProcessId: subProcessComposable.selectedSubProcessId,
+        selectedSubProcess: subProcessComposable.selectedSubProcess,
+        currentSubProcess: subProcessComposable.currentSubProcess,
+        isSubProcessLoading: subProcessComposable.isSubProcessLoading,
         searchQuery: searchComposable.searchQuery,
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
         refreshData: actionsComposable.refreshData,
-        handleSubProcessAdded: actionsComposable.handleSubProcessAdded,
-        handleSubProcessChange: actionsComposable.handleSubProcessChange,
+        handleRiskControlMatrixAdded: actionsComposable.handleRiskControlMatrixAdded,
+        handleRiskControlMatrixChange: actionsComposable.handleRiskControlMatrixChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
         ...modalComposable

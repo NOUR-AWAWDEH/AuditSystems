@@ -1,69 +1,69 @@
 import { ref, computed, watch } from 'vue';
-import { useGetAuditProcessById } from '@/composables/riskControl/auditProcess/useGetAuditProcessById';
+import { useGetSubProcessById } from '@/composables/riskControl/subProcess/useGetSubProcessById';
 
-export function useAuditProcessManagement(auditProcesses) {
+export function useSubProcessManagement(subProcesses) {
     // Initialize from localStorage - USE THE SAME KEY AS RiskControl.vue
-    const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || '');
+    const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || '');
 
     // Watch for changes and persist to localStorage
-    watch(selectedAuditProcessId, (newValue) => {
+    watch(selectedSubProcessId, (newValue) => {
         if (newValue) {
-            localStorage.setItem('riskControlSelectedAuditProcessId', newValue);
+            localStorage.setItem('riskControlSelectedSubProcessId', newValue);
         } else {
-            localStorage.removeItem('riskControlSelectedAuditProcessId');
+            localStorage.removeItem('riskControlSelectedSubProcessId');
         }
     });
 
     const {
-        auditProcess: fetchAuditProcess,
-        isLoading: isAuditProcessLoading,
-        fetchAuditProcessById,
-        clearAuditProcess
-    } = useGetAuditProcessById();
+        subProcess: fetchSubProcess,
+        isLoading: isSubProcessLoading,
+        fetchSubProcessById,
+        clearSubProcess
+    } = useGetSubProcessById();
 
-    // Add watcher to fetch AuditProcess details when selectedAuditProcessId changes
-    watch(selectedAuditProcessId, async (newAuditProcessId) => {
-        if (newAuditProcessId) {
+    // Add watcher to fetch SubProcess details when selectedSubProcessId changes
+    watch(selectedSubProcessId, async (newSubProcessId) => {
+        if (newSubProcessId) {
             try {
-                await fetchAuditProcessById(newAuditProcessId);
+                await fetchSubProcessById(newSubProcessId);
             } catch (error) {
-                console.error('Error fetching AuditProcess details:', error);
+                console.error('Error fetching SubProcess details:', error);
             }
         } else {
-            clearAuditProcess();
+            clearSubProcess();
         }
     }, { immediate: true });
 
-    const auditProcessesRef = computed(() => {
-        if (auditProcesses && typeof auditProcesses === 'object' && 'value' in auditProcesses) {
-            return auditProcesses.value || [];
+    const subProcessesRef = computed(() => {
+        if (subProcesses && typeof subProcesses === 'object' && 'value' in subProcesses) {
+            return subProcesses.value || [];
         }
-        return auditProcesses || [];
+        return subProcesses || [];
     });
 
-    const selectedAuditProcess = computed(() => {
-        const auditProcessId = selectedAuditProcessId.value;
-        const auditProcessesList = auditProcessesRef.value;
+    const selectedSubProcess = computed(() => {
+        const subProcessId = selectedSubProcessId.value;
+        const subProcessesList = subProcessesRef.value;
 
-        if (!auditProcessId || !auditProcessesList || auditProcessesList.length === 0) {
+        if (!subProcessId || !subProcessesList || subProcessesList.length === 0) {
             return null;
         }
-        const auditProcess = auditProcessesList.find(auditProcess => auditProcess.id === auditProcessId);
-        return auditProcess || null;
+        const subProcess = subProcessesList.find(subProcess => subProcess.id === subProcessId);
+        return subProcess || null;
     });
 
-    const currentAuditProcess = computed(() => {
-        const auditProcess = fetchAuditProcess?.value || selectedAuditProcess?.value;
-        return auditProcess?.auditProcessModel || auditProcess;
+    const currentSubProcess = computed(() => {
+        const subProcess = fetchSubProcess?.value || selectedSubProcess?.value;
+        return subProcess?.subProcessModel || subProcess;
     });
 
     return {
-        selectedAuditProcessId,
-        selectedAuditProcess,
-        currentAuditProcess,
-        isAuditProcessLoading,
-        auditProcessesRef,
-        fetchAuditProcessById,
-        clearAuditProcess
+        selectedSubProcessId,
+        selectedSubProcess,
+        currentSubProcess,
+        isSubProcessLoading,
+        subProcessesRef,
+        fetchSubProcessById,
+        clearSubProcess
     };
 }

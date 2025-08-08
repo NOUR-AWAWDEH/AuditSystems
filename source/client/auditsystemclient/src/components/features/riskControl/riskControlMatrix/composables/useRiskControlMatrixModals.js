@@ -1,67 +1,67 @@
 import { ref } from 'vue';
-import { useDeleteSubProcessById } from '@/composables/riskControl/subProcess/useDeleteSubProcessById';
+import { useDeleteRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useDeleteRiskControlMatrixById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSubProcessModals(refreshData) {
-    const { deleteSubProcess } = useDeleteSubProcessById();
+export function useRiskControlMatrixModals(refreshData) {
+    const { deleteRiskControlMatrix } = useDeleteRiskControlMatrixById();
     const { showNotification } = useNotification();
 
-    const showAddSubProcessModal = ref(false);
-    const showEditSubProcessModal = ref(false);
-    const subProcessToEdit = ref(null);
+    const showAddRiskControlMatrixModal = ref(false);
+    const showEditRiskControlMatrixModal = ref(false);
+    const riskControlMatrixToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
     const deleteDialogMessage = ref('');
     const itemToDelete = ref(null);
 
-    const handleAddSubProcess = () => {
-        showAddSubProcessModal.value = true;
+    const handleAddRiskControlMatrix = () => {
+        showAddRiskControlMatrixModal.value = true;
     };
 
-    const handleCloseAddSubProcessModal = () => {
-        showAddSubProcessModal.value = false;
+    const handleCloseAddRiskControlMatrixModal = () => {
+        showAddRiskControlMatrixModal.value = false;
     };
 
-    const handleSubProcessAdded = async () => {
+    const handleRiskControlMatrixAdded = async () => {
         try {
             await refreshData();
-            handleCloseAddSubProcessModal();
+            handleCloseAddRiskControlMatrixModal();
         } catch (error) {
-            console.error('Error in handleSubProcessAdded:', error);
-            showNotification('Failed to refresh data after adding subprocess', 'error');
+            console.error('Error in handleRiskControlMatrixAdded:', error);
+            showNotification('Failed to refresh data after adding risk control matrix', 'error');
         }
     };
 
-    const handleEditSubProcess = (subProcess) => {
-        subProcessToEdit.value = subProcess;
-        showEditSubProcessModal.value = true;
+    const handleEditRiskControlMatrix = (riskControlMatrix) => {
+        riskControlMatrixToEdit.value = riskControlMatrix;
+        showEditRiskControlMatrixModal.value = true;
     };
 
-    const handleCloseEditSubProcessModal = () => {
-        showEditSubProcessModal.value = false;
-        subProcessToEdit.value = null;
+    const handleCloseEditRiskControlMatrixModal = () => {
+        showEditRiskControlMatrixModal.value = false;
+        riskControlMatrixToEdit.value = null;
     };
 
-    const handleSubProcessUpdated = async () => {
-        // Store the particular subprocess name before clearing the reference
-        const particular = subProcessToEdit.value?.particular || 'Unknown Process';
+    const handleRiskControlMatrixUpdated = async () => {
+        // Store the description risk control matrix name before clearing the reference
+        const description = riskControlMatrixToEdit.value?.description || 'Unknown Risk Control Matrix';
         await refreshData();
-        showNotification(`SubProcess "${particular}" has been updated successfully!`, 'success');
-        handleCloseEditSubProcessModal();
+        showNotification(`Risk Control Matrix "${description}" has been updated successfully!`, 'success');
+        handleCloseEditRiskControlMatrixModal();
     };
 
-    const handleDeleteSubProcess = (subProcess) => {
-        itemToDelete.value = subProcess;
-        deleteDialogTitle.value = 'Delete SubProcess';
-        deleteDialogMessage.value = `Are you sure you want to delete the subprocess "${subProcess.particular}"?`;
+    const handleDeleteRiskControlMatrix = (riskControlMatrix) => {
+        itemToDelete.value = riskControlMatrix;
+        deleteDialogTitle.value = 'Delete Risk Control Matrix';
+        deleteDialogMessage.value = `Are you sure you want to delete the risk control matrix "${riskControlMatrix.description}"?`;
         showDeleteDialog.value = true;
     };
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteSubProcess(itemToDelete.value.id);
+            const result = await deleteRiskControlMatrix(itemToDelete.value.id);
             if (result.success) {
-                showNotification(`SubProcess "${itemToDelete.value.particular}" has been deleted successfully!`, 'success');
+                showNotification(`Risk Control Matrix "${itemToDelete.value.description}" has been deleted successfully!`, 'success');
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);
@@ -78,20 +78,20 @@ export function useSubProcessModals(refreshData) {
     };
 
     return {
-        showAddSubProcessModal,
-        showEditSubProcessModal,
-        subProcessToEdit,
+        showAddRiskControlMatrixModal,
+        showEditRiskControlMatrixModal,
+        riskControlMatrixToEdit,
         showDeleteDialog,
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
-        handleAddSubProcess,
-        handleCloseAddSubProcessModal,
-        handleSubProcessAdded,
-        handleEditSubProcess,
-        handleCloseEditSubProcessModal,
-        handleSubProcessUpdated,
-        handleDeleteSubProcess,
+        handleAddRiskControlMatrix,
+        handleCloseAddRiskControlMatrixModal,
+        handleRiskControlMatrixAdded,
+        handleEditRiskControlMatrix,
+        handleCloseEditRiskControlMatrixModal,
+        handleRiskControlMatrixUpdated,
+        handleDeleteRiskControlMatrix,
         confirmDelete,
         cancelDelete,
     };

@@ -17,7 +17,7 @@ export function useSubDepartmentManagement(subDepartments) {
     const {
         subdepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
-        fetchSubDepartmentById,
+        getSubDepartmentById,
         clearSubDepartment
     } = useGetSubDepartmentById();
 
@@ -25,7 +25,7 @@ export function useSubDepartmentManagement(subDepartments) {
     watch(selectedSubDepartmentId, async (newSubDepartmentId) => {
         if (newSubDepartmentId) {
             try {
-                await fetchSubDepartmentById(newSubDepartmentId);
+                await getSubDepartmentById(newSubDepartmentId);
             } catch (error) {
                 console.error('Error fetching SubDepartment details:', error);
             }
@@ -63,7 +63,7 @@ export function useSubDepartmentManagement(subDepartments) {
         currentSubDepartment,
         isSubDepartmentLoading,
         subDepartmentsRef,
-        fetchSubDepartmentById,
+        getSubDepartmentById,
         clearSubDepartment
     };
 }

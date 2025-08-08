@@ -39,10 +39,10 @@
         />
       </div>
 
-      <!-- Sub Process Management -->
+      <!-- SubProcess component -->
       <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
         <SubProcess
-          :audit-processes="allAuditProcesses.value"
+          :audit-processes="auditProcesses"
           :selected-audit-process-id="selectedAuditProcessId"
           @sub-process-selected="handleSubProcessSelected"
         />
@@ -51,7 +51,7 @@
       <!-- Risk Control Matrix -->
       <div v-if="activeTab === 'matrix'" class="p-3 sm:p-4 md:p-6">
         <RiskControlMatrix
-          :sub-processes="allSubProcesses.value?.subProcesses || []"
+          :sub-processes="subProcesses"
           :selected-sub-process-id="selectedSubProcessId"
           @risk-control-matrix-selected="handleRiskControlMatrixSelected"
         />
@@ -125,9 +125,19 @@ import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess
 const route = useRoute();
 const router = useRouter();
 
+// Composable For audit processes
 const { 
-  subdepartment: selectedSubDepartment, 
-  fetchSubDepartmentById 
+  getAuditProcessesByUserId
+} = useGetAuditProcessesByUserId();
+
+// Composable For sub processes
+const { 
+  getSubProcessesByUserId
+} = useGetSubProcessesByUserId();
+
+// Composable For sub department
+const { 
+  getSubDepartmentById 
 } = useGetSubDepartmentById();
 
 const { 
@@ -135,21 +145,19 @@ const {
   getSubDepartmentsByUserId 
 } = useGetSubDepartmentsByUserId();
 
-const {
-  auditProcesses: allAuditProcesses,
-  getAuditProcessesByUserId
-} = useGetAuditProcessesByUserId();
-
-const {
-  subProcesses: allSubProcesses,
-  getSubProcessesByUserId
-} = useGetSubProcessesByUserId();
 
 // Active tab state
 const activeTab = ref('processes');
 
 // Props for AuditProcess component
 const subDepartments = ref([]);
+
+// Props for SubProcess component
+const auditProcesses = ref([]);
+
+// Props for RiskControlMatrix component
+const subProcesses = ref([]);
+
 // Initialize from localStorage
 const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
 
@@ -203,7 +211,10 @@ const fetchAllSubDepartments = async () => {
 // Function to fetch all audit processes for the user
 const fetchAllAuditProcesses = async () => {
   try {
-    await getAuditProcessesByUserId();
+    const result = await getAuditProcessesByUserId();
+    if (result?.success) {
+      auditProcesses.value = result.auditProcesses;
+    }
   } catch (error) {
     console.error('Error fetching audit processes:', error);
   }
@@ -212,7 +223,11 @@ const fetchAllAuditProcesses = async () => {
 // Function to fetch all sub processes for the user
 const fetchAllSubProcesses = async () => {
   try {
-    await getSubProcessesByUserId();
+    const result = await getSubProcessesByUserId();
+    if (result?.success) {
+      subProcesses.value = result.subProcesses;
+    }
+
   } catch (error) {
     console.error('Error fetching sub processes:', error);
   }
@@ -284,7 +299,7 @@ onMounted(async () => {
   const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
   if (subDepartmentId) {
     selectedSubDepartmentId.value = subDepartmentId;
-    await fetchSubDepartmentById(subDepartmentId);
+    await getSubDepartmentById(subDepartmentId);
     
     // Only redirect if we came from a query parameter
     if (route.query.subDepartmentId) {

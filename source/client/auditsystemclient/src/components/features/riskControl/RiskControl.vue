@@ -239,7 +239,7 @@ watch(
   async (newSubDepartmentId) => {
     if (newSubDepartmentId) {
       selectedSubDepartmentId.value = newSubDepartmentId;
-      await fetchSubDepartmentById(newSubDepartmentId);
+      await getSubDepartmentById(newSubDepartmentId);
       
       // Fetch all subdepartments instead of just the selected one
       await fetchAllSubDepartments();

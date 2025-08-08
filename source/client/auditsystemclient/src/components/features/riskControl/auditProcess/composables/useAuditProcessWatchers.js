@@ -14,7 +14,7 @@ export function useAuditProcessWatchers({
     getAuditProcessesByUserId,
     allAuditProcesses,
     clearSubDepartment,
-    fetchSubDepartmentById,
+    getSubDepartmentById,
     initializeData,
     resetToDefaultView
 }) {
@@ -89,7 +89,7 @@ export function useAuditProcessWatchers({
         
         if (newSubDepartmentId) {
             try {
-                await fetchSubDepartmentById(newSubDepartmentId);
+                await getSubDepartmentById(newSubDepartmentId);
             } catch (error) {
                 console.error('[Process] Error fetching subdepartment:', error);
             }

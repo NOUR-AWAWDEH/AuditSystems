@@ -134,7 +134,7 @@ onMounted(async () => {
 // Watch for prop changes and update internal state
 watch(() => props.selectedSubDepartmentId, (newSubDepartmentId) => {
     if (newSubDepartmentId !== internalSelectedSubDepartmentId.value) {
-        handleAuditProcessChange(newSubDepartmentId); // Changed from handleSubDepartmentChange
+        handleAuditProcessChange(newSubDepartmentId);
     }
 }, { immediate: true });
 

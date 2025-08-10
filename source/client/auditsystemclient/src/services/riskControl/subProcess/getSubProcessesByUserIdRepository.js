@@ -24,7 +24,7 @@ export const getSubProcessesByUserIdRepository = {
             responseData = data;
             
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result, data?.successMessage || 'SubProcesses retrieved successfully'); 
+                return ApiResponseT.ok(data?.result?.subProcessModels, data?.successMessage || 'SubProcesses retrieved successfully'); 
             }
 
             const errors = Array.isArray(data?.errors)

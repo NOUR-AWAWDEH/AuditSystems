@@ -165,6 +165,8 @@ const { getRiskControlMatrixById } = useGetRiskControlMatrixById();
 const normalizedAuditProcesses = computed(() => Array.isArray(auditProcesses.value) ? auditProcesses.value.flat() : []);
 const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value.flat() : []);
 const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value.flat() : []);
+//const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value.flat() : []);
+
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -198,6 +200,7 @@ const fetchData = async () => {
     auditProcesses.value = auditResult?.data || [];
     subProcesses.value = subProcResult?.data || [];
     riskControlMatrices.value = riskMatrixResult?.data || [];
+
   } catch (err) {
     errorMessage.value = err.message || 'Failed to fetch data';
   } finally {
@@ -235,7 +238,8 @@ const handleSubProcessSelected = async (id) => {
 };
 
 const handleRiskControlMatrixSelected = async (id) => {
-  selectRiskControlMatrix(id);
+  //selectRiskControlMatrix(id);
+  //if (!normalizedObjectives.value.length) await fetchData();
   setActiveTab('objectives');
 };
 

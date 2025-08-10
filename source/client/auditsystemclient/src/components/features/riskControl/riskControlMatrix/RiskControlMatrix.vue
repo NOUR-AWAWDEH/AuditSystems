@@ -1,3 +1,4 @@
+// RiskControlMatrix.vue
 <template>
     <div class="space-y-6">
         <!-- Add RiskControlMatrix Modal -->
@@ -10,8 +11,8 @@
 
         <!-- Show RiskControlMatrixTable only when sub processes exist -->
         <RiskControlMatrixTable
-            v-if="hasSubProcesses"
-            :sub-processes="subProcessesForComposable"
+            v-if="props.subProcesses && props.subProcesses.length > 0"
+            :sub-processes="props.subProcesses"
             :risk-control-matrices="riskControlMatrices"
             :is-loading="isLoading"
             :selected-sub-process-id="internalSelectedSubProcessId"
@@ -79,7 +80,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, computed } from 'vue';
+import { watch, onMounted, ref  } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
@@ -92,34 +93,27 @@ import ProcessIcon from '@/components/common/icons/ProcessIcon.vue';
 const props = defineProps({
     subProcesses: {
         type: Array,
-        default: () => []
+        default: () => [],
     },
     selectedSubProcessId: {
         type: [String, Number],
         default: null
-    }
+    },
 });
 
-const hasSubProcesses = computed(() => {
-    let sp = props.subProcesses;
 
-    // If it's a ref, unwrap it
-    if (sp && typeof sp === 'object' && 'value' in sp) {
-        sp = sp.value;
-    }
 
-    // If object with subProcesses array
-    if (sp && typeof sp === 'object' && Array.isArray(sp.subProcesses)) {
-        return sp.subProcesses.length > 0;
-    }
+const internalRCM = ref([]);
 
-    // Direct array
-    if (Array.isArray(sp)) {
-        return sp.length > 0;
-    }
+watch(
+  () => props.riskControlMatrices,
+  (newVal) => {
+    internalRCM.value = newVal;
+  },
+  { immediate: true }
+);
 
-    return false;
-});
+console.log('From RiskControlMatrix', props.subProcesses);
 
 
 // Define emit first
@@ -128,38 +122,6 @@ const emit = defineEmits(['risk-control-matrix-selected']);
 const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
-// Pass the reactive ref or array properly
-const subProcessesForComposable = computed(() => {
-    const subProcesses = props.subProcesses;
-    
-    // Handle direct arrays
-    if (Array.isArray(subProcesses)) {
-        return subProcesses;
-    }
-    
-    // Handle object with nested subProcesses array
-    if (subProcesses && typeof subProcesses === 'object') {
-        // Check for nested subProcesses array (from composable)
-        if (subProcesses.subProcesses && Array.isArray(subProcesses.subProcesses)) {
-            return subProcesses.subProcesses;
-        }
-        
-        // Check if it's a reactive ref with value property
-        if ('value' in subProcesses) {
-            const value = subProcesses.value;
-            if (Array.isArray(value)) {
-                return value;
-            }
-            // Check nested subProcesses in value
-            if (value && value.subProcesses && Array.isArray(value.subProcesses)) {
-                return value.subProcesses;
-            }
-        }
-    }
-    
-    // Fallback to empty array
-    return [];
-});
 
 const {
     riskControlMatrices,
@@ -174,27 +136,40 @@ const {
     handleRiskControlMatrixChange,
     handleSearch,
     resetToDefaultView,
-} = useRiskControlMatrixTable(subProcessesForComposable);
+} = useRiskControlMatrixTable(props.subProcesses);
+
+// Local ref to manage selectedSubProcessId
+const localSelectedSubProcessId = ref(props.selectedSubProcessId);
 
 // Add onMounted to refresh data on page load
 onMounted(async () => {
-    // If there's a selected sub process, refresh the data
-    if (internalSelectedSubProcessId.value) {
+    if (localSelectedSubProcessId.value) {
         await refreshData();
     }
 });
 
 // Watch for prop changes and update internal state
-watch(() => props.selectedSubProcessId, (newSubProcessId) => {
-    if (newSubProcessId !== internalSelectedSubProcessId.value) {
-        handleRiskControlMatrixChange(newSubProcessId);
-    }
-}, { immediate: true });
+watch(
+    () => props.selectedSubProcessId,
+    async (newSubProcessId) => {
+        localSelectedSubProcessId.value = newSubProcessId;
+        if (newSubProcessId !== internalSelectedSubProcessId.value) {
+            await handleRiskControlMatrixChange(newSubProcessId);
+        }
+    },
+    { immediate: true }
+);
 
 // Watch for subProcesses prop changes
-watch(() => props.subProcesses, (newSubProcesses) => {
-    // Watch for changes in sub processes
-}, { immediate: true, deep: true });
+watch(
+    () => props.subProcesses,
+    async (newSubProcesses) => {
+        if (newSubProcesses.length > 0 && localSelectedSubProcessId.value) {
+            await refreshData();
+        }
+    },
+    { immediate: true, deep: true }
+);
 
 // Use modal composable for dialog management
 const {
@@ -222,7 +197,7 @@ const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
 
 defineExpose({
     riskControlMatrices,
-    selectedSubProcessId: internalSelectedSubProcessId,
+    selectedSubProcessId: localSelectedSubProcessId,
     resetToDefaultView
 });
 </script>

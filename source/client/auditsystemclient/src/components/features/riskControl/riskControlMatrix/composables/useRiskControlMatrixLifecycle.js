@@ -15,11 +15,11 @@ export function useRiskControlMatrixLifecycle({
 
     const initializeData = async () => {
         if (!selectedSubProcessId.value || isInitialized.value || isInitializing.value) {
-
             return;
         }
 
         try {
+            isInitializing.value = true;
             if (searchRiskControlMatrices) {
                 await searchRiskControlMatrices({
                     subProcessId: selectedSubProcessId.value,

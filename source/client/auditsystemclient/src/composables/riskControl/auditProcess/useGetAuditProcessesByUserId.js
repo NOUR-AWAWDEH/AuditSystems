@@ -31,7 +31,6 @@ export function useGetAuditProcessesByUserId() {
             : [];
 
         auditProcesses.value = auditProcessesData;
-        console.log('Normalized auditProcesses:', auditProcessesData); // Debug log
         return { success: true, data: auditProcessesData };
     };
 
@@ -57,7 +56,6 @@ export function useGetAuditProcessesByUserId() {
             auditProcesses.value = [];
 
             const response = await getAuditProcessesByUserIdRepository.getAuditProcessesByUserId();
-            console.log('Raw API response:', response); // Debug log
 
             if (response?.success) {
                 return handleFetchSuccess(response);

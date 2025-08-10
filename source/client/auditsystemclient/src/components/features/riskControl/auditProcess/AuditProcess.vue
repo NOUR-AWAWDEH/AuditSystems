@@ -1,3 +1,5 @@
+// AuditProcess.vue
+
 <template>
     <div class="space-y-6">
         <!-- Add Audit Process Modal -->
@@ -102,8 +104,11 @@ const props = defineProps({
     }
 });
 
+console.log('From AuditProcess', props.subDepartments);
+
+
 // Define emit first
-const emit = defineEmits(['audit-process-selected']);
+const emit = defineEmits(['audit-process-selected', ]);
 
 const { showNotification } = useNotification();
 

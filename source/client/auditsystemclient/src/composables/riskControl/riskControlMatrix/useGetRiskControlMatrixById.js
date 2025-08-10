@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { getRiskControlMatrixByIdRepository } from '@/services/riskControl/riskControlMatrix/getRiskControlMatrixByIdRepository';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetRiskControlMatrixById() {
     const riskControlMatrix = ref(null);

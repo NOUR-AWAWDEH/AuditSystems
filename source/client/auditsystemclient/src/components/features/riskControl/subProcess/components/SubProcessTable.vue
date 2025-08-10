@@ -132,17 +132,50 @@ import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
-    auditProcesses: Array,
-    subProcesses: Array,
-    isLoading: Boolean,
-    selectedAuditProcessId: String,
-    selectedAuditProcess: Object,
-    currentAuditProcess: Object,
-    isAuditProcessLoading: Boolean,
-    searchQuery: String,
-    handleAuditProcessChange: Function,
-    handleSearch: Function,
-    refreshData: Function
+    auditProcesses: {
+        type: Array,
+        default: () => []
+    },
+    subProcesses: {
+        type: Array,
+        default: () => []
+    },
+    isLoading: {
+        type: Boolean,
+        default: false
+    },
+    selectedAuditProcessId: {
+        type: String,
+        default: ''
+    },
+    selectedAuditProcess: {
+        type: Object,
+        default: () => null
+    },
+    currentAuditProcess: {
+        type: Object,
+        default: () => null
+    },
+    isAuditProcessLoading: {
+        type: Boolean,
+        default: false
+    },
+    searchQuery: {
+        type: String,
+        default: ''
+    },
+    handleAuditProcessChange: {
+        type: Function,
+        default: () => {}
+    },
+    handleSearch: {
+        type: Function,
+        default: () => {}
+    },
+    refreshData: {
+        type: Function,
+        default: () => {}
+    }
 });
 
 const internalSelectedAuditProcessId = ref(props.selectedAuditProcessId);

@@ -1,3 +1,4 @@
+// SubProcess.vue
 <template>
   <div class="space-y-6">
     <!-- Add SubProcess Modal -->
@@ -8,9 +9,9 @@
       @sub-process-added="handleSubProcessAdded"
     />
 
-    <!-- Show SubProcessTable only when subProcesses exist -->
+    <!-- Show SubProcessTable only when audit Processes exist -->
     <SubProcessTable
-      v-if="subProcesses.length > 0"
+      v-if="props.auditProcesses && props.auditProcesses.length > 0"
       :audit-processes="props.auditProcesses"
       :sub-processes="subProcesses"
       :is-loading="isLoading"
@@ -28,7 +29,7 @@
       @sub-process-selected="handleSubProcessSelected"
     />
 
-    <!-- Show big Process icon when no sub-processes exist -->
+    <!-- Show big Process icon when no Audit-processes exist -->
     <div v-else class="text-center py-20">
       <div class="max-w-lg mx-auto">
         <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
@@ -93,21 +94,21 @@ import ProcessIcon from '@/components/common/icons/ProcessIcon.vue';
 const props = defineProps({
   auditProcesses: {
     type: Array,
-    required: true,
     default: () => [],
   },
   selectedAuditProcessId: {
     type: [String, Number],
-    required: true,
     default: null,
   },
 });
+
+console.log('From SubProcess', props.auditProcesses);
 
 const emit = defineEmits(['sub-process-selected']);
 
 const { showNotification } = useNotification();
 
-// Initialize useSubProcessTable with auditProcesses and selectedAuditProcessId
+// Use composables -now with integrated backend search
 const {
   subProcesses,
   isLoading,
@@ -121,16 +122,14 @@ const {
   handleSubProcessChange,
   handleSearch,
   resetToDefaultView,
-} = useSubProcessTable(props.auditProcesses, ref(props.selectedAuditProcessId));
+} = useSubProcessTable(props.auditProcesses);
 
 // Local ref to manage selectedAuditProcessId
 const localSelectedAuditProcessId = ref(props.selectedAuditProcessId);
 
 onMounted(async () => {
-  console.log('Mounted: Checking selected audit process ID', localSelectedAuditProcessId.value);
   if (localSelectedAuditProcessId.value) {
     await refreshData();
-    console.log('Data refreshed for audit process ID:', localSelectedAuditProcessId.value);
   }
 });
 
@@ -150,7 +149,6 @@ watch(
 watch(
   () => props.auditProcesses,
   async (newAuditProcesses) => {
-    console.log('Audit processes changed:', newAuditProcesses);
     if (newAuditProcesses.length > 0 && localSelectedAuditProcessId.value) {
       await refreshData();
     }

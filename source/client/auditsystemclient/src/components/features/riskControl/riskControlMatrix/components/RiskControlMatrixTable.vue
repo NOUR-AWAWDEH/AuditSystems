@@ -2,6 +2,7 @@
     <div class="space-y-6">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
+
                 <!-- SubProcessSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
@@ -131,17 +132,50 @@ import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
-    subProcesses: Array,
-    riskControlMatrices: Array,
-    isLoading: Boolean,
-    selectedSubProcessId: String,
-    selectedSubProcess: Object,
-    currentSubProcess: Object,
-    isSubProcessLoading: Boolean,
-    searchQuery: String,
-    handleSubProcessChange: Function,
-    handleSearch: Function,
-    refreshData: Function
+    subProcesses: {
+        type: Array,
+        default: () => []
+    },
+    riskControlMatrices: {
+        type: Array,
+        default: () => []
+    },
+    isLoading: {
+        type: Boolean,
+        default: false
+    },
+    selectedSubProcessId: {
+        type: [String, Number],
+        default: null
+    },
+    selectedSubProcess: {
+        type: Object,
+        default: () => null
+    },
+    currentSubProcess: {
+        type: Object,
+        default: () => null
+    },
+    isSubProcessLoading: {
+        type: Boolean,
+        default: false
+    },
+    searchQuery: {
+        type: String,
+        default: ''
+    },
+    handleSubProcessChange: {
+        type: Function,
+        default: () => {}
+    },
+    handleSearch: {
+        type: Function,
+        default: () => {}
+    },
+    refreshData: {
+        type: Function,
+        default: () => {}
+    }
 });
 
 const internalSelectedSubProcessId = ref(props.selectedSubProcessId);

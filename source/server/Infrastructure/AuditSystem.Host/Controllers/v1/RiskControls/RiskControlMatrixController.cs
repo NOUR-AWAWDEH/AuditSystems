@@ -61,7 +61,7 @@ public sealed class RiskControlMatrixController(IMediator mediator) : ApiControl
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Risk Control Matrix
-    [HttpGet("search-risk-control-matrix-by-user-id")]
+    [HttpGet("search-risk-control-matrices-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RiskControlMatrixModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchRiskControlMatrix([FromQuery] SearchRiskControlMatrixQuery query) =>

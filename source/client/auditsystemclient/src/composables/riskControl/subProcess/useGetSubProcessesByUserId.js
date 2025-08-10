@@ -9,7 +9,10 @@ export function useGetSubProcessesByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const subProcessesData = response.result?.subProcesses || [];
+        const subProcessesData =  Array.isArray(response.result)
+    ? response.result
+    : response.result?.subProcesses || [];
+
         subProcesses.value = subProcessesData;
         return { success: true, data: subProcessesData };
     };
@@ -36,7 +39,6 @@ export function useGetSubProcessesByUserId() {
             subProcesses.value = [];
 
             const response = await getSubProcessesByUserIdRepository.getSubProcessesByUserId();
-
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {

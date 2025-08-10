@@ -1,3 +1,4 @@
+// RiskControl.vue
 <template>
   <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-2 sm:p-4 md:p-6">
     <!-- Header Section -->
@@ -14,7 +15,7 @@
           <button
             v-for="tab in tabs"
             :key="tab.id"
-            @click="activeTab = tab.id"
+            @click="setActiveTab(tab.id)"
             :class="[
               'whitespace-nowrap py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0',
               activeTab === tab.id
@@ -30,81 +31,88 @@
 
     <!-- Tab Content -->
     <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
-      <!-- Process Management -->
-      <div v-if="activeTab === 'processes'" class="p-3 sm:p-4 md:p-6">
-        <AuditProcess
-          :sub-departments="subDepartments"
-          :selected-sub-department-id="selectedSubDepartmentId"
-          @audit-process-selected="handleAuditProcessSelected"
-        />
+      <div v-if="isLoading" class="p-3 sm:p-4 md:p-6 text-center">
+        <p class="text-gray-500">Loading...</p>
       </div>
-
-      <!-- Sub Process Management -->
-      <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
-        <SubProcess
-          :audit-processes="allAuditProcesses?.auditProcesses || []"
-          :selected-audit-process-id="selectedAuditProcessId"
-          @sub-process-selected="handleSubProcessSelected"
-        />
+      <div v-else-if="errorMessage" class="p-3 sm:p-4 md:p-6 text-center">
+        <p class="text-red-500">{{ errorMessage }}</p>
       </div>
-
-      <!-- Risk Control Matrix -->
-      <div v-if="activeTab === 'matrix'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Risk Control Matrix</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Matrix Entry
-          </button>
+      <div v-else>
+        <!-- Process Management -->
+        <div v-if="activeTab === 'processes'" class="p-3 sm:p-4 md:p-6">
+          <AuditProcess
+            :sub-departments="subDepartments"
+            :selected-sub-department-id="selectedSubDepartmentId"
+            @audit-process-selected="handleAuditProcessSelected"
+          />
         </div>
-      </div>
 
-      <!-- Objectives -->
-      <div v-if="activeTab === 'objectives'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Objectives Management</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Objective
-          </button>
+        <!-- SubProcess component -->
+        <div v-if="activeTab === 'subprocesses'" class="p-3 sm:p-4 md:p-6">
+          <SubProcess
+            :audit-processes="auditProcesses"
+            :selected-audit-process-id="selectedAuditProcessId"
+            @sub-process-selected="handleSubProcessSelected"
+          />
         </div>
-      </div>
 
-      <!-- Risks -->
-      <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Risk Management</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Risk
-          </button>
+        <!-- Risk Control Matrix -->
+        <div v-if="activeTab === 'matrix'" class="p-3 sm:p-4 md:p-6">
+          <RiskControlMatrix
+            :sub-processes="subProcesses"
+            :selected-sub-process-id="selectedSubProcessId"
+            @risk-control-matrix-selected="handleRiskControlMatrixSelected"
+          />
         </div>
-      </div>
 
-      <!-- Exit Risks -->
-      <div v-if="activeTab === 'exitrisks'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Exit Risk Management</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Exit Risk
-          </button>
+        <!-- Objectives -->
+        <div v-if="activeTab === 'objectives'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Objectives Management</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add Objective
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Control Design -->
-      <div v-if="activeTab === 'controls'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Control Design</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Control
-          </button>
+        <!-- Risks -->
+        <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Risk Management</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add Risk
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Observations -->
-      <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Observations</h2>
-          <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-            Add Observation
-          </button>
+        <!-- Exit Risks -->
+        <div v-if="activeTab === 'exitrisks'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Exit Risk Management</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add Exit Risk
+            </button>
+          </div>
+        </div>
+
+        <!-- Control Design -->
+        <div v-if="activeTab === 'controls'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Control Design</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add Control
+            </button>
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Observations</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add Observation
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -112,163 +120,58 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
+
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
-import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
-import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
+import RiskControlMatrix from './riskControlMatrix/RiskControlMatrix.vue';
 
+import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
+import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
+import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
+import { useGetAuditProcessById } from '@/composables/riskControl/auditProcess/useGetAuditProcessById';
+import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess/useGetSubProcessesByUserId';
+import { useGetSubProcessById } from '@/composables/riskControl/subProcess/useGetSubProcessById';
+import { useGetRiskControlMatricesByUserId } from '@/composables/riskControl/riskControlMatrix/useGetRiskControlMatricesByUserId';
+import { useGetRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useGetRiskControlMatrixById';
+
+// Router
 const route = useRoute();
 const router = useRouter();
 
-const { 
-  subdepartment: selectedSubDepartment, 
-  fetchSubDepartmentById 
-} = useGetSubDepartmentById();
-
-const { 
-  subdepartments: allSubDepartments,
-  getSubDepartmentsByUserId 
-} = useGetSubDepartmentsByUserId();
-
-const {
-  auditProcesses: allAuditProcesses,
-  getAuditProcessesByUserId
-} = useGetAuditProcessesByUserId();
-
-// Active tab state
+// State
 const activeTab = ref('processes');
-
-// Props for AuditProcess component
-const subDepartments = ref([]);
-// Initialize from localStorage
 const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
-
-// Props for SubProcess component - use the reactive ref directly from composable
-// Initialize from localStorage
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
+const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
+const selectedRiskControlMatrixId = ref(localStorage.getItem('riskControlSelectedRiskControlMatrixId') || null);
 
-// Watch for selectedSubDepartmentId changes and persist to localStorage
-watch(selectedSubDepartmentId, (newValue) => {
-  if (newValue) {
-    localStorage.setItem('riskControlSelectedSubDepartmentId', newValue);
-  } else {
-    localStorage.removeItem('riskControlSelectedSubDepartmentId');
-  }
-});
+// Composables
+const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
+const { getSubDepartmentById } = useGetSubDepartmentById();
 
-// Watch for selectedAuditProcessId changes and persist to localStorage
-watch(selectedAuditProcessId, (newValue) => {
-  if (newValue) {
-    localStorage.setItem('riskControlSelectedAuditProcessId', newValue);
-  } else {
-    localStorage.removeItem('riskControlSelectedAuditProcessId');
-  }
-});
+const { getAuditProcessesByUserId, auditProcesses } = useGetAuditProcessesByUserId();
+const { getAuditProcessById } = useGetAuditProcessById();
 
-// Function to fetch all subdepartments for the user
-const fetchAllSubDepartments = async () => {
-  try {
-    const result = await getSubDepartmentsByUserId();
-    if (result?.success) {
-      subDepartments.value = allSubDepartments.value; // Now contains ALL subdepartments
-    }
-  } catch (error) {
-    console.error('Error fetching subdepartments:', error);
-  }
-};
+const { getSubProcessesByUserId, subProcesses } = useGetSubProcessesByUserId();
+const { getSubProcessById } = useGetSubProcessById();
 
-// Function to fetch all audit processes for the user
-const fetchAllAuditProcesses = async () => {
-  try {
-    await getAuditProcessesByUserId();
-  } catch (error) {
-    console.error('Error fetching audit processes:', error);
-  }
-};
+const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskControlMatricesByUserId();
+const { getRiskControlMatrixById } = useGetRiskControlMatrixById();
 
-// Watch for route query changes to load subdepartment
-watch(
-  () => route.query.subDepartmentId,
-  async (newSubDepartmentId) => {
-    if (newSubDepartmentId) {
-      selectedSubDepartmentId.value = newSubDepartmentId;
-      await fetchSubDepartmentById(newSubDepartmentId);
-      
-      // Fetch all subdepartments instead of just the selected one
-      await fetchAllSubDepartments();
-      
-      // Redirect to clean URL after processing the subDepartmentId
-      router.replace({ path: '/risk-control' });
-    }
-  },
-  { immediate: true }
-);
+// Computed normalized lists
+const normalizedAuditProcesses = computed(() => Array.isArray(auditProcesses.value) ? auditProcesses.value.flat() : []);
+const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value.flat() : []);
+const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value.flat() : []);
+//const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value.flat() : []);
 
-// Watch for route query changes to load audit process
-watch(
-  () => route.query.auditProcessId,
-  async (newAuditProcessId) => {
-    if (newAuditProcessId) {
-      selectedAuditProcessId.value = newAuditProcessId;
-      
-      // Fetch all audit processes
-      await fetchAllAuditProcesses();
-      
-      // Redirect to clean URL after processing the auditProcessId
-      router.replace({ path: '/risk-control' });
-    }
-  },
-  { immediate: true }
-);
 
-// Load subdepartment on component mount
-onMounted(async () => {
-  // Always fetch all subdepartments first
-  await fetchAllSubDepartments();
-  
-  // Always fetch all audit processes
-  await fetchAllAuditProcesses();
-  
-  const subDepartmentId = route.query.subDepartmentId || selectedSubDepartmentId.value;
-  if (subDepartmentId) {
-    selectedSubDepartmentId.value = subDepartmentId;
-    await fetchSubDepartmentById(subDepartmentId);
-    
-    // Only redirect if we came from a query parameter
-    if (route.query.subDepartmentId) {
-      router.replace({ path: '/risk-control' });
-    }
-  }
-  
-  const auditProcessId = route.query.auditProcessId || selectedAuditProcessId.value;
-  if (auditProcessId) {
-    selectedAuditProcessId.value = auditProcessId;
-    
-    // Only redirect if we came from a query parameter
-    if (route.query.auditProcessId) {
-      router.replace({ path: '/risk-control' });
-    }
-  }
-});
+const isLoading = ref(false);
+const errorMessage = ref(null);
 
-// Handle audit process selection
-const handleAuditProcessSelected = (auditProcessId) => {
-  selectedAuditProcessId.value = auditProcessId;
-  // Switch to sub processes tab when an audit process is selected
-  activeTab.value = 'subprocesses';
-};
-
-// Handle sub process selection
-const handleSubProcessSelected = (subProcessId) => {
-  console.log('Sub process selected:', subProcessId);
-  // Handle sub process selection logic here
-};
-
-// Tab configuration
+// Tabs
 const tabs = ref([
   { id: 'processes', name: 'Processes' },
   { id: 'subprocesses', name: 'Sub Processes' },
@@ -279,15 +182,116 @@ const tabs = ref([
   { id: 'controls', name: 'Control Design' },
   { id: 'observations', name: 'Observations' }
 ]);
+
+// Fetch all required data
+const fetchData = async () => {
+  isLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    const [subDeptResult, auditResult, subProcResult, riskMatrixResult] = await Promise.all([
+      getSubDepartmentsByUserId(),
+      getAuditProcessesByUserId(),
+      getSubProcessesByUserId(),
+      getRiskControlMatricesByUserId()
+    ]);
+
+    subDepartments.value = subDeptResult?.data || [];
+    auditProcesses.value = auditResult?.data || [];
+    subProcesses.value = subProcResult?.data || [];
+    riskControlMatrices.value = riskMatrixResult?.data || [];
+
+  } catch (err) {
+    errorMessage.value = err.message || 'Failed to fetch data';
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Selection handlers
+const selectAuditProcess = (id) => {
+  selectedAuditProcessId.value = id;
+  localStorage.setItem('riskControlSelectedAuditProcessId', id || '');
+};
+
+const selectSubProcess = (id) => {
+  selectedSubProcessId.value = id;
+  localStorage.setItem('riskControlSelectedSubProcessId', id || '');
+};
+
+const selectRiskControlMatrix = (id) => {
+  selectedRiskControlMatrixId.value = id;
+  localStorage.setItem('riskControlSelectedRiskControlMatrixId', id || '');
+};
+
+// Event handlers
+const handleAuditProcessSelected = async (id) => {
+  selectAuditProcess(id);
+  if (!normalizedSubProcesses.value.length) await fetchData();
+  setActiveTab('subprocesses');
+};
+
+const handleSubProcessSelected = async (id) => {
+  selectSubProcess(id);
+  if (!normalizedRiskControlMatrices.value.length) await fetchData();
+  setActiveTab('matrix');
+};
+
+const handleRiskControlMatrixSelected = async (id) => {
+  //selectRiskControlMatrix(id);
+  //if (!normalizedObjectives.value.length) await fetchData();
+  setActiveTab('objectives');
+};
+
+// Tab navigation
+const setActiveTab = (tabId) => {
+  activeTab.value = tabId;
+};
+
+// Handle route queries
+const handleRouteQueries = async () => {
+  const { subDepartmentId, auditProcessId, subProcessId, riskControlMatrixId } = route.query;
+
+  if (subDepartmentId) {
+    selectedSubDepartmentId.value = subDepartmentId;
+    await getSubDepartmentById(subDepartmentId);
+  }
+  if (auditProcessId) {
+    selectedAuditProcessId.value = auditProcessId;
+    await getAuditProcessById(auditProcessId);
+  }
+  if (subProcessId) {
+    selectedSubProcessId.value = subProcessId;
+    await getSubProcessById(subProcessId);
+  }
+  if (riskControlMatrixId) {
+    selectedRiskControlMatrixId.value = riskControlMatrixId;
+    await getRiskControlMatrixById(riskControlMatrixId);
+  }
+
+  // Clean up URL
+  if (subDepartmentId || auditProcessId || subProcessId || riskControlMatrixId) {
+    await router.replace({ path: '/risk-control' });
+  }
+};
+
+// Init
+onMounted(async () => {
+  await fetchData();
+  await handleRouteQueries();
+});
+
+watch(() => route.query, handleRouteQueries);
 </script>
 
+
 <style scoped>
+/* Existing styles remain unchanged */
 .min-h-\[calc\(100vh-4rem\)\] {
   min-height: calc(100vh - 4rem);
   min-height: calc(100dvh - 4rem);
 }
 
-/* Hide scrollbar for tab navigation */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -297,48 +301,23 @@ const tabs = ref([
   display: none;
 }
 
-/* Enhanced mobile responsiveness */
 @media (max-width: 640px) {
-  .p-2 {
-    padding: 0.5rem;
-  }
-  
-  .mb-4 {
-    margin-bottom: 1rem;
-  }
-  
-  .gap-3 {
-    gap: 0.75rem;
-  }
+  .p-2 { padding: 0.5rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .gap-3 { gap: 0.75rem; }
 }
 
 @media (max-width: 480px) {
-  .p-2 {
-    padding: 0.375rem;
-  }
-  
-  .mb-4 {
-    margin-bottom: 0.75rem;
-  }
-  
-  .gap-3 {
-    gap: 0.5rem;
-  }
-  
-  /* Ensure tabs don't get too cramped */
+  .p-2 { padding: 0.375rem; }
+  .mb-4 { margin-bottom: 0.75rem; }
+  .gap-3 { gap: 0.5rem; }
   .space-x-2 > :not([hidden]) ~ :not([hidden]) {
     margin-left: 0.25rem;
   }
 }
 
 @media (max-width: 360px) {
-  .p-2 {
-    padding: 0.25rem;
-  }
-  
-  /* Very small screens - stack everything */
-  .flex-shrink-0 {
-    min-width: fit-content;
-  }
+  .p-2 { padding: 0.25rem; }
+  .flex-shrink-0 { min-width: fit-content; }
 }
 </style>

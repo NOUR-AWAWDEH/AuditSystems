@@ -1,3 +1,5 @@
+// AuditProcess.vue
+
 <template>
     <div class="space-y-6">
         <!-- Add Audit Process Modal -->
@@ -103,7 +105,7 @@ const props = defineProps({
 });
 
 // Define emit first
-const emit = defineEmits(['audit-process-selected']);
+const emit = defineEmits(['audit-process-selected', ]);
 
 const { showNotification } = useNotification();
 
@@ -134,7 +136,7 @@ onMounted(async () => {
 // Watch for prop changes and update internal state
 watch(() => props.selectedSubDepartmentId, (newSubDepartmentId) => {
     if (newSubDepartmentId !== internalSelectedSubDepartmentId.value) {
-        handleAuditProcessChange(newSubDepartmentId); // Changed from handleSubDepartmentChange
+        handleAuditProcessChange(newSubDepartmentId);
     }
 }, { immediate: true });
 
@@ -161,9 +163,6 @@ const {
     confirmDelete,
     cancelDelete
 } = useAuditProcessModals(refreshData, showNotification);
-
-// Remove the incorrect destructuring from useAuditProcessActions
-// Keep only the actions that are actually returned by useAuditProcessActions
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {

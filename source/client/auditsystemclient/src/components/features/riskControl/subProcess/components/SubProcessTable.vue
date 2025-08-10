@@ -2,6 +2,7 @@
     <div class="space-y-6">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
+
                 <!-- AuditProcessSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
@@ -131,17 +132,50 @@ import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
-    auditProcesses: Array,
-    subProcesses: Array,
-    isLoading: Boolean,
-    selectedAuditProcessId: String,
-    selectedAuditProcess: Object,
-    currentAuditProcess: Object,
-    isAuditProcessLoading: Boolean,
-    searchQuery: String,
-    handleAuditProcessChange: Function,
-    handleSearch: Function,
-    refreshData: Function
+    auditProcesses: {
+        type: Array,
+        default: () => []
+    },
+    subProcesses: {
+        type: Array,
+        default: () => []
+    },
+    isLoading: {
+        type: Boolean,
+        default: false
+    },
+    selectedAuditProcessId: {
+        type: String,
+        default: ''
+    },
+    selectedAuditProcess: {
+        type: Object,
+        default: () => null
+    },
+    currentAuditProcess: {
+        type: Object,
+        default: () => null
+    },
+    isAuditProcessLoading: {
+        type: Boolean,
+        default: false
+    },
+    searchQuery: {
+        type: String,
+        default: ''
+    },
+    handleAuditProcessChange: {
+        type: Function,
+        default: () => {}
+    },
+    handleSearch: {
+        type: Function,
+        default: () => {}
+    },
+    refreshData: {
+        type: Function,
+        default: () => {}
+    }
 });
 
 const internalSelectedAuditProcessId = ref(props.selectedAuditProcessId);

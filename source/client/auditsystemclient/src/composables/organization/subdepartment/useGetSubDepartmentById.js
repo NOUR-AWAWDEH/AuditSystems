@@ -37,7 +37,7 @@ export function useGetSubDepartmentById() {
     return null;
   };
 
-  const fetchSubDepartmentById = async (subDepartmentId) => {
+  const getSubDepartmentById = async (subDepartmentId) => {
     try {
       isLoading.value = true;
       error.value = null;
@@ -76,7 +76,7 @@ export function useGetSubDepartmentById() {
     error,
 
     // Actions
-    fetchSubDepartmentById,
+    getSubDepartmentById,
     clearSubDepartment,
   };
 }

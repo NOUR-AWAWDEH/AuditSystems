@@ -62,6 +62,7 @@ export function useAuditProcessModals(refreshData) {
             const result = await deleteAuditProcess(itemToDelete.value.id);
             if (result.success) {
                 showNotification(`Process "${itemToDelete.value.processName}" has been deleted successfully!`, 'success');
+                localStorage.removeItem('riskControlSelectedAuditProcessId');
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);

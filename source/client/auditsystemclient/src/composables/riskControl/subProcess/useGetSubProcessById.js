@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { getSubProcessByIdRepository } from '@/services/riskControl/subProcess/getSubProcessByIdRepository';
-import { useNotification } from '@/composables/useNotification';
+import { useNotification } from '@/composables/notification/useNotification';
+
 
 export function useGetSubProcessById() {
     const subProcess = ref(null);

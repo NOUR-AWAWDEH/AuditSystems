@@ -3,7 +3,7 @@ import { getSubDepartmentsByUserIdRepository } from '@/services/organization/sub
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubDepartmentsByUserId() {
-  const subdepartments = ref([]);
+  const subDepartments = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
   const { showNotification } = useNotification();
@@ -11,7 +11,7 @@ export function useGetSubDepartmentsByUserId() {
   const handleFetchSuccess = (response) => {
     // Fix: Extract subDepartments array from the nested result object
     const subdepartmentData = response.result?.subDepartments || [];
-    subdepartments.value = subdepartmentData;
+    subDepartments.value = subdepartmentData;
     return { success: true, data: subdepartmentData };
   };
   
@@ -34,7 +34,7 @@ export function useGetSubDepartmentsByUserId() {
     try {
       isLoading.value = true;
       error.value = null;
-      subdepartments.value = [];
+      subDepartments.value = [];
 
       const response = await getSubDepartmentsByUserIdRepository.getSubDepartmentsByUserId();
 
@@ -52,7 +52,7 @@ export function useGetSubDepartmentsByUserId() {
 
   return {
     // State
-    subdepartments,
+    subDepartments,
     isLoading,
     error,
 

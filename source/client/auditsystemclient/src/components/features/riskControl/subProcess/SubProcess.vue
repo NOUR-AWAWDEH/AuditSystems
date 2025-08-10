@@ -102,8 +102,6 @@ const props = defineProps({
   },
 });
 
-console.log('From SubProcess', props.auditProcesses);
-
 const emit = defineEmits(['sub-process-selected']);
 
 const { showNotification } = useNotification();

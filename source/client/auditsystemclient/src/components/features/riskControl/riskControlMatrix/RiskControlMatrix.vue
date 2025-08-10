@@ -11,7 +11,6 @@
 
         <!-- Show RiskControlMatrixTable only when sub processes exist -->
         <RiskControlMatrixTable
-            v-if="props.subProcesses && props.subProcesses.length > 0"
             :sub-processes="props.subProcesses"
             :risk-control-matrices="riskControlMatrices"
             :is-loading="isLoading"
@@ -30,7 +29,7 @@
         />
 
         <!-- Show big process icon when no sub processes exist -->
-        <div v-else class="text-center py-20">
+        <div class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
                     <ProcessIcon size="xxxl" custom-class="text-primary-shade" />
@@ -112,9 +111,6 @@ watch(
   },
   { immediate: true }
 );
-
-console.log('From RiskControlMatrix', props.subProcesses);
-
 
 // Define emit first
 const emit = defineEmits(['risk-control-matrix-selected']);

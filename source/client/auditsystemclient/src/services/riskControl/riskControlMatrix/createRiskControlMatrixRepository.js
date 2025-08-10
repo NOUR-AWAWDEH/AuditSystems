@@ -11,7 +11,7 @@ export const createRiskControlMatrixRepository = {
             const token = authService.getLocalToken();
 
             const payload = {
-                particular: riskControlMatrixData.particular,
+                description: riskControlMatrixData.description,
                 subProcessId: typeof riskControlMatrixData.subProcessId === 'object' 
                     ? riskControlMatrixData.subProcessId.value || riskControlMatrixData.subProcessId.id
                     : riskControlMatrixData.subProcessId

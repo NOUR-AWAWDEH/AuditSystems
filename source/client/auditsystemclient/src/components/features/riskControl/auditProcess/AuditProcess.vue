@@ -104,9 +104,6 @@ const props = defineProps({
     }
 });
 
-console.log('From AuditProcess', props.subDepartments);
-
-
 // Define emit first
 const emit = defineEmits(['audit-process-selected', ]);
 

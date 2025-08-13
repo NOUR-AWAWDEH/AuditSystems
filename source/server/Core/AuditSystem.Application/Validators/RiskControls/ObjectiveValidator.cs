@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
 
-namespace AuditSystem.Application.Validators.Audit;
+namespace AuditSystem.Application.Validators.RiskControls;
 
 internal sealed class ObjectiveValidator<T> : PropertyValidator<T, string?>, IObjectiveValidator
 {

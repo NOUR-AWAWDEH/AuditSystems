@@ -16,11 +16,11 @@ public class RiskControlMatrixConfiguration : IEntityTypeConfiguration<RiskContr
 
         // Properties
         builder.Property(d => d.SubProcessId)
-            .IsRequired();
+            .IsRequired(true);
 
         builder.Property(d => d.Description)
             .HasMaxLength(500)
-            .IsRequired(false);
+            .IsRequired(true);
 
         // Relationships
         builder.HasOne(d => d.SubProcess)

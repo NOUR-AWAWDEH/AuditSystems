@@ -1,9 +1,9 @@
 ﻿using AuditSystem.Contract.Models.Common;
 
-namespace AuditSystem.Contract.Models.Audit;
+namespace AuditSystem.Contract.Models.RiskControls;
 
 public sealed class ObjectiveModel : BaseModel<Guid>
 {
     public required Guid RiskControlMatrixId { get; set; }
-    public string Description { get; set; } = string.Empty;
+    public required string Description { get; set; } = string.Empty;
 }

@@ -1,4 +1,5 @@
 ﻿using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.RiskControls;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

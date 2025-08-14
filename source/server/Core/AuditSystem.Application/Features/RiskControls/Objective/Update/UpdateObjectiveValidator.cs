@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Audit.Objective.Update;
+namespace AuditSystem.Application.Features.RiskControls.Objective.Update;
 
 public sealed class UpdateObjectiveValidator : AbstractValidator<UpdateObjectiveCommand>
 {
@@ -19,12 +19,6 @@ public sealed class UpdateObjectiveValidator : AbstractValidator<UpdateObjective
             .Must(x => x != Guid.Empty)
             .WithMessage("RiskControlMatrixId must be a valid GUID.");
 
-
-        RuleFor(x => x.RatingId)
-            .NotEmpty()
-            .WithMessage("RatingId is required.")
-            .Must(x => x != Guid.Empty)
-            .WithMessage("RatingId must be a valid GUID.");
 
         RuleFor(x => x.Description)
             .MaximumLength(500)

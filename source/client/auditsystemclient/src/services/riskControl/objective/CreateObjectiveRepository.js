@@ -1,8 +1,8 @@
-import api from '@/services/api';
+import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const OBJECTIVE_API_ENDPOINT = '/api/objectives';
+const OBJECTIVE_API_ENDPOINT = '/api/Objective';
 const CREATE_OBJECTIVE_API_ENDPOINT = '/create-objective';
 
 export const createObjectiveRepository = {
@@ -11,10 +11,10 @@ export const createObjectiveRepository = {
             const token = authService.getLocalToken();
             const payload = {
                 description: objectiveData.description,
-              riskControlMatrixId: typeof objectiveData.riskControlMatrixId === 'object'
-                ? objectiveData.riskControlMatrixId.value || objectiveData.riskControlMatrixId.id
-                    : objectiveData.riskControlMatrixId
-            };
+                riskControlMatrixId: (objectiveData.riskControlMatrixId && typeof objectiveData.riskControlMatrixId === 'object')
+                        ? objectiveData.riskControlMatrixId.value || objectiveData.riskControlMatrixId.id
+                        : objectiveData.riskControlMatrixId
+            }
 
             const response = await api.post(
                 `${OBJECTIVE_API_ENDPOINT}${CREATE_OBJECTIVE_API_ENDPOINT}`,

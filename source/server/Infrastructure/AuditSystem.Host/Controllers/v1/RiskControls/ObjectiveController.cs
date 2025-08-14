@@ -45,7 +45,7 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
         await ProcessRequestToActionResultAsync(query);
 
     //Get Objective By Id User
-    [HttpGet("get-objective-by-id-user")]
+    [HttpGet("get-objectives-by-id-user")]
     [ProducesResponseType(typeof(ApiResponse<GetObjectivesByUserIdQueryResponse>), StatusCodes.Status200OK)]
 
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -62,7 +62,7 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
     //Search Objective
-    [HttpGet("search-objective-by-user-id")]
+    [HttpGet("search-objectives-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<ObjectiveModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchObjective([FromQuery] SearchObjectiveQuery query) =>

@@ -14,8 +14,8 @@ export const updateRiskControlMatrixByIdRepository = {
             const payload = {
                 id: riskControlMatrixData.id,
                 description: riskControlMatrixData.description,
-                subProcessId:  typeof riskControlMatrixData.subProcessId === 'object'
-                    ? riskControlMatrixData.subProcessId.value || riskControlMatrixData.subProcessId.id 
+                subProcessId:  (riskControlMatrixData.subProcessId && typeof riskControlMatrixData.subProcessId === 'object')
+                    ? riskControlMatrixData.subProcessId.value || riskControlMatrixData.subProcessId.id
                     : riskControlMatrixData.subProcessId,
             };
 
@@ -42,7 +42,7 @@ export const updateRiskControlMatrixByIdRepository = {
                 : [{ message: data?.successMessage || 'Update failed' }];
             console.error('Update risk control matrix failed with errors:', errors);
             return ApiResponseT.badRequest(errors, data?.successMessage || 'Failed to update risk control matrix.');
-            
+
         } catch (error) {
             responseData = error.response?.data;
             console.error('Error updating risk control matrix:', error);
@@ -53,23 +53,23 @@ export const updateRiskControlMatrixByIdRepository = {
                     'Authentication required'
                 );
             }
-        
+
             if (error.response?.status === 400) {
                 const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
                 return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
             }
-        
+
             if (error.response?.status === 404) {
                 return ApiResponseT.notFound(
                     [{ message: 'Risk Control Matrix not found' }],
                     'Risk Control Matrix not found'
                 );
             }
-        
+
             return ApiResponseT.serverError(
                 [{ message: error.message || 'Failed to update risk control matrix.' }],
                 'An unexpected error occurred while updating risk control matrix.'
-            );  
+            );
         }
     }
 };

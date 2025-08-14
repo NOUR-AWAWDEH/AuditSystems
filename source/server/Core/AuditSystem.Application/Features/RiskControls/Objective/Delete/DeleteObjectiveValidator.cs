@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace AuditSystem.Application.Features.Audit.Objective.Delete;
+namespace AuditSystem.Application.Features.RiskControls.Objective.Delete;
 
 public sealed class DeleteObjectiveValidator : AbstractValidator<DeleteObjectiveCommand>
 {
@@ -11,6 +11,12 @@ public sealed class DeleteObjectiveValidator : AbstractValidator<DeleteObjective
             .WithMessage("Objective Id is required.")
             .Must(IsValidGuid)
             .WithMessage("Objective Id is not a valid GUID.");
+        
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User Id is required.")
+            .Must(IsValidGuid)
+            .WithMessage("User Id is not a valid GUID.");
     }
 
     private bool IsValidGuid(Guid guid)

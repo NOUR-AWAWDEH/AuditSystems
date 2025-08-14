@@ -78,6 +78,8 @@ using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessSe
 using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
+using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -121,8 +123,7 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, BusinessObjective, BusinessObjectiveModel>, BusinessObjectiveService>()
             .AddScoped<ISpecialProjectService, SpecialProjectService>()
             .AddScoped<IUnifiedCacheService<Guid, SpecialProject, SpecialProjectModel>, SpecialProjectService>()
-            .AddScoped<IObjectiveService, ObjectiveService>()
-            .AddScoped<IUnifiedCacheService<Guid, Objective, ObjectiveModel>, ObjectiveService>()
+            
 
             // Checklist
             .AddScoped<IChecklistService, ChecklistService>()
@@ -206,6 +207,12 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>, RiskControlMatrixService>()
             .AddScoped<IRiskControlMatrixSearch, RiskControlMatrixSearchHelper>()
             .AddScoped<IRiskControlMatrixValidation, RiskControlMatrixValidationHelper>()
+
+            // Objectives
+            .AddScoped<IObjectiveService, ObjectiveService>()
+            .AddScoped<IUnifiedCacheService<Guid, Objective, ObjectiveModel>, ObjectiveService>()
+            .AddScoped<IObjectiveValidation, ObjectiveValidationHelper>()
+            .AddScoped<IObjectiveSearch, ObjectiveSearchHelper>()
 
             // Risk Controls
             .AddScoped<IRiskControlService, RiskControlService>()

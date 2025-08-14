@@ -10,13 +10,15 @@ using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
 using AuditSystem.Application.Features.Audit.AuditUniverseObjective.Update;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Create;
 using AuditSystem.Application.Features.Audit.BusinessObjective.Update;
-using AuditSystem.Application.Features.Audit.Objective.Create;
-using AuditSystem.Application.Features.Audit.Objective.Update;
+using AuditSystem.Application.Features.RiskControls.Objective.Create;
+using AuditSystem.Application.Features.RiskControls.Objective.Update;
 using AuditSystem.Application.Features.Audit.SpecialProject.Create;
 using AuditSystem.Application.Features.Audit.SpecialProject.Update;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
+using AuditSystem.Contract.Models.RiskControls;
+using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.BusinessLogic.Mappings;
 

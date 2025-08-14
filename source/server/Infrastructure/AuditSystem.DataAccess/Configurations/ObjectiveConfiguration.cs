@@ -1,4 +1,5 @@
 ﻿using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.RiskControls;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,18 +9,33 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
 {
 public void Configure(EntityTypeBuilder<Objective> builder)
 {
+       // Table configuration
+       builder.ToTable("Objectives");
+
        // Primary Key
-       builder.HasKey(o => o.Id);
+       builder.HasKey(rcm => rcm.Id);
 
        // Properties
-       builder.Property(o => o.Description)
-              .IsRequired()
+       builder.Property(rcm => rcm.RiskControlMatrixId)
+              .IsRequired(true);
+
+       builder.Property(rcm => rcm.Description)
+              .IsRequired(true)
               .HasMaxLength(500);
 
-       // Relationships (Avoid Cascade Paths)
-       builder.HasOne(o => o.RiskControlMatrix)
-              .WithMany()
-              .HasForeignKey(o => o.RiskControlMatrixId)
+       // Relationships
+       builder.HasOne(rcm => rcm.RiskControlMatrix)
+              .WithMany(rcm => rcm.Objectives)
+              .HasForeignKey(rcm => rcm.RiskControlMatrixId)
               .OnDelete(DeleteBehavior.Restrict);
+
+       builder.HasMany(rcm => rcm.Risks)
+              .WithOne(r => r.Objective)
+              .HasForeignKey(r => r.ObjectiveId)
+              .OnDelete(DeleteBehavior.Restrict);
+
+       // Indexes for performance
+       builder.HasIndex(rcm => rcm.RiskControlMatrixId);
+       builder.HasIndex(rcm => rcm.Description);
 }
 }

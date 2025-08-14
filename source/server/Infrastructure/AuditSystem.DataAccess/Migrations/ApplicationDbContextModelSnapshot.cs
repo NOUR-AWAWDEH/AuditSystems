@@ -221,33 +221,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("BusinessObjectives");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<Guid>("RiskControlMatrixId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RiskControlMatrixId");
-
-                    b.ToTable("Objectives");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.SpecialProject", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1016,6 +989,35 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("ReportingFollowUps");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("RiskControlMatrixId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Description");
+
+                    b.HasIndex("RiskControlMatrixId");
+
+                    b.ToTable("Objectives", (string)null);
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1026,6 +1028,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -1751,17 +1754,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("AuditUniverse");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
-                {
-                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", "RiskControlMatrix")
-                        .WithMany("Objectives")
-                        .HasForeignKey("RiskControlMatrixId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("RiskControlMatrix");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.SpecialProject", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Audit.AuditUniverse", "AuditUniverse")
@@ -1992,6 +1984,17 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("Creator");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", "RiskControlMatrix")
+                        .WithMany("Objectives")
+                        .HasForeignKey("RiskControlMatrixId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RiskControlMatrix");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Processes.SubProcess", "SubProcess")
@@ -2054,10 +2057,10 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Audit.Objective", "Objective")
+                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.Objective", "Objective")
                         .WithMany("Risks")
                         .HasForeignKey("ObjectiveId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rate")
@@ -2217,11 +2220,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("SpecialProject");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.Objective", b =>
-                {
-                    b.Navigation("Risks");
-                });
-
             modelBuilder.Entity("AuditSystem.Domain.Entities.Checklists.ChecklistCollection", b =>
                 {
                     b.Navigation("Checklists");
@@ -2257,6 +2255,11 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.SubProcess", b =>
                 {
                     b.Navigation("RiskControlMatrices");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
+                {
+                    b.Navigation("Risks");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>

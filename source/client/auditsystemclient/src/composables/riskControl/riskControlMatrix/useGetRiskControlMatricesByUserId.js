@@ -9,20 +9,20 @@ export function useGetRiskControlMatricesByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const riskControlMatricesData = response.result?.riskControlMatrices || [];
+        const riskControlMatricesData = Array.isArray(response.result) ? response.result : [];
         riskControlMatrices.value = riskControlMatricesData;
         return { success: true, data: riskControlMatricesData };
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch risk control matrices') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -45,7 +45,7 @@ export function useGetRiskControlMatricesByUserId() {
 
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch risk control matrices');
-            
+
         } finally {
             isLoading.value = false;
         }

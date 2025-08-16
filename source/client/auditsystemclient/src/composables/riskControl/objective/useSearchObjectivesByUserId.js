@@ -14,11 +14,12 @@ export function useSearchObjectivesByUserId() {
     const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
-        const items = response.result?.result?.items || response.result?.items || [];
-        const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
+        const items = response.result?.items || [];
+        const extractedTotalCount = response.result?.totalCount || 0;
+
 
         const isValidArray = Array.isArray(items);
-        
+
         searchResults.value = isValidArray ? items : [];
         totalCount.value = extractedTotalCount;
 
@@ -33,7 +34,7 @@ export function useSearchObjectivesByUserId() {
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -52,6 +53,7 @@ export function useSearchObjectivesByUserId() {
                 pageSize: searchParams.pageSize || pageSize.value,
             }
 
+
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
             if (searchParams.riskControlMatrixId !== undefined) riskControlMatrixId.value = searchParams.riskControlMatrixId;
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
@@ -63,13 +65,14 @@ export function useSearchObjectivesByUserId() {
                 params.pageSize,
                 params.riskControlMatrixId
             );
-            
+
+
             if (response?.success) {
                 return handleSearchSuccess(response);
             } else {
                 return handleSearchFailure(response);
             }
-            
+
         } catch (err) {
             return handleSearchFailure(err, err.message || 'Failed to search objectives');
 
@@ -87,7 +90,7 @@ export function useSearchObjectivesByUserId() {
         totalCount.value = 0;
         pageSize.value = 10;
     };
-    
+
     const resetState = () => {
         searchResults.value = [];
         isSearching.value = false;

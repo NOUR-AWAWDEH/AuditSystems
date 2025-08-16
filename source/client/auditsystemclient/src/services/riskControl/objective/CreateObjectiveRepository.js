@@ -27,7 +27,6 @@ export const createObjectiveRepository = {
                 }
             );
 
-            console.log('Create Objective Response:', response);
 
             const { data, status } = response;
             if (status === 201 && data?.success) {

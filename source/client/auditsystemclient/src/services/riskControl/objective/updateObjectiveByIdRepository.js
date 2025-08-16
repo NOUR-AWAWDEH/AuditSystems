@@ -30,7 +30,6 @@ export const updateObjectiveByIdRepository = {
                 }
             );
 
-            console.log('Update Objective Response:', response);
             const { data, status } = response;
             responseData = data;
 
@@ -43,7 +42,7 @@ export const updateObjectiveByIdRepository = {
                 : [{ message: data?.successMessage || 'Update failed' }];
             console.error('Update objective failed with errors:', errors);
             return ApiResponseT.badRequest(errors, data?.successMessage || 'Failed to update objective.');
-            
+
         } catch (error) {
             responseData = error.response?.data;
             console.error('Error updating objective:', error);
@@ -54,23 +53,23 @@ export const updateObjectiveByIdRepository = {
                     'Authentication required'
                 );
             }
-        
+
             if (error.response?.status === 400) {
                 const errors = responseData?.errors || [{ message: responseData?.message || 'Bad request' }];
                 return ApiResponseT.badRequest(errors, responseData?.message || 'Bad request');
             }
-        
+
             if (error.response?.status === 404) {
                 return ApiResponseT.notFound(
                     [{ message: 'Objective not found' }],
                     'Objective not found'
                 );
             }
-        
+
             return ApiResponseT.serverError(
                 [{ message: error.message || 'An unexpected error occurred while updating objective.' }],
                 'An unexpected error occurred while updating objective.'
-            );  
+            );
         }
     }
 };

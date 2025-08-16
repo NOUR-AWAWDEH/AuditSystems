@@ -5,6 +5,7 @@
                 <!-- SubDepartmentSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
+                        <AuditProcessHeader/>
                         <SubDepartmentSelector
                             :subDepartments="subDepartments"
                             :selectedSubDepartmentId="internalSelectedSubDepartmentId"
@@ -26,29 +27,29 @@
                 </div>
 
                 <!-- Keep only this Selected SubDepartment Info section -->
-                <div v-if="selectedSubDepartmentId" 
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"> 
-                     <div class="flex items-center justify-between"> 
-                         <div class="flex items-center"> 
-                             <DepartmentIcon size="lg" custom-class="text-blue-600 mr-2" /> 
- 
-                             <p class="text-sm text-gray-700"> 
-                                 Showing Audit Processes for: &nbsp;&nbsp; 
-                                 <span class="font-semibold text-blue-800"> 
-                                     <span v-if="isSubDepartmentLoading">Loading sub-department...</span> 
-                                     <span v-else>{{ currentSubDepartment?.name || 'Loading...' }}</span> 
-                                 </span> 
-                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span> 
-                             </p> 
-                         </div> 
-                         <button @click="$emit('add-audit-process')" 
-                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"> 
-                             <PlusIcon :stroke-width="3" /> 
-                             Add Process 
-                         </button> 
-                     </div> 
+                <div v-if="selectedSubDepartmentId"
+                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                     <div class="flex items-center justify-between">
+                         <div class="flex items-center">
+                             <DepartmentIcon size="lg" custom-class="text-blue-600 mr-2" />
+
+                             <p class="text-sm text-gray-700">
+                                 Showing Audit Processes for: &nbsp;&nbsp;
+                                 <span class="font-semibold text-blue-800">
+                                     <span v-if="isSubDepartmentLoading">Loading sub-department...</span>
+                                     <span v-else>{{ currentSubDepartment?.name || 'Loading...' }}</span>
+                                 </span>
+                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
+                             </p>
+                         </div>
+                         <button @click="$emit('add-audit-process')"
+                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
+                             <PlusIcon :stroke-width="3" />
+                             Add Process
+                         </button>
+                     </div>
                  </div>
-                 
+
                 <!-- Table Container - Show when SubDepartment is Selected -->
                 <div v-if="selectedSubDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable :items="auditProcesses" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
@@ -129,6 +130,7 @@ import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+import AuditProcessHeader from './AuditProcessHeader.vue';
 
 const props = defineProps({
     subDepartments: Array,

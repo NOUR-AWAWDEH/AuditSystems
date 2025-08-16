@@ -6,6 +6,7 @@
                 <!-- Risk Control Matrix and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
+                        <ObjectiveHeader/>
                         <RiskControlMatrixSelector
                             :risk-control-matrices="riskControlMatrices"
                             :selected-risk-control-matrix-id="internalSelectedRiskControlMatrixId"
@@ -131,6 +132,7 @@ import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+import ObjectiveHeader from './ObjectiveHeader.vue';
 
 const props = defineProps({
     riskControlMatrices: {

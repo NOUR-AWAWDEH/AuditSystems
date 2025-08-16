@@ -6,7 +6,8 @@
                 <!-- AuditProcessSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
-                        <AuditProcessSelector
+                      <SubProcessHeader/>
+                      <AuditProcessSelector
                             :auditProcesses="auditProcesses"
                             :selectedAuditProcessId="internalSelectedAuditProcessId"
                             @update:selectedAuditProcess="(id) => internalSelectedAuditProcessId = id"
@@ -27,29 +28,29 @@
                 </div>
 
                 <!-- Keep only this Selected AuditProcess Info section -->
-                <div v-if="selectedAuditProcessId" 
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"> 
-                     <div class="flex items-center justify-between"> 
-                         <div class="flex items-center"> 
-                             <DepartmentIcon size="lg" custom-class="text-blue-600 mr-2" /> 
- 
-                             <p class="text-sm text-gray-700"> 
-                                 Showing Sub Processes for: &nbsp;&nbsp; 
-                                 <span class="font-semibold text-blue-800"> 
-                                     <span v-if="isAuditProcessLoading">Loading audit process...</span> 
-                                     <span v-else>{{ currentAuditProcess?.processName || 'Loading...' }}</span> 
-                                 </span> 
-                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span> 
-                             </p> 
-                         </div> 
-                         <button @click="$emit('add-sub-process')" 
-                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"> 
-                             <PlusIcon :stroke-width="3" /> 
-                             Add Sub Process 
-                         </button> 
-                     </div> 
+                <div v-if="selectedAuditProcessId"
+                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                     <div class="flex items-center justify-between">
+                         <div class="flex items-center">
+                             <DepartmentIcon size="lg" custom-class="text-blue-600 mr-2" />
+
+                             <p class="text-sm text-gray-700">
+                                 Showing Sub Processes for: &nbsp;&nbsp;
+                                 <span class="font-semibold text-blue-800">
+                                     <span v-if="isAuditProcessLoading">Loading audit process...</span>
+                                     <span v-else>{{ currentAuditProcess?.processName || 'Loading...' }}</span>
+                                 </span>
+                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
+                             </p>
+                         </div>
+                         <button @click="$emit('add-sub-process')"
+                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
+                             <PlusIcon :stroke-width="3" />
+                             Add Sub Process
+                         </button>
+                     </div>
                  </div>
-                 
+
                 <!-- Table Container - Show when AuditProcess is Selected -->
                 <div v-if="selectedAuditProcessId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable :items="subProcesses" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
@@ -130,6 +131,7 @@ import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+import SubProcessHeader from './SubProcessHeader.vue';
 
 const props = defineProps({
     auditProcesses: {

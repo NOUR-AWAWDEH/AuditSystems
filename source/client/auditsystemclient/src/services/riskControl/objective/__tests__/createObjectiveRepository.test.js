@@ -8,7 +8,7 @@ vi.mock('@/services/auth/authRepos/authService', () => ({
   default: { getLocalToken: vi.fn() },
 }));
 
-import { createObjectiveRepository } from '@/services/riskControl/objective/CreateObjectiveRepository';
+import { createObjectiveRepository } from '@/services/riskControl/objective/createObjectiveRepository';
 
 import api from '@/services/api/api';
 import authService from '@/services/auth/authRepos/authService';

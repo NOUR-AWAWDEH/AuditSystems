@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { createObjectiveRepository } from '@/services/riskControl/objective/CreateObjectiveRepository';
+import { createObjectiveRepository } from '@/services/riskControl/objective/createObjectiveRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateObjective() {

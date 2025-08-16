@@ -1,5 +1,5 @@
-// Objective.vue
 <template>
+  <!-- Objective.vue -->
     <div class="space-y-6">
         <!-- Add Objective Modal -->
         <AddObjectiveModal

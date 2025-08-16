@@ -8,7 +8,7 @@
                 <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Risk Control Matrix</h3>
+                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Objective</h3>
                         <button
                             @click="$emit('close')"
                             class="text-gray-base hover:text-gray-shade focus:outline-none">

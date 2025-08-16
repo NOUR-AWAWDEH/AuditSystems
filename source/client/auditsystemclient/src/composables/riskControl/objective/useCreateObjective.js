@@ -21,7 +21,7 @@ export function useCreateObjective() {
         const errorMessage = response?.errors?.length
             ? response.errors[0].message
             : response?.message || defaultErrorMessage;
-        
+
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
         return {
@@ -48,7 +48,7 @@ export function useCreateObjective() {
         } catch (err) {
             console.error('useCreateObjective: Create error:', err);
             return handleCreateFailure(err, err.message || 'Failed to create objective');
-            
+
         } finally {
             isCreating.value = false;
         }

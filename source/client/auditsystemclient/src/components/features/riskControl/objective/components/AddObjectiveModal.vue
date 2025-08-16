@@ -68,7 +68,7 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import { useCreateObjective } from '@/composables/riskControl/objective/useCreateObjective';
+import { useCreateObjective } from '@/composables/riskControl/objective/useCreateObjective.js';
 import { useNotification } from '@/composables/notification/useNotification';
 
 const props = defineProps({

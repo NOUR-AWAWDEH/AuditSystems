@@ -6,13 +6,13 @@ const OBJECTIVE_BASE_ENDPOINT = '/api/Objective';
 const SEARCH_OBJECTIVES_BY_USER_ID_ENDPOINT = '/search-objectives-by-user-id';
 
 export const searchObjectivesByUserIdRepository = {
-    async searchObjectivesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, riskControlMatrix = '') {
+    async searchObjectivesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, riskControlMatrixId = '') {
         try {
             const token = authService.getLocalToken();
 
             const params = {
                 searchTerm: searchTerm,
-                RiskControlMatrixId: riskControlMatrix,
+                riskControlMatrixId: riskControlMatrixId,
                 page: pageNumber,
                 pageSize: pageSize
             };
@@ -28,18 +28,23 @@ export const searchObjectivesByUserIdRepository = {
                 }
             );
 
-            console.log('Search Objectives Response:', response);
+
             const { data, status } = response;
 
             if (status === 200 && data?.success) {
                 const result = data.result;
 
-                if (result?.items && typeof result.totalCount === 'number') {
+                if (Array.isArray(result?.items) && typeof result.totalCount === 'number') {
+                    const safeTotalCount = result.totalCount === 0 && result.items.length > 0
+                        ? result.items.length
+                        : result.totalCount;
+
                     return ApiResponseT.ok(
-                        result,
+                        { ...result, totalCount: safeTotalCount },
                         data.successMessage || 'Objectives fetched successfully.'
                     );
                 }
+
 
                 return ApiResponseT.badRequest(
                     [{ message: 'Missing or invalid result structure.' }],

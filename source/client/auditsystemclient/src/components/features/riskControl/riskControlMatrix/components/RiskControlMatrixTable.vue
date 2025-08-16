@@ -7,9 +7,9 @@
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
                         <SubProcessSelector
-                            :subProcesses="subProcesses"
-                            :selectedSubProcessId="internalSelectedSubProcessId"
-                            @update:selectedSubProcess="(id) => internalSelectedSubProcessId = id"
+                            :sub-processes="subProcesses"
+                            :selected-sub-processId="internalSelectedSubProcessId"
+                            @update:selected-sub-process="(id) => internalSelectedSubProcessId = id"
                             @sub-process-changed="(id) => internalSelectedSubProcessId = id"
                         />
                     </div>
@@ -27,29 +27,29 @@
                 </div>
 
                 <!-- Keep only this Selected SubProcess Info section -->
-                <div v-if="selectedSubProcessId" 
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"> 
-                     <div class="flex items-center justify-between"> 
-                         <div class="flex items-center"> 
-                             <ProcessIcon size="lg" custom-class="text-blue-600 mr-2" /> 
- 
-                             <p class="text-sm text-gray-700"> 
-                                 Showing Risk Control Matrices for: &nbsp;&nbsp; 
-                                 <span class="font-semibold text-blue-800"> 
-                                     <span v-if="isSubProcessLoading">Loading sub process...</span> 
-                                     <span v-else>{{ currentSubProcess?.particular || 'Loading...' }}</span> 
-                                 </span> 
-                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span> 
-                             </p> 
-                         </div> 
-                         <button @click="$emit('add-risk-control-matrix')" 
-                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"> 
-                             <PlusIcon :stroke-width="3" /> 
-                             Add Risk Control Matrix 
-                         </button> 
-                     </div> 
+                <div v-if="selectedSubProcessId"
+                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                     <div class="flex items-center justify-between">
+                         <div class="flex items-center">
+                             <ProcessIcon size="lg" custom-class="text-blue-600 mr-2" />
+
+                             <p class="text-sm text-gray-700">
+                                 Showing Risk Control Matrices for: &nbsp;&nbsp;
+                                 <span class="font-semibold text-blue-800">
+                                     <span v-if="isSubProcessLoading">Loading sub process...</span>
+                                     <span v-else>{{ currentSubProcess?.particular || 'Loading...' }}</span>
+                                 </span>
+                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
+                             </p>
+                         </div>
+                         <button @click="$emit('add-risk-control-matrix')"
+                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
+                             <PlusIcon :stroke-width="3" />
+                             Add Risk Control Matrix
+                         </button>
+                     </div>
                  </div>
-                 
+
                 <!-- Table Container - Show when SubProcess is Selected -->
                 <div v-if="selectedSubProcessId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable :items="riskControlMatrices" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"

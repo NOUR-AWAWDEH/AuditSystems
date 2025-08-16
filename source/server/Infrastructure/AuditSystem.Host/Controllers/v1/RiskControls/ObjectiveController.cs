@@ -45,9 +45,8 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
         await ProcessRequestToActionResultAsync(query);
 
     //Get Objective By Id User
-    [HttpGet("get-objectives-by-id-user")]
+    [HttpGet("get-objectives-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<GetObjectivesByUserIdQueryResponse>), StatusCodes.Status200OK)]
-
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetObjective([FromQuery] GetObjectivesByUserIdQuery query) =>
@@ -58,7 +57,7 @@ public sealed class ObjectiveController(IMediator mediator) : ApiControllerBase(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteObjective([FromQuery] DeleteObjectiveCommand command) =>
+    public async Task<IActionResult> DeleteObjective([FromBody] DeleteObjectiveCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
     
     //Search Objective

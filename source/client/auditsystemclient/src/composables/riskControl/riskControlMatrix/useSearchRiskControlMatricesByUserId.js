@@ -14,11 +14,11 @@ export function useSearchRiskControlMatricesByUserId() {
     const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
-        const items = response.result?.result?.items || response.result?.items || [];
-        const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
+        const items = response.result?.items || [];
+        const extractedTotalCount = response.result?.totalCount || 0;
 
         const isValidArray = Array.isArray(items);
-        
+
         searchResults.value = isValidArray ? items : [];
         totalCount.value = extractedTotalCount;
 
@@ -33,7 +33,7 @@ export function useSearchRiskControlMatricesByUserId() {
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -63,13 +63,14 @@ export function useSearchRiskControlMatricesByUserId() {
                 params.pageSize,
                 params.subProcessId
             );
-            
+
+
             if (response?.success) {
                 return handleSearchSuccess(response);
             } else {
                 return handleSearchFailure(response);
             }
-            
+
         } catch (err) {
             return handleSearchFailure(err, err.message || 'Failed to search risk control matrices');
 
@@ -87,7 +88,7 @@ export function useSearchRiskControlMatricesByUserId() {
         totalCount.value = 0;
         pageSize.value = 10;
     };
-    
+
     const resetState = () => {
         searchResults.value = [];
         isSearching.value = false;

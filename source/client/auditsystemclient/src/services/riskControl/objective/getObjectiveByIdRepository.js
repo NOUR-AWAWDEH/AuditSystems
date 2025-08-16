@@ -19,12 +19,10 @@ export const getObjectiveByIdRepository = {
                         'Content-Type': 'application/json',
                     },
                 });
-            
-            console.log('Get Objective Response:', response);
 
             const { data, status } = response;
             responseData = data;
-            
+
             if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Objective retrieved successfully');
             }
@@ -33,7 +31,7 @@ export const getObjectiveByIdRepository = {
                 ? data.errors
                 : [{ message: 'Failed to retrieve Objective.' }];
             console.error('Retrieve Objective failed with errors:', errors);
-            
+
             return ApiResponseT.badRequest(
                 errors,
                 data?.successMessage || 'Failed to retrieve Objective.'
@@ -51,7 +49,7 @@ export const getObjectiveByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = responseData?.errors || 
+                const errors = responseData?.errors ||
                     [{ message: responseData?.successMessage || 'Bad request' }];
                 return ApiResponseT.badRequest(
                     errors,

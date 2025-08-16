@@ -13,16 +13,16 @@ export const getRiskControlMatrixByIdRepository = {
 
             const response = await api.get(
                 `${RISK_CONTROL_MATRIX_API_ENDPOINT}${RISK_CONTROL_MATRIX_API_ENDPOINT_ID}`, {
-                    data: { id: riskControlMatrixId },
+                    params: { id: riskControlMatrixId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
-            
+
             const { data, status } = response;
             responseData = data;
-            
+
             if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result, data?.successMessage || 'Risk Control Matrix retrieved successfully');
             }
@@ -31,7 +31,7 @@ export const getRiskControlMatrixByIdRepository = {
                 ? data.errors
                 : [{ message: 'Failed to retrieve Risk Control Matrix.' }];
             console.error('Retrieve Risk Control Matrix failed with errors:', errors);
-            
+
             return ApiResponseT.badRequest(
                 errors,
                 data?.successMessage || 'Failed to retrieve Risk Control Matrix.'
@@ -49,7 +49,7 @@ export const getRiskControlMatrixByIdRepository = {
             }
 
             if (error.response?.status === 400) {
-                const errors = responseData?.errors || 
+                const errors = responseData?.errors ||
                     [{ message: responseData?.successMessage || 'Bad request' }];
                 return ApiResponseT.badRequest(
                     errors,

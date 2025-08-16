@@ -52,7 +52,7 @@ export function useDeleteObjectiveById() {
             }
 
             const response = await deleteObjectiveByIdRepository.deleteObjectiveById(objectiveId);
-            
+
             if (response?.success) {
                 return handleDeleteSuccess(response);
             } else {

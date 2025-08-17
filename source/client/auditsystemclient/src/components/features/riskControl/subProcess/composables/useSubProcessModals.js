@@ -62,6 +62,7 @@ export function useSubProcessModals(refreshData) {
             const result = await deleteSubProcess(itemToDelete.value.id);
             if (result.success) {
                 showNotification(`SubProcess "${itemToDelete.value.particular}" has been deleted successfully!`, 'success');
+                localStorage.removeItem("riskControlSelectedSubProcessId");
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);

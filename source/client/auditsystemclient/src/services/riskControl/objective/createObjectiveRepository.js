@@ -5,6 +5,7 @@ import authService from '@/services/auth/authRepos/authService';
 const OBJECTIVE_API_ENDPOINT = '/api/Objective';
 const CREATE_OBJECTIVE_API_ENDPOINT = '/create-objective';
 
+
 export const createObjectiveRepository = {
     async createObjective(objectiveData) {
         try {

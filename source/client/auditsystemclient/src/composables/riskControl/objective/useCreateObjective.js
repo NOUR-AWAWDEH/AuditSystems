@@ -1,7 +1,6 @@
 import { ref } from 'vue';
-import { createObjectiveRepository } from '@/services/riskControl/objective/createObjectiveRepository';
+import { createObjectiveRepository } from '@/services/riskControl/objective/createObjectiveRepository.js';
 import { useNotification } from '@/composables/notification/useNotification';
-
 
 export function useCreateObjective() {
     const isCreating = ref(false);

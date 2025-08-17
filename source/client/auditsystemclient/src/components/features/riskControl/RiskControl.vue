@@ -126,7 +126,7 @@ import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
 import RiskControlMatrix from './riskControlMatrix/RiskControlMatrix.vue';
-import Objective from './objective/Objective.vue';
+import Objective from './objective/ObjectiveVue.vue';
 
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
@@ -272,7 +272,7 @@ const handleRiskControlMatrixSelected = async (id) => {
 
 const handleObjectiveSelected = async (id) => {
   selectObjective(id);
-  if (!normalizedRisks.value.length) await fetchData();
+  //if (!normalizedRisks.value.length) await fetchData();
   setActiveTab('risks');
 };
 

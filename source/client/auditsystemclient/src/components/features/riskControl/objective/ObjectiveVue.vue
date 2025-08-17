@@ -141,7 +141,7 @@ watch(
     async (newRiskControlMatrixId) => {
         localSelectedRiskControlMatrixId.value = newRiskControlMatrixId;
         if (newRiskControlMatrixId !== internalSelectedRiskControlMatrixId.value) {
-            await handleRiskControlMatrixChange(newRiskControlMatrixId);
+            await handleObjectiveChange(newRiskControlMatrixId);
         }
     },
     { immediate: true }

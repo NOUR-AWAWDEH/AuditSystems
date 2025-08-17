@@ -62,6 +62,7 @@ export function useRiskControlMatrixModals(refreshData) {
             const result = await deleteRiskControlMatrix(itemToDelete.value.id);
             if (result.success) {
                 showNotification(`Risk Control Matrix "${itemToDelete.value.description}" has been deleted successfully!`, 'success');
+                localStorage.removeItem("riskControlSelectedRiskControlMatrixId");
                 setTimeout(async () => {
                     await refreshData();
                 }, 100);

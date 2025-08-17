@@ -10,11 +10,11 @@ public sealed class CreateRiskValidator : AbstractValidator<CreateRiskCommand>
         RuleFor(x => x.RiskName)
             .ValidateRequiredString(2, 255, "Risk name");
 
-        RuleFor(x => x.RatingId)
+        RuleFor(x => x.RateId)
            .NotEmpty()
-           .WithMessage("Rating is required.")
+           .WithMessage("Rate is required.")
            .Must(x => x != Guid.Empty)
-           .WithMessage("Rating is required.");
+           .WithMessage("Rate is required.");
 
         RuleFor(x => x.Description)
             .MaximumLength(500)
@@ -25,5 +25,11 @@ public sealed class CreateRiskValidator : AbstractValidator<CreateRiskCommand>
             .WithMessage("Objective ID is required.")
             .Must(x => x != Guid.Empty)
             .WithMessage("Objective ID is required.");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User ID is required.")
+            .Must(x => x != Guid.Empty)
+            .WithMessage("User ID is required.");
     }
 }

@@ -80,6 +80,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskCon
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
+using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -223,6 +224,12 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, RiskProgram, RiskProgramModel>, RiskProgramService>()
 
             // Risks
+            .AddScoped<IRiskService, RiskService>()
+            .AddScoped<IUnifiedCacheService<Guid, Risk, RiskModel>, RiskService>()
+            .AddScoped<IRiskValidation, RiskValidationHelper>()
+            .AddScoped<IRiskSearch, RiskSearchHelper>()
+
+
             .AddScoped<IRiskAssessmentService, RiskAssessmentService>()
             .AddScoped<IUnifiedCacheService<Guid, RiskAssessment, RiskAssessmentModel>, RiskAssessmentService>()
             .AddScoped<IRiskFactorService, RiskFactorService>()

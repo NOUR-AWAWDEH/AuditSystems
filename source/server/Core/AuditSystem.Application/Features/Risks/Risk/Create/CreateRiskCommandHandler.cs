@@ -13,12 +13,12 @@ internal sealed class CreateRiskCommandHandler(
     ILogger<CreateRiskCommandHandler> logger) :
     IRequestHandler<CreateRiskCommand, Result<CreateRiskCommandResponse>>
 {
-    public async Task<Result<CreateRiskCommandResponse>> Handle(CreateRiskCommand command, CancellationToken cancellationToken)
+    public async Task<Result<CreateRiskCommandResponse>> Handle(CreateRiskCommand request, CancellationToken cancellationToken)
     {
-        var riskModel = mapper.Map<RiskModel>(command);
-        var riskId = await riskService.CreateRiskAsync(riskModel);
-        logger.LogInformation("Risk with name {RiskName} has been created.", command.RiskName);
+        var riskModel = mapper.Map<RiskModel>(request);
+        var riskId = await riskService.CreateRiskAsync(riskModel, request.UserId);
 
+        logger.LogInformation("Risk with name {RiskName} has been created by user {UserId}.", request.RiskName, request.UserId);
         return Result<CreateRiskCommandResponse>.Created(new CreateRiskCommandResponse(riskId), "Risk created.");
     }
 }

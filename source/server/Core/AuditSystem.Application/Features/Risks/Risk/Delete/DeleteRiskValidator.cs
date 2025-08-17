@@ -10,7 +10,14 @@ public sealed class DeleteRiskValidator : AbstractValidator<DeleteRiskCommand>
           .WithMessage("Risk Id is required")
           .Must(IsValidGuid)
           .WithMessage("Invalid Risk Id format");
+        
+        RuleFor(x => x.UserId)
+          .NotEmpty()
+          .WithMessage("User Id is required")
+          .Must(IsValidGuid)
+          .WithMessage("Invalid User Id format");
     }
+    
     private bool IsValidGuid(Guid id)
     {
         return id != Guid.Empty;

@@ -9,13 +9,13 @@ public sealed class UpdateRiskValidator : AbstractValidator<UpdateRiskCommand>
         RuleFor(x => x.Id)
             .NotEmpty()
             .WithMessage("Id is required.")
-            .Must(id => id != Guid.Empty)
+            .Must(BeAValidGuid)
             .WithMessage("Id must not be empty.");
         
         RuleFor(x => x.ObjectiveId)
             .NotEmpty()
             .WithMessage("ObjectiveId is required.")
-            .Must(id => id != Guid.Empty)
+            .Must(BeAValidGuid)
             .WithMessage("ObjectiveId must not be empty.");
         
         RuleFor(x => x.RiskName)
@@ -26,14 +26,19 @@ public sealed class UpdateRiskValidator : AbstractValidator<UpdateRiskCommand>
             .MaximumLength(100)
             .WithMessage("RiskName must not exceed 100 characters.");
         
-        RuleFor(x => x.RatingId)
+        RuleFor(x => x.RateId)
             .NotEmpty()
-            .WithMessage("RatingId is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("RatingId must not be empty.");
+            .WithMessage("RateId is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("RateId must not be empty.");
         
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
     }
+
+    private static bool BeAValidGuid(Guid id)
+    {
+        return id != Guid.Empty;
+    } 
 }

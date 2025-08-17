@@ -12,16 +12,10 @@ internal sealed class DeleteRiskCommandHandler(
 {
     public async Task<Result> Handle(DeleteRiskCommand request, CancellationToken cancellationToken)
     {
-       try
-       {
-           await riskService.DeleteRiskAsync(request.Id);
-           logger.LogInformation("Risk with id: {Id} was deleted", request.Id);
-           return Result.SuccessWithMessage("Risk deleted");
-       }
-       catch (Exception ex)
-       {
-           logger.LogError(ex, "Error while deleting risk with id: {Id}", request.Id);
-           return Result.Error("Error while deleting risk");  
-       }
+       
+        await riskService.DeleteRiskAsync(request.Id, request.UserId);
+
+        logger.LogInformation("Risk with id: {Id} was deleted by user with id {UserId}", request.Id, request.UserId);
+        return Result.SuccessWithMessage("Risk deleted");
     }
 }

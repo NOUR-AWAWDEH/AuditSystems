@@ -5,9 +5,13 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 
 public interface IRiskService
 {
-    public Task<Guid> CreateRiskAsync(RiskModel riskModel);
-    public Task UpdateRiskAsync(RiskModel riskModel);
-    public Task DeleteRiskAsync(Guid riskId);
-    public Task<RiskModel> GetRiskByIdAsync(Guid id);
-    public Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page);
+    Task<Guid> CreateRiskAsync(RiskModel riskModel, Guid userId);
+    Task UpdateRiskAsync(RiskModel riskModel, Guid userId);
+    Task DeleteRiskAsync(Guid riskId, Guid userId);
+    Task<RiskModel> GetRiskByIdAsync(Guid id, Guid userId);
+    Task<ICollection<RiskModel>> GetRisksByUserIdAsync(Guid userId);
+
+    Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid objectiveId, Page? page);
+    // The existing SearchAsync for admin/system use if needed
+    Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page);
 }

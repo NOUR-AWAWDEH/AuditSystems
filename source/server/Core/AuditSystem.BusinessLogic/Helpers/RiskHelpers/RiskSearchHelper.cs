@@ -1,0 +1,115 @@
+using System.Linq.Expressions;
+using AuditSystem.Application.Constants;
+using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
+using AuditSystem.Application.Constants.Risks.RiskConst;
+using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
+using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.Risks;
+using AuditSystem.Domain.Entities.Risks;
+using AutoMapper;
+
+namespace AuditSystem.BusinessLogic.Helpers.RiskHelpers;
+
+public class RiskSearchHelper : IRiskSearch
+{
+    private readonly IRepository<Guid, Risk> _repository;
+    private readonly IMapper _mapper;
+    private readonly ICacheService _cacheService;
+
+    public RiskSearchHelper(
+        IRepository<Guid, Risk> repository,
+        IMapper mapper,
+        ICacheService cacheService)
+    {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    }
+
+    public Expression<Func<Risk, bool>> BuildUserSearchPredicate(
+        Guid userId, string? searchTerm, Guid objectiveId)
+    {
+        return r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId &&
+                (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
+                r.ObjectiveId == objectiveId;
+    }
+
+    // Original method for backward compatibility
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Page page)
+    {
+        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
+    }
+
+    // Method with required Guid objectiveId - matches interface
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid objectiveId, Page page)
+    {
+        var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
+        var objectiveIdStr = objectiveId.ToString();
+        
+        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
+            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
+
+        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
+            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr);
+
+        return (cacheKey, countCacheKey);
+    }
+
+    // Updated method with nullable objectiveId support (for internal use)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid? objectiveId, Page page)
+    {
+        var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
+        var objectiveIdStr = objectiveId?.ToString() ?? "all";
+        
+        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
+            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
+
+        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
+            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr);
+
+        return (cacheKey, countCacheKey);
+    }
+
+    public async Task<PaginationResult<RiskModel>> GetUserSearchFromRepositoryAsync(
+        Guid userId, string? searchTerm, Guid objectiveId, Page page, string cacheKey, string countCacheKey)
+    {
+        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, objectiveId));
+         
+        var totalCount = query.Count;
+        var items = query
+            .Skip((page.Number - 1) * page.Size)
+            .Take(page.Size)
+            .ToList();
+    
+        var mappedItems = _mapper.Map<List<RiskModel>>(items);
+        var result = new PaginationResult<RiskModel>
+        {
+            Items = mappedItems,
+            TotalCount = totalCount,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    
+        await Task.WhenAll(
+            CacheSearchResultsAsync(cacheKey, items),
+            CacheSearchCountAsync(countCacheKey, totalCount)
+        );
+    
+        return result;
+    }
+
+    private async Task CacheSearchResultsAsync(string cacheKey, List<Risk> items)
+    {
+        await _cacheService.SetAsync(cacheKey, items, RiskConstants.RiskTags, CacheExpirations.MediumTerm);
+    }
+
+    private async Task CacheSearchCountAsync(string countCacheKey, int totalCount)
+    {
+        await _cacheService.SetAsync(countCacheKey, totalCount, RiskConstants.RiskTags, CacheExpirations.MediumTerm);
+    }
+}

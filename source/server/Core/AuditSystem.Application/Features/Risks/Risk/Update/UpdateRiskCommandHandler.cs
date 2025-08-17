@@ -13,12 +13,14 @@ internal sealed class UpdateRiskCommandHandler(
     ILogger<UpdateRiskCommandHandler> logger)
     : IRequestHandler<UpdateRiskCommand, Result>
 {
-    public async Task<Result> Handle(UpdateRiskCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(
+        UpdateRiskCommand request,
+        CancellationToken cancellationToken)
     {
-       var riskModel = mapper.Map<RiskModel>(request);
-        await riskService.UpdateRiskAsync(riskModel);
+        var riskModel = mapper.Map<RiskModel>(request);
+        await riskService.UpdateRiskAsync(riskModel, request.UserId);
         
-        logger.LogInformation("Risk updated successfully");
+        logger.LogInformation("Risk updated successfully with ID: {RiskId} by user Id: {UserId}", request.Id, request.UserId);
         return Result.SuccessWithMessage("Risk updated successfully");
     }
 }

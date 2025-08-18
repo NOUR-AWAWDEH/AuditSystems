@@ -384,14 +384,55 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("Level")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Level")
+                        .IsUnique();
+
                     b.ToTable("Rates");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CreatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Level = "Critical",
+                            UpdatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CreatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Level = "High",
+                            UpdatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CreatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Level = "Medium",
+                            UpdatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            CreatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Level = "Low",
+                            UpdatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            CreatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Level = "Minimal",
+                            UpdatedAt = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Compliance.ComplianceAuditLink", b =>
@@ -1154,7 +1195,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<Guid>("ObjectiveId")
                         .HasColumnType("uniqueidentifier");
@@ -1164,12 +1206,15 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("RiskName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Description");
 
                     b.HasIndex("ObjectiveId");
 
@@ -2066,7 +2111,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rate")
                         .WithMany()
                         .HasForeignKey("RateId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Objective");

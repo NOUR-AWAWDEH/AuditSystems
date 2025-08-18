@@ -5,7 +5,7 @@ using AuditSystem.Contract.Models.Risks;
 namespace AuditSystem.Application.Features.Risks.Risk.Search;
 
 public sealed record class SearchRiskQuery(
-    string? SearchTerm,
+    string SearchTerm,
     Guid ObjectiveId
 ) : PaginationRequest<RiskModel>, IUserAwareRequest
 { 

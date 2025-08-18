@@ -17,42 +17,42 @@ namespace AuditSystem.Host.Controllers.v1.Common;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public sealed class RatingController(IMediator mediator) : ApiControllerBase(mediator)
+public sealed class RateController(IMediator mediator) : ApiControllerBase(mediator)
 {
-    //Create Rating
-    [HttpPost("create-rating")]
+    // Create Rate
+    [HttpPost("create-rate")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse<CreateRatingCommandResponse>), StatusCodes.Status201Created)]
-    public async Task<IActionResult> CreateRating([FromBody] CreateRatingCommand command) =>
+    [ProducesResponseType(typeof(ApiResponse<CreateRateCommandResponse>), StatusCodes.Status201Created)]
+    public async Task<IActionResult> CreateRate([FromBody] CreateRateCommand command) =>
         await ProcessRequestToActionResultAsync(command);
 
-    //Update Rating
-    [HttpPut("update-rating")]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateRating([FromBody] UpdateRatingCommand command) =>
-        await ProcessRequestToActionNoContentResultAsync<Result>(command);
-
-    //Get Rating
-    [HttpGet("get-rating")]
-    [ProducesResponseType(typeof(ApiResponse<GetRatingByIdQueryResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetRating([FromQuery] GetRatingByIdQuery query) =>
-        await ProcessRequestToActionResultAsync(query);
-
-    //Delete Rating
-    [HttpDelete("delete-rating")]
+    // Update Rate
+    [HttpPut("update-rate")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteRating([FromBody] DeleteRatingCommand command) =>
+    public async Task<IActionResult> UpdateRate([FromBody] UpdateRateCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
-    
-    //Search Rating
-    [HttpGet("search-rating")]
+
+    // Get Rate by ID
+    [HttpGet("get-rate-by-id")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<GetRateByIdQueryResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetRate([FromQuery] GetRateByIdQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
+
+    // Delete Rate
+    [HttpDelete("delete-rate-by-id")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteRate([FromBody] DeleteRateCommand command) =>
+        await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    // Search Rates
+    [HttpGet("search-rates")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RateModel>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchRating([FromQuery] SearchRatingQuery query) =>
+    public async Task<IActionResult> SearchRates([FromQuery] SearchRatesQuery query) =>
         await ProcessRequestToActionResultAsync(query);
 }

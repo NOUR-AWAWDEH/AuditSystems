@@ -133,8 +133,8 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, Remark, RemarkModel>, RemarkService>()
 
             // Common
-            .AddScoped<IRateService, RatingService>()
-            .AddScoped<IUnifiedCacheService<Guid, Rate, RateModel>, RatingService>()
+            .AddScoped<IRateService, RateService>()
+            .AddScoped<IUnifiedCacheService<Guid, Rate, RateModel>, RateService>()
 
             // Compliance
             .AddScoped<IComplianceChecklistService, ComplianceChecklistService>()

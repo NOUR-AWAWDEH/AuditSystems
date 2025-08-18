@@ -2,5 +2,5 @@
 
 public class Rate : Entity<Guid>
 {
-    public required string Level { get; set; } = string.Empty;
+    public required RateLevel Level { get; set; }
 }

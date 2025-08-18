@@ -20,9 +20,6 @@ public class SearchRiskQueryValidator : PaginationRequestValidator<RiskModel, Se
             .Must(BeAValidGuid)
             .WithMessage("Objective ID must be a valid GUID.");
 
-        RuleFor(x => x.SearchTerm)
-            .NotEmpty()
-            .WithMessage("Search term is required.");
     }
     
     private bool BeAValidGuid(Guid id)

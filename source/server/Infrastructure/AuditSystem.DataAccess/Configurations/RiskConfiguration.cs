@@ -29,7 +29,7 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
 
         // Relationship with Objective
         builder.HasOne(r => r.Objective)
-               .WithMany()
+               .WithMany(r => r.Risks)
                .HasForeignKey(r => r.ObjectiveId)
                .OnDelete(DeleteBehavior.Restrict);
 
@@ -38,8 +38,8 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                .WithMany()
                .HasForeignKey(r => r.RateId)
                .OnDelete(DeleteBehavior.Restrict);
-        
-        builder.HasIndex()
 
+        builder.HasIndex(r => r.ObjectiveId);
+        builder.HasIndex(r => r.Description);
     }
 }

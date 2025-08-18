@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
+using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Application.Features.Common.Rating.Update;
 
-public sealed class UpdateRatingValidator : AbstractValidator<UpdateRatingCommand>
+public sealed class UpdateRateValidator : AbstractValidator<UpdateRateCommand>
 {
-    public UpdateRatingValidator()
+    public UpdateRateValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty()
@@ -13,10 +14,7 @@ public sealed class UpdateRatingValidator : AbstractValidator<UpdateRatingComman
             .WithMessage("Id must be a valid GUID.");
 
         RuleFor(x => x.Level)
-            .NotEmpty()
-            .WithMessage("Level is required.")
-            .MaximumLength(50)
-            .WithMessage("Level must not exceed 50 characters.");
+            .IsInEnum()
+            .WithMessage("Invalid rate level. Valid values are: " + string.Join(", ", Enum.GetNames<RateLevel>()));
     }
 }
-

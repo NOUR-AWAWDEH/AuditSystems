@@ -2,15 +2,15 @@ using FluentValidation;
 
 namespace AuditSystem.Application.Features.Common.Rating.Get;
 
-public sealed class GetRatingByIdQueryValidator : AbstractValidator<GetRatingByIdQuery>
+public sealed class GetRateByIdQueryValidator : AbstractValidator<GetRateByIdQuery>
 {
-    public GetRatingByIdQueryValidator()
+    public GetRateByIdQueryValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty()
-            .WithMessage("Rating Id is required")
+            .WithMessage("Rate Id is required")
             .Must(BeAValidGuid)
-            .WithMessage("Rating Id must be a valid Guid");
+            .WithMessage("Rate Id must be a valid Guid");
     }
 
     private bool BeAValidGuid(Guid id)

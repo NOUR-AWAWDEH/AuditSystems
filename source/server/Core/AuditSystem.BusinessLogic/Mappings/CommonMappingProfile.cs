@@ -11,7 +11,7 @@ public sealed class CommonMappingProfile : Profile
     {
         //Rating
         CreateMap<RateModel, Rate>().ReverseMap();
-        CreateMap<CreateRatingCommand, RateModel>();
+        CreateMap<CreateRateCommand, RateModel>();
         CreateMap<RateModel, Rate>().ReverseMap();
     }
 }

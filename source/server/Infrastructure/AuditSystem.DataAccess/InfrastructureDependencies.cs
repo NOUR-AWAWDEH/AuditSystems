@@ -28,19 +28,27 @@ namespace AuditSystem.DataAccess;
 
 public static class InfrastructureDependencies
 {
-    public static IServiceCollection AddDataAccess(this IServiceCollection services,
-        IConfiguration configuration,
-        IHealthChecksBuilder healthChecksBuilder, bool isProduction)
+    public static IServiceCollection AddDataAccess(
+         this IServiceCollection services,
+         IConfiguration configuration,
+         IHealthChecksBuilder healthChecksBuilder,
+         bool isProduction)
     {
+        // Register DbContext, repositories, and identity
         services
             .AddDbContext(configuration, isProduction)
             .AddRepositories()
             .AddIdentity();
 
+        // Add health check
         healthChecksBuilder.AddDbContextHealthCheck();
+
+        // Register the generic context
         services.AddScoped<IContext, EntityContext>();
+
         return services;
     }
+
 
     private static IServiceCollection AddIdentity(this IServiceCollection services)
     {

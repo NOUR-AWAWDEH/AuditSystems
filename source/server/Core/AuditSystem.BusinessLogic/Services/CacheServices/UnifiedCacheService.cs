@@ -53,7 +53,11 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         };
     }
 
-    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page, string? name)
+    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(
+            string cacheKey,
+            string countCacheKey,
+            Page page,
+            string? name)
     {
         var predicate = BuildSearchPredicate<TEntity>("Name", name);
 
@@ -224,4 +228,31 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         
         _logger.LogDebug("Cleared user-related caches for user {UserId} and entity type {EntityType}", userId, entityTypeName);
     }
+
+    public async Task<PaginationResult<TTargetModel>> GetAllFromRepositoryAsync<TTargetModel>(
+    string cacheKey,
+    string countCacheKey,
+    Page page,
+    string? name = null) // keep the parameter but ignore it
+    {
+        var query = repository.GetAll()
+                              .OrderBy(x => x.Id); // just order by Id
+
+        var modelQuery = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
+        var result = await modelQuery.PaginateAsync(page, repository);
+
+        // Cache results
+        var entities = mapper.Map<List<TEntity>>(result.Items);
+        await CacheSearchResultsAsync(cacheKey, entities);
+        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
+
+        return new PaginationResult<TTargetModel>
+        {
+            Items = result.Items,
+            TotalCount = result.TotalCount,
+            PageNumber = page.Number,
+            PageSize = page.Size
+        };
+    }
+
 }

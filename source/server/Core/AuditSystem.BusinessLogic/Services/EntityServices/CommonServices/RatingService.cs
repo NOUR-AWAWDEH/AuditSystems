@@ -14,8 +14,8 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
 
 internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, IRateService
 {
-    private static readonly string[] RatingTags = new[] { "ratings", "rating-list" };
-    private static readonly string[] ListTags = new[] { "rating-list" };
+    private static readonly string[] RatingTags = ["ratings", "rating-list"];
+    private static readonly string[] ListTags = ["rating-list"];
 
     private readonly IRepository<Guid, Rate> _repository;
     private readonly IMapper _mapper;

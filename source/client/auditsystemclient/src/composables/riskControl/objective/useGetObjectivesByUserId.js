@@ -9,20 +9,20 @@ export function useGetObjectivesByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const objectivesData = response.result?.objectives || [];
+        const objectivesData = Array.isArray(response.result) ? response.result : [];
         objectives.value = objectivesData;
         return { success: true, data: objectivesData };
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch objectives') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -46,7 +46,7 @@ export function useGetObjectivesByUserId() {
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch objectives');
 
-            
+
         } finally {
             isLoading.value = false;
         }

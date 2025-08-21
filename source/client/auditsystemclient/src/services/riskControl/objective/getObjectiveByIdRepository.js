@@ -20,7 +20,6 @@ export const getObjectiveByIdRepository = {
                     },
                 });
 
-            console.log("getObjectiveByIdRepository: " ,response);
 
             const { data, status } = response;
             responseData = data;

@@ -7,7 +7,7 @@
     value-key="id"
     label-key="riskName"
     :error="error"
-    @update:modelValue="handleRateTypeChange"
+    @update:modelValue="handleRateChange"
   />
 </template>
 
@@ -39,7 +39,7 @@ defineProps({
 
 const emit = defineEmits(['update:selectedRateId', 'rate-changed']);
 
-const handleRateTypeChange = (value) => {  
+const handleRateChange = (value) => {  
   emit('update:selectedRateId', value);
   emit('rate-changed', value);
 };

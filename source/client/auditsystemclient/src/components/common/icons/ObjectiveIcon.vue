@@ -1,55 +1,53 @@
 <template>
-  <svg
-    :class="[sizeClass, customClass]"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <!-- Outer ring -->
-    <circle
-      cx="12"
-      cy="12"
-      r="10"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      :stroke-width="strokeWidth"
-    />
-    <!-- Middle ring -->
-    <circle
-      cx="12"
-      cy="12"
-      r="6.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      :stroke-width="strokeWidth"
-    />
-    <!-- Inner ring -->
-    <circle
-      cx="12"
-      cy="12"
-      r="3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      :stroke-width="strokeWidth"
-    />
-    <!-- Arrow -->
-    <line
-      x1="12"
-      y1="12"
-      x2="19"
-      y2="5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      :stroke-width="strokeWidth"
-    />
-    <polyline
-      points="16,5 19,5 19,8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      fill="none"
-      :stroke-width="strokeWidth"
-    />
-  </svg>
+<svg
+  :class="[sizeClass, customClass]"
+  fill="none"
+  stroke="currentColor"
+  viewBox="0 0 24 24"
+>
+  <!-- Outer ring -->
+  <circle
+    cx="12"
+    cy="12"
+    r="10"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    :stroke-width="strokeWidth"
+  />
+  <!-- Middle ring -->
+  <circle
+    cx="12"
+    cy="12"
+    r="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    :stroke-width="strokeWidth"
+  />
+  <!-- Inner ring -->
+  <circle
+    cx="12"
+    cy="12"
+    r="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    :stroke-width="strokeWidth"
+  />
+  <!-- Arrow shaft -->
+  <line
+    x1="12"
+    y1="12"
+    x2="19"
+    y2="5"
+    stroke-linecap="round"
+    :stroke-width="strokeWidth * 0.8"
+  />
+  <!-- Arrowhead (thin + sharp) -->
+  <polygon
+    points="19,5 17.8,5.6 18.4,4.2"
+    fill="currentColor"
+  />
+</svg>
+
 </template>
 
 <script setup>

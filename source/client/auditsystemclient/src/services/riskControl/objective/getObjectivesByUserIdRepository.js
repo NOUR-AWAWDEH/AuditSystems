@@ -20,11 +20,12 @@ export const getObjectivesByUserIdRepository = {
                 }
             );
 
+
             const { data, status } = response;
             responseData = data;
 
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result, data?.successMessage || 'Objectives retrieved successfully');
+                return ApiResponseT.ok(data?.result?.objectiveModels, data?.successMessage || 'Objectives retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

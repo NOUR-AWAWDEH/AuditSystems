@@ -1,6 +1,5 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Features.Common.Pagination;
-using AuditSystem.Application.Features.Processes.AuditProcess.Get.GetByUserId;
 using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.Risk.Delete;
 using AuditSystem.Application.Features.Risks.Risk.Get.GetById;
@@ -62,7 +61,7 @@ public sealed class RiskController(IMediator mediator) : ApiControllerBase(media
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Risk
-    [HttpGet("search-risk-by-user-id")]
+    [HttpGet("search-risks-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<RiskModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchRisk([FromQuery] SearchRiskQuery query) =>

@@ -15,14 +15,14 @@ export function useGetRisksByUserId() {
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch risks') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -36,7 +36,6 @@ export function useGetRisksByUserId() {
             risks.value = [];
 
             const response = await getRisksByUserIdRepository.getRisksByUserId();
-            console.log("useGetRisksByUserId: ", response);
 
             if (response?.success) {
                 return handleFetchSuccess(response);

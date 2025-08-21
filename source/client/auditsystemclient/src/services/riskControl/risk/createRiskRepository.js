@@ -10,7 +10,7 @@ export const createRiskRepository = {
     async createRisk(riskData) {
         try {
             const token = authService.getLocalToken();
-            
+
             const payload = {
                 riskName: riskData.riskName,
                 description: riskData.description,
@@ -33,7 +33,6 @@ export const createRiskRepository = {
                 }
             );
 
-            console.log("createRiskRepository: ", response);
             const { data, status } = response;
             if (status === 201 && data?.success) {
                 return ApiResponseT.ok(data.result, data.successMessage || 'Risk created successfully');

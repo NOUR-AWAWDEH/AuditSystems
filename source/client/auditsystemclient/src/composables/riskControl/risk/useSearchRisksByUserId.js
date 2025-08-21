@@ -47,26 +47,26 @@ export function useSearchRisksByUserId() {
             error.value = null;
 
             const params = {
-                searchTerm: searchParams.searchTerm || searchTerm.value,
+                searchTerm: (searchParams.searchTerm || searchTerm.value || '').trim(),
                 objectiveId: searchParams.objectiveId || objectiveId.value,
-                page: searchParams.page || currentPage.value,
+                pageNumber: searchParams.pageNumber || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
-            }
+            };
+
 
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
             if (searchParams.objectiveId !== undefined) objectiveId.value = searchParams.objectiveId;
-            if (searchParams.page !== undefined) currentPage.value = searchParams.page;
+            if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
             const response = await searchRisksByUserIdRepository.searchRisksByUserId(
                 params.searchTerm,
-                params.page,
+                params.pageNumber,
                 params.pageSize,
                 params.objectiveId
             );
 
-            console.log("useSearchRisksByUserId:", response);
 
             if (response?.success) {
                 return handleSearchSuccess(response);

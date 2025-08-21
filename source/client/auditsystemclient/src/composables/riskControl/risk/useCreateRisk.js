@@ -39,7 +39,6 @@ export function useCreateRisk() {
 
             const response = await createRiskRepository.createRisk(riskData);
 
-            console.log("useCreateRisk: ", response);
 
             if (response?.success) {
                 return handleCreateSuccess(response);

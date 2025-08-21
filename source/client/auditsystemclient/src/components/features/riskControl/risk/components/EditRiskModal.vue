@@ -1,50 +1,97 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity" @click="$emit('close')"></div>
+      <div v-if="isVisible" class="fixed inset-0 flex items-center justify-center p-4">
+        <!-- Overlay -->
+        <div
+          class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
+          @click="$emit('close')"
+        ></div>
 
         <!-- Modal -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+        <div
+          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+        >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Objective</h3>
-            <button @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
-              <CloseIcon size="md" />
+            <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Risk</h3>
+            <button
+              @click="$emit('close')"
+              class="text-gray-base hover:text-gray-shade focus:outline-none"
+            >
+              <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
             </button>
           </div>
 
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Objective Description Field -->
+              <!-- Risk Name -->
               <div>
-                <label for="edit-objective-description" class="block text-sm font-medium text-secondary-shade mb-1">
-                  Objective Description *
+                <label for="risk-name" class="block text-sm font-medium text-gray-700">
+                  Risk Name *
                 </label>
-                <BaseInput 
-                  id="edit-objective-description"
+                <BaseInput
+                  id="risk-name"
+                  v-model="formData.riskName"
+                  placeholder="Enter Risk Name"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${
+                    errors.riskName ? 'border-error' : 'border-gray-tint'
+                  } focus:ring-primary-base`"
+                />
+                <p v-if="errors.riskName" class="text-error text-sm mt-1">{{ errors.riskName }}</p>
+              </div>
+
+              <!-- Risk Description -->
+              <div>
+                <label for="risk-description" class="block text-sm font-medium text-gray-700">
+                  Risk Description *
+                </label>
+                <BaseInput
+                  id="risk-description"
                   v-model="formData.description"
-                  placeholder="Enter Objective description"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                  placeholder="Enter Risk Description"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${
+                    errors.description ? 'border-error' : 'border-gray-tint'
+                  } focus:ring-primary-base`"
+                />
                 <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
               </div>
-              <!-- Error Display -->
+
+              <!-- Rate Selector -->
+              <RateSelector
+                :rates="rates"
+                :selectedRateId="selectedRateId"
+                label="Risk Level"
+                placeholder="Select a risk level"
+                :error="errors.rate"
+                @update:selectedRateId="handleRateChange"
+              />
+              <p v-if="errors.rate" class="text-error text-sm mt-1">{{ errors.rate }}</p>
+
+              <!-- API Error -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                 <p class="text-error text-sm">{{ error }}</p>
               </div>
 
+              <!-- Actions -->
               <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" @click="$emit('close')" :disabled="isUpdating"
-                  class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
+                <button
+                  type="button"
+                  @click="$emit('close')"
+                  :disabled="isUpdating"
+                  class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
+                >
                   Cancel
                 </button>
 
-                <button type="submit" :disabled="!formData.description.trim() || isUpdating"
-                  class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
-                  <span v-if="isUpdating">Updating...</span>
-                  <span v-else>Update Objective</span>
+                <button
+                  type="submit"
+                  :disabled="!formData.riskName.trim() || isUpdating"
+                  class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
+                >
+                  <span v-if="isUpdating">Editing...</span>
+                  <span v-else>Edit Risk</span>
                 </button>
               </div>
             </form>
@@ -56,155 +103,99 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { useUpdateObjectiveById } from '@/composables/riskControl/objective/useUpdateObjectiveById';
-import { useNotification } from '@/composables/notification/useNotification';
-import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
+import RateSelector from '@/components/common/rate/RateSelector.vue';
+import { useUpdateRiskById } from '@/composables/riskControl/risk/useUpdateRiskById.js';
+import { useSearchRates } from '@/composables/common/rate/useSearchRates';
 
+// Props
 const props = defineProps({
-  isVisible: {
-    type: Boolean,
-    default: false
-  },
-  objective: {
-    type: Object,
-    default: () => ({})
-  }
+  isVisible: { type: Boolean, default: false },
+  objectiveId: { type: [String, Number], default: null },
+  risk: { type: Object, default: null }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'risk-updated']);
 
-const { showNotification } = useNotification();
-const { isUpdating, error, updateObjective, resetState } = useUpdateObjectiveById();
-const { authStatus, checkAuthStatus } = useAuthStatus();
+const { isUpdating, error, updateRisk, resetState } = useUpdateRiskById();
 
+// Form state
 const formData = ref({
+  riskName: '',
   description: ''
 });
-
 const errors = ref({
-  description: ''
+  riskName: '',
+  description: '',
+  rate: ''
 });
 
-// Reset form when modal opens/closes or risk control matrix changes
-watch([() => props.isVisible, () => props.objective], ([newVisible, newObjective]) => {
-  if (newVisible && newObjective) {
-    resetForm();
-    populateForm();
+// Rates from API
+const { searchResults: rates } = useSearchRates();
+const selectedRateId = ref('');
+
+// Prefill form when modal opens
+watch(
+  () => props.isVisible,
+  (visible) => {
+    if (visible) resetForm();
   }
-});
+);
 
 const resetForm = () => {
   formData.value = {
-    description: ''
+    riskName: props.risk?.riskName || '',
+    description: props.risk?.description || ''
   };
-  errors.value = {
-    description: ''
-  };
-
+  selectedRateId.value = props.risk?.rateId || '';
+  errors.value = { riskName: '', description: '', rate: '' };
   resetState();
 };
 
-const populateForm = () => {
-  if (props.objective) {
-    formData.value = {
-      description: props.objective.description || '',
-    };
-  }
-};
-
-// Initialize auth status when component mounts
-onMounted(async () => {
-  if (!authStatus.value) {
-    await checkAuthStatus();
-  }
-});
-
-const handleSubmit = async () => {
-  // Check if user is authenticated
-  if (!authStatus.value) {
-    console.error('Authentication status not loaded');
-    showNotification('Authentication required. Please refresh the page and try again.', 'error');
-    return;
-  }
-
-  if (!props.objective?.id) {
-    console.error('Missing objective ID:', props.objective);
-    showNotification('Objective ID is required', 'error');
-    return;
-  }
-
-  if (!validateForm()) {
-    console.error('Form validation failed:', errors.value);
-    return;
-  }
-
-  try {
-    const objectiveData = {
-        id: props.objective?.id,
-        riskControlMatrixId: props.objective?.riskControlMatrixId,
-        description: formData.value.description.trim(),
-      };
-
-
-    const result = await updateObjective(objectiveData);
-
-    if (result?.success) {
-      const updatedObjectiveData = {
-        ...objectiveData,
-        ...result.data
-      };
-
-      emit('updated', updatedObjectiveData);
-      emit('close');
-    } else {
-      const errorMessage = result?.message || error.value || 'Failed to update objective. Please try again.';
-      showNotification(errorMessage, 'error');
-    }
-  } catch (err) {
-    console.error('Error in handleSubmit:', err);
-    const errorMessage = err.response?.data?.message || err.message || 'Failed to update objective. Please try again.';
-    showNotification(errorMessage, 'error');
-  }
+const handleRateChange = (value) => {
+  selectedRateId.value = value;
 };
 
 const validateForm = () => {
-  errors.value = {
-    description: ''
-  };
+  errors.value = { riskName: '', description: '', rate: '' };
+  let valid = true;
 
-  let isValid = true;
-
+  if (!formData.value.riskName.trim()) {
+    errors.value.riskName = 'Risk name is required';
+    valid = false;
+  }
   if (!formData.value.description.trim()) {
-    errors.value.description = 'Objective description is required';
-    isValid = false;
+    errors.value.description = 'Risk description is required';
+    valid = false;
+  }
+  if (!selectedRateId.value) {
+    errors.value.rate = 'Risk rate is required';
+    valid = false;
   }
 
-  return isValid;
+  return valid;
 };
 
+const handleSubmit = async () => {
+  if (!props.objectiveId) return;
+
+  if (!validateForm()) return;
+
+  const riskData = {
+    id: props.risk?.id,
+    riskName: formData.value.riskName.trim(),
+    description: formData.value.description.trim(),
+    rateId: selectedRateId.value,
+    objectiveId: props.objectiveId
+  };
+
+  const result = await updateRisk(riskData);
+
+  if (result?.success) {
+    emit('risk-updated', result.data);
+    emit('close');
+  }
+};
 </script>
-
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-active .relative,
-.modal-leave-active .relative {
-  transition: transform 0.3s ease;
-}
-
-.modal-enter-from .relative,
-.modal-leave-to .relative {
-  transform: scale(0.95);
-}
-</style>

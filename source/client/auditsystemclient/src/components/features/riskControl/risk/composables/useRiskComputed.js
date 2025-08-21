@@ -29,6 +29,8 @@
  * - Safe defaults ensure the UI never breaks even if data is not yet loaded.
  */
 
+import { computed } from 'vue';
+
 export function useRiskComputed({
     searchQuery,
     selectedObjectiveId,

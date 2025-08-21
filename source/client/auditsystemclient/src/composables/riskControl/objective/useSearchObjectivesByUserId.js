@@ -49,19 +49,19 @@ export function useSearchObjectivesByUserId() {
             const params = {
                 searchTerm: searchParams.searchTerm || searchTerm.value,
                 riskControlMatrixId: searchParams.riskControlMatrixId || riskControlMatrixId.value,
-                page: searchParams.page || currentPage.value,
+                pageNumber: searchParams.pageNumber || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
             }
 
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
             if (searchParams.riskControlMatrixId !== undefined) riskControlMatrixId.value = searchParams.riskControlMatrixId;
-            if (searchParams.page !== undefined) currentPage.value = searchParams.page;
+            if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
             const response = await searchObjectivesByUserIdRepository.searchObjectivesByUserId(
                 params.searchTerm,
-                params.page,
+                params.pageNumber,
                 params.pageSize,
                 params.riskControlMatrixId
             );

@@ -13,18 +13,20 @@ export const getObjectiveByIdRepository = {
 
             const response = await api.get(
                 `${OBJECTIVE_API_ENDPOINT}${OBJECTIVE_API_ENDPOINT_ID}`, {
-                    data: { id: objectiveId },
+                    params: { id: objectiveId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
 
+            console.log("getObjectiveByIdRepository: " ,response);
+
             const { data, status } = response;
             responseData = data;
 
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result, data?.successMessage || 'Objective retrieved successfully');
+                return ApiResponseT.ok(data?.result?.ObjectiveModel, data?.successMessage || 'Objective retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

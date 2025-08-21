@@ -51,7 +51,6 @@ export function useGetRiskById() {
 
             const response = await getRiskByIdRepository.getRiskById(riskId);
 
-            console.log("useGetRiskById: ", response);
 
             if (response?.success) {
                 return handleFetchSuccess(response);
@@ -61,7 +60,7 @@ export function useGetRiskById() {
 
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch risk');
-        
+
         } finally {
             isLoading.value = false;
         }

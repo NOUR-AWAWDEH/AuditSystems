@@ -1,42 +1,42 @@
 <template>
-  <!-- Objective.vue -->
+  <!-- RiskVue.vue -->
     <div class="space-y-6">
-        <!-- Add Objective Modal -->
-        <AddObjectiveModal
-            :is-visible="showAddObjectiveModal"
-            :risk-control-matrix-id="internalSelectedRiskControlMatrixId"
-            @close="handleCloseAddObjectiveModal"
-            @objective-added="handleObjectiveAdded"
+        <!-- Add Risk Modal -->
+        <AddRiskModal
+            :is-visible="showAddRiskModal"
+            :objective-id="internalSelectedObjectiveId"
+            @close="handleCloseAddRiskModal"
+            @risk-added="handleRiskAdded"
         />
 
-        <!-- Show ObjectiveTable only when risk control matrices exist -->
-        <ObjectiveTable
-            v-if="props.riskControlMatrices && props.riskControlMatrices.length > 0"
-            :risk-control-matrices="props.riskControlMatrices"
-            :objectives="objectives"
+        <!-- Show RiskTable only when objectives exist -->
+        <RiskTable
+            v-if="props.objectives && props.objectives.length > 0"
+            :objectives="props.objectives"
+            :risks="risks"
             :is-loading="isLoading"
-            :selected-risk-control-matrix-id="internalSelectedRiskControlMatrixId"
-            :selected-risk-control-matrix="selectedRiskControlMatrix"
-            :current-risk-control-matrix="currentRiskControlMatrix"
-            :is-risk-control-matrix-loading="isRiskControlMatrixLoading"
+            :selected-objective-id="internalSelectedObjectiveId"
+            :selected-objective="selectedObjective"
+            :current-objective="currentObjective"
+            :is-objective-loading="isObjectiveLoading"
             :search-query="searchQuery"
-            :handle-risk-control-matrix-change="handleObjectiveChange"
+            :handle-objective-change="handleRiskChange"
             :handle-search="handleSearch"
             :refresh-data="refreshData"
-            @add-objective="handleAddObjective"
-            @edit-objective="handleEditObjective"
-            @delete-objective="handleDeleteObjective"
-            @objective-selected="handleObjectiveSelected"
+            @add-risk="handleAddRisk"
+            @edit-risk="handleEditRisk"
+            @delete-risk="handleDeleteRisk"
+            @risk-selected="handleRiskSelected"
         />
 
-        <!-- Show big RiskControlMatrix icon when no Risk Control Matrix  exist -->
+        <!-- Show big Objective icon when no Objective  exist -->
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
-                    <RiskControlMatrixIcon size="xxxl" custom-class="text-primary-shade" />
+                    <ObjectiveIcon size="xxxl" custom-class="text-primary-shade" />
                 </div>
-                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Risk Control Matrices Available</h3>
-                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create risk control matrices first before you can manage objectives</p>
+                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Objectives Available</h3>
+                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create objectives first before you can manage risks</p>
                 <div class="bg-white border border-tertiary-shade rounded-lg p-6">
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
@@ -48,21 +48,21 @@
                             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
                             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
                                 <li>Navigate to the Risk Control section</li>
-                                <li>Create or select a risk control matrix</li>
-                                <li>Return here to manage objectives</li>
+                                <li>Create or select an objective</li>
+                                <li>Return here to manage risks</li>
                             </ol>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Edit Objective Modal -->
-        <EditObjectiveModal
-            v-if="showEditObjectiveModal"
-            :is-visible="showEditObjectiveModal"
-            :objective="objectiveToEdit"
-            @close="handleCloseEditObjectiveModal"
-            @updated="handleObjectiveUpdated"
+        <!-- Edit Risk Modal -->
+        <EditRiskModal
+            v-if="showEditRiskModal"
+            :is-visible="showEditRiskModal"
+            :risk="riskToEdit"
+            @close="handleCloseEditRiskModal"
+            @updated="handleRiskUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -70,7 +70,7 @@
             v-model="showDeleteDialog"
             :title="deleteDialogTitle"
             :message="deleteDialogMessage"
-            :highlight-text="itemToDelete?.description || ''"
+            :highlight-text="itemToDelete?.nameRisk || ''"
             :confirm-text="'Delete'"
             :cancel-text="'Cancel'"
             @confirm="confirmDelete"
@@ -83,19 +83,19 @@
 import { watch, onMounted, ref  } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import ObjectiveTable from './components/RiskTable.vue';
-import AddObjectiveModal from './components/AddRiskModal.vue';
-import EditObjectiveModal from './components/EditRiskModal.vue';
-import { useObjectiveTable } from './composables/useRiskTable';
-import { useObjectiveModals } from './composables/useRiskModals';
-import RiskControlMatrixIcon from '@/components/common/icons/RiskControlMatrixIcon.vue';
+import RiskTable from './components/RiskTable.vue';
+import AddRiskModal from './components/AddRiskModal.vue';
+import EditRiskModal from './components/EditRiskModal.vue';
+import { useRiskTable } from './composables/useRiskTable';
+import { useRiskModals } from './composables/useRiskModals';
+import ObjectiveIcon from '@/components/common/icons/ObjectiveIcon.vue';
 
 const props = defineProps({
-    riskControlMatrices: {
+    objectives: {
         type: Array,
         default: () => [],
     },
-    selectedRiskControlMatrixId: {
+    selectedObjectiveId: {
         type: [String, Number],
         default: null
     }
@@ -104,54 +104,54 @@ const props = defineProps({
 
 
 // Define emit first
-const emit = defineEmits(['objective-selected']);
+const emit = defineEmits(['risk-selected']);
 
 const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 
 const {
-    objectives,
+    risks,
     isLoading,
-    selectedRiskControlMatrixId : internalSelectedRiskControlMatrixId,
-    selectedRiskControlMatrix,
-    currentRiskControlMatrix,
-    isRiskControlMatrixLoading,
+    selectedObjectiveId : internalSelectedObjectiveId,
+    selectedObjective,
+    currentObjective,
+    isObjectiveLoading,
     searchQuery,
     refreshData,
-    handleObjectiveAdded,
-    handleObjectiveChange,
+    handleRiskAdded,
+    handleRiskChange,
     handleSearch,
     resetToDefaultView,
-} = useObjectiveTable(props.riskControlMatrices);
+} = useRiskTable(props.objectives);
 
-// Local ref to manage selectedRiskControlMatrixId
-const localSelectedRiskControlMatrixId = ref(props.selectedRiskControlMatrixId);
+// Local ref to manage selectedObjectiveId
+const localSelectedObjectiveId = ref(props.selectedObjectiveId);
 
 // Add onMounted to refresh data on page load
 onMounted(async () => {
-    if (localSelectedRiskControlMatrixId.value) {
+    if (localSelectedObjectiveId.value) {
         await refreshData();
     }
 });
 
 // Watch for prop changes and update internal state
 watch(
-    () => props.selectedRiskControlMatrixId,
-    async (newRiskControlMatrixId) => {
-        localSelectedRiskControlMatrixId.value = newRiskControlMatrixId;
-        if (newRiskControlMatrixId !== internalSelectedRiskControlMatrixId.value) {
-            await handleObjectiveChange(newRiskControlMatrixId);
+    () => props.selectedObjectiveId,
+    async (newObjectiveId) => {
+        localSelectedObjectiveId.value = newObjectiveId;
+        if (newObjectiveId !== internalSelectedObjectiveId.value) {
+            await handleRiskChange(newObjectiveId);
         }
     },
     { immediate: true }
 );
 
-// Watch for RiskControlMatrices prop changes
+// Watch for objectives prop changes
 watch(
-    () => props.riskControlMatrices,
-    async (newRiskControlMatrices) => {
-        if (newRiskControlMatrices.length > 0 && localSelectedRiskControlMatrixId.value) {
+    () => props.objectives,
+    async (newObjectives) => {
+        if (newObjectives.length > 0 && localSelectedObjectiveId.value) {
             await refreshData();
         }
     },
@@ -160,38 +160,38 @@ watch(
 
 // Use modal composable for dialog management
 const {
-    showAddObjectiveModal,
-    showEditObjectiveModal,
-    objectiveToEdit,
+    showAddRiskModal,
+    showEditRiskModal,
+    riskToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    handleAddObjective,
-    handleCloseAddObjectiveModal,
-    handleEditObjective,
-    handleCloseEditObjectiveModal,
-    handleObjectiveUpdated,
-    handleDeleteObjective,
+    handleAddRisk,
+    handleCloseAddRiskModal,
+    handleEditRisk,
+    handleCloseEditRiskModal,
+    handleRiskUpdated,
+    handleDeleteRisk,
     confirmDelete,
     cancelDelete
-} = useObjectiveModals(refreshData, showNotification);
+} = useRiskModals(refreshData, showNotification);
 
 
-// Handle objective selection and forward to parent
-const handleObjectiveSelected = (objectiveId) => {
-    emit('objective-selected', objectiveId);
+// Handle risk selection and forward to parent
+const handleRiskSelected = (riskId) => {
+    emit('risk-selected', riskId);
 };
 
 defineExpose({
-    objectives,
-    selectedRiskControlMatrixId: localSelectedRiskControlMatrixId,
+    risks,
+    selectedObjectiveId: localSelectedObjectiveId,
     resetToDefaultView
 });
 </script>
 
 <style scoped>
-.objective-table .table-row {
+.risk-table .table-row {
     transition: all 0.2s ease;
 }
 </style>

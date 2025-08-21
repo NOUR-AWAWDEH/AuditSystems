@@ -46,7 +46,7 @@ export function useRiskActions({
                     await searchRisks({
                         searchTerm: searchQuery.value || '',
                         objectiveId: selectedObjectiveId.value,
-                        page: currentPage.value,
+                        pageNumber: currentPage.value,
                         pageSize: pageSize.value,
                     });
                 }

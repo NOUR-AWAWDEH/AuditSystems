@@ -19,9 +19,8 @@ export const getRisksByUserIdRepository = {
                     },
                 }
             );
-            
-            console.log("GetRisksByUserIdRepository: ", response);
-            
+
+
             const { data, status } = response;
             responseData = data;
 

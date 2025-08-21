@@ -19,7 +19,6 @@ export const deleteRiskByIdRepository = {
                     },
             });
 
-            console.log("Delete Risk Response:", response);
 
             const { data, status } = response;
 

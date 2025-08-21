@@ -17,7 +17,7 @@ export function useDeleteRiskById() {
     };
 
     const handleDeleteFailure = (response, defaultErrorMessage = 'Failed to delete risk') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
@@ -29,7 +29,7 @@ export function useDeleteRiskById() {
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
         };
-        
+
         return failureResult;
     };
 
@@ -39,21 +39,20 @@ export function useDeleteRiskById() {
         }
         return null;
     };
-    
+
     const deleteRisk = async (riskId) => {
         try {
             isDeleting.value = true;
             error.value = null;
             deletedRisk.value = null;
-            
-            const validationError = validateDeleteRisk(riskId); 
+
+            const validationError = validateDeleteRisk(riskId);
             if (validationError) {
                 return handleDeleteFailure({ message: validationError });
             }
 
             const response = await deleteRiskByIdRepository.deleteRiskById(riskId);
 
-            console.log("useDeleteRiskById: ", response);
 
             if (response?.success) {
                 return handleDeleteSuccess(response);

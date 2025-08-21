@@ -9,11 +9,11 @@ export const searchRisksByUserIdRepository = {
     async searchRisksByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, objectiveId = '') {
         try {
             const token = authService.getLocalToken();
-
+            const searchTermParam = searchTerm?.trim() || '';
             const params = {
-                searchTerm: searchTerm,
+                searchTerm: searchTermParam,
                 objectiveId: objectiveId,
-                page: pageNumber,
+                pageNumber: pageNumber,
                 pageSize: pageSize
             };
 
@@ -28,7 +28,7 @@ export const searchRisksByUserIdRepository = {
                 }
             );
 
-            console.log("SearchRisksByUserIdRepository: ", response);
+
             const { data, status } = response;
 
             if (status === 200 && data?.success) {

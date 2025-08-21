@@ -13,20 +13,19 @@ export const getRiskByIdRepository = {
 
             const response = await api.get(
                 `${RISK_API_ENDPOINT}${RISK_API_ENDPOINT_ID}`, {
-                    data: { id: riskId },
+                    params: { id: riskId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                 });
-            
-            console.log("Get Risk Response:", response);
+
 
             const { data, status } = response;
             responseData = data;
 
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result, data?.successMessage || 'Risk retrieved successfully');
+                return ApiResponseT.ok(data?.result?.riskModel, data?.successMessage || 'Risk retrieved successfully');
 
             }
 

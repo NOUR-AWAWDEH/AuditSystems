@@ -296,7 +296,7 @@ const handleObjectiveSelected = async (id) => {
 const handleRiskSelected = async (id) => {
   selectRisk(id);
   //if (!normalizedControls.value.length) await fetchData();
-  setActiveTab('controls');
+  //setActiveTab('controls');
 };
 
 

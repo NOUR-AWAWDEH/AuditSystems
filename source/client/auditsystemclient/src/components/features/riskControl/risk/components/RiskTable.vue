@@ -3,7 +3,6 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
 
-                <!-- Objective and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
                         <RiskHeader/>
@@ -27,34 +26,45 @@
                     </div>
                 </div>
 
-                <!-- Keep only this Selected Objective Info section -->
                 <div v-if="selectedObjectiveId"
                      class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                     <div class="flex items-center justify-between">
-                         <div class="flex items-center">
-                             <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
 
-                             <p class="text-sm text-gray-700">
-                                 Showing Objectives for: &nbsp;&nbsp;
-                                 <span class="font-semibold text-blue-800">
-                                     <span v-if="isObjectiveLoading">Loading objective...</span>
-                                     <span v-else>{{ currentObjective?.description || 'Loading...' }}</span>
-                                 </span>
-                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
-                             </p>
-                         </div>
-                         <button @click="$emit('add-risk')"
-                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
-                             <PlusIcon :stroke-width="3" />
-                             Add Risk
-                         </button>
-                     </div>
-                 </div>
+                            <p class="text-sm text-gray-700">
+                                Showing Objectives for: &nbsp;&nbsp;
+                                <span class="font-semibold text-blue-800">
+                                    <span v-if="isObjectiveLoading">Loading objective...</span>
+                                    <span v-else>{{ currentObjective?.description || 'Loading...' }}</span>
+                                </span>
+                                <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
+                            </p>
+                        </div>
+                        <button @click="$emit('add-risk')"
+                                class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
+                            <PlusIcon :stroke-width="3" />
+                            Add Risk
+                        </button>
+                    </div>
+                </div>
 
-                <!-- Table Container - Show when objective is Selected -->
                 <div v-if="selectedObjectiveId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="risks" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
-                        :no-data-message="noDataMessage" class="risk-table" @row-click="handleRowClick">
+                    <ReusableTable
+                        :items="transformedRisks"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="risk-table"
+                        @row-click="handleRowClick"
+                    >
+                        <template #cell-rate="{ item }">
+                            <span :class="rateColorMap[item.rate]" class="px-2 py-1 rounded-full text-xs font-semibold">
+                                {{ item.rate }}
+                            </span>
+                        </template>
+
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectRisk(item)"
@@ -78,7 +88,6 @@
                         </template>
                     </ReusableTable>
 
-                    <!-- Clear Search Button (shown when no results and searching) -->
                     <div v-if="searchQuery && risks.length === 0 && !isLoading"
                         class="text-center py-4 border-t border-gray-200">
                         <button @click="handleSearch('')"
@@ -89,10 +98,7 @@
                     </div>
                 </div>
 
-                <!-- No Objective Selected - Show when no objective is selected -->
-
                 <div v-else class="text-center py-20">
-                    <!-- When risk Control matrices are available but none selected -->
                     <div v-if="objectives && objectives.length > 0" class="max-w-md mx-auto">
                         <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
                             <ObjectiveIcon size="xxxl" custom-class="text-blue-600" />
@@ -106,7 +112,6 @@
                         </div>
                     </div>
 
-                    <!-- When no objectives are available -->
                     <div v-else class="max-w-lg mx-auto">
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
                             <ObjectiveIcon size="xxxl" custom-class="text-gray-400" />
@@ -121,7 +126,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
@@ -187,6 +192,11 @@ watch(() => props.selectedObjectiveId, (newVal) => {
     internalSelectedObjectiveId.value = newVal;
 });
 
+onMounted(() => {
+    console.log(props.risks);
+});
+
+
 watch(internalSelectedObjectiveId, (newVal) => {
     props.handleObjectiveChange(newVal);
 });
@@ -213,9 +223,9 @@ const handleRowClick = (risk) => {
 };
 
 const riskColumns = [
-    { key: 'name', label: 'Name' },
+    { key: 'riskName', label: 'Name' },
     { key: 'description', label: 'Description' },
-    { key: 'rate', label: 'Risk Level' },
+    { key: 'rate', label: 'Rate Level' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
@@ -229,6 +239,35 @@ const noDataMessage = computed(() => {
     }
     return 'No Risks found for this Objective.';
 });
+
+const rateLevelMap = {
+    '11111111-1111-1111-1111-111111111111': 'Critical',
+    '22222222-2222-2222-2222-222222222222': 'High',
+    '33333333-3333-3333-3333-333333333333': 'Medium',
+    '44444444-4444-4444-4444-444444444444': 'Low',
+    '55555555-5555-5555-5555-555555555555': 'Minimal'
+};
+
+const rateColorMap = {
+    'Critical': 'bg-red-100 text-red-800',
+    'High': 'bg-orange-100 text-orange-800',
+    'Medium': 'bg-yellow-100 text-yellow-800',
+    'Low': 'bg-green-100 text-green-800',
+    'Minimal': 'bg-blue-100 text-blue-800',
+    'Unknown': 'bg-gray-100 text-gray-800'
+};
+
+
+const transformedRisks = computed(() => {
+    return props.risks.map(risk => {
+        const rate = rateLevelMap[risk.rateId] || 'Unknown';
+        return {
+            ...risk,
+            rate,
+        };
+    });
+});
+
 
 </script>
 

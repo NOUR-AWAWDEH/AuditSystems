@@ -38,6 +38,7 @@ export const searchRatesRepository = {
         },
       });
 
+      console.log("searchRatesRepository: " , response);
       const { data, status } = response;
 
       if (status === 200 && data?.success) {

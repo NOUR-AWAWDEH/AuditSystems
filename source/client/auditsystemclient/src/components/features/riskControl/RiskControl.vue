@@ -44,6 +44,7 @@
             :sub-departments="subDepartments"
             :selected-sub-department-id="selectedSubDepartmentId"
             @audit-process-selected="handleAuditProcessSelected"
+            @audit-process-added="handleAuditProcessAdded"
           />
         </div>
 
@@ -53,6 +54,7 @@
             :audit-processes="auditProcesses"
             :selected-audit-process-id="selectedAuditProcessId"
             @sub-process-selected="handleSubProcessSelected"
+            @sub-process-added="handleSubProcessAdded"
           />
         </div>
 
@@ -62,6 +64,7 @@
             :sub-processes="subProcesses"
             :selected-sub-process-id="selectedSubProcessId"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
+            @risk-control-matrix-added="handleRiskControlMatrixAdded"
           />
         </div>
 
@@ -71,6 +74,7 @@
             :risk-control-matrices="riskControlMatrices"
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
             @objective-selected="handleObjectiveSelected"
+            @objective-added="handleObjectiveAdded"
           />
         </div>
 
@@ -80,6 +84,7 @@
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @risk-selected="handleRiskSelected"
+            @risk-added="handleRiskAdded"
           />
         </div>
 
@@ -185,16 +190,12 @@ const { getRiskById } = useGetRiskById();
 
 
 // Computed normalized lists
-const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value.flat() : []);
-const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value.flat() : []);
-const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value.flat() : []);
-const normalizedRisks = computed(() => Array.isArray(risks.value) ? risks.value.flat() : []);
-//const normalizedExitRisks = computed(() => Array.isArray(exitRisks.value) ? exitRisks.value.flat() : []);
-//const normalizedObservations = computed(() => Array.isArray(observations.value) ? observations.value.flat() : []);
-
-
-
-
+const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value : []);
+const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value : []);
+const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value : []);
+const normalizedRisks = computed(() => Array.isArray(risks.value) ? risks.value : []);
+//const normalizedExitRisks = computed(() => Array.isArray(exitRisks.value) ? exitRisks.value : []);
+//const normalizedObservations = computed(() => Array.isArray(observations.value) ? observations.value : []);
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -217,7 +218,7 @@ const fetchData = async () => {
   errorMessage.value = null;
 
   try {
-    const [subDeptResult, auditResult, subProcResult, riskMatrixResult, objectiveResult, riskResult] = await Promise.all([
+    await Promise.all([
       getSubDepartmentsByUserId(),
       getAuditProcessesByUserId(),
       getSubProcessesByUserId(),
@@ -225,13 +226,6 @@ const fetchData = async () => {
       getObjectivesByUserId(),
       getRisksByUserId(),
     ]);
-
-    subDepartments.value = subDeptResult?.data || [];
-    auditProcesses.value = auditResult?.data || [];
-    subProcesses.value = subProcResult?.data || [];
-    riskControlMatrices.value = riskMatrixResult?.data || [];
-    objectives.value = objectiveResult?.data || [];
-    risks.value = riskResult?.data || [];
 
   } catch (err) {
     errorMessage.value = err.message || 'Failed to fetch data';
@@ -298,6 +292,34 @@ const handleRiskSelected = async (id) => {
   //if (!normalizedControls.value.length) await fetchData();
   //setActiveTab('controls');
 };
+
+// Handle  added
+
+const handleAuditProcessAdded = async () => {
+  await getAuditProcessesByUserId();
+};
+
+const handleSubProcessAdded = async () => {
+  await getSubProcessesByUserId();
+};
+
+const handleRiskControlMatrixAdded = async () => {
+  await getRiskControlMatricesByUserId();
+};
+
+const handleObjectiveAdded = async () => {
+  await getObjectivesByUserId();
+};
+
+const handleRiskAdded = async () => {
+  await getRisksByUserId();
+};
+
+
+// const handleExitRiskAdded = () => {
+//   fetchData();
+// };
+
 
 
 

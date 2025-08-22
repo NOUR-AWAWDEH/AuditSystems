@@ -52,8 +52,14 @@
 
                 <!-- Table Container - Show when SubDepartment is Selected -->
                 <div v-if="selectedSubDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="auditProcesses" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
-                        :no-data-message="noDataMessage" class="audit-process-table" @row-click="handleRowClick">
+                    <ReusableTable 
+                        :items="auditProcesses"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="audit-process-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectAuditProcess(item)"
@@ -172,10 +178,6 @@ const handleSelectAuditProcess = (auditProcess) => {
     emit('audit-process-selected', auditProcess.id);
 };
 
-// Handle row click to select audit process
-const handleRowClick = (auditProcess) => {
-    handleSelectAuditProcess(auditProcess);
-};
 
 const auditProcessColumns = [
     { key: 'processName', label: 'Name' },

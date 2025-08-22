@@ -102,7 +102,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['sub-process-selected']);
+const emit = defineEmits(['sub-process-selected', 'sub-process-added']);
 
 const { showNotification } = useNotification();
 
@@ -116,7 +116,6 @@ const {
   isAuditProcessLoading,
   searchQuery,
   refreshData,
-  handleSubProcessAdded,
   handleSubProcessChange,
   handleSearch,
   resetToDefaultView,
@@ -177,6 +176,14 @@ const {
 const handleSubProcessSelected = (subProcessId) => {
   emit('sub-process-selected', subProcessId);
 };
+
+// Handle sub-process addition and refresh
+const handleSubProcessAdded = () => {
+  // bubble up to parent (RiskControl.vue)
+  refreshData();
+  emit('sub-process-added');
+};
+
 
 defineExpose({
   subProcesses,

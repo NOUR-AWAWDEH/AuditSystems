@@ -100,7 +100,6 @@
               v-for="(item, index) in items"
               :key="item[itemKey] || index"
               class="hover:bg-gray-50 transition-colors"
-              @click="$emit('row-click', item)"
               :class="{'cursor-pointer': !!$attrs['onRow-click']}"
             >
               <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 text-gray-600">{{ index + 1 }}</td>
@@ -170,7 +169,7 @@ defineProps({
   }
 });
 
-defineEmits(['row-click', 'edit-item', 'delete-item', 'view-item', 'download-item']);
+defineEmits(['edit-item', 'delete-item', 'view-item', 'download-item']);
 
 function formatDate(dateString) {
   if (!dateString) return 'N/A';

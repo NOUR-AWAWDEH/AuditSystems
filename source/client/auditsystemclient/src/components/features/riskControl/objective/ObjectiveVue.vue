@@ -104,7 +104,8 @@ const props = defineProps({
 
 
 // Define emit first
-const emit = defineEmits(['objective-selected']);
+const emit = defineEmits(['objective-selected', 'objective-added']);
+
 
 const { showNotification } = useNotification();
 
@@ -119,7 +120,6 @@ const {
     isRiskControlMatrixLoading,
     searchQuery,
     refreshData,
-    handleObjectiveAdded,
     handleObjectiveChange,
     handleSearch,
     resetToDefaultView,
@@ -181,6 +181,13 @@ const {
 // Handle objective selection and forward to parent
 const handleObjectiveSelected = (objectiveId) => {
     emit('objective-selected', objectiveId);
+};
+
+const handleObjectiveAdded = () => {
+  // refresh local table
+  refreshData();
+  // bubble up to parent (RiskControl.vue)
+  emit('objective-added');
 };
 
 defineExpose({

@@ -104,7 +104,7 @@ const props = defineProps({
 
 
 // Define emit first
-const emit = defineEmits(['risk-selected']);
+const emit = defineEmits(['risk-selected', 'risk-added']);
 
 const { showNotification } = useNotification();
 
@@ -119,7 +119,6 @@ const {
     isObjectiveLoading,
     searchQuery,
     refreshData,
-    handleRiskAdded,
     handleRiskChange,
     handleSearch,
     resetToDefaultView,
@@ -181,6 +180,12 @@ const {
 // Handle risk selection and forward to parent
 const handleRiskSelected = (riskId) => {
     emit('risk-selected', riskId);
+};
+
+// Handle risk addition and forward to parent
+const handleRiskAdded = () => {
+    refreshData();
+    emit('risk-added');
 };
 
 defineExpose({

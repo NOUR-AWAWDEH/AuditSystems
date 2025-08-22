@@ -105,7 +105,7 @@ const props = defineProps({
 });
 
 // Define emit first
-const emit = defineEmits(['audit-process-selected', ]);
+const emit = defineEmits(['audit-process-selected','audit-process-added' ]);
 
 const { showNotification } = useNotification();
 
@@ -119,7 +119,6 @@ const {
     isSubDepartmentLoading,
     searchQuery,
     refreshData,
-    handleAuditProcessAdded,
     handleAuditProcessChange,
     handleSearch,
     resetToDefaultView,
@@ -168,6 +167,13 @@ const {
 const handleAuditProcessSelected = (auditProcessId) => {
     emit('audit-process-selected', auditProcessId);
 };
+
+// Handle audit process added
+const handleAuditProcessAdded = () => {
+    refreshData();
+    emit('audit-process-added');
+};
+
 
 defineExpose({
     auditProcesses,

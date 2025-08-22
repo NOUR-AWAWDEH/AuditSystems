@@ -53,8 +53,14 @@
 
                 <!-- Table Container - Show when risk control matrix is Selected -->
                 <div v-if="selectedRiskControlMatrixId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="objectives" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
-                        :no-data-message="noDataMessage" class="objective-table" @row-click="handleRowClick">
+                    <ReusableTable 
+                        :items="objectives"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="objective-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectObjective(item)"
@@ -207,10 +213,6 @@ const handleSelectObjective = (objective) => {
     emit('objective-selected', objective.id);
 };
 
-// Handle row click to select objective
-const handleRowClick = (objective) => {
-    handleSelectObjective(objective);
-};
 
 const objectiveColumns = [
     { key: 'description', label: 'Description' },

@@ -53,8 +53,14 @@
 
                 <!-- Table Container - Show when SubProcess is Selected -->
                 <div v-if="selectedSubProcessId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="riskControlMatrices" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
-                        :no-data-message="noDataMessage" class="risk-control-matrix-table" @row-click="handleRowClick">
+                    <ReusableTable 
+                        :items="riskControlMatrices"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="risk-control-matrix-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectRiskControlMatrix(item)"
@@ -206,10 +212,6 @@ const handleSelectRiskControlMatrix = (riskControlMatrix) => {
     emit('risk-control-matrix-selected', riskControlMatrix.id);
 };
 
-// Handle row click to select risk control matrix
-const handleRowClick = (riskControlMatrix) => {
-    handleSelectRiskControlMatrix(riskControlMatrix);
-};
 
 const riskControlMatrixColumns = [
     { key: 'description', label: 'Description' },

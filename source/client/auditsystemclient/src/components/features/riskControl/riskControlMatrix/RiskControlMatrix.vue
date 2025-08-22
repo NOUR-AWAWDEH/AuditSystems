@@ -114,7 +114,7 @@ watch(
 );
 
 // Define emit first
-const emit = defineEmits(['risk-control-matrix-selected']);
+const emit = defineEmits(['risk-control-matrix-selected', 'risk-control-matrix-added']);
 
 const { showNotification } = useNotification();
 
@@ -129,7 +129,6 @@ const {
     isSubProcessLoading,
     searchQuery,
     refreshData,
-    handleRiskControlMatrixAdded,
     handleRiskControlMatrixChange,
     handleSearch,
     resetToDefaultView,
@@ -192,11 +191,18 @@ const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
     emit('risk-control-matrix-selected', riskControlMatrixId);
 };
 
+// Handle risk control matrix addition and forward to parent
+const handleRiskControlMatrixAdded = () => {
+    refreshData();
+    emit('risk-control-matrix-added');
+};
+
 defineExpose({
     riskControlMatrices,
     selectedSubProcessId: localSelectedSubProcessId,
     resetToDefaultView
 });
+
 </script>
 
 <style scoped>

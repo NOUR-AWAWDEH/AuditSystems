@@ -57,7 +57,6 @@
                         :actions="[]"
                         :no-data-message="noDataMessage"
                         class="risk-table"
-                        @row-click="handleRowClick"
                     >
                         <template #cell-rate="{ item }">
                             <span :class="rateColorMap[item.rate]" class="px-2 py-1 rounded-full text-xs font-semibold">
@@ -192,11 +191,6 @@ watch(() => props.selectedObjectiveId, (newVal) => {
     internalSelectedObjectiveId.value = newVal;
 });
 
-onMounted(() => {
-    console.log(props.risks);
-});
-
-
 watch(internalSelectedObjectiveId, (newVal) => {
     props.handleObjectiveChange(newVal);
 });
@@ -217,10 +211,6 @@ const handleSelectRisk = (risk) => {
     emit('risk-selected', risk.id);
 };
 
-// Handle row click to select risk
-const handleRowClick = (risk) => {
-    handleSelectRisk(risk);
-};
 
 const riskColumns = [
     { key: 'riskName', label: 'Name' },

@@ -1,20 +1,25 @@
 <template>
-  <CustomSelect
-    :model-value="selectedRateId"
-    :options="rates"
-    :label="label"
-    :placeholder="placeholder"
-    value-key="id"
-    label-key="riskName"
-    :error="error"
-    @update:modelValue="handleRateChange"
-  />
+  <div>
+     <div v-if="props.rates.length > 0">
+      <CustomSelect
+        :model-value="selectedRateId"
+        :options="props.rates"
+        :label="props.label"
+        :placeholder="props.placeholder"
+        value-key="id"
+        label-key="level"
+        :error="props.error"
+        @update:modelValue="handleRateChange"
+      />
+    </div>
+    <div v-else-if="props.error" class="text-error text-sm mt-1">{{ props.error }}</div> 
+  </div>
 </template>
 
 <script setup>
 import CustomSelect from '@/components/common/CustomSelect.vue';
 
-defineProps({
+const props = defineProps({
   rates: {
     type: Array,
     default: () => []
@@ -36,6 +41,7 @@ defineProps({
     default: ''
   }
 });
+
 
 const emit = defineEmits(['update:selectedRateId', 'rate-changed']);
 

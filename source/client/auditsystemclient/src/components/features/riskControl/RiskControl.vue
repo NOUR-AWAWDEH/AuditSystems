@@ -156,13 +156,13 @@ import { useGetObjectiveById } from '@/composables/riskControl/objective/useGetO
 import { useGetRisksByUserId } from '@/composables/riskControl/risk/useGetRisksByUserId';
 import { useGetRiskById } from '@/composables/riskControl/risk/useGetRiskById';
 
-
 // Router
 const route = useRoute();
 const router = useRouter();
 
 // State
 const activeTab = ref('processes');
+
 const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
 const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
@@ -170,42 +170,30 @@ const selectedRiskControlMatrixId = ref(localStorage.getItem('riskControlSelecte
 const selectedObjectiveId = ref(localStorage.getItem('riskControlSelectedObjectiveId') || null);
 const selectedRiskId = ref(localStorage.getItem('riskControlSelectedRiskId') || null);
 
-
-// Call the Composables
-
-// Sub Departments
+// Composables
 const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
 const { getSubDepartmentById } = useGetSubDepartmentById();
 
-// Audit Processes
 const { getAuditProcessesByUserId, auditProcesses } = useGetAuditProcessesByUserId();
 const { getAuditProcessById } = useGetAuditProcessById();
 
-// Sub Processes
 const { getSubProcessesByUserId, subProcesses } = useGetSubProcessesByUserId();
 const { getSubProcessById } = useGetSubProcessById();
 
-// Risk Control Matrices
 const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskControlMatricesByUserId();
 const { getRiskControlMatrixById } = useGetRiskControlMatrixById();
 
-// Objectives
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getObjectiveById } = useGetObjectiveById();
 
-// Risks
 const { getRisksByUserId, risks } = useGetRisksByUserId();
 const { getRiskById } = useGetRiskById();
-
-
 
 // Computed normalized lists
 const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value : []);
 const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value : []);
 const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value : []);
 const normalizedRisks = computed(() => Array.isArray(risks.value) ? risks.value : []);
-//const normalizedExitRisks = computed(() => Array.isArray(exitRisks.value) ? exitRisks.value : []);
-//const normalizedObservations = computed(() => Array.isArray(observations.value) ? observations.value : []);
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -222,157 +210,68 @@ const tabs = ref([
   { id: 'observations', name: 'Observations' }
 ]);
 
-// Fetch all required data
-const fetchData = async () => {
-  isLoading.value = true;
-  errorMessage.value = null;
-
-  try {
-    await Promise.all([
-      getSubDepartmentsByUserId(),
-      getAuditProcessesByUserId(),
-      getSubProcessesByUserId(),
-      getRiskControlMatricesByUserId(),
-      getObjectivesByUserId(),
-      getRisksByUserId(),
-    ]);
-
-  } catch (err) {
-    errorMessage.value = err.message || 'Failed to fetch data';
-  } finally {
-    isLoading.value = false;
+// Selection handlers
+const setSelectedId = (key, value) => {
+  switch (key) {
+    case 'subDepartment': selectedSubDepartmentId.value = value; localStorage.setItem('riskControlSelectedSubDepartmentId', value || ''); break;
+    case 'auditProcess': selectedAuditProcessId.value = value; localStorage.setItem('riskControlSelectedAuditProcessId', value || ''); break;
+    case 'subProcess': selectedSubProcessId.value = value; localStorage.setItem('riskControlSelectedSubProcessId', value || ''); break;
+    case 'riskControlMatrix': selectedRiskControlMatrixId.value = value; localStorage.setItem('riskControlSelectedRiskControlMatrixId', value || ''); break;
+    case 'objective': selectedObjectiveId.value = value; localStorage.setItem('riskControlSelectedObjectiveId', value || ''); break;
+    case 'risk': selectedRiskId.value = value; localStorage.setItem('riskControlSelectedRiskId', value || ''); break;
   }
 };
 
-// Selection handlers
-const selectAuditProcess = (id) => {
-  selectedAuditProcessId.value = id;
-  localStorage.setItem('riskControlSelectedAuditProcessId', id || '');
-};
-
-const selectSubProcess = (id) => {
-  selectedSubProcessId.value = id;
-  localStorage.setItem('riskControlSelectedSubProcessId', id || '');
-};
-
-const selectRiskControlMatrix = (id) => {
-  selectedRiskControlMatrixId.value = id;
-  localStorage.setItem('riskControlSelectedRiskControlMatrixId', id || '');
-};
-
-const selectObjective = (id) => {
-  selectedObjectiveId.value = id;
-  localStorage.setItem('riskControlSelectedObjectiveId', id || '');
-};
-
-const selectRisk = (id) => {
-  selectedRiskId.value = id;
-  localStorage.setItem('riskControlSelectedRiskId', id || '');
-};
-
-
-
 // Event handlers
 const handleAuditProcessSelected = async (id) => {
-  selectAuditProcess(id);
-  if (!normalizedSubProcesses.value.length) await fetchData();
-  setActiveTab('subprocesses');
+  setSelectedId('auditProcess', id);
+  if (!normalizedSubProcesses.value.length) await refreshAuditProcesses();
+  activeTab.value = 'subprocesses';
 };
 
 const handleSubProcessSelected = async (id) => {
-  selectSubProcess(id);
-  if (!normalizedRiskControlMatrices.value.length) await fetchData();
-  setActiveTab('matrix');
+  setSelectedId('subProcess', id);
+  if (!normalizedRiskControlMatrices.value.length) await refreshSubProcesses();
+  activeTab.value = 'matrix';
 };
 
 const handleRiskControlMatrixSelected = async (id) => {
-  selectRiskControlMatrix(id);
-  if (!normalizedObjectives.value.length) await fetchData();
-  setActiveTab('objectives');
+  setSelectedId('riskControlMatrix', id);
+  if (!normalizedObjectives.value.length) await refreshRiskControlMatrices();
+  activeTab.value = 'objectives';
 };
 
 const handleObjectiveSelected = async (id) => {
-  selectObjective(id);
-  if (!normalizedRisks.value.length) await fetchData();
-  setActiveTab('risks');
+  setSelectedId('objective', id);
+  if (!normalizedRisks.value.length) await refreshObjectives();
+  activeTab.value = 'risks';
 };
 
 const handleRiskSelected = async (id) => {
-  selectRisk(id);
-  //if (!normalizedControls.value.length) await fetchData();
-  //setActiveTab('controls');
+  setSelectedId('risk', id);
 };
 
-
-// Refreshers 
-
-// Refresh Audit Processes
-const refreshAuditProcesses = async () => {
-  await getAuditProcessesByUserId();
-};
-
-// Refresh Sub Processes
-const refreshSubProcesses = async () => {
-  await getSubProcessesByUserId();
-};
-
-// Refresh Risk Control Matrices
-const refreshRiskControlMatrices = async () => {
-  await getRiskControlMatricesByUserId();
-};
-
-// Refresh Objectives
-const refreshObjectives = async () => {
-  await getObjectivesByUserId();
-};
-
-// Refresh Risks
-const refreshRisks = async () => {
-  await getRisksByUserId();
-};
-
-
-
-
-
-
-
+// Refreshers
+const refreshSubDepartments = async () => await getSubDepartmentsByUserId();
+const refreshAuditProcesses = async () => await getAuditProcessesByUserId();
+const refreshSubProcesses = async () => await getSubProcessesByUserId();
+const refreshRiskControlMatrices = async () => await getRiskControlMatricesByUserId();
+const refreshObjectives = async () => await getObjectivesByUserId();
+const refreshRisks = async () => await getRisksByUserId();
 
 // Tab navigation
-const setActiveTab = (tabId) => {
-  activeTab.value = tabId;
-};
+const setActiveTab = (tabId) => activeTab.value = tabId;
 
 // Handle route queries
 const handleRouteQueries = async () => {
   const { subDepartmentId, auditProcessId, subProcessId, riskControlMatrixId, objectiveId, riskId } = route.query;
 
-  if (subDepartmentId) {
-    selectedSubDepartmentId.value = subDepartmentId;
-    await getSubDepartmentById(subDepartmentId);
-  }
-  if (auditProcessId) {
-    selectedAuditProcessId.value = auditProcessId;
-    await getAuditProcessById(auditProcessId);
-  }
-  if (subProcessId) {
-    selectedSubProcessId.value = subProcessId;
-    await getSubProcessById(subProcessId);
-  }
-  if (riskControlMatrixId) {
-    selectedRiskControlMatrixId.value = riskControlMatrixId;
-    await getRiskControlMatrixById(riskControlMatrixId);
-  }
-  if (objectiveId) {
-    selectedObjectiveId.value = objectiveId;
-    await getObjectiveById(objectiveId);
-  }
-  if (riskId) {
-    selectedRiskId.value = riskId;
-    await getRiskById(riskId);
-  }
-
-
+  if (subDepartmentId) { selectedSubDepartmentId.value = subDepartmentId; await getSubDepartmentById(subDepartmentId); }
+  if (auditProcessId) { selectedAuditProcessId.value = auditProcessId; await getAuditProcessById(auditProcessId); }
+  if (subProcessId) { selectedSubProcessId.value = subProcessId; await getSubProcessById(subProcessId); }
+  if (riskControlMatrixId) { selectedRiskControlMatrixId.value = riskControlMatrixId; await getRiskControlMatrixById(riskControlMatrixId); }
+  if (objectiveId) { selectedObjectiveId.value = objectiveId; await getObjectiveById(objectiveId); }
+  if (riskId) { selectedRiskId.value = riskId; await getRiskById(riskId); }
 
   // Clean up URL
   if (subDepartmentId || auditProcessId || subProcessId || riskControlMatrixId || objectiveId || riskId) {
@@ -382,47 +281,11 @@ const handleRouteQueries = async () => {
 
 // Init
 onMounted(async () => {
-  await fetchData();
+  await refreshSubDepartments();
+  await refreshAuditProcesses();
   await handleRouteQueries();
 });
 
 watch(() => route.query, handleRouteQueries);
+
 </script>
-
-
-<style scoped>
-/* Existing styles remain unchanged */
-.min-h-\[calc\(100vh-4rem\)\] {
-  min-height: calc(100vh - 4rem);
-  min-height: calc(100dvh - 4rem);
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-@media (max-width: 640px) {
-  .p-2 { padding: 0.5rem; }
-  .mb-4 { margin-bottom: 1rem; }
-  .gap-3 { gap: 0.75rem; }
-}
-
-@media (max-width: 480px) {
-  .p-2 { padding: 0.375rem; }
-  .mb-4 { margin-bottom: 0.75rem; }
-  .gap-3 { gap: 0.5rem; }
-  .space-x-2 > :not([hidden]) ~ :not([hidden]) {
-    margin-left: 0.25rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .p-2 { padding: 0.25rem; }
-  .flex-shrink-0 { min-width: fit-content; }
-}
-</style>

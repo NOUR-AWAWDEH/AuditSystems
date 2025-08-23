@@ -3,7 +3,7 @@ import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
 const RISK_API_ENDPOINT = '/api/Risk';
-const RISK_API_ENDPOINT_ID = '/update-risk';
+const RISK_API_ENDPOINT_ID = '/update-risk-by-id';
 
 export const updateRiskByIdRepository = {
     async updateRiskById(riskData) {
@@ -18,7 +18,7 @@ export const updateRiskByIdRepository = {
                 objectiveId: (riskData.objectiveId && typeof riskData.objectiveId === 'object')
                         ? riskData.objectiveId.value || riskData.objectiveId.id
                         : riskData.objectiveId,
-                rateId: riskData.reateId
+                rateId: riskData.rateId
             };
 
             const response = await api.put(

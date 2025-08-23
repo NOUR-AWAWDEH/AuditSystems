@@ -57,12 +57,13 @@
             </div>
         </div>
         <!-- Edit Risk Modal -->
+
         <EditRiskModal
             v-if="showEditRiskModal"
             :is-visible="showEditRiskModal"
             :risk="riskToEdit"
             @close="handleCloseEditRiskModal"
-            @updated="handleRiskUpdated"
+            @risk-updated="handleRiskUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -70,7 +71,7 @@
             v-model="showDeleteDialog"
             :title="deleteDialogTitle"
             :message="deleteDialogMessage"
-            :highlight-text="itemToDelete?.nameRisk || ''"
+            :highlight-text="itemToDelete?.riskName || ''"
             :confirm-text="'Delete'"
             :cancel-text="'Cancel'"
             @confirm="confirmDelete"

@@ -61,6 +61,7 @@
 
               <!-- Rate Selector -->
               <RateSelector
+                v-if="!isLoadingRates"
                 :rates="rates"
                 :selectedRateId="selectedRateId"
                 label="Risk Level"
@@ -123,6 +124,11 @@ const emit = defineEmits(['close', 'risk-added']);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createRisk, resetState } = useCreateRisk();
+const rates = ref([]);
+const isLoadingRates = ref(true);
+
+const { searchRates, searchResults } = useSearchRates();
+const selectedRateId = ref('');
 
 const formData = ref({
   riskName: '',
@@ -136,8 +142,14 @@ const errors = ref({
   rate: ''
 });
 
-watch(() => props.isVisible, (newValue) => {
-  if (newValue) resetForm();
+watch(() => props.isVisible, async (newValue) => {
+  if (newValue) {
+    resetForm();
+    isLoadingRates.value = true; // Start loading
+    await searchRates(); // Fetch rates
+    rates.value = searchResults.value; // Assign fetched rates to the reactive rates ref
+    isLoadingRates.value = false; // End loading
+  }
 });
 
 const resetForm = () => {
@@ -148,8 +160,7 @@ const resetForm = () => {
   resetState();
 };
 
-const { searchResults: rates } = useSearchRates();
-const selectedRateId = ref('');
+
 
 const handleRateChange = (value) => {
   selectedRateId.value = value;

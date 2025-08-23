@@ -30,7 +30,7 @@ public sealed class RiskController(IMediator mediator) : ApiControllerBase(media
         await ProcessRequestToActionResultAsync(command);
 
     //Update Risk
-    [HttpPut("update-risk")]
+    [HttpPut("update-risk-by-id")]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateRisk([FromBody] UpdateRiskCommand command) =>

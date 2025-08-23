@@ -2,16 +2,13 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="isVisible" class="fixed inset-0 flex items-center justify-center p-4">
-        <!-- Overlay -->
         <div
           class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
           @click="$emit('close')"
         ></div>
 
         <!-- Modal -->
-        <div
-          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
-        >
+        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
             <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Risk</h3>
@@ -26,7 +23,7 @@
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Risk Name -->
+              <!-- Risk Name Field -->
               <div>
                 <label for="risk-name" class="block text-sm font-medium text-gray-700">
                   Risk Name *
@@ -39,7 +36,9 @@
                     errors.riskName ? 'border-error' : 'border-gray-tint'
                   } focus:ring-primary-base`"
                 />
-                <p v-if="errors.riskName" class="text-error text-sm mt-1">{{ errors.riskName }}</p>
+                <p v-if="errors.riskName" class="text-error text-sm mt-1">
+                  {{ errors.riskName }}
+                </p>
               </div>
 
               <!-- Risk Description -->
@@ -55,11 +54,14 @@
                     errors.description ? 'border-error' : 'border-gray-tint'
                   } focus:ring-primary-base`"
                 />
-                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
+                <p v-if="errors.description" class="text-error text-sm mt-1">
+                  {{ errors.description }}
+                </p>
               </div>
 
               <!-- Rate Selector -->
               <RateSelector
+                v-if="!isLoadingRates"
                 :rates="rates"
                 :selectedRateId="selectedRateId"
                 label="Risk Level"
@@ -67,14 +69,16 @@
                 :error="errors.rate"
                 @update:selectedRateId="handleRateChange"
               />
-              <p v-if="errors.rate" class="text-error text-sm mt-1">{{ errors.rate }}</p>
+              <p v-if="errors.rate" class="text-error text-sm mt-1">
+                {{ errors.rate }}
+              </p>
 
               <!-- API Error -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                 <p class="text-error text-sm">{{ error }}</p>
               </div>
 
-              <!-- Actions -->
+              <!-- Action Buttons -->
               <div class="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
@@ -90,8 +94,8 @@
                   :disabled="!formData.riskName.trim() || isUpdating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
-                  <span v-if="isUpdating">Editing...</span>
-                  <span v-else>Edit Risk</span>
+                  <span v-if="isUpdating">Updating...</span>
+                  <span v-else>Update Risk</span>
                 </button>
               </div>
             </form>
@@ -103,54 +107,54 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
+import { useUpdateRiskById } from '@/composables/riskControl/risk/useUpdateRiskById';
+import { useNotification } from '@/composables/notification/useNotification';
 import RateSelector from '@/components/common/rate/RateSelector.vue';
-import { useUpdateRiskById } from '@/composables/riskControl/risk/useUpdateRiskById.js';
 import { useSearchRates } from '@/composables/common/rate/useSearchRates';
 
-// Props
 const props = defineProps({
   isVisible: { type: Boolean, default: false },
-  objectiveId: { type: [String, Number], default: null },
-  risk: { type: Object, default: null }
+  risk: { type: Object, default: () => ({}) }
 });
 
 const emit = defineEmits(['close', 'risk-updated']);
 
+const { showNotification } = useNotification();
 const { isUpdating, error, updateRisk, resetState } = useUpdateRiskById();
+const rates = ref([]);
+const isLoadingRates = ref(true);
 
-// Form state
+const { searchRates, searchResults } = useSearchRates();
+const selectedRateId = ref('');
+
 const formData = ref({
   riskName: '',
-  description: ''
+  description: '',
+  rate: ''
 });
+
 const errors = ref({
   riskName: '',
   description: '',
   rate: ''
 });
 
-// Rates from API
-const { searchResults: rates } = useSearchRates();
-const selectedRateId = ref('');
-
-// Prefill form when modal opens
-watch(
-  () => props.isVisible,
-  (visible) => {
-    if (visible) resetForm();
-  }
-);
+onMounted( async () => {
+    resetForm();
+    isLoadingRates.value = true; // Start loading
+    await searchRates(); // Fetch rates
+    rates.value = searchResults.value; // Assign fetched rates to the reactive rates ref
+    isLoadingRates.value = false; // End loading
+});
 
 const resetForm = () => {
-  formData.value = {
-    riskName: props.risk?.riskName || '',
-    description: props.risk?.description || ''
-  };
-  selectedRateId.value = props.risk?.rateId || '';
+  formData.value = { riskName: '', description: '', rate: '' };
+
   errors.value = { riskName: '', description: '', rate: '' };
+  selectedRateId.value = '';
   resetState();
 };
 
@@ -160,42 +164,57 @@ const handleRateChange = (value) => {
 
 const validateForm = () => {
   errors.value = { riskName: '', description: '', rate: '' };
-  let valid = true;
+  let isValid = true;
 
   if (!formData.value.riskName.trim()) {
     errors.value.riskName = 'Risk name is required';
-    valid = false;
+    isValid = false;
   }
   if (!formData.value.description.trim()) {
     errors.value.description = 'Risk description is required';
-    valid = false;
+    isValid = false;
   }
   if (!selectedRateId.value) {
     errors.value.rate = 'Risk rate is required';
-    valid = false;
+    isValid = false;
   }
 
-  return valid;
+  return isValid;
 };
 
 const handleSubmit = async () => {
-  if (!props.objectiveId) return;
+  if (!props.risk.id) {
+    showNotification('Risk is required', 'error');
+    return;
+  }
+  if (!props.risk.objectiveId) {
+    showNotification('Objective is requerd', 'error');
+  }
 
   if (!validateForm()) return;
 
-  const riskData = {
-    id: props.risk?.id,
-    riskName: formData.value.riskName.trim(),
-    description: formData.value.description.trim(),
-    rateId: selectedRateId.value,
-    objectiveId: props.objectiveId
-  };
+  try {
+    const riskData = {
+      id: props.risk.id,
+      riskName: formData.value.riskName.trim(),
+      description: formData.value.description.trim(),
+      objectiveId: props.risk.objectiveId,
+      rateId: selectedRateId.value,
+    };
 
-  const result = await updateRisk(riskData);
+    const result = await updateRisk(riskData);
 
-  if (result?.success) {
-    emit('risk-updated', result.data);
-    emit('close');
+
+    if (result?.success) {
+      showNotification(`Risk "${formData.value.riskName}" has been added successfully!`, 'success');
+      emit('risk-updated', result.data);
+      emit('close');
+    } else {
+      showNotification(result?.message || 'Failed to create risk', 'error');
+    }
+  } catch (err) {
+    console.error('Error creating risk:', err);
+    showNotification('Failed to create risk. Please try again.', 'error');
   }
 };
 </script>

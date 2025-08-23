@@ -48,7 +48,7 @@ export function useUpdateRiskById() {
 
       // API call
       const response = await updateRiskByIdRepository.updateRiskById(riskData);
-
+      
       if (response?.success) {
         return handleUpdateSuccess(response);
       } else {

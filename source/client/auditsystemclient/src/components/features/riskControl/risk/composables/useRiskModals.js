@@ -38,9 +38,11 @@
 
 import { ref } from 'vue';
 import { useDeleteRiskById } from '@/composables/riskControl/risk/useDeleteRiskById';
+import { useNotification } from '@/composables/notification/useNotification';
 
-export function useRiskModals(refreshData, showNotification) {
+export function useRiskModals(refreshData, emit) {
     const { deleteRisk } = useDeleteRiskById();
+    const { showNotification } = useNotification();
 
     const showAddRiskModal = ref(false);
     const showEditRiskModal = ref(false);
@@ -61,6 +63,7 @@ export function useRiskModals(refreshData, showNotification) {
     const handleRiskAdded = async () => {
         try {
             await refreshData();
+            emit('risk-added');
             handleCloseAddRiskModal();
         } catch (error) {
             console.error('Error in handleRiskAdded:', error);
@@ -81,6 +84,7 @@ export function useRiskModals(refreshData, showNotification) {
     const handleRiskUpdated = async () => {
         const riskName = riskToEdit.value?.riskName || 'Unknown risk';
         await refreshData();
+        emit('risk-updated');
         showNotification(`Risk "${riskName}" has been updated successfully!`, 'success');
         handleCloseEditRiskModal();
     };
@@ -94,14 +98,22 @@ export function useRiskModals(refreshData, showNotification) {
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteRisk(itemToDelete.value.id);
+            const deletedRisk = { ...itemToDelete.value };
+            const result = await deleteRisk(deletedRisk.id);
+
             if (result.success) {
-                showNotification(`Risk "${itemToDelete.value.riskName}" has been deleted successfully!`, 'success');
+                showNotification(
+                    `Risk "${deletedRisk.riskName}" has been deleted successfully!`,
+                    'success'
+                );
                 localStorage.removeItem('riskControlSelectedRiskId');
-                setTimeout(async () => {
-                    await refreshData();
-                }, 100);
+
+            setTimeout(async () => {
+                await refreshData();
+                emit('risk-deleted', deletedRisk.id);
+            }, 100);
             }
+
             cancelDelete();
         }
     };

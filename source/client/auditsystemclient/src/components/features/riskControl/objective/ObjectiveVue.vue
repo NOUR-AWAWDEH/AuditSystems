@@ -81,7 +81,6 @@
 
 <script setup>
 import { watch, onMounted, ref  } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import ObjectiveTable from './components/ObjectiveTable.vue';
 import AddObjectiveModal from './components/AddObjectiveModal.vue';
@@ -104,10 +103,9 @@ const props = defineProps({
 
 
 // Define emit first
-const emit = defineEmits(['objective-selected', 'objective-added']);
+const emit = defineEmits(['objective-selected', 'objective-added', 'objective-updated', 'objective-deleted']);
 
 
-const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 
@@ -168,14 +166,15 @@ const {
     deleteDialogMessage,
     itemToDelete,
     handleAddObjective,
-    handleCloseAddObjectiveModal,
     handleEditObjective,
-    handleCloseEditObjectiveModal,
+    handleObjectiveAdded,
     handleObjectiveUpdated,
-    handleDeleteObjective,
     confirmDelete,
+    handleCloseAddObjectiveModal,
+    handleCloseEditObjectiveModal,
+    handleDeleteObjective,
     cancelDelete
-} = useObjectiveModals(refreshData, showNotification);
+} = useObjectiveModals(refreshData, emit);
 
 
 // Handle objective selection and forward to parent
@@ -183,12 +182,6 @@ const handleObjectiveSelected = (objectiveId) => {
     emit('objective-selected', objectiveId);
 };
 
-const handleObjectiveAdded = () => {
-  // refresh local table
-  refreshData();
-  // bubble up to parent (RiskControl.vue)
-  emit('objective-added');
-};
 
 defineExpose({
     objectives,

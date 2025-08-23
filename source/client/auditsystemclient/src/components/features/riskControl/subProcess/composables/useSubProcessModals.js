@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteSubProcessById } from '@/composables/riskControl/subProcess/useDeleteSubProcessById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSubProcessModals(refreshData) {
+export function useSubProcessModals(refreshData, emit) {
     const { deleteSubProcess } = useDeleteSubProcessById();
     const { showNotification } = useNotification();
 
@@ -25,6 +25,7 @@ export function useSubProcessModals(refreshData) {
     const handleSubProcessAdded = async () => {
         try {
             await refreshData();
+            emit('sub-process-added');
             handleCloseAddSubProcessModal();
         } catch (error) {
             console.error('Error in handleSubProcessAdded:', error);
@@ -46,6 +47,7 @@ export function useSubProcessModals(refreshData) {
         // Store the particular subprocess name before clearing the reference
         const particular = subProcessToEdit.value?.particular || 'Unknown Process';
         await refreshData();
+        emit('sub-process-updated');
         showNotification(`SubProcess "${particular}" has been updated successfully!`, 'success');
         handleCloseEditSubProcessModal();
     };
@@ -59,17 +61,26 @@ export function useSubProcessModals(refreshData) {
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteSubProcess(itemToDelete.value.id);
+            const deletedSubProcess = { ...itemToDelete.value };
+            const result = await deleteSubProcess(deletedSubProcess.id);
+
             if (result.success) {
-                showNotification(`SubProcess "${itemToDelete.value.particular}" has been deleted successfully!`, 'success');
-                localStorage.removeItem("riskControlSelectedSubProcessId");
-                setTimeout(async () => {
-                    await refreshData();
-                }, 100);
+            showNotification(
+                `SubProcess "${deletedSubProcess.particular}" has been deleted successfully!`,
+                'success'
+            );
+            localStorage.removeItem("riskControlSelectedSubProcessId");
+
+            setTimeout(async () => {
+                await refreshData();
+                emit('sub-process-deleted', deletedSubProcess.id);
+            }, 100);
             }
+
             cancelDelete();
         }
     };
+
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

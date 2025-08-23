@@ -82,7 +82,6 @@
 
 <script setup>
 import { watch, onMounted, ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubProcessTable from './components/SubProcessTable.vue';
 import AddSubProcessModal from './components/AddSubProcessModal.vue';
@@ -102,9 +101,8 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['sub-process-selected', 'sub-process-added']);
+const emit = defineEmits(['sub-process-selected', 'sub-process-added','sub-process-updated', 'sub-process-deleted']);
 
-const { showNotification } = useNotification();
 
 // Use composables -now with integrated backend search
 const {
@@ -166,23 +164,18 @@ const {
   handleCloseAddSubProcessModal,
   handleEditSubProcess,
   handleCloseEditSubProcessModal,
+  handleSubProcessAdded,
   handleSubProcessUpdated,
   handleDeleteSubProcess,
   confirmDelete,
   cancelDelete,
-} = useSubProcessModals(refreshData, showNotification);
+} = useSubProcessModals(refreshData, emit);
 
 // Handle sub-process selection and forward to parent
 const handleSubProcessSelected = (subProcessId) => {
   emit('sub-process-selected', subProcessId);
 };
 
-// Handle sub-process addition and refresh
-const handleSubProcessAdded = () => {
-  // bubble up to parent (RiskControl.vue)
-  refreshData();
-  emit('sub-process-added');
-};
 
 
 defineExpose({

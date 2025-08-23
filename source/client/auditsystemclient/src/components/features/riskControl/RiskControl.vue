@@ -44,7 +44,9 @@
             :sub-departments="subDepartments"
             :selected-sub-department-id="selectedSubDepartmentId"
             @audit-process-selected="handleAuditProcessSelected"
-            @audit-process-added="handleAuditProcessAdded"
+            @audit-process-added="refreshAuditProcesses"
+            @audit-process-updated="refreshAuditProcesses"
+            @audit-process-deleted="refreshAuditProcesses"
           />
         </div>
 
@@ -54,7 +56,9 @@
             :audit-processes="auditProcesses"
             :selected-audit-process-id="selectedAuditProcessId"
             @sub-process-selected="handleSubProcessSelected"
-            @sub-process-added="handleSubProcessAdded"
+            @sub-process-added="refreshSubProcesses"
+            @sub-process-updated="refreshSubProcesses"
+            @sub-process-deleted="refreshSubProcesses"
           />
         </div>
 
@@ -64,7 +68,9 @@
             :sub-processes="subProcesses"
             :selected-sub-process-id="selectedSubProcessId"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
-            @risk-control-matrix-added="handleRiskControlMatrixAdded"
+            @risk-control-matrix-added="refreshRiskControlMatrices"
+            @risk-control-matrix-updated="refreshRiskControlMatrices"
+            @risk-control-matrix-deleted="refreshRiskControlMatrices"
           />
         </div>
 
@@ -74,7 +80,9 @@
             :risk-control-matrices="riskControlMatrices"
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
             @objective-selected="handleObjectiveSelected"
-            @objective-added="handleObjectiveAdded"
+            @objective-added="refreshObjectives"
+            @objective-updated="refreshObjectives"
+            @objective-deleted="refreshObjectives"
           />
         </div>
 
@@ -84,7 +92,9 @@
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @risk-selected="handleRiskSelected"
-            @risk-added="handleRiskAdded"
+            @risk-added="refreshRisks"
+            @risk-updated="refreshRisks"
+            @risk-deleted="refreshRisks"
           />
         </div>
 
@@ -293,32 +303,37 @@ const handleRiskSelected = async (id) => {
   //setActiveTab('controls');
 };
 
-// Handle  added
 
-const handleAuditProcessAdded = async () => {
+// Refreshers 
+
+// Refresh Audit Processes
+const refreshAuditProcesses = async () => {
   await getAuditProcessesByUserId();
 };
 
-const handleSubProcessAdded = async () => {
+// Refresh Sub Processes
+const refreshSubProcesses = async () => {
   await getSubProcessesByUserId();
 };
 
-const handleRiskControlMatrixAdded = async () => {
+// Refresh Risk Control Matrices
+const refreshRiskControlMatrices = async () => {
   await getRiskControlMatricesByUserId();
 };
 
-const handleObjectiveAdded = async () => {
+// Refresh Objectives
+const refreshObjectives = async () => {
   await getObjectivesByUserId();
 };
 
-const handleRiskAdded = async () => {
+// Refresh Risks
+const refreshRisks = async () => {
   await getRisksByUserId();
 };
 
 
-// const handleExitRiskAdded = () => {
-//   fetchData();
-// };
+
+
 
 
 

@@ -81,7 +81,6 @@
 
 <script setup>
 import { watch, onMounted, ref  } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskTable from './components/RiskTable.vue';
 import AddRiskModal from './components/AddRiskModal.vue';
@@ -104,9 +103,8 @@ const props = defineProps({
 
 
 // Define emit first
-const emit = defineEmits(['risk-selected', 'risk-added']);
+const emit = defineEmits(['risk-selected', 'risk-added', 'risk-updated','risk-deleted']);
 
-const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 
@@ -170,22 +168,17 @@ const {
     handleCloseAddRiskModal,
     handleEditRisk,
     handleCloseEditRiskModal,
+    handleRiskAdded,
     handleRiskUpdated,
     handleDeleteRisk,
     confirmDelete,
     cancelDelete
-} = useRiskModals(refreshData, showNotification);
+} = useRiskModals(refreshData, emit);
 
 
 // Handle risk selection and forward to parent
 const handleRiskSelected = (riskId) => {
     emit('risk-selected', riskId);
-};
-
-// Handle risk addition and forward to parent
-const handleRiskAdded = () => {
-    refreshData();
-    emit('risk-added');
 };
 
 defineExpose({

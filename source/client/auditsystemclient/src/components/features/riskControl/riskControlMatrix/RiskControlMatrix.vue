@@ -81,7 +81,6 @@
 
 <script setup>
 import { watch, onMounted, ref  } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
 import AddRiskControlMatrixModal from './components/AddRiskControlMatrixModal.vue';
@@ -102,7 +101,6 @@ const props = defineProps({
 });
 
 
-
 const internalRCM = ref([]);
 
 watch(
@@ -114,9 +112,8 @@ watch(
 );
 
 // Define emit first
-const emit = defineEmits(['risk-control-matrix-selected', 'risk-control-matrix-added']);
+const emit = defineEmits(['risk-control-matrix-selected', 'risk-control-matrix-added', 'risk-control-matrix-updated', 'risk-control-matrix-deleted']);
 
-const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 
@@ -180,21 +177,16 @@ const {
     handleCloseAddRiskControlMatrixModal,
     handleEditRiskControlMatrix,
     handleCloseEditRiskControlMatrixModal,
+    handleRiskControlMatrixAdded,
     handleRiskControlMatrixUpdated,
     handleDeleteRiskControlMatrix,
     confirmDelete,
     cancelDelete
-} = useRiskControlMatrixModals(refreshData, showNotification);
+} = useRiskControlMatrixModals(refreshData, emit);
 
 // Handle risk control matrix selection and forward to parent
 const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
     emit('risk-control-matrix-selected', riskControlMatrixId);
-};
-
-// Handle risk control matrix addition and forward to parent
-const handleRiskControlMatrixAdded = () => {
-    refreshData();
-    emit('risk-control-matrix-added');
 };
 
 defineExpose({

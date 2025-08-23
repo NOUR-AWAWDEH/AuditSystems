@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteAuditProcessById } from '@/composables/riskControl/auditProcess/useDeleteAuditProcessById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useAuditProcessModals(refreshData) {
+export function useAuditProcessModals(refreshData, emit) {
     const { deleteAuditProcess } = useDeleteAuditProcessById();
     const { showNotification } = useNotification();
 
@@ -25,6 +25,7 @@ export function useAuditProcessModals(refreshData) {
     const handleAuditProcessAdded = async () => {
         try {
             await refreshData();
+            emit('audit-process-added');
             handleCloseAddAuditProcessModal();
         } catch (error) {
             console.error('Error in handleAuditProcessAdded:', error);
@@ -46,6 +47,7 @@ export function useAuditProcessModals(refreshData) {
         // Store the process name before clearing the reference
         const processName = auditProcessToEdit.value?.processName || 'Unknown Process';
         await refreshData();
+        emit('audit-process-updated');
         showNotification(`Process "${processName}" has been updated successfully!`, 'success');
         handleCloseEditAuditProcessModal();
     };
@@ -59,12 +61,15 @@ export function useAuditProcessModals(refreshData) {
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteAuditProcess(itemToDelete.value.id);
+            const deleteProcess = { ...itemToDelete.value };
+            const result = await deleteAuditProcess(deleteProcess.id);
             if (result.success) {
-                showNotification(`Process "${itemToDelete.value.processName}" has been deleted successfully!`, 'success');
+                showNotification(`Process "${deleteProcess.processName}" has been deleted successfully!`, 'success');
                 localStorage.removeItem('riskControlSelectedAuditProcessId');
+                
                 setTimeout(async () => {
                     await refreshData();
+                    emit('audit-process-deleted', deleteProcess.id);
                 }, 100);
             }
             cancelDelete();

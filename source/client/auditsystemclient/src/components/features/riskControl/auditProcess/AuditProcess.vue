@@ -84,7 +84,6 @@
 
 <script setup>
 import { watch, onMounted } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProcessTable from './components/AuditProcessTable.vue';
 import AddAuditProcessModal from './components/AddAuditProcessModal.vue';
@@ -105,9 +104,7 @@ const props = defineProps({
 });
 
 // Define emit first
-const emit = defineEmits(['audit-process-selected','audit-process-added' ]);
-
-const { showNotification } = useNotification();
+const emit = defineEmits(['audit-process-selected','audit-process-added','audit-process-updated','audit-process-deleted' ]);
 
 // Use composables - now with integrated backend search
 const {
@@ -154,26 +151,20 @@ const {
     deleteDialogMessage,
     itemToDelete,
     handleAddAuditProcess,
-    handleCloseAddAuditProcessModal,
     handleEditAuditProcess,
-    handleCloseEditAuditProcessModal,
-    handleAuditProcessUpdated,
     handleDeleteAuditProcess,
+    handleCloseAddAuditProcessModal,
+    handleAuditProcessAdded,
+    handleAuditProcessUpdated,
     confirmDelete,
+    handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(refreshData, showNotification);
+} = useAuditProcessModals(refreshData, emit);
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {
     emit('audit-process-selected', auditProcessId);
 };
-
-// Handle audit process added
-const handleAuditProcessAdded = () => {
-    refreshData();
-    emit('audit-process-added');
-};
-
 
 defineExpose({
     auditProcesses,

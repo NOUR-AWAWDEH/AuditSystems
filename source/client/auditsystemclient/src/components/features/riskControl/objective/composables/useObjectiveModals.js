@@ -1,9 +1,11 @@
 import { ref } from 'vue';
 import { useDeleteObjectiveById } from '@/composables/riskControl/objective/useDeleteObjectiveById';
+import { useNotification } from '@/composables/notification/useNotification';
 
-export function useObjectiveModals(refreshData, showNotification) {
+export function useObjectiveModals(refreshData, emit) {
 
     const { deleteObjective } = useDeleteObjectiveById();
+    const { showNotification } = useNotification();
 
     const showAddObjectiveModal = ref(false);
     const showEditObjectiveModal = ref(false);
@@ -24,6 +26,8 @@ export function useObjectiveModals(refreshData, showNotification) {
     const handleObjectiveAdded = async () => {
         try {
             await refreshData();
+            emit('objective-added');
+
             handleCloseAddObjectiveModal();
         } catch (error) {
             console.error('Error in handleObjectiveAdded:', error);
@@ -45,6 +49,8 @@ export function useObjectiveModals(refreshData, showNotification) {
         // Store the description objective name before clearing the reference
         const description = objectiveToEdit.value?.description || 'Unknown Objective';
         await refreshData();
+        emit('objective-updated');
+
         showNotification(`Objective "${description}" has been updated successfully!`, 'success');
         handleCloseEditObjectiveModal();
     };
@@ -57,18 +63,27 @@ export function useObjectiveModals(refreshData, showNotification) {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete.value) {
-            const result = await deleteObjective(itemToDelete.value.id);
-            if (result.success) {
-                showNotification(`Objective "${itemToDelete.value.description}" has been deleted successfully!`, 'success');
-                localStorage.removeItem('riskControlSelectedObjectiveId');
-                setTimeout(async () => {
-                    await refreshData();
-                }, 100);
-            }
-            cancelDelete();
+      if (itemToDelete.value) {
+        const deletedObjective = { ...itemToDelete.value };
+        const result = await deleteObjective(deletedObjective.id);
+
+        if (result.success) {
+          showNotification(
+            `Objective "${deletedObjective.description}" has been deleted successfully!`,
+            'success'
+          );
+          localStorage.removeItem('riskControlSelectedObjectiveId');
+
+          setTimeout(async () => {
+            await refreshData();
+            emit('objective-deleted', deletedObjective.id);
+          }, 100);
         }
+
+        cancelDelete();
+      }
     };
+
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

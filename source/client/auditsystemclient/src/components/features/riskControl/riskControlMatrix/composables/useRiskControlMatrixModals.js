@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useDeleteRiskControlMatrixById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useRiskControlMatrixModals(refreshData) {
+export function useRiskControlMatrixModals(refreshData, emit) {
     const { deleteRiskControlMatrix } = useDeleteRiskControlMatrixById();
     const { showNotification } = useNotification();
 
@@ -25,6 +25,7 @@ export function useRiskControlMatrixModals(refreshData) {
     const handleRiskControlMatrixAdded = async () => {
         try {
             await refreshData();
+            emit('risk-control-matrix-added');
             handleCloseAddRiskControlMatrixModal();
         } catch (error) {
             console.error('Error in handleRiskControlMatrixAdded:', error);
@@ -46,6 +47,7 @@ export function useRiskControlMatrixModals(refreshData) {
         // Store the description risk control matrix name before clearing the reference
         const description = riskControlMatrixToEdit.value?.description || 'Unknown Risk Control Matrix';
         await refreshData();
+        emit('risk-control-matrix-updated');
         showNotification(`Risk Control Matrix "${description}" has been updated successfully!`, 'success');
         handleCloseEditRiskControlMatrixModal();
     };
@@ -59,17 +61,26 @@ export function useRiskControlMatrixModals(refreshData) {
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
-            const result = await deleteRiskControlMatrix(itemToDelete.value.id);
+            const deletedMatrix = { ...itemToDelete.value };
+            const result = await deleteRiskControlMatrix(deletedMatrix.id);
+
             if (result.success) {
-                showNotification(`Risk Control Matrix "${itemToDelete.value.description}" has been deleted successfully!`, 'success');
-                localStorage.removeItem("riskControlSelectedRiskControlMatrixId");
-                setTimeout(async () => {
-                    await refreshData();
-                }, 100);
+            showNotification(
+                `Risk Control Matrix "${deletedMatrix.description}" has been deleted successfully!`,
+                'success'
+            );
+            localStorage.removeItem("riskControlSelectedRiskControlMatrixId");
+
+            setTimeout(async () => {
+                await refreshData();
+                emit('risk-control-matrix-deleted', deletedMatrix.id);
+            }, 100);
             }
+
             cancelDelete();
         }
     };
+
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

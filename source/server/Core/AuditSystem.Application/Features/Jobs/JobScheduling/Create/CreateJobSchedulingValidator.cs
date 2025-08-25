@@ -42,12 +42,12 @@ public sealed class CreateJobSchedulingValidator : AbstractValidator<CreateJobSc
 
     private bool YearMustBeValid(DateOnly date)
     {
-        return date.Year <= DateTime.Now.Year;
+        return date.Year <= DateTime.UtcNow.Year;
     }
 
 
     private bool DateMustBeInFuture(DateOnly date)
     {
-        return date > DateOnly.FromDateTime(DateTime.Now);
+        return date > DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

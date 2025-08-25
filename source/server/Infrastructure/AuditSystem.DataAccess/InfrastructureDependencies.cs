@@ -71,13 +71,28 @@ public static class InfrastructureDependencies
 
     private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration, bool isProduction)
     {
-        var connectionString = configuration[ConfigurationKeys.DefaultConnectionString] ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
+        // Using Sql Server
+
+        //var connectionString = configuration[ConfigurationKeys.DefaultConnectionString] ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
+        //return services.AddDbContext<ApplicationDbContext>(options =>
+        //    options.UseSqlServer(connectionString)
+        //           .EnableSensitiveDataLogging(false)
+        //           .LogTo(Console.WriteLine, LogLevel.Information)
+        //           .ConfigureWarnings(warnings => warnings.Ignore(
+        //                Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.SavepointsDisabledBecauseOfMARS)));
+
+        // Using PostgreSQL
+
+        var connectionString = configuration[ConfigurationKeys.DefaultConnectionString]
+                ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
+
         return services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString)
+            options.UseNpgsql(connectionString)
                    .EnableSensitiveDataLogging(false)
                    .LogTo(Console.WriteLine, LogLevel.Information)
                    .ConfigureWarnings(warnings => warnings.Ignore(
-                        Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.SavepointsDisabledBecauseOfMARS)));
+                        Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning))
+        );
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>

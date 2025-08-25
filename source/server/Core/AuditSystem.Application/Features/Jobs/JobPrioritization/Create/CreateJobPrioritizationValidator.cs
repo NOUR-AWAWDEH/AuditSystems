@@ -46,6 +46,6 @@ public sealed class CreateJobPrioritizationValidator : AbstractValidator<CreateJ
 
     private bool YearMustBeValid(DateOnly date)
     {
-        return date.Year <= DateTime.Now.Year;
+        return date.Year <= DateTime.UtcNow.Year;
     }
 }

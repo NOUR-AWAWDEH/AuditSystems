@@ -59,6 +59,6 @@ public sealed class CreateAuditEngagementValidator : AbstractValidator<CreateAud
 
     private bool DateMustBeInFuture(DateOnly date)
     {
-        return date > DateOnly.FromDateTime(DateTime.Now);
+        return date > DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }

@@ -14,9 +14,6 @@ public class SupportingDocConfigration : IEntityTypeConfiguration<SupportingDoc>
         // Configure primary key
         builder.HasKey(x => x.Id);
         
-        builder.Property(x => x.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
         
         // Configure properties
         builder.Property(x => x.FileName)

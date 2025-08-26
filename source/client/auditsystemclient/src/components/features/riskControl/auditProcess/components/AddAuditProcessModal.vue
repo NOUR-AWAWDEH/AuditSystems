@@ -139,8 +139,8 @@ const handleSubmit = async () => {
             };
 
             showNotification(`Audit Process "${formData.value.name}" has been added successfully!`, 'success');
-            
-            emit('audit-process-added', newAuditProcess); // send full object to parent
+
+            emit('audit-process-added', newAuditProcess);
             emit('close');
         }
         else {

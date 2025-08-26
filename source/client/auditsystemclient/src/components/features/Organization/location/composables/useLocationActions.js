@@ -1,8 +1,10 @@
 import { ref } from 'vue';
 import { useDeleteLocationById } from '@/composables/organization/location/useDeleteLocationById';
+import { useNotification } from '@/composables/notification/useNotification';
 
-export function useLocationActions(refreshData, showNotification, onLocationDeleted = null) {
+export function useLocationActions(locations, emit) {
     const { deleteLocation } = useDeleteLocationById();
+    const { showNotification } = useNotification();
 
     // Modal states
     const showAddLocationModal = ref(false);
@@ -23,26 +25,45 @@ export function useLocationActions(refreshData, showNotification, onLocationDele
     };
 
     const handleLocationAdded = async (newLocation) => {
-        await refreshData(); 
-        showNotification(`Location "${newLocation.name}" has been added successfully!`, 'success');
+        locations.value.push(newLocation);
+        emit('location-added',newLocation);
         handleCloseAddLocationModal();
     };
 
     // Location actions
     const handleEditLocation = (location) => {
         locationToEdit.value = location;
-        showEditLocationModal.value = true; // Changed from showEditModal
+        showEditLocationModal.value = true;
     };
 
-    const handleCloseEditLocationModal = () => { // Changed function name
-        showEditLocationModal.value = false; // Changed from showEditModal
+    const handleCloseEditLocationModal = () => {
+        showEditLocationModal.value = false;
         locationToEdit.value = null;
     };
 
     const handleLocationUpdated = async (updatedLocation) => {
-        await refreshData();
-        showNotification(`Location "${updatedLocation.name}" has been updated successfully!`, 'success');
+      try {
+        // Find and replace the updated location in the local list
+        const index = locations.value.findIndex(
+          loc => loc.id === updatedLocation.id
+        );
+
+        if (index !== -1) {
+            locations.value[index] = { ...locations.value[index], ...updatedLocation };
+        }
+
+        emit('location-updated', updatedLocation);
+
+        showNotification(
+          `Location "${updatedLocation.name}" has been updated successfully!`,
+           'success'
+        );
+
         handleCloseEditLocationModal();
+      } catch (error) {
+        console.error('Error updating location:', error);
+        showNotification(`Failed to update location.`, 'error');
+      }
     };
 
     const handleDeleteLocation = (location) => {
@@ -54,28 +75,35 @@ export function useLocationActions(refreshData, showNotification, onLocationDele
 
     // Delete confirmation
     const confirmDelete = async () => {
-        if (itemToDelete.value) {
-            const deletedLocationId = itemToDelete.value.id;
-            const result = await deleteLocation(itemToDelete.value.id, itemToDelete.value.name);
-            
-            if (result.success) {
-                showNotification(`Location "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
-                await refreshData();
-                
-                // Notify parent component about location deletion
-                if (onLocationDeleted) {
-                    onLocationDeleted(deletedLocationId);
-                }
-            }
-            
-            itemToDelete.value = null;
-            showDeleteDialog.value = false;
+        if (!itemToDelete.value) return;
+
+        const deletedLocation = { ...itemToDelete.value };
+        const result = await deleteLocation(deletedLocation.id);
+
+        if (result.success) {
+          // Remove the deleted location from the local list
+          const index = locations.value.findIndex(loc => loc.id === deletedLocation.id);
+          if (index !== -1) {
+              locations.value.splice(index, 1); // <-- reactive change
+          }
+
+          showNotification(
+            `Location "${deletedLocation.name}" has been deleted successfully!`,
+            'success'
+          );
+
+          localStorage.removeItem('organizationSelectedLocationId');
+
+          emit('location-deleted', deletedLocation.id);
         }
+        cancelDelete();
     };
 
     const cancelDelete = () => {
-        itemToDelete.value = null;
         showDeleteDialog.value = false;
+        itemToDelete.value = null;
+        deleteDialogTitle.value = '';
+        deleteDialogMessage.value = '';
     };
 
     return {
@@ -87,7 +115,7 @@ export function useLocationActions(refreshData, showNotification, onLocationDele
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
-        
+
         // Action handlers
         handleAddLocation,
         handleCloseAddLocationModal,

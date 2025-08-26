@@ -83,7 +83,7 @@ export function useAuditProcessModals(auditProcesses, emit) {
         const result = await deleteAuditProcess(deleteProcess.id);
 
         if (result.success) {
-            // 🔥 Remove in place
+            // Remove the deleted audit process from the local list
             const index = auditProcesses.value.findIndex(p => p.id === deleteProcess.id);
             if (index !== -1) {
                 auditProcesses.value.splice(index, 1); // <-- reactive change
@@ -98,8 +98,6 @@ export function useAuditProcessModals(auditProcesses, emit) {
         
         cancelDelete();
     };
-
-
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

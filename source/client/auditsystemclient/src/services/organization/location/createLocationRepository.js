@@ -9,46 +9,50 @@ export const createLocationRepository = {
   async createLocation(locationData) {
     try {
       const token = authService.getLocalToken();
-      
+
       // Note: With UserAware pattern, userId is automatically injected
       const payload = {
         name: locationData.name,
         address: locationData.address || null,
         companyId: locationData.companyId
       };
-      
-      const response = await api.post(`${LOCATION_BASE_ENDPOINT}${CREATE_LOCATION_ENDPOINT}`, payload, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' 
-        }
+
+      const response = await api.post(`${LOCATION_BASE_ENDPOINT}${CREATE_LOCATION_ENDPOINT}`,
+        payload, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
       });
 
-      if (response.status === 201 || response?.success !== false) {
-        return ApiResponseT.ok(response.result, response?.data?.successMessage || 'Location created successfully');
+      const {data, status} = response;
+
+
+      if (status === 201 && data?.success) {
+        return ApiResponseT.ok(data.result, data.successMessage || 'Location created successfully');
       }
 
-      const errors = Array.isArray(response?.errors)
-          ? response.errors
-          : [{ message: response?.data?.successMessage || 'Creation failed' }];
-      return ApiResponseT.badRequest(errors, response?.data?.successMessage);
+
+      return ApiResponseT.badRequest(
+          data?.errors || [{ message: data?.successMessage || 'Failed to create location' }],
+          data?.successMessage || 'Failed to create location.');
 
     } catch (error) {
       console.error('Create location error:', error);
-      
+      const responseData = error.response?.data;
+
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: 'Authentication required. Please log in again.' }],
           'Authentication required'
         );
       }
-      
-      if (error.response?.status === 400) {
-        const errors = error.response?.errors ||
-            [{ message: error.response?.data?.successMessage || 'Bad request' }];
-        return ApiResponseT.badRequest(errors, error.response?.data?.successMessage || 'Bad request');
+
+       if (error.response?.status === 400) {
+           const errors = responseData?.errors || [{ message: responseData?.successMessage || 'Bad request' }];
+           return ApiResponseT.badRequest(errors, responseData?.successMessage || 'Bad request');
       }
-      
+
       return ApiResponseT.serverError(
         [{ message: error.message || 'An unexpected error occurred while creating location.' }],
         'Server error'

@@ -1,3 +1,5 @@
+// LocationView.vue
+
 <template>
     <div class="space-y-6">
         <!-- Add Location Modal -->
@@ -6,19 +8,18 @@
             @close="handleCloseAddLocationModal"
             @location-added="handleLocationAdded"
         />
-        
+
         <!-- Location Table with integrated selection -->
         <LocationTable
             :locations="locations"
             :is-loading="isLoading"
-            :search="search"
+            :search-query="searchQuery"
+            :handle-search="handleSearch"
             @edit-location="handleEditLocation"
             @delete-location="handleDeleteLocation"
-            @update:search="search = $event"
-            @refresh="refreshData"
             @location-selected="handleLocationSelected"
         />
-        
+
         <!-- Edit Location Modal -->
         <EditLocationModal
             v-if="showEditLocationModal"
@@ -27,7 +28,7 @@
             @close="handleCloseEditLocationModal"
             @updated="handleLocationUpdated"
         />
-        
+
         <!-- Confirmation Dialog -->
         <ConfirmDialog
             v-model="showDeleteDialog"
@@ -49,22 +50,21 @@ import EditLocationModal from './components/EditLocationModal.vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import { useLocationTable } from './composables/useLocationTable';
 import { useLocationActions } from './composables/useLocationActions';
-import { useNotification } from '@/composables/notification/useNotification';
 
-const emit = defineEmits(['location-selected']);
+const emit = defineEmits([
+  'location-selected',
+  'location-added',
+  'location-updated',
+  'location-deleted'
+]);
 
 const {
     locations,
     isLoading,
-    searchQuery: search,
-    refreshData
+    searchQuery,
+    handleSearch,
+    resetToDefaultView
 } = useLocationTable();
-
-const { showNotification } = useNotification();
-
-const handleLocationDeleted = () => {
-    emit('location-selected', null);
-};
 
 const {
     showAddLocationModal,
@@ -82,7 +82,7 @@ const {
     handleDeleteLocation,
     confirmDelete,
     cancelDelete
-} = useLocationActions(refreshData, showNotification, handleLocationDeleted);
+} = useLocationActions( locations, emit);
 
 const handleLocationSelected = (locationId) => {
     emit('location-selected', locationId);
@@ -91,6 +91,12 @@ const handleLocationSelected = (locationId) => {
 // Expose locations for parent component
 defineExpose({
     locations,
-    refreshData
+    resetToDefaultView
 });
 </script>
+
+<style scoped>
+.location-table .table-row {
+  transition:  all 0.2s ease;
+}
+</style>

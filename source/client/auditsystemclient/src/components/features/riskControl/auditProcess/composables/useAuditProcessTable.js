@@ -7,8 +7,9 @@ import { useAuditProcessLifecycle } from './useAuditProcessLifecycle';
 import { useAuditProcessComputed } from './useAuditProcessComputed';
 import { useAuditProcessModals } from './useAuditProcessModals';
 
-export function useAuditProcessTable(subDepartments, showNotification) {
+export function useAuditProcessTable(subDepartments) {
 
+    const { showNotification } = use
     const dataComposable = useAuditProcessData();
     const subDepartmentComposable = useSubDepartmentManagement(subDepartments);
     const searchComposable = useSearchAndPagination();
@@ -41,11 +42,6 @@ export function useAuditProcessTable(subDepartments, showNotification) {
         ...lifecycleComposable
     });
 
-    const modalComposable = useAuditProcessModals(
-        actionsComposable.refreshData,
-        showNotification
-    );
-
     return {
         auditProcesses: computedComposable.auditProcesses,
         isLoading: computedComposable.isLoading,
@@ -62,6 +58,5 @@ export function useAuditProcessTable(subDepartments, showNotification) {
         handleAuditProcessChange: actionsComposable.handleAuditProcessChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
-        ...modalComposable
     };
 }

@@ -9,19 +9,23 @@ export function useCreateLocation() {
   const { showNotification } = useNotification();
 
   const handleCreateSuccess = (response) => {
-    createdLocation.value = response.result;
+
+    createdLocation.value = response;
+
     showNotification(response?.successMessage || 'Location created successfully!', 'success');
-    return { success: true, data: response.result };
+
+    return { success: true, data: response };
   };
-  
+
+
   const handleCreateFailure = (response, defaultErrorMessage = 'Failed to create location') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
-    
+
     error.value = errorMessage;
     showNotification(errorMessage, 'error');
-    
+
     return {
       success: false,
       message: errorMessage,

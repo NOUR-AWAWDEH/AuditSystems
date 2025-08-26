@@ -1,14 +1,10 @@
-import { ref, watch, onMounted } from 'vue';
+import { watch, onMounted } from 'vue';
 import { useSearchLocationByUserId } from '@/composables/organization/location/useSearchLocationByUserId';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
-// Remove this import as it's not needed on location page
-// import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
+import { useSearchAndPagination } from './useSearchAndPagination';
 
 export function useLocationTable() {
-  const searchQuery = ref('');
-  const sortBy = ref('name');
-  const currentPage = ref(1);
-  const pageSize = ref(10);
+
 
   const {
     searchResults: locations,
@@ -22,11 +18,12 @@ export function useLocationTable() {
     fetchLocationsByUserId
   } = useGetLocationsByUserId();
 
-  // Remove sublocation-related code
-  // const {
-  //   subLocations,
-  //   getSubLocationsByUserId
-  // } = useGetSubLocationsByUserId();
+  const {
+    searchQuery,
+    currentPage,
+    pageSize,
+    handleSearch,
+  } = useSearchAndPagination();
 
   // 🔁 This handles live search or manual refresh
   const refreshData = async () => {
@@ -50,14 +47,12 @@ export function useLocationTable() {
 
   return {
     locations,
-    // Remove subLocations from return
-    // subLocations,
     isLoading,
     searchQuery,
-    sortBy,
     currentPage,
     pageSize,
     totalCount,
+    handleSearch,
     refreshData
   };
 }

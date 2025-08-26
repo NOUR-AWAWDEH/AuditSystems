@@ -110,20 +110,28 @@ const handleAddLocation = async () => {
         name: newLocation.value.name,
         address: newLocation.value.address,
         userId: authStatus.value.userId,
-        companyId: authStatus.value.companyId
+        companyId: authStatus.value.companyId,
+        createdAt: new Date().toISOString()
     };
 
     const result = await createLocation(locationData);
+    console.log('Create Location Result:', result.data);
 
     if (result.success) {
-        emit('location-added', {
-            id: result.data?.locationId || result.data?.id || Date.now(), // Fallback to timestamp if no ID
-            ...newLocation.value
-        });
+        // Merge the returned data with the original data to ensure full object
+        const fullLocation = {
+           id: result.locationId,
+           ...locationData
+        };
+
+        emit('location-added', fullLocation); // emit the full location object
         resetForm();
         showAddForm.value = false;
+    } else {
+        error.value = result?.message || 'Failed to create location';
     }
 };
+
 </script>
 
 <style scoped>

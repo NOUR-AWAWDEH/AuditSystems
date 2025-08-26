@@ -115,12 +115,11 @@ const handleAddLocation = async () => {
     };
 
     const result = await createLocation(locationData);
-    console.log('Create Location Result:', result.data);
 
     if (result.success) {
         // Merge the returned data with the original data to ensure full object
         const fullLocation = {
-           id: result.locationId,
+           id: result.data.result.locationId,
            ...locationData
         };
 
@@ -131,6 +130,7 @@ const handleAddLocation = async () => {
         error.value = result?.message || 'Failed to create location';
     }
 };
+
 
 </script>
 

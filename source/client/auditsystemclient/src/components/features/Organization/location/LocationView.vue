@@ -26,7 +26,7 @@
             :is-visible="showEditLocationModal"
             :location="locationToEdit"
             @close="handleCloseEditLocationModal"
-            @updated="handleLocationUpdated"
+            @location-updated="handleLocationUpdated"
         />
 
         <!-- Confirmation Dialog -->

@@ -26,7 +26,10 @@
     <div class="rounded-xl shadow-sm border border-gray-200">
       <!-- Locations -->
       <div v-if="activeTab === 'locations'" class="p-6 bg-white">
-        <LocationView ref="locationViewRef" @location-selected="onLocationSelected" />
+        <LocationView
+          ref="locationViewRef"
+          @location-selected="onLocationSelected"
+        />
       </div>
 
       <!-- Sub-Locations -->
@@ -247,7 +250,7 @@ const onLocationSelected = (locationId) => {
   selectedSubDepartmentId.value = null;
 
   resetViews(subLocationViewRef, departmentViewRef, subDepartmentViewRef);
-  
+
   if (locationId) {
     activeTab.value = 'sublocations';
   }
@@ -259,7 +262,7 @@ const onSubLocationSelected = (subLocationId) => {
   selectedSubDepartmentId.value = null;
 
   resetViews(departmentViewRef, subDepartmentViewRef);
-  
+
   if(subLocationId) {
     activeTab.value = 'departments';
   }

@@ -32,7 +32,6 @@ export const createLocationRepository = {
         return ApiResponseT.ok(data.result, data.successMessage || 'Location created successfully');
       }
 
-
       return ApiResponseT.badRequest(
           data?.errors || [{ message: data?.successMessage || 'Failed to create location' }],
           data?.successMessage || 'Failed to create location.');

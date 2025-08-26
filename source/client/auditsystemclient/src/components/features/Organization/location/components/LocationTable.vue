@@ -1,7 +1,5 @@
 <template>
     <div>
-        
-        
         <!-- Location Table -->
         <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
@@ -10,15 +8,15 @@
                     <LocationHeader />
 
                     <div class="flex flex-col sm:flex-row sm:items-end gap-3">
-                        <Filters
-                            :search="search"
+                        <SearchFilters
+                            :search="searchQuery"
                             :searchPlaceholder="'Search locations...'"
-                            @update:search="$emit('update:search', $event)"
-                            @refresh="$emit('refresh')"
+                            @update:search="handleSearch"
+                            class="w-full sm:w-auto"
                         />
                     </div>
                 </div>
-                
+
                 <!-- Table Container -->
                 <div class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
@@ -26,8 +24,8 @@
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
                         :actions="[]"
+                        :no-data-message="noDataMessage"
                         class="location-table"
-                        @row-click="handleRowClick"
                     >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
@@ -66,7 +64,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
-import Filters from '@/components/common/SearchFilter.vue';
+import SearchFilters from '@/components/common/SearchFilter.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
@@ -76,14 +74,14 @@ import LocationHeader from './LocationHeader.vue';
 const props = defineProps({
     locations: Array,
     isLoading: Boolean,
-    search: String
+    searchQuery: String,
+    handleSearch: Function
 });
 
 const emit = defineEmits([
+    'add-location',
     'edit-location',
     'delete-location',
-    'update:search',
-    'refresh',
     'location-selected'
 ]);
 
@@ -96,10 +94,22 @@ const handleSelectLocation = (location) => {
     emit('location-selected', location.id);
 };
 
-// Handle row click to select location
-const handleRowClick = (location) => {
-    handleSelectLocation(location);
-};
+const locationColumns = [
+    { key: 'name', label: 'Name' },
+    { key: 'address', label: 'Address' },
+    { key: 'createdAt', label: 'Created Date', type: 'date' }
+];
+
+const enhancedColumns = computed(() => {
+    return [...locationColumns, { key: 'actions', label: 'Actions' }];
+});
+
+// Message for empty data
+const noDataMessage = computed(() => {
+    return props.searchQuery
+        ? `No Locations found for "${props.searchQuery}".`
+        : 'No Locations found yet. Please add a location.';
+});
 
 // Watch for location changes to reset selection if location is deleted
 watch(() => props.locations, (newLocations) => {
@@ -112,15 +122,6 @@ watch(() => props.locations, (newLocations) => {
     }
 }, { deep: true });
 
-const locationColumns = [
-    { key: 'name', label: 'Name' },
-    { key: 'address', label: 'Address' },
-    { key: 'createdAt', label: 'Created Date', type: 'date' }
-];
-
-const enhancedColumns = computed(() => {
-    return [...locationColumns, { key: 'actions', label: 'Actions' }];
-});
 </script>
 
 <style scoped>

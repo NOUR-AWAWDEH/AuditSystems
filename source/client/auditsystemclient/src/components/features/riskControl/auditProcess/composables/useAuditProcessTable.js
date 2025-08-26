@@ -5,11 +5,9 @@ import { useAuditProcessActions } from './useAuditProcessActions';
 import { useAuditProcessWatchers } from './useAuditProcessWatchers';
 import { useAuditProcessLifecycle } from './useAuditProcessLifecycle';
 import { useAuditProcessComputed } from './useAuditProcessComputed';
-import { useAuditProcessModals } from './useAuditProcessModals';
 
 export function useAuditProcessTable(subDepartments) {
 
-    const { showNotification } = use
     const dataComposable = useAuditProcessData();
     const subDepartmentComposable = useSubDepartmentManagement(subDepartments);
     const searchComposable = useSearchAndPagination();

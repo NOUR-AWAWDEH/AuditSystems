@@ -11,9 +11,7 @@ export function useCreateLocation() {
   const handleCreateSuccess = (response) => {
 
     createdLocation.value = response;
-
     showNotification(response?.successMessage || 'Location created successfully!', 'success');
-
     return { success: true, data: response };
   };
 

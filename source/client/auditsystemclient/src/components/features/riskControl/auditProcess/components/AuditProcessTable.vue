@@ -148,18 +148,7 @@ const props = defineProps({
     isSubDepartmentLoading: Boolean,
     searchQuery: String,
     handleSubDepartmentChange: Function,
-    handleSearch: Function,
-    refreshData: Function
-});
-
-const internalSelectedSubDepartmentId = ref(props.selectedSubDepartmentId);
-
-watch(() => props.selectedSubDepartmentId, (newVal) => {
-    internalSelectedSubDepartmentId.value = newVal;
-});
-
-watch(internalSelectedSubDepartmentId, (newVal) => {
-    props.handleSubDepartmentChange(newVal);
+    handleSearch: Function
 });
 
 const emit = defineEmits([
@@ -169,32 +158,41 @@ const emit = defineEmits([
     'audit-process-selected'
 ]);
 
+// Local ref for sub-department selection
+const internalSelectedSubDepartmentId = ref(props.selectedSubDepartmentId);
+
+// Sync internal state with parent prop
+watch(() => props.selectedSubDepartmentId, (newVal) => {
+    internalSelectedSubDepartmentId.value = newVal;
+});
+
+// Emit change when internal selection changes
+watch(internalSelectedSubDepartmentId, (newVal) => {
+    props.handleSubDepartmentChange(newVal);
+}, { immediate: true });
+
 // Audit Process selection state
 const selectedAuditProcessId = ref(null);
 
-// Handle audit process selection from table row or button
 const handleSelectAuditProcess = (auditProcess) => {
     selectedAuditProcessId.value = auditProcess.id;
     emit('audit-process-selected', auditProcess.id);
 };
 
-
+// Table columns
 const auditProcessColumns = [
     { key: 'processName', label: 'Name' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
-const enhancedColumns = computed(() => {
-    return [...auditProcessColumns, { key: 'actions', label: 'Actions' }];
-});
+const enhancedColumns = computed(() => [...auditProcessColumns, { key: 'actions', label: 'Actions' }]);
 
+// Message for empty data
 const noDataMessage = computed(() => {
-    if (props.searchQuery) {
-        return `No processes found for "${props.searchQuery}".`;
-    }
-    return 'No processes found for this sub department.';
+    return props.searchQuery
+        ? `No processes found for "${props.searchQuery}".`
+        : 'No processes found for this sub department.';
 });
-
 </script>
 
 <style scoped>

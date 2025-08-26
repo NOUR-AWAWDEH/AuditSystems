@@ -23,7 +23,6 @@
             :search-query="searchQuery"
             :handle-sub-department-change="handleAuditProcessChange"
             :handle-search="handleSearch"
-            :refresh-data="refreshData"
             @add-audit-process="handleAddAuditProcess"
             @edit-audit-process="handleEditAuditProcess"
             @delete-audit-process="handleDeleteAuditProcess"
@@ -73,7 +72,7 @@
             v-model="showDeleteDialog"
             :title="deleteDialogTitle"
             :message="deleteDialogMessage"
-            :highlight-text="itemToDelete?.name || ''"
+            :highlight-text="itemToDelete?.processName || ''"
             :confirm-text="'Delete'"
             :cancel-text="'Cancel'"
             @confirm="confirmDelete"
@@ -104,7 +103,12 @@ const props = defineProps({
 });
 
 // Define emit first
-const emit = defineEmits(['audit-process-selected','audit-process-added','audit-process-updated','audit-process-deleted' ]);
+const emit = defineEmits([
+    'audit-process-selected',
+    'audit-process-added',
+    'audit-process-updated',
+    'audit-process-deleted' 
+]);
 
 // Use composables - now with integrated backend search
 const {
@@ -159,7 +163,7 @@ const {
     confirmDelete,
     handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(refreshData, emit);
+} = useAuditProcessModals(auditProcesses, emit);
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {

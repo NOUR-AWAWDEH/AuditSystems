@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteAuditProcessById } from '@/composables/riskControl/auditProcess/useDeleteAuditProcessById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useAuditProcessModals(refreshData, emit) {
+export function useAuditProcessModals(auditProcesses, emit) {
     const { deleteAuditProcess } = useDeleteAuditProcessById();
     const { showNotification } = useNotification();
 
@@ -22,10 +22,10 @@ export function useAuditProcessModals(refreshData, emit) {
         showAddAuditProcessModal.value = false;
     };
 
-    const handleAuditProcessAdded = async () => {
+    const handleAuditProcessAdded = async (newAuditProcess) => {
         try {
-            await refreshData();
-            emit('audit-process-added');
+            auditProcesses.value.push(newAuditProcess);
+            emit('audit-process-added',newAuditProcess);
             handleCloseAddAuditProcessModal();
         } catch (error) {
             console.error('Error in handleAuditProcessAdded:', error);
@@ -43,14 +43,31 @@ export function useAuditProcessModals(refreshData, emit) {
         auditProcessToEdit.value = null;
     };
 
-    const handleAuditProcessUpdated = async () => {
-        // Store the process name before clearing the reference
-        const processName = auditProcessToEdit.value?.processName || 'Unknown Process';
-        await refreshData();
-        emit('audit-process-updated');
-        showNotification(`Process "${processName}" has been updated successfully!`, 'success');
-        handleCloseEditAuditProcessModal();
+    const handleAuditProcessUpdated = async (updatedAuditProcess) => {
+        try {
+            // Find and replace the updated process in the local list
+            const index = auditProcesses.value.findIndex(
+                p => p.id === updatedAuditProcess.id
+            );
+
+            if (index !== -1) {
+                auditProcesses.value[index] = { ...auditProcesses.value[index], ...updatedAuditProcess };
+            }
+
+            emit('audit-process-updated', updatedAuditProcess);
+
+            showNotification(
+                `Process "${updatedAuditProcess.processName}" has been updated successfully!`,
+                'success'
+            );
+
+            handleCloseEditAuditProcessModal();
+        } catch (error) {
+            console.error('Error in handleAuditProcessUpdated:', error);
+            showNotification('Failed to update process', 'error');
+        }
     };
+
 
     const handleDeleteAuditProcess = (auditProcess) => {
         itemToDelete.value = auditProcess;
@@ -60,21 +77,29 @@ export function useAuditProcessModals(refreshData, emit) {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete.value) {
-            const deleteProcess = { ...itemToDelete.value };
-            const result = await deleteAuditProcess(deleteProcess.id);
-            if (result.success) {
-                showNotification(`Process "${deleteProcess.processName}" has been deleted successfully!`, 'success');
-                localStorage.removeItem('riskControlSelectedAuditProcessId');
-                
-                setTimeout(async () => {
-                    await refreshData();
-                    emit('audit-process-deleted', deleteProcess.id);
-                }, 100);
+        if (!itemToDelete.value) return;
+
+        const deleteProcess = { ...itemToDelete.value };
+        const result = await deleteAuditProcess(deleteProcess.id);
+
+        if (result.success) {
+            // 🔥 Remove in place
+            const index = auditProcesses.value.findIndex(p => p.id === deleteProcess.id);
+            if (index !== -1) {
+                auditProcesses.value.splice(index, 1); // <-- reactive change
             }
-            cancelDelete();
+
+            showNotification(`Process "${deleteProcess.processName}" has been deleted successfully!`, 'success');
+
+            localStorage.removeItem('riskControlSelectedAuditProcessId');
+
+            emit('audit-process-deleted', deleteProcess.id);
         }
+        
+        cancelDelete();
     };
+
+
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

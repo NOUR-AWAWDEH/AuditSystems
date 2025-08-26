@@ -282,7 +282,6 @@ const handleRouteQueries = async () => {
 // Init
 onMounted(async () => {
   await refreshSubDepartments();
-  await refreshAuditProcesses();
   await handleRouteQueries();
 });
 

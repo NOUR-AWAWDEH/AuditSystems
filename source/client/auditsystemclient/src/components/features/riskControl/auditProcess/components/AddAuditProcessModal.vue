@@ -131,10 +131,19 @@ const handleSubmit = async () => {
         const result = await createAuditProcess(auditProcessData);
 
         if (result?.success) {
+            const newAuditProcess = {
+                id: result.data.auditProcessId,
+                processName: formData.value.name.trim(),
+                subDepartmentId: props.subDepartmentId,
+                createdAt: new Date().toISOString()
+            };
+
             showNotification(`Audit Process "${formData.value.name}" has been added successfully!`, 'success');
-            emit('audit-process-added', result.data);
+            
+            emit('audit-process-added', newAuditProcess); // send full object to parent
             emit('close');
-        } else {
+        }
+        else {
              showNotification(result?.message || 'Failed to create audit process', 'error');
         }
 

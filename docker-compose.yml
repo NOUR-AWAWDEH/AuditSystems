@@ -1,17 +1,16 @@
 services:
- 
   auditsystem.host:
     image: nourawawdeh/auditsystem:latest
     build:
       context: .
       dockerfile: .\source\server\Infrastructure\AuditSystem.Host\Dockerfile
     ports:
-    - "80:80"
-    - "443:443"
+      - "80:80"
+      - "443:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - DB_CONNECTION_STRING=Data Source=SQL1003.site4now.net;Initial Catalog=db_ab89b4_auditsystem;User Id=db_ab89b4_auditsystem_admin;Password=Havana123%100;
-      - JWT_KEY=AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765e
+      - DB_CONNECTION_STRING=Host=dpg-d2m1o0je5dus739aeg80-a;Port=5432;Database=auditsystemdb;Username=auditsystemdb_user;Password=EDbyO0KolpZf67j32jcpmW1gis90PzZc;SSL Mode=Require;Trust Server Certificate=True;
+      - JWT_KEY=AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765
       - JWT_ISSUER=https://auditsystem.onrender.com
       - JWT_AUDIENCE=https://auditsystem.onrender.com
       - JWT_EXPIRATION_MINUTES=60

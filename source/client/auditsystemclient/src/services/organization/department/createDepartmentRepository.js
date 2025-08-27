@@ -28,7 +28,7 @@ export const createDepartmentRepository = {
             });
 
             if (response.status === 201 || response?.success !== false) {
-                return ApiResponseT.ok(response.result, response.successMessage || 'Department created successfully');
+                return ApiResponseT.ok(response.data.result, response.successMessage || 'Department created successfully');
             }
 
             const errors = Array.isArray(response?.errors)

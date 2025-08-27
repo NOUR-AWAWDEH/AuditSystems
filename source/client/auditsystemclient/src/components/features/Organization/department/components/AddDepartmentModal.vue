@@ -9,7 +9,7 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-gray-tint">
                         <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Department</h3>
-                        <button 
+                        <button
                             @click="$emit('close')"
                             class="text-gray-base hover:text-gray-shade focus:outline-none">
                             <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
@@ -24,12 +24,12 @@
                                 <label for="department-name" class="block text-sm font-medium text-gray-700">
                                     Department Name *
                                 </label>
-                                <BaseInput 
-                                    id="department-name" 
-                                    v-model="formData.name" 
+                                <BaseInput
+                                    id="department-name"
+                                    v-model="formData.name"
                                     label="Department Name"
                                     placeholder="Enter Department Name"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" 
+                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
                                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
                             </div>
@@ -39,18 +39,18 @@
                                 <p class="text-error text-sm">{{ error }}</p>
                             </div>
 
-                            <!-- Acction Buttons -->
+                            <!-- Action Buttons -->
                             <div class="flex justify-end space-x-3 pt-4">
-                                <button 
-                                    type="button" 
-                                    @click="$emit('close')" 
+                                <button
+                                    type="button"
+                                    @click="$emit('close')"
                                     :disabled="isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     Cancel
                                 </button>
 
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     :disabled="!formData.name.trim() || isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     <span v-if="isCreating">Adding...</span>
@@ -65,7 +65,7 @@
     </Teleport>
 </template>
 <script setup>
-import { createApp, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import { useCreateDepartment } from '@/composables/organization/department/useCreateDepartment';
@@ -114,7 +114,7 @@ const resetForm = () => {
 
 const handleSubmit = async () => {
     if (!props.subLocationId) {
-        showNotification('sub location is requered', 'error');
+        showNotification('sub location is required ', 'error');
         return;
     }
 
@@ -129,14 +129,14 @@ const handleSubmit = async () => {
         };
 
         const result = await createDepartment(departmentData);
-        console.log("Create Department", result);
+
         if (result?.success) {
             const newDepartment = {
                 id: result.data.departmentId,
                 ...departmentData,
-                createAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
             };
-            console.log("New Department", newDepartment);
+
             showNotification(`Department ${departmentData.name} has been added successfully!`, 'success');
             emit('department-added', newDepartment);
             emit('close');

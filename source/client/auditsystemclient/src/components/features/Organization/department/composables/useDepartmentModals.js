@@ -91,7 +91,7 @@ export function useDepartmentModals(departments, emit) {
 
             showNotification(`Department "${deletedDepartment.name}" has been deleted successfully!`, 'success');
 
-            localStorage.removeItem('riskControlSelectedDepartmentId');
+            localStorage.removeItem('organizationSelectedDepartmentId');
 
             emit('department-deleted', deletedDepartment.id);
         }

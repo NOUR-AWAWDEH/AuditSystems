@@ -54,7 +54,7 @@ export function useSubLocationManagement(subLocations) {
 
     const currentSubLocation = computed(() => {
         const subLocation = fetchSubLocation?.value || selectedSubLocation?.value;
-        return subLocation?.SubLocationModel || subLocation;
+        return subLocation?.subLocationModel || subLocation;
     });
 
     return {

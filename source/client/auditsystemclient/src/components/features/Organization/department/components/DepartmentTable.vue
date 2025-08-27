@@ -13,8 +13,6 @@
                             <SubLocationSelector
                                 :sub-locations="subLocations"
                                 :selected-sub-location-id="selectedSubLocationId"
-                                value-key="id"
-                                label-key="name"
                                 @sub-location-changed="handleSubLocationChange"
                             />
                         </div>

@@ -3,19 +3,19 @@ import { getSubDepartmentByIdRepository } from '@/services/organization/subdepar
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubDepartmentById() {
-  const subdepartment = ref(null);
+  const subDepartment = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
     // Handle potential nested structure - extract the actual subdepartment data
-    const subdepartmentData = response.result?.subDepartmentModel || response.result;
-    subdepartment.value = subdepartmentData;
-    return { success: true, data: subdepartmentData };
+    const subDepartmentData = response.result?.subDepartmentModel || response.result;
+    subDepartment.value = subDepartmentData;
+    return { success: true, data: subDepartmentData };
   };
   
-  const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch subdepartment') => {
+  const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch subDepartment') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
@@ -41,7 +41,7 @@ export function useGetSubDepartmentById() {
     try {
       isLoading.value = true;
       error.value = null;
-      subdepartment.value = null;
+      subDepartment.value = null;
 
       // Validate required fields
       const validationError = validateSubDepartmentId(subDepartmentId);
@@ -65,13 +65,13 @@ export function useGetSubDepartmentById() {
 
   const clearSubDepartment = () => {
     error.value = null;
-    subdepartment.value = null;
+    subDepartment.value = null;
     isLoading.value = false;
   };
 
   return {
     // State
-    subdepartment,
+    subDepartment,
     isLoading,
     error,
 

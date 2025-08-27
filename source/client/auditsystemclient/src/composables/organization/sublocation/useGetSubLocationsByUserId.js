@@ -3,16 +3,16 @@ import { getSubLocationsByUserIdRepository } from '@/services/organization/sublo
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubLocationsByUserId() {
-  const sublocations = ref([]);
+  const subLocations = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
     // Fix: Extract subLocations array from the nested result object
-    const sublocationData = response.result?.subLocations || [];
-    sublocations.value = sublocationData;
-    return { success: true, data: sublocationData };
+    const subLocationData = response.result || [];
+    subLocations.value = subLocationData;
+    return { success: true, data: subLocationData };
   };
   
   const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch sublocations') => {
@@ -34,7 +34,7 @@ export function useGetSubLocationsByUserId() {
     try {
       isLoading.value = true;
       error.value = null;
-      sublocations.value = [];
+      subLocations.value = [];
 
       const response = await getSubLocationsByUserIdRepository.getSubLocationsByUserId();
 
@@ -52,7 +52,7 @@ export function useGetSubLocationsByUserId() {
 
   return {
     // State
-    sublocations,
+    subLocations,
     isLoading,
     error,
 

@@ -91,7 +91,7 @@ export function useSubLocationModals(subLocations, emit) {
 
             showNotification(`Sub-Location "${deletedSubLocation.name}" has been deleted successfully!`, 'success');
 
-            localStorage.removeItem('riskControlSelectedSubLocationId');
+            localStorage.removeItem('organizationSelectedSubLocationId');
 
             emit('sub-location-deleted', deletedSubLocation.id);
         }

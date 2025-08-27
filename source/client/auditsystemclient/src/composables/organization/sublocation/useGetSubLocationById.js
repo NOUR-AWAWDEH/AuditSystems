@@ -3,19 +3,19 @@ import { getSubLocationByIdRepository } from '@/services/organization/sublocatio
 import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubLocationById() {
-  const sublocation = ref(null);
+  const subLocation = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
-    // Handle potential nested structure - extract the actual sublocation data
-    const sublocationData = response.result?.subLocationModel || response.result;
-    sublocation.value = sublocationData;
-    return { success: true, data: sublocationData };
+    // Handle potential nested structure - extract the actual subLocation data
+    const subLocationData = response.result?.subLocationModel || response.result;
+    subLocation.value = subLocationData;
+    return { success: true, data: subLocationData };
   };
   
-  const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch sublocation') => {
+  const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch subLocation') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
@@ -41,7 +41,7 @@ export function useGetSubLocationById() {
     try {
       isLoading.value = true;
       error.value = null;
-      sublocation.value = null;
+      subLocation.value = null;
 
       // Validate required fields
       const validationError = validateSubLocationId(subLocationId);
@@ -65,13 +65,13 @@ export function useGetSubLocationById() {
 
   const clearSubLocation = () => {
     error.value = null;
-    sublocation.value = null;
+    subLocation.value = null;
     isLoading.value = false;
   };
 
   return {
     // State
-    sublocation,
+    subLocation,
     isLoading,
     error,
 

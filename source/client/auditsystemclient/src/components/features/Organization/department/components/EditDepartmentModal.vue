@@ -72,7 +72,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close','department-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateDepartment, resetState } = useUpdateDepartmentById();
@@ -148,7 +148,7 @@ const handleSubmit = async () => {
     };
 
     const result = await updateDepartment(departmentData);
-    console.log("Edit Department: ", result);
+
     if (result?.success) {
       const updatedDepartmentData = {
         ...departmentData,

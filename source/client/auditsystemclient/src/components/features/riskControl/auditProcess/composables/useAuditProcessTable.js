@@ -1,6 +1,6 @@
 import { useAuditProcessData } from './useAuditProcessData';
 import { useSubDepartmentManagement } from './useSubDepartmentManagement';
-import { useSearchAndPagination } from './useSearchAndPagination';
+import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 import { useAuditProcessActions } from './useAuditProcessActions';
 import { useAuditProcessWatchers } from './useAuditProcessWatchers';
 import { useAuditProcessLifecycle } from './useAuditProcessLifecycle';
@@ -52,7 +52,6 @@ export function useAuditProcessTable(subDepartments) {
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
         refreshData: actionsComposable.refreshData,
-        handleAuditProcessAdded: actionsComposable.handleAuditProcessAdded,
         handleAuditProcessChange: actionsComposable.handleAuditProcessChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,

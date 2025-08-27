@@ -1,7 +1,7 @@
 import { watch, onMounted } from 'vue';
 import { useSearchLocationByUserId } from '@/composables/organization/location/useSearchLocationByUserId';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
-import { useSearchAndPagination } from './useSearchAndPagination';
+import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 
 export function useLocationTable() {
 
@@ -15,7 +15,7 @@ export function useLocationTable() {
 
   const {
     locations: allLocations,
-    fetchLocationsByUserId
+    getLocationsByUserId
   } = useGetLocationsByUserId();
 
   const {
@@ -30,7 +30,7 @@ export function useLocationTable() {
     if (searchQuery.value.trim()) {
       await searchLocations(searchQuery.value, currentPage.value, pageSize.value);
     } else {
-      await fetchLocationsByUserId();
+      await getLocationsByUserId();
       locations.value = allLocations.value || [];
     }
   };

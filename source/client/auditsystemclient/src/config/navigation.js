@@ -1,5 +1,5 @@
 import DashboardIcon from '@/components/common/icons/DashboardIcon.vue'
-import LocationIcon from '@/components/common/icons/LocationIcon.vue'
+import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue'
 import RiskControlIcon from '@/components/common/icons/RiskControlIcon.vue'
 import DocumentIcon from '@/components/common/icons/DocumentIcon.vue'
 
@@ -20,10 +20,10 @@ export const navigationItems = [
     requiresAuth: true
   },
   {
-    route: '/locations',
-    name: 'Locations',
-    label: 'Locations',
-    icon: LocationIcon,
+    route: '/organization',
+    name: 'Organization',
+    label: 'Organization',
+    icon: DepartmentIcon,
     requiresAuth: true
   },
   {

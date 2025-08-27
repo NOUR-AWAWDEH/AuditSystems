@@ -18,7 +18,7 @@ export function useSubDepartmentManagement(subDepartments) {
         subdepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
         getSubDepartmentById,
-        clearSubDepartment
+        clearSubDepartment,
     } = useGetSubDepartmentById();
 
     // Add watcher to fetch SubDepartment details when selectedSubDepartmentId changes
@@ -62,8 +62,8 @@ export function useSubDepartmentManagement(subDepartments) {
         selectedSubDepartment,
         currentSubDepartment,
         isSubDepartmentLoading,
-        subDepartmentsRef,
-        getSubDepartmentById,
-        clearSubDepartment
+        // subDepartmentsRef,
+        // getSubDepartmentById,
+        // clearSubDepartment
     };
 }

@@ -15,14 +15,15 @@
                                 :selected-location-id="selectedLocationId"
                                 value-key="id"
                                 label-key="name"
-                                @location-changed="handleLocationChange" />
+                                @location-changed="handleLocationChange" 
+                            />
                         </div>
-                        <div v-if="validSelectedLocation" class="w-full sm:w-auto">
+                        <div class="w-full sm:w-auto">
                             <SearchFilter 
                                 :search="searchQuery"
                                 :searchPlaceholder="'Search sub locations...'" 
                                 @update:search="handleSearch" 
-                                @refresh="refreshData" 
+                                class="w-full sm:w-auto"
                             />
                         </div>
 
@@ -55,9 +56,14 @@
 
                 <!-- Table Container - Show when location is selected -->
                 <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="subLocations" :columns="enhancedColumns" :is-loading="isLoading"
-                        :actions="[]" :no-data-message="noDataMessage" class="sub-location-table"
-                        @row-click="handleRowClick">
+                    <ReusableTable 
+                        :items="subLocations"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="sub-location-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectSubLocation(item)"
@@ -135,7 +141,6 @@ const props = defineProps({
     searchQuery: String,
     handleLocationChange: Function,
     handleSearch: Function,
-    refreshData: Function
 });
 
 const emit = defineEmits([
@@ -145,38 +150,27 @@ const emit = defineEmits([
     'sub-location-selected'
 ]);
 
+// Local ref for location selection
+const internalSelectedLocationId = ref(props.selectedLocationId);
+
+// Sync internal state with parent prop
+watch(() => props.selectedLocationId, (newLocationId) => {
+    internalSelectedLocationId.value = newLocationId;
+});
+
+// Emit change when internal selection changes
+watch(internalSelectedLocationId, (newVal) => {
+    props.handleLocationChange(newVal);
+}, { immediate: true });
+
 // SubLocation selection state
 const selectedSubLocationId = ref(null);
 
 // Handle SubLocation selection from table row or button
 const handleSelectSubLocation = (subLocation) => {
-    if (subLocation && subLocation.id) {
-        selectedSubLocationId.value = subLocation.id;
-        emit('sub-location-selected', subLocation.id);
-    }
+    selectedSubLocationId.value = subLocation.id;
+    emit('sub-location-selected', subLocation.id);
 };
-
-// Handle row click to select sublocation
-const handleRowClick = (subLocation) => {
-    handleSelectSubLocation(subLocation);
-};
-
-// Watch for sublocation changes to reset selection if sublocation is deleted
-watch(() => props.subLocations, (newSubLocations) => {
-    if (selectedSubLocationId.value && newSubLocations) {
-        const subLocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
-        if (!subLocationExists) {
-            selectedSubLocationId.value = null;
-            emit('sub-location-selected', null);
-        }
-    }
-}, { deep: true });
-
-// Reset selection when location changes
-watch(() => props.selectedLocationId, () => {
-    selectedSubLocationId.value = null;
-    emit('sub-location-selected', null);
-});
 
 const subLocationColumns = [
     { key: 'name', label: 'Name' },
@@ -195,9 +189,6 @@ const noDataMessage = computed(() => {
     return 'No SubLocations found for this location.';
 });
 
-const validSelectedLocation = computed(() => {
-    return props.selectedLocationId && props.currentLocation?.name;
-});
 </script>
 
 <style scoped>

@@ -33,14 +33,6 @@ export function useAuditProcessActions({
         }
     };
 
-    const handleAuditProcessAdded = async () => {
-        try {
-            await refreshData();
-        } catch (error) {
-            console.error('Error handling audit process addition:', error);
-        }
-    };
-
     const handleAuditProcessChange = async (newSubDepartmentId) => {
         try {
             if (clearSearch) {
@@ -81,7 +73,6 @@ export function useAuditProcessActions({
 
     return {
         refreshData,
-        handleAuditProcessAdded,
         handleAuditProcessChange,
         resetToDefaultView
     };

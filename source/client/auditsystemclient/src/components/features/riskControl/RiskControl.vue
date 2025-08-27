@@ -118,6 +118,16 @@
           </div>
         </div>
 
+        <!-- AuditProgram -->
+        <div v-if="activeTab === 'AuditProgram'" class="p-3 sm:p-4 md:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Audit Program</h2>
+            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
+              Add AuditProgram
+            </button>
+          </div>
+        </div>
+
         <!-- Observations -->
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
@@ -207,6 +217,7 @@ const tabs = ref([
   { id: 'risks', name: 'Risks' },
   { id: 'exitrisks', name: 'Exit Risks' },
   { id: 'controls', name: 'Control Design' },
+  { id: 'AuditProgram', name: 'Audit Program' },
   { id: 'observations', name: 'Observations' }
 ]);
 

@@ -1,111 +1,96 @@
+// OrganizationView.vue
 <template>
-  <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-4 md:p-6">
-    <!-- Header -->
-    <OrganizationHeader />
-
-    <!-- Tabs Navigation -->
-    <div class="mb-6 border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8 overflow-x-auto">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          @click="activeTab = tab.id"
-          :class="[
-            'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
-            activeTab === tab.id
-              ? 'border-primary-base text-primary-base'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          {{ tab.name }}
-        </button>
-      </nav>
+  <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-2 sm:p-4 md:p-6">
+    <!-- Header Section -->
+    <div class="mb-4 sm:mb-6 md:mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <OrganizationHeader />
+      </div>
     </div>
 
-    <!-- Tab Panels -->
-    <div class="rounded-xl shadow-sm border border-gray-200">
-      <!-- Locations -->
-      <div v-if="activeTab === 'locations'" class="p-6 bg-white">
-        <LocationView
-          ref="locationViewRef"
-          @location-selected="onLocationSelected"
-        />
+    <!-- Navigation Tabs -->
+    <div class="mb-4 sm:mb-6">
+      <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto scrollbar-hide">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            @click="setActiveTab(tab.id)"
+            :class="[
+              'whitespace-nowrap py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-xs sm:text-sm transition-colors duration-200 flex-shrink-0',
+              activeTab === tab.id
+                ? 'border-primary-base text-primary-base'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            ]"
+          >
+            {{ tab.name }}
+          </button>
+        </nav>
       </div>
+    </div>
 
-      <!-- Sub-Locations -->
-      <div v-if="activeTab === 'sublocations'" class="p-6 bg-white">
-        <template v-if="!selectedLocationId">
-          <div class="text-center py-8">
-            <p class="text-gray-500 text-lg">Please select a location first from the Locations tab</p>
-            <button
-              @click="activeTab = 'locations'"
-              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
-            >
-              Go to Locations
-            </button>
-          </div>
-        </template>
-        <template v-else>
+    <!-- Tab Content -->
+    <div class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
+      <div v-if="isLoading" class="p-3 sm:p-4 md:p-6 text-center">
+        <p class="text-gray-500">Loading...</p>
+      </div>
+      <div v-else-if="errorMessage" class="p-3 sm:p-4 md:p-6 text-center">
+        <p class="text-red-500">{{ errorMessage }}</p>
+      </div>
+      <div v-else>
+        <!-- Locations -->
+        <div v-if="activeTab === 'locations'" class="p-3 sm:p-4 md:p-6">
+          <LocationView
+            @location-selected="handleLocationSelected"
+            @location-added="refreshLocations"
+            @location-updated="refreshLocations"
+            @location-deleted="refreshLocations"
+          />
+        </div>
+
+        <!-- Sub-Locations -->
+        <div v-if="activeTab === 'sublocations'" class="p-3 sm:p-4 md:p-6">
           <SubLocationView
-            ref="subLocationViewRef"
             :locations="locations"
             :selected-location-id="selectedLocationId"
-            @sub-location-selected="onSubLocationSelected"
+            @sub-location-selected="handleSubLocationSelected"
+            @sub-location-added="refreshSubLocations"
+            @sub-location-updated="refreshSubLocations"
+            @sub-location-deleted="refreshSubLocations"
           />
-        </template>
-      </div>
+        </div>
 
-      <!-- Departments -->
-      <div v-if="activeTab === 'departments'" class="p-6 bg-white">
-        <template v-if="!effectiveSelectedSubLocationId">
-          <div class="text-center py-8">
-            <p class="text-gray-500 text-lg">Please select a sub-location first from the Sub-Locations tab</p>
-            <button
-              @click="activeTab = 'sublocations'"
-              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
-            >
-              Go to Sub-Locations
-            </button>
-          </div>
-        </template>
-        <template v-else>
+        <!-- Departments -->
+        <div v-if="activeTab === 'departments'" class="p-3 sm:p-4 md:p-6">
           <DepartmentView
-            ref="departmentViewRef"
             :sub-locations="subLocations"
-            :selected-sub-location-id="effectiveSelectedSubLocationId"
-            @department-selected="onDepartmentSelected"
+            :selected-sub-location-id="selectedSubLocationId"
+            @department-selected="handleDepartmentSelected"
+            @department-added="refreshDepartments"
+            @department-updated="refreshDepartments"
+            @department-deleted="refreshDepartments"
           />
-        </template>
-      </div>
+        </div>
 
-      <!-- Sub-Departments -->
-      <div v-if="activeTab === 'subdepartments'" class="p-6 bg-white">
-        <template v-if="!selectedDepartmentId">
-          <div class="text-center py-8">
-            <p class="text-gray-500 text-lg">Please select a department first from the Departments tab</p>
-            <button
-              @click="activeTab = 'departments'"
-              class="mt-4 bg-primary-base text-white px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200"
-            >
-              Go to Departments
-            </button>
-          </div>
-        </template>
-        <template v-else>
+        <!-- Sub-Departments -->
+        <div v-if="activeTab === 'subdepartments'" class="p-3 sm:p-4 md:p-6">
           <SubDepartmentView
-            ref="subDepartmentViewRef"
             :departments="departments"
             :selected-department-id="selectedDepartmentId"
-            @sub-department-selected="onSubDepartmentSelected"
+            @sub-department-selected="handleSubDepartmentSelected"
+            @sub-department-added="refreshSubDepartments"
+            @sub-department-updated="refreshSubDepartments"
+            @sub-department-deleted="refreshSubDepartments"
           />
-        </template>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
@@ -113,174 +98,122 @@ import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
 import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
 
-// Tab State
+import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
+import { useGetLocationById } from '@/composables/organization/location/useGetLocationById';
+import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
+import { useGetSubLocationById } from '@/composables/organization/sublocation/useGetSubLocationById';
+import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
+import { useGetDepartmentById } from '@/composables/organization/department/useGetDepartmentById';
+import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
+import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
+
+// Router
+const route = useRoute();
+const router = useRouter();
+
+// State
 const activeTab = ref('locations');
-const tabs = [
+
+const selectedLocationId = ref(localStorage.getItem('organizationSelectedLocationId') || null);
+const selectedSubLocationId = ref(localStorage.getItem('organizationSelectedSubLocationId') || null);
+const selectedDepartmentId = ref(localStorage.getItem('organizationSelectedDepartmentId') || null);
+const selectedSubDepartmentId = ref(localStorage.getItem('organizationSelectedSubDepartmentId') || null);
+
+// Composables
+const { getLocationsByUserId, locations } = useGetLocationsByUserId();
+const { getLocationById } = useGetLocationById();
+
+const { getSubLocationsByUserId, subLocations } = useGetSubLocationsByUserId();
+const { getSubLocationById } = useGetSubLocationById();
+
+const { getDepartmentsByUserId, departments } = useGetDepartmentsByUserId();
+const { getDepartmentById } = useGetDepartmentById();
+
+const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
+const { getSubDepartmentById } = useGetSubDepartmentById();
+
+// Computed normalized lists
+const normalizedSubLocations = computed(() => subLocations?.value ? (Array.isArray(subLocations.value) ? subLocations.value : []) : []);
+const normalizedDepartments = computed(() => departments?.value ? (Array.isArray(departments.value) ? departments.value : []) : []);
+const normalizedSubDepartments = computed(() => subDepartments?.value ? (Array.isArray(subDepartments.value) ? subDepartments.value : []) : []);
+
+const isLoading = ref(false);
+const errorMessage = ref(null);
+
+// Tabs
+const tabs = ref([
   { id: 'locations', name: 'Locations' },
   { id: 'sublocations', name: 'Sub-Locations' },
   { id: 'departments', name: 'Departments' },
   { id: 'subdepartments', name: 'Sub-Departments' }
-];
+]);
 
-// View Refs
-const locationViewRef = ref(null);
-const subLocationViewRef = ref(null);
-const departmentViewRef = ref(null);
-const subDepartmentViewRef = ref(null);
-
-// Hierarchical Selection State
-const selectedLocationId = ref(null);
-const selectedSubLocationId = ref(null);
-const selectedDepartmentId = ref(null);
-const selectedSubDepartmentId = ref(null);
-
-// Replace computed properties with reactive refs
-const locations = ref([]);
-const subLocations = ref([]);
-const departments = ref([]);
-
-// Watch for locationViewRef changes and update locations
-watch(
-  () => locationViewRef.value,
-  async (newLocationViewRef) => {
-    if (newLocationViewRef) {
-      await nextTick();
-      const checkLocations = () => {
-        const currentLocations = newLocationViewRef.locations;
-        if (currentLocations && currentLocations.length > 0) {
-          locations.value = currentLocations;
-        } else {
-          setTimeout(checkLocations, 100);
-        }
-      };
-      checkLocations();
-    }
-  },
-  { immediate: true }
-);
-
-// Watch for direct changes to locationViewRef.locations
-watch(
-  () => locationViewRef.value?.locations,
-  (newLocations) => {
-    if (newLocations && newLocations.length > 0) {
-      locations.value = newLocations;
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-// Watch for subLocationViewRef changes and update subLocations
-watch(
-  () => subLocationViewRef.value,
-  async (newSubLocationViewRef) => {
-    if (newSubLocationViewRef) {
-      await nextTick();
-      const checkSubLocations = () => {
-        const currentSubLocations = newSubLocationViewRef.subLocations;
-        if (currentSubLocations && currentSubLocations.length > 0) {
-          subLocations.value = currentSubLocations;
-        } else {
-          setTimeout(checkSubLocations, 100);
-        }
-      };
-      checkSubLocations();
-    }
-  },
-  { immediate: true }
-);
-
-// Watch for direct changes to subLocationViewRef.subLocations
-watch(
-  () => subLocationViewRef.value?.subLocations,
-  (newSubLocations) => {
-    if (newSubLocations && newSubLocations.length > 0) {
-      subLocations.value = newSubLocations;
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-// Watch for departmentViewRef changes and update departments
-watch(
-  () => departmentViewRef.value,
-  async (newDepartmentViewRef) => {
-    if (newDepartmentViewRef) {
-      await nextTick();
-      const checkDepartments = () => {
-        const currentDepartments = newDepartmentViewRef.departments;
-        if (currentDepartments && currentDepartments.length > 0) {
-          departments.value = currentDepartments;
-        } else {
-          setTimeout(checkDepartments, 100);
-        }
-      };
-      checkDepartments();
-    }
-  },
-  { immediate: true }
-);
-
-// Watch for direct changes to departmentViewRef.departments
-watch(
-  () => departmentViewRef.value?.departments,
-  (newDepartments) => {
-    if (newDepartments && newDepartments.length > 0) {
-      departments.value = newDepartments;
-    }
-  },
-  { immediate: true, deep: true }
-);
-
-// Keep this computed property for effectiveSelectedSubLocationId
-const effectiveSelectedSubLocationId = computed(() =>
-  selectedSubLocationId.value || subLocationViewRef.value?.selectedLocationId
-);
-
-// Helper function to reset all lower components
-function resetViews(...refs) {
-  refs.forEach(r => r?.value?.resetToDefaultView?.());
-}
-
-// Event Handlers - Modified to NOT automatically change tabs
-const onLocationSelected = (locationId) => {
-  selectedLocationId.value = locationId;
-  selectedSubLocationId.value = null;
-  selectedDepartmentId.value = null;
-  selectedSubDepartmentId.value = null;
-
-  resetViews(subLocationViewRef, departmentViewRef, subDepartmentViewRef);
-
-  if (locationId) {
-    activeTab.value = 'sublocations';
+// Selection handlers
+const setSelectedId = (key, value) => {
+  switch (key) {
+    case 'location': selectedLocationId.value = value; localStorage.setItem('organizationSelectedLocationId', value || ''); break;
+    case 'subLocation': selectedSubLocationId.value = value; localStorage.setItem('organizationSelectedSubLocationId', value || ''); break;
+    case 'department': selectedDepartmentId.value = value; localStorage.setItem('organizationSelectedDepartmentId', value || ''); break;
+    case 'subDepartment': selectedSubDepartmentId.value = value; localStorage.setItem('organizationSelectedSubDepartmentId', value || ''); break;
   }
 };
 
-const onSubLocationSelected = (subLocationId) => {
-  selectedSubLocationId.value = subLocationId;
-  selectedDepartmentId.value = null;
-  selectedSubDepartmentId.value = null;
+// Event handlers
+const handleLocationSelected = async (id) => {
+  setSelectedId('location', id);
+  if (!normalizedSubLocations.value.length) await refreshLocations();
+  activeTab.value = 'sublocations';
+};
 
-  resetViews(departmentViewRef, subDepartmentViewRef);
+const handleSubLocationSelected = async (id) => {
+  setSelectedId('subLocation', id);
+  if (!normalizedDepartments.value.length) await refreshSubLocations();
+  activeTab.value = 'departments';
+};
 
-  if(subLocationId) {
-    activeTab.value = 'departments';
+const handleDepartmentSelected = async (id) => {
+  setSelectedId('department', id);
+  if (!normalizedSubDepartments.value.length) await refreshDepartments();
+  activeTab.value = 'subdepartments';
+};
+
+const handleSubDepartmentSelected = async (id) => {
+  setSelectedId('subDepartment', id);
+};
+
+// Refreshers
+const refreshLocations = async () => await getLocationsByUserId();
+const refreshSubLocations = async () => await getSubLocationsByUserId();
+const refreshDepartments = async () => await getDepartmentsByUserId();
+const refreshSubDepartments = async () => await getSubDepartmentsByUserId();
+
+
+// Tab navigation
+const setActiveTab = (tabId) => activeTab.value = tabId;
+
+// Handle route queries
+const handleRouteQueries = async () => {
+  
+  const { locationId, subLocationId, departmentId, subDepartmentId } = route.query;
+
+  if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }
+  if (subLocationId) { selectedSubLocationId.value = subLocationId; await getSubLocationById(subLocationId); }
+  if (departmentId) { selectedDepartmentId.value = departmentId; await getDepartmentById(departmentId); }
+  if (subDepartmentId) { selectedSubDepartmentId.value = subDepartmentId;  await getSubDepartmentById(subDepartmentId); }
+
+  // Clean up URL
+  if (locationId || subLocationId || departmentId || subDepartmentId) {
+    await router.replace({ path: '/organization' });
   }
 };
 
-const onDepartmentSelected = (departmentId) => {
-  selectedDepartmentId.value = departmentId;
-  selectedSubDepartmentId.value = null;
+// Init
+onMounted(async () => {
+  await refreshLocations();
+  await handleRouteQueries();
+});
 
-  resetViews(subDepartmentViewRef);
-  if (departmentId) {
-    activeTab.value = 'subdepartments';
-  }
-};
-
-const onSubDepartmentSelected = (subDepartmentId) => {
-  selectedSubDepartmentId.value = subDepartmentId;
-};
+watch(() => route.query, handleRouteQueries);
 </script>
 
 <style scoped>

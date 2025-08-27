@@ -172,7 +172,7 @@ const handleSubmit = async () => {
       // Pass the updated sublocation data with the correct structure
       const updatedSubLocationData = {
         ...subLocationData,
-        ...result.data
+        createdAt: new Date().toISOString()
       };
 
       emit('updated', updatedSubLocationData);

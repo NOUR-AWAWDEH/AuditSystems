@@ -107,7 +107,7 @@ const emit = defineEmits([
     'audit-process-selected',
     'audit-process-added',
     'audit-process-updated',
-    'audit-process-deleted' 
+    'audit-process-deleted'
 ]);
 
 // Use composables - now with integrated backend search
@@ -140,10 +140,7 @@ watch(() => props.selectedSubDepartmentId, (newSubDepartmentId) => {
     }
 }, { immediate: true });
 
-// Watch for subDepartments prop changes
-watch(() => props.subDepartments, () => {
-    // The composable should handle this automatically, but we can add logging here if needed
-}, { immediate: true, deep: true });
+
 
 // Use modal composable for dialog management
 const {

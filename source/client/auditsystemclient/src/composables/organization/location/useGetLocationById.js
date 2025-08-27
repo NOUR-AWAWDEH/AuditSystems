@@ -8,7 +8,7 @@ export function useGetLocationById() {
   const error = ref(null);
   const { showNotification } = useNotification();
 
-  const fetchLocationById = async (locationId) => {
+  const getLocationById = async (locationId) => {
     if (!locationId) {
       const errorMsg = 'Location ID is required';
       error.value = errorMsg;
@@ -55,7 +55,7 @@ export function useGetLocationById() {
     location,
     isLoading,
     error,
-    fetchLocationById,
+    getLocationById,
     clearLocation
   };
 }

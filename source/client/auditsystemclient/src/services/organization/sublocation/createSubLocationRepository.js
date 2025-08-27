@@ -29,8 +29,9 @@ export const createSubLocationRepository = {
         }
       );
 
+
       if (response?.success !== false || response.status === 201) {
-        return ApiResponseT.ok(response?.result, response?.data?.successMessage || 'SubLocation created successfully.');
+        return ApiResponseT.ok(response?.data?.result, response?.data?.successMessage || 'SubLocation created successfully.');
       }
 
       const errors = Array.isArray(response?.errors)

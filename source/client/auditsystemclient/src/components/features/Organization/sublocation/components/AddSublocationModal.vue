@@ -142,10 +142,15 @@ const handleSubmit = async () => {
     };
 
     const result = await createSubLocation(subLocationData);
-
     if (result?.success) {
-      showNotification(`SubLocation "${subLocationData.name}" has been added successfully!`, 'success');
-      emit('sub-location-added', result.data);
+      const newSubLocation = {
+        id: result.data.subLocationId,
+        ...subLocationData,
+        createdAt: new Date().toISOString()
+      };
+      showNotification(`SubLocation "${newSubLocation.name}" has been added successfully!`, 'success');
+      
+      emit('sub-location-added', newSubLocation);
       emit('close');
     }
   } catch (error) {

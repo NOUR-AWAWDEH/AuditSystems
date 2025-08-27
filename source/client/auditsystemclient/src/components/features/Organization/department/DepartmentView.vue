@@ -7,10 +7,10 @@
             @close="handleCloseAddDepartmentModal"
             @department-added="handleDepartmentAdded"
         />
-        
+
         <!-- Department Management -->
         <DepartmentTable
-            :sub-locations="subLocations"
+            :sub-locations="props.subLocations"
             :departments="departments"
             :is-loading="isLoading"
             :selected-sub-location-id="internalSelectedSubLocationId"
@@ -18,9 +18,8 @@
             :current-sub-location="currentSubLocation"
             :is-sub-location-loading="isSubLocationLoading"
             :search-query="searchQuery"
-            :handle-sub-location-change="handleSubLocationChange"
+            :handle-sub-location-change="handleDepartmentChange"
             :handle-search="handleSearch"
-            :refresh-data="refreshData"
             @add-department="handleAddDepartment"
             @edit-department="handleEditDepartment"
             @delete-department="handleDeleteDepartment"
@@ -33,7 +32,7 @@
             :is-visible="showEditDepartmentModal"
             :department="departmentToEdit"
             @close="handleCloseEditDepartmentModal"
-            @updated="handleDepartmentUpdated"
+            @department-updated="handleDepartmentUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -56,9 +55,8 @@ import DepartmentTable from './components/DepartmentTable.vue';
 import AddDepartmentModal from './components/AddDepartmentModal.vue';
 import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
-import { useDepartmentActions } from './composables/useDepartmentActions';
-import { useNotification } from '@/composables/notification/useNotification';
-import { watch } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useDepartmentModals } from './composables/useDepartmentModals';
 
 const props = defineProps({
     subLocations: {
@@ -72,9 +70,13 @@ const props = defineProps({
 });
 
 // Define emit first
-const emit = defineEmits(['department-selected']);
+const emit = defineEmits([
+    'department-selected',
+    'department-added',
+    'department-updated',
+    'department-deleted',
+]);
 
-const { showNotification } = useNotification();
 
 // Use composables - now with integrated backend search
 const {
@@ -86,23 +88,25 @@ const {
     isSubLocationLoading,
     searchQuery,
     refreshData,
-    handleDepartmentAdded,
-    handleSubLocationChange,
+    handleDepartmentChange,
     handleSearch,
     resetToDefaultView,
 } = useDepartmentTable(props.subLocations);
 
+onMounted( async () => {
+    if(internalSelectedSubLocationId) {
+        await refreshData();
+    }
+});
+
+
 // Watch for prop changes and update internal state
 watch(() => props.selectedSubLocationId, (newSubLocationId) => {
     if (newSubLocationId !== internalSelectedSubLocationId.value) {
-        handleSubLocationChange(newSubLocationId);
+        handleDepartmentChange(newSubLocationId);
     }
 }, { immediate: true });
 
-// Watch for subLocations prop changes
-watch(() => props.subLocations, () => {
-    // The composable should handle this automatically, but we can add logging here if needed
-}, { immediate: true, deep: true });
 
 const {
     showAddDepartmentModal,
@@ -116,11 +120,12 @@ const {
     handleCloseAddDepartmentModal,
     handleEditDepartment,
     handleCloseEditDepartmentModal,
+    handleDepartmentAdded,
     handleDepartmentUpdated,
     handleDeleteDepartment,
     confirmDelete,
     cancelDelete
-} = useDepartmentActions(refreshData, showNotification);
+} = useDepartmentModals(departments, emit);
 
 // Handle department selection and forward to parent
 const handleDepartmentSelected = (departmentId) => {

@@ -37,7 +37,7 @@ export function useGetSubLocationById() {
     return null;
   };
 
-  const fetchSubLocationById = async (subLocationId) => {
+  const getSubLocationById = async (subLocationId) => {
     try {
       isLoading.value = true;
       error.value = null;
@@ -76,7 +76,7 @@ export function useGetSubLocationById() {
     error,
 
     // Actions
-    fetchSubLocationById,
+    getSubLocationById,
     clearSubLocation,
   };
 }

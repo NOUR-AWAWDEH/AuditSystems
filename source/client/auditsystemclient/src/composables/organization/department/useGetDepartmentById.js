@@ -38,7 +38,7 @@ export function useGetDepartmentById() {
         }
     };
 
-    const fetchDepartmentById = async (departmentId) => {
+    const getDepartmentById = async (departmentId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -75,7 +75,7 @@ export function useGetDepartmentById() {
         department,
         isLoading,
         error,
-        fetchDepartmentById,
+        getDepartmentById,
         clearDepartment,
     };
 }

@@ -169,13 +169,13 @@ const handleSubmit = async () => {
 
 
     if (result?.success) {
-      // Pass the updated sublocation data with the correct structure
+      // Pass the updated sub location data with the correct structure
       const updatedSubLocationData = {
         ...subLocationData,
         createdAt: new Date().toISOString()
       };
 
-      emit('updated', updatedSubLocationData);
+      emit('sub-location-updated', updatedSubLocationData);
       emit('close');
     } else {
       console.error('❌ Update failed - result not successful:', result);

@@ -10,18 +10,20 @@
                     <!-- SubLocationSelector and Filters - Stack on mobile -->
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
-                            <SubLocationSelector 
+                            <SubLocationSelector
                                 :sub-locations="subLocations"
                                 :selected-sub-location-id="selectedSubLocationId"
+                                value-key="id"
+                                label-key="name"
                                 @sub-location-changed="handleSubLocationChange"
                             />
                         </div>
-                        <div v-if="validSelectedSubLocation" class="w-full sm:w-auto">
-                            <SearchFilter 
+                        <div class="w-full sm:w-auto">
+                            <SearchFilter
                                 :search="searchQuery"
-                                :searchPlaceholder="'Search departments...'" 
-                                @update:search="handleSearch" 
-                                @refresh="refreshData" 
+                                :searchPlaceholder="'Search departments...'"
+                                @update:search="handleSearch"
+                                class="w-full sm:w-auto"
                             />
                         </div>
 
@@ -54,8 +56,14 @@
 
                 <!-- Table Container - Show when SubLocation is Selected -->
                 <div v-if="selectedSubLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="departments" :columns="enhancedColumns" :is-loading="isLoading" :actions="[]"
-                        :no-data-message="noDataMessage" class="department-table" @row-click="handleRowClick">
+                    <ReusableTable
+                        :items="departments"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="department-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectDepartment(item)"
@@ -99,7 +107,6 @@
                     <p class="text-gray-500 mb-6">Choose a subLocation from the dropdown above to get started</p>
 
                     <!-- No SubLocations Available -->
-                    <!-- No SubLocations Available -->
                     <div v-if="!subLocations || subLocations.length === 0" class="text-center">
                         <p class="text-sm text-gray-400">Please add a subLocation first to manage departments</p>
                     </div>
@@ -134,17 +141,6 @@ const props = defineProps({
     searchQuery: String,
     handleSubLocationChange: Function,
     handleSearch: Function,
-    refreshData: Function
-});
-
-const internalSelectedSubLocationId = ref(props.selectedSubLocationId);
-
-watch(() => props.selectedSubLocationId, (newVal) => {
-  internalSelectedSubLocationId.value = newVal;
-});
-
-watch(internalSelectedSubLocationId, (newVal) => {
-  props.handleSubLocationChange(newVal);
 });
 
 const emit = defineEmits([
@@ -154,6 +150,16 @@ const emit = defineEmits([
     'department-selected'
 ]);
 
+const internalSelectedSubLocationId = ref(props.selectedSubLocationId);
+
+watch(() => props.selectedSubLocationId, (newVal) => {
+  internalSelectedSubLocationId.value = newVal;
+});
+
+watch(internalSelectedSubLocationId, (newVal) => {
+  props.handleSubLocationChange(newVal);
+}, { immediate: true });
+
 // Department selection state
 const selectedDepartmentId = ref(null);
 
@@ -162,28 +168,6 @@ const handleSelectDepartment = (department) => {
     selectedDepartmentId.value = department.id;
     emit('department-selected', department.id);
 };
-
-// Handle row click to select department
-const handleRowClick = (department) => {
-    handleSelectDepartment(department);
-};
-
-// Watch for department changes to reset selection if department is deleted
-watch(() => props.departments, (newDepartments) => {
-    if (selectedDepartmentId.value && newDepartments) {
-        const departmentExists = newDepartments.some(dept => dept.id === selectedDepartmentId.value);
-        if (!departmentExists) {
-            selectedDepartmentId.value = null;
-            emit('department-selected', null);
-        }
-    }
-}, { deep: true });
-
-// Reset selection when sublocation changes
-watch(() => props.selectedSubLocationId, () => {
-    selectedDepartmentId.value = null;
-    emit('department-selected', null);
-});
 
 const departmentColumns = [
     { key: 'name', label: 'Name' },
@@ -201,9 +185,6 @@ const noDataMessage = computed(() => {
     return 'No departments found for this sub location.';
 });
 
-const validSelectedSubLocation = computed(() => {
-   return props.selectedSubLocationId && props.currentSubLocation?.name;
-});
 </script>
 
 <style scoped>

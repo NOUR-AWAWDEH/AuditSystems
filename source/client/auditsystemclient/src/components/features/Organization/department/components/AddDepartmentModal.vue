@@ -65,7 +65,7 @@
     </Teleport>
 </template>
 <script setup>
-import { ref, watch } from 'vue';
+import { createApp, ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import { useCreateDepartment } from '@/composables/organization/department/useCreateDepartment';
@@ -129,10 +129,16 @@ const handleSubmit = async () => {
         };
 
         const result = await createDepartment(departmentData);
-
+        console.log("Create Department", result);
         if (result?.success) {
+            const newDepartment = {
+                id: result.data.departmentId,
+                ...departmentData,
+                createAt: new Date().toISOString(),
+            };
+            console.log("New Department", newDepartment);
             showNotification(`Department ${departmentData.name} has been added successfully!`, 'success');
-            emit('department-added', result.data);
+            emit('department-added', newDepartment);
             emit('close');
         }
 

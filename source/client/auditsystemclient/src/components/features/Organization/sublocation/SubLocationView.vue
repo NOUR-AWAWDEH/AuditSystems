@@ -7,7 +7,7 @@
             @close="handleCloseAddSubLocationModal"
             @sub-location-added="handleSubLocationAdded"
         />
-        
+
         <!-- SubLocation Management -->
         <SubLocationTable
             v-if="props.locations && props.locations.length > 0 "
@@ -27,15 +27,15 @@
             @sub-location-selected="handleSubLocationSelected"
         />
 
-        
 
-        <!-- Edit Sublocation Modal -->
+
+        <!-- Edit Sub location Modal -->
         <EditSubLocationModal
             v-if="showEditSubLocationModal"
             :is-visible="showEditSubLocationModal"
             :sub-location="subLocationToEdit"
             @close="handleCloseEditSubLocationModal"
-            @updated="handleSubLocationUpdated"
+            @sub-location-updated="handleSubLocationUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -56,8 +56,8 @@
 import { watch, onMounted } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubLocationTable from './components/SubLocationTable.vue';
-import AddSubLocationModal from './components/AddSublocationModal.vue';
-import EditSubLocationModal from './components/EditSublocationModal.vue';
+import AddSubLocationModal from './components/AddSubLocationModal.vue';
+import EditSubLocationModal from './components/EditSubLocationModal.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
 import { useSubLocationModals } from './composables/useSubLocationModals';
 
@@ -72,7 +72,7 @@ const props = defineProps({
     }
 });
 
-// Define emit to forward sublocation selection to parent
+// Define emit to forward subLocation selection to parent
 const emit = defineEmits([
     'sub-location-selected',
     'sub-location-added',
@@ -99,7 +99,7 @@ const {
 
 onMounted( async () => {
     if(internalSelectedLocationId.value) {
-     await refreshData();
+      await refreshData();
     }
 });
 

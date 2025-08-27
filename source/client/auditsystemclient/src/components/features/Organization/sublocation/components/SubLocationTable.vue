@@ -10,19 +10,19 @@
                     <!-- Location Selector and Filters - Stack on mobile -->
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
-                            <LocationSelector 
-                                :locations="locations" 
+                            <LocationSelector
+                                :locations="locations"
                                 :selected-location-id="selectedLocationId"
                                 value-key="id"
                                 label-key="name"
-                                @location-changed="handleLocationChange" 
+                                @location-changed="handleLocationChange"
                             />
                         </div>
                         <div class="w-full sm:w-auto">
-                            <SearchFilter 
+                            <SearchFilter
                                 :search="searchQuery"
-                                :searchPlaceholder="'Search sub locations...'" 
-                                @update:search="handleSearch" 
+                                :searchPlaceholder="'Search sub locations...'"
+                                @update:search="handleSearch"
                                 class="w-full sm:w-auto"
                             />
                         </div>
@@ -56,7 +56,7 @@
 
                 <!-- Table Container - Show when location is selected -->
                 <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="subLocations"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -203,7 +203,7 @@ const noDataMessage = computed(() => {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.sublocation-table .table-row.selected {
+.sub-location-table .table-row.selected {
     background-color: #eff6ff;
     border-left: 4px solid #3b82f6;
 }

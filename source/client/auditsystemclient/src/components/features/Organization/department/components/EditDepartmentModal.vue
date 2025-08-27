@@ -148,14 +148,13 @@ const handleSubmit = async () => {
     };
 
     const result = await updateDepartment(departmentData);
-
+    console.log("Edit Department: ", result);
     if (result?.success) {
       const updatedDepartmentData = {
         ...departmentData,
-        ...result.data
       };
 
-      emit('updated', updatedDepartmentData);
+      emit('department-updated', updatedDepartmentData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update department. Please try again.';

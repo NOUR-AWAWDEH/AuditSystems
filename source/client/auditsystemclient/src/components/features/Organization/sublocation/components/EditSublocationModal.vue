@@ -83,7 +83,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'sub-location-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateSubLocation, resetState } = useUpdateSubLocationById();

@@ -42,9 +42,6 @@
         <div v-if="activeTab === 'locations'" class="p-3 sm:p-4 md:p-6">
           <LocationView
             @location-selected="handleLocationSelected"
-            @location-added="refreshLocations"
-            @location-updated="refreshLocations"
-            @location-deleted="refreshLocations"
           />
         </div>
 
@@ -54,9 +51,6 @@
             :locations="locations"
             :selected-location-id="selectedLocationId"
             @sub-location-selected="handleSubLocationSelected"
-            @sub-location-added="refreshSubLocations"
-            @sub-location-updated="refreshSubLocations"
-            @sub-location-deleted="refreshSubLocations"
           />
         </div>
 
@@ -66,9 +60,7 @@
             :sub-locations="subLocations"
             :selected-sub-location-id="selectedSubLocationId"
             @department-selected="handleDepartmentSelected"
-            @department-added="refreshDepartments"
-            @department-updated="refreshDepartments"
-            @department-deleted="refreshDepartments"
+            
           />
         </div>
 
@@ -78,9 +70,6 @@
             :departments="departments"
             :selected-department-id="selectedDepartmentId"
             @sub-department-selected="handleSubDepartmentSelected"
-            @sub-department-added="refreshSubDepartments"
-            @sub-department-updated="refreshSubDepartments"
-            @sub-department-deleted="refreshSubDepartments"
           />
         </div>
       </div>
@@ -89,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import OrganizationHeader from './components/OrganizationHeader.vue';
@@ -104,8 +93,6 @@ import { useGetSubLocationsByUserId } from '@/composables/organization/sublocati
 import { useGetSubLocationById } from '@/composables/organization/sublocation/useGetSubLocationById';
 import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
 import { useGetDepartmentById } from '@/composables/organization/department/useGetDepartmentById';
-import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
-import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 
 // Router
 const route = useRoute();
@@ -129,13 +116,6 @@ const { getSubLocationById } = useGetSubLocationById();
 const { getDepartmentsByUserId, departments } = useGetDepartmentsByUserId();
 const { getDepartmentById } = useGetDepartmentById();
 
-const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
-const { getSubDepartmentById } = useGetSubDepartmentById();
-
-// Computed normalized lists
-const normalizedSubLocations = computed(() => subLocations?.value ? (Array.isArray(subLocations.value) ? subLocations.value : []) : []);
-const normalizedDepartments = computed(() => departments?.value ? (Array.isArray(departments.value) ? departments.value : []) : []);
-const normalizedSubDepartments = computed(() => subDepartments?.value ? (Array.isArray(subDepartments.value) ? subDepartments.value : []) : []);
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -161,19 +141,18 @@ const setSelectedId = (key, value) => {
 // Event handlers
 const handleLocationSelected = async (id) => {
   setSelectedId('location', id);
-  if (!normalizedSubLocations.value.length) await refreshLocations();
   activeTab.value = 'sublocations';
 };
 
 const handleSubLocationSelected = async (id) => {
   setSelectedId('subLocation', id);
-  if (!normalizedDepartments.value.length) await refreshSubLocations();
+   await refreshSubLocations();
   activeTab.value = 'departments';
 };
 
 const handleDepartmentSelected = async (id) => {
   setSelectedId('department', id);
-  if (!normalizedSubDepartments.value.length) await refreshDepartments();
+  await refreshDepartments();
   activeTab.value = 'subdepartments';
 };
 
@@ -185,7 +164,7 @@ const handleSubDepartmentSelected = async (id) => {
 const refreshLocations = async () => await getLocationsByUserId();
 const refreshSubLocations = async () => await getSubLocationsByUserId();
 const refreshDepartments = async () => await getDepartmentsByUserId();
-const refreshSubDepartments = async () => await getSubDepartmentsByUserId();
+
 
 
 // Tab navigation
@@ -199,7 +178,6 @@ const handleRouteQueries = async () => {
   if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }
   if (subLocationId) { selectedSubLocationId.value = subLocationId; await getSubLocationById(subLocationId); }
   if (departmentId) { selectedDepartmentId.value = departmentId; await getDepartmentById(departmentId); }
-  if (subDepartmentId) { selectedSubDepartmentId.value = subDepartmentId;  await getSubDepartmentById(subDepartmentId); }
 
   // Clean up URL
   if (locationId || subLocationId || departmentId || subDepartmentId) {

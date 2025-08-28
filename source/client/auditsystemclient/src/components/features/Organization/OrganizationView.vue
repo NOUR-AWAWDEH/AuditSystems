@@ -85,14 +85,14 @@ import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
 import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
-import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
-
+import SubDepartmentView from './subdepartment/SubDepartmentView.vue'; 
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
 import { useGetLocationById } from '@/composables/organization/location/useGetLocationById';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 import { useGetSubLocationById } from '@/composables/organization/sublocation/useGetSubLocationById';
 import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
 import { useGetDepartmentById } from '@/composables/organization/department/useGetDepartmentById';
+import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 
 // Router
 const route = useRoute();
@@ -101,6 +101,7 @@ const router = useRouter();
 // State
 const activeTab = ref('locations');
 
+// localStorage get
 const selectedLocationId = ref(localStorage.getItem('organizationSelectedLocationId') || null);
 const selectedSubLocationId = ref(localStorage.getItem('organizationSelectedSubLocationId') || null);
 const selectedDepartmentId = ref(localStorage.getItem('organizationSelectedDepartmentId') || null);
@@ -116,6 +117,8 @@ const { getSubLocationById } = useGetSubLocationById();
 const { getDepartmentsByUserId, departments } = useGetDepartmentsByUserId();
 const { getDepartmentById } = useGetDepartmentById();
 
+//const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
+const { getSubDepartmentById } = useGetSubDepartmentById();
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -128,7 +131,7 @@ const tabs = ref([
   { id: 'subdepartments', name: 'Sub-Departments' }
 ]);
 
-// Selection handlers
+// Selection handlers localStorage set
 const setSelectedId = (key, value) => {
   switch (key) {
     case 'location': selectedLocationId.value = value; localStorage.setItem('organizationSelectedLocationId', value || ''); break;
@@ -146,25 +149,19 @@ const handleLocationSelected = async (id) => {
 
 const handleSubLocationSelected = async (id) => {
   setSelectedId('subLocation', id);
-   await refreshSubLocations();
+   await getSubLocationsByUserId();
   activeTab.value = 'departments';
 };
 
 const handleDepartmentSelected = async (id) => {
   setSelectedId('department', id);
-  await refreshDepartments();
+  await getDepartmentsByUserId();
   activeTab.value = 'subdepartments';
 };
 
 const handleSubDepartmentSelected = async (id) => {
   setSelectedId('subDepartment', id);
 };
-
-// Refreshers
-const refreshLocations = async () => await getLocationsByUserId();
-const refreshSubLocations = async () => await getSubLocationsByUserId();
-const refreshDepartments = async () => await getDepartmentsByUserId();
-
 
 
 // Tab navigation
@@ -178,7 +175,7 @@ const handleRouteQueries = async () => {
   if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }
   if (subLocationId) { selectedSubLocationId.value = subLocationId; await getSubLocationById(subLocationId); }
   if (departmentId) { selectedDepartmentId.value = departmentId; await getDepartmentById(departmentId); }
-
+  if (subDepartmentId) {selectedDepartmentId.value= subDepartmentId; await getSubDepartmentById(subDepartmentId);}
   // Clean up URL
   if (locationId || subLocationId || departmentId || subDepartmentId) {
     await router.replace({ path: '/organization' });
@@ -187,7 +184,7 @@ const handleRouteQueries = async () => {
 
 // Init
 onMounted(async () => {
-  await refreshLocations();
+  await getLocationsByUserId();
   await handleRouteQueries();
 });
 

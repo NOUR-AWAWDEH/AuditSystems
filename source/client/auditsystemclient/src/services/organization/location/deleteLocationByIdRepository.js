@@ -19,7 +19,7 @@ export const deleteLocationByIdRepository = {
       });
       
       const { data, status } = response;
-      
+
       if (status === 204 || (status === 200 && data?.success !== false)) {
         return ApiResponseT.ok(null, data?.successMessage || 'Location deleted successfully');
       }

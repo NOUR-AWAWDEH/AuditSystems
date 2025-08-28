@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { useSearchSubLocationByUserId } from '@/composables/organization/sublocation/useSearchSubLocationByUserId';
+import { useSearchSubLocationsByUserId } from '@/composables/organization/sublocation/useSearchSubLocationsByUserId';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 
 export function useSubLocationData() {
@@ -9,7 +9,7 @@ export function useSubLocationData() {
     totalCount = ref(0),
     searchSubLocations,
     clearSearch
-  } = useSearchSubLocationByUserId() || {};
+  } = useSearchSubLocationsByUserId() || {};
 
   const {
     subLocations: allSubLocations = ref([]),

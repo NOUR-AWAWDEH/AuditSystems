@@ -1,8 +1,8 @@
 import { ref } from 'vue';
-import { searchSubLocationByUserIdRepository } from '@/services/organization/sublocation/searchSubLocationByUserIdRepository';
+import { searchSubLocationsByUserIdRepository } from '@/services/organization/sublocation/searchSubLocationsByUserIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSearchSubLocationByUserId() {
+export function useSearchSubLocationsByUserId() {
 
 // Create singleton state outside the function
 const searchResults = ref([]);
@@ -21,10 +21,10 @@ const locationId = ref(localStorage.getItem('searchLocationId') || null);
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
-    
+
     error.value = errorMessage;
     showNotification(errorMessage, 'error');
-    
+
     return {
       success: false,
       message: errorMessage,
@@ -39,12 +39,12 @@ const locationId = ref(localStorage.getItem('searchLocationId') || null);
           page = 1,
           pageSize: pageSizeParam = 10
       } = params;
-      
+
       isSearching.value = true;
       error.value = null;
       currentPage.value = page;
       pageSize.value = pageSizeParam;
-  
+
       try {
           // Create the search parameters object for the repository
           const searchParams = {
@@ -53,21 +53,21 @@ const locationId = ref(localStorage.getItem('searchLocationId') || null);
               page,
               pageSize: pageSizeParam
           };
-          
-          const result = await searchSubLocationByUserIdRepository.searchSubLocationsByUserId(
+
+          const result = await searchSubLocationsByUserIdRepository.searchSubLocationsByUserId(
               searchParams
           );
-          
+
 
           if (result.success) {
             const subLocations = result.result?.items || result.result || [];
             const fetchedTotalCount = result.result?.totalCount || 0;
-  
+
             searchResults.value = subLocations;
             totalCount.value = fetchedTotalCount;
-  
-            return { 
-              success: true, 
+
+            return {
+              success: true,
               message: result.message || 'Search completed successfully',
               data: {
                 subLocations: searchResults.value,
@@ -81,11 +81,11 @@ const locationId = ref(localStorage.getItem('searchLocationId') || null);
               error.value = errorMsg;
               searchResults.value = [];
               totalCount.value = 0;
-              
+
               if (result.errors && result.errors.length > 0) {
                   showNotification(errorMsg, 'error');
               }
-              
+
               return { success: false, message: errorMsg, errors: result.errors };
           }
       } catch (err) {

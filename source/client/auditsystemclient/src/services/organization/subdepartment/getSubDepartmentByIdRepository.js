@@ -25,7 +25,6 @@ export const getSubDepartmentByIdRepository = {
 
             const { data, status } = response;
 
-            console.log('getSubDepartmentById response data:', data);
             if (status === 200 && data?.success && data?.result) {
                 return ApiResponseT.ok(
                     data.result,

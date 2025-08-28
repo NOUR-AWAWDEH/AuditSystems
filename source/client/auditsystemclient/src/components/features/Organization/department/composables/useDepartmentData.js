@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { useSearchDepartmentByUserId } from '@/composables/organization/department/useSearchDepartmentByUserId';
+import { useSearchDepartmentsByUserId } from '@/composables/organization/department/useSearchDepartmentsByUserId';
 import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
 
 export function useDepartmentData() {
@@ -9,7 +9,7 @@ export function useDepartmentData() {
     totalCount = ref(0),
     searchDepartments,
     clearSearch
-  } = useSearchDepartmentByUserId() || {};
+  } = useSearchDepartmentsByUserId() || {};
 
   const {
     departments: allDepartments = ref([]),

@@ -44,9 +44,6 @@
             :sub-departments="subDepartments"
             :selected-sub-department-id="selectedSubDepartmentId"
             @audit-process-selected="handleAuditProcessSelected"
-            @audit-process-added="refreshAuditProcesses"
-            @audit-process-updated="refreshAuditProcesses"
-            @audit-process-deleted="refreshAuditProcesses"
           />
         </div>
 
@@ -56,9 +53,6 @@
             :audit-processes="auditProcesses"
             :selected-audit-process-id="selectedAuditProcessId"
             @sub-process-selected="handleSubProcessSelected"
-            @sub-process-added="refreshSubProcesses"
-            @sub-process-updated="refreshSubProcesses"
-            @sub-process-deleted="refreshSubProcesses"
           />
         </div>
 
@@ -68,9 +62,6 @@
             :sub-processes="subProcesses"
             :selected-sub-process-id="selectedSubProcessId"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
-            @risk-control-matrix-added="refreshRiskControlMatrices"
-            @risk-control-matrix-updated="refreshRiskControlMatrices"
-            @risk-control-matrix-deleted="refreshRiskControlMatrices"
           />
         </div>
 
@@ -80,9 +71,6 @@
             :risk-control-matrices="riskControlMatrices"
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
             @objective-selected="handleObjectiveSelected"
-            @objective-added="refreshObjectives"
-            @objective-updated="refreshObjectives"
-            @objective-deleted="refreshObjectives"
           />
         </div>
 
@@ -92,9 +80,6 @@
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @risk-selected="handleRiskSelected"
-            @risk-added="refreshRisks"
-            @risk-updated="refreshRisks"
-            @risk-deleted="refreshRisks"
           />
         </div>
 
@@ -143,16 +128,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
 import RiskControlMatrix from './riskControlMatrix/RiskControlMatrix.vue';
 import Objective from './objective/ObjectiveVue.vue';
 import RiskVue from './risk/RiskVue.vue';
-
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
@@ -172,8 +155,7 @@ const router = useRouter();
 
 // State
 const activeTab = ref('processes');
-
-const selectedSubDepartmentId = ref(localStorage.getItem('riskControlSelectedSubDepartmentId') || null);
+const selectedSubDepartmentId = ref(localStorage.getItem('organizationSelectedSubDepartmentId') || null);
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
 const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
 const selectedRiskControlMatrixId = ref(localStorage.getItem('riskControlSelectedRiskControlMatrixId') || null);
@@ -196,14 +178,9 @@ const { getRiskControlMatrixById } = useGetRiskControlMatrixById();
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getObjectiveById } = useGetObjectiveById();
 
-const { getRisksByUserId, risks } = useGetRisksByUserId();
+const { getRisksByUserId } = useGetRisksByUserId();
 const { getRiskById } = useGetRiskById();
 
-// Computed normalized lists
-const normalizedSubProcesses = computed(() => Array.isArray(subProcesses.value) ? subProcesses.value : []);
-const normalizedRiskControlMatrices = computed(() => Array.isArray(riskControlMatrices.value) ? riskControlMatrices.value : []);
-const normalizedObjectives = computed(() => Array.isArray(objectives.value) ? objectives.value : []);
-const normalizedRisks = computed(() => Array.isArray(risks.value) ? risks.value : []);
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -224,7 +201,6 @@ const tabs = ref([
 // Selection handlers
 const setSelectedId = (key, value) => {
   switch (key) {
-    case 'subDepartment': selectedSubDepartmentId.value = value; localStorage.setItem('riskControlSelectedSubDepartmentId', value || ''); break;
     case 'auditProcess': selectedAuditProcessId.value = value; localStorage.setItem('riskControlSelectedAuditProcessId', value || ''); break;
     case 'subProcess': selectedSubProcessId.value = value; localStorage.setItem('riskControlSelectedSubProcessId', value || ''); break;
     case 'riskControlMatrix': selectedRiskControlMatrixId.value = value; localStorage.setItem('riskControlSelectedRiskControlMatrixId', value || ''); break;
@@ -233,50 +209,46 @@ const setSelectedId = (key, value) => {
   }
 };
 
+
 // Event handlers
+
 const handleAuditProcessSelected = async (id) => {
   setSelectedId('auditProcess', id);
-  if (!normalizedSubProcesses.value.length) await refreshAuditProcesses();
+  await getAuditProcessesByUserId();
   activeTab.value = 'subprocesses';
 };
 
 const handleSubProcessSelected = async (id) => {
   setSelectedId('subProcess', id);
-  if (!normalizedRiskControlMatrices.value.length) await refreshSubProcesses();
+  await getSubProcessesByUserId();
   activeTab.value = 'matrix';
 };
 
 const handleRiskControlMatrixSelected = async (id) => {
   setSelectedId('riskControlMatrix', id);
-  if (!normalizedObjectives.value.length) await refreshRiskControlMatrices();
+  await getRiskControlMatricesByUserId();
   activeTab.value = 'objectives';
 };
 
 const handleObjectiveSelected = async (id) => {
   setSelectedId('objective', id);
-  if (!normalizedRisks.value.length) await refreshObjectives();
+  await getObjectivesByUserId();
   activeTab.value = 'risks';
 };
 
 const handleRiskSelected = async (id) => {
   setSelectedId('risk', id);
+  await getRisksByUserId();
+  activeTab.value = 'exitrisks';
 };
 
-// Refreshers
-const refreshSubDepartments = async () => await getSubDepartmentsByUserId();
-const refreshAuditProcesses = async () => await getAuditProcessesByUserId();
-const refreshSubProcesses = async () => await getSubProcessesByUserId();
-const refreshRiskControlMatrices = async () => await getRiskControlMatricesByUserId();
-const refreshObjectives = async () => await getObjectivesByUserId();
-const refreshRisks = async () => await getRisksByUserId();
 
 // Tab navigation
 const setActiveTab = (tabId) => activeTab.value = tabId;
 
 // Handle route queries
 const handleRouteQueries = async () => {
-  const { subDepartmentId, auditProcessId, subProcessId, riskControlMatrixId, objectiveId, riskId } = route.query;
-
+  const {subDepartmentId ,auditProcessId, subProcessId, riskControlMatrixId, objectiveId, riskId } = route.query;
   if (subDepartmentId) { selectedSubDepartmentId.value = subDepartmentId; await getSubDepartmentById(subDepartmentId); }
   if (auditProcessId) { selectedAuditProcessId.value = auditProcessId; await getAuditProcessById(auditProcessId); }
   if (subProcessId) { selectedSubProcessId.value = subProcessId; await getSubProcessById(subProcessId); }
@@ -292,9 +264,10 @@ const handleRouteQueries = async () => {
 
 // Init
 onMounted(async () => {
-  await refreshSubDepartments();
+  await getSubDepartmentsByUserId();
   await handleRouteQueries();
 });
+
 
 watch(() => route.query, handleRouteQueries);
 

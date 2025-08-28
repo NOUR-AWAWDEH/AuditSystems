@@ -1,8 +1,8 @@
 import { ref } from 'vue';
 import { useNotification } from '@/composables/notification/useNotification';
-import { searchDepartmentByUserIdRepository } from '@/services/organization/department/searchDepartmentsByUserIdRepository';
+import { searchDepartmentsByUserIdRepository } from '@/services/organization/department/searchDepartmentsByUserIdRepository';
 
-export function useSearchDepartmentByUserId() {
+export function useSearchDepartmentsByUserId() {
     const searchResults = ref([]);
     const isSearching = ref(false);
     const error = ref(null);
@@ -57,7 +57,7 @@ export function useSearchDepartmentByUserId() {
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-            const response = await searchDepartmentByUserIdRepository.searchDepartmentByUserId(params);
+            const response = await searchDepartmentsByUserIdRepository.searchDepartmentsByUserId(params);
             
             if (response?.success) {
                 return handleSearchSuccess(response);

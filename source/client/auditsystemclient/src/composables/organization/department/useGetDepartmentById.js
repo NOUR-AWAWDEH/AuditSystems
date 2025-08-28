@@ -51,7 +51,6 @@ export function useGetDepartmentById() {
 
             const response = await getDepartmentByIdRepository.getDepartmentById(departmentId);
 
-            console.log('getDepartmentById response:', response);
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {

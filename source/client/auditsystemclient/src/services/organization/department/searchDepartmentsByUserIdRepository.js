@@ -5,9 +5,9 @@ import api from '@/services/api/api';
 const DEPARTMENT_BASE_ENDPOINT = '/api/department';
 const SEARCH_DEPARTMENT_BY_USER_ID_ENDPOINT = '/search-department-by-user-id';
 
-export const searchDepartmentByUserIdRepository = {
+export const searchDepartmentsByUserIdRepository = {
 
-    async searchDepartmentByUserId(searchParams = {}) {
+    async searchDepartmentsByUserId(searchParams = {}) {
         try {
             const token = authService.getLocalToken();
 

@@ -1,30 +1,41 @@
-import api from '@/services/api/api';
-import { ApiResponseT } from '@/utils/ApiResponse';
-import authService from '@/services/auth/authRepos/authService';
+import { ApiResponseT } from "@/utils/ApiResponse";
+import authService from "@/services/auth/authRepos/authService";
+import api from "@/services/api/api";
 
-const LOCATION_BASE_ENDPOINT = '/api/Location';
-const SEARCH_LOCATION_BY_USER_ID_ENDPOINT = '/search-location-by-user-id';
+const SUBLOCATION_BASE_ENDPOINT = "api/SubLocation";
+const SUBLOCATION_SEARCH_BY_USER_ID_ENDPOINT = "/search-sub-location-by-user-id";
 
-export const searchLocationByUserIdRepository = {
-  async searchLocationsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10) {
+export const searchSubLocationsByUserIdRepository = {
+  async searchSubLocationsByUserId(searchParams = {}) {
     try {
+      const {
+        searchTerm = '',
+        locationId = null,
+        page = 1,
+        pageSize = 10
+      } = searchParams;
+      
       const token = authService.getLocalToken();
-
       const params = {
         searchTerm,
-        page: pageNumber,
+        page,
         pageSize,
         sortBy: 'name'
       };
-
+      
+      // Add locationId to params if provided
+      if (locationId) {
+        params.locationId = locationId;
+      }
+      
       const response = await api.get(
-        `${LOCATION_BASE_ENDPOINT}${SEARCH_LOCATION_BY_USER_ID_ENDPOINT}`,
+        `${SUBLOCATION_BASE_ENDPOINT}${SUBLOCATION_SEARCH_BY_USER_ID_ENDPOINT}`,
         {
           params,
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -37,7 +48,7 @@ export const searchLocationByUserIdRepository = {
         if (result?.items && typeof result.totalCount === 'number') {
           return ApiResponseT.ok(
             result, // includes items and totalCount
-            data.successMessage || 'Locations fetched successfully.'
+            data.successMessage || 'Sublocations fetched successfully.'
           );
         }
 
@@ -49,11 +60,11 @@ export const searchLocationByUserIdRepository = {
 
       return ApiResponseT.badRequest(
         [{ message: 'Unexpected response format.' }],
-        'Failed to search locations'
+        'Failed to search sublocations'
       );
 
-    } catch (error) {
-      console.error('Search locations error:', error);
+    } catch(error) { 
+      console.error('Search sublocations error:', error);
 
       const responseData = error.response?.data;
 

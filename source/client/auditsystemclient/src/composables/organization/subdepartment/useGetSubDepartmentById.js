@@ -9,8 +9,7 @@ export function useGetSubDepartmentById() {
   const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
-    // Handle potential nested structure - extract the actual subdepartment data
-    const subDepartmentData = response.result.subDepartmentModel || response.result;
+    const subDepartmentData = response.result.subDepartmentModel;
     subDepartment.value = subDepartmentData;
     return { success: true, data: subDepartmentData };
   };
@@ -51,7 +50,6 @@ export function useGetSubDepartmentById() {
 
       const response = await getSubDepartmentByIdRepository.getSubDepartmentById(subDepartmentId);
 
-      console.log('getSubDepartmentById response:', response);
       if (response?.success) {
         return handleFetchSuccess(response);
       } else {

@@ -64,7 +64,7 @@
             :is-visible="showEditAuditProcessModal"
             :audit-process="auditProcessToEdit"
             @close="handleCloseEditAuditProcessModal"
-            @updated="handleAuditProcessUpdated"
+            @audit-process-updated="handleAuditProcessUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -128,7 +128,7 @@ const {
 // Add onMounted to refresh data on page load
 onMounted(async () => {
     // If there's a selected sub-department, refresh the data
-    if (internalSelectedSubDepartmentId.value) {
+    if (internalSelectedSubDepartmentId) {
         await refreshData();
     }
 });

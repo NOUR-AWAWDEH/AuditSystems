@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { searchSubDepartmentByUserIdRepository } from '@/services/organization/subdepartment/searchSubDepartmentByUserIdRepository';
+import { searchSubDepartmentsByUserIdRepository } from '@/services/organization/subdepartment/searchSubDepartmentsByUserIdRepository';
 import { useNotification } from '@/composables/notification/useNotification';
 
 // Create singleton state outside the function
@@ -11,31 +11,31 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const searchTerm = ref('');
 // Persist departmentId in localStorage
-const departmentId = ref(localStorage.getItem('searchDepartmentId') || null);
+const departmentId = ref(localStorage.getItem('organizationSelectedDepartmentId') || null);
 
-export function useSearchSubDepartmentByUserId() {
+export function useSearchSubDepartmentsByUserId() {
   const { showNotification } = useNotification();
 
   const handleSearchSuccess = (response) => {
     const items = response.result?.result?.items || response.result?.items || [];
     const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
-        
+
     const isValidArray = Array.isArray(items);
-    
+
     searchResults.value = isValidArray ? items : [];
     totalCount.value = extractedTotalCount;
-        
+
     return { success: true, data: response.result };
   };
-  
+
   const handleSearchFailure = (response, defaultErrorMessage = 'Failed to search subdepartments') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
-    
+
     error.value = errorMessage;
     showNotification(errorMessage, 'error');
-    
+
     return {
       success: false,
       message: errorMessage,
@@ -61,15 +61,15 @@ export function useSearchSubDepartmentByUserId() {
         departmentId.value = searchParams.departmentId;
         // Persist to localStorage
         if (searchParams.departmentId) {
-          localStorage.setItem('searchDepartmentId', searchParams.departmentId);
+          localStorage.setItem('organizationSelectedDepartmentId', searchParams.departmentId);
         } else {
-          localStorage.removeItem('searchDepartmentId');
+          localStorage.removeItem('organizationSelectedDepartmentId');
         }
       }
       if (searchParams.page !== undefined) currentPage.value = searchParams.page;
       if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-      const response = await searchSubDepartmentByUserIdRepository.searchSubDepartmentsByUserId(params);
+      const response = await searchSubDepartmentsByUserIdRepository.searchSubDepartmentsByUserId(params);
 
       if (response?.success) {
         return handleSearchSuccess(response);
@@ -93,7 +93,7 @@ export function useSearchSubDepartmentByUserId() {
 
   const clearDepartmentFilter = () => {
     departmentId.value = null;
-    localStorage.removeItem('searchDepartmentId');
+    localStorage.removeItem('organizationSelectedDepartmentId');
     searchResults.value = [];
   };
 
@@ -126,7 +126,7 @@ export function useSearchSubDepartmentByUserId() {
     currentPage.value = 1;
     searchTerm.value = '';
     departmentId.value = null;
-    localStorage.removeItem('searchDepartmentId');
+    localStorage.removeItem('organizationSelectedDepartmentId');
   };
 
   return {

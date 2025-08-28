@@ -14,7 +14,7 @@ export function useSubDepartmentManagement(subDepartments) {
         }
     });
 
-    const {
+    const {            
         subdepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
         getSubDepartmentById,
@@ -53,8 +53,7 @@ export function useSubDepartmentManagement(subDepartments) {
     });
 
     const currentSubDepartment = computed(() => {
-        const subDepartment = fetchSubDepartment?.value || selectedSubDepartment?.value;
-        return subDepartment?.subDepartmentModel || subDepartment;
+        return fetchSubDepartment?.value || selectedSubDepartment?.value;
     });
 
     return {

@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { useSearchSubDepartmentByUserId } from '@/composables/organization/subdepartment/useSearchSubDepartmentByUserId';
+import { useSearchSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useSearchSubDepartmentsByUserId';
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 
 export function useSubDepartmentData() {
@@ -9,7 +9,7 @@ export function useSubDepartmentData() {
     totalCount = ref(0),
     searchSubDepartments,
     clearSearch
-  } = useSearchSubDepartmentByUserId() || {};
+  } = useSearchSubDepartmentsByUserId() || {};
 
   const {
     subDepartments: allSubDepartments = ref([]),

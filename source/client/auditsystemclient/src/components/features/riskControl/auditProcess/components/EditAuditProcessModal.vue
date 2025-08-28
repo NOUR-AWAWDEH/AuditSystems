@@ -72,7 +72,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'audit-process-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateAuditProcess, resetState } = useUpdateAuditProcessById();
@@ -154,7 +154,7 @@ const handleSubmit = async () => {
         ...result.data
       };
 
-      emit('updated', updatedAuditProcessData);
+      emit('audit-process-updated', updatedAuditProcessData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update audit process. Please try again.';

@@ -1,5 +1,5 @@
 import { watch, onMounted } from 'vue';
-import { useSearchLocationByUserId } from '@/composables/organization/location/useSearchLocationByUserId';
+import { useSearchLocationsByUserId } from '@/composables/organization/location/useSearchLocationsByUserId';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
 import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 
@@ -11,7 +11,7 @@ export function useLocationTable() {
     isSearching: isLoading,
     totalCount,
     searchLocations
-  } = useSearchLocationByUserId();
+  } = useSearchLocationsByUserId();
 
   const {
     locations: allLocations,

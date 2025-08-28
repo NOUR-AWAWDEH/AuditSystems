@@ -10,16 +10,16 @@
                     <!-- Department Selector and Filters - Stack on mobile -->
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
-                            <DepartmentSelector 
-                                :departments="departments" 
+                            <DepartmentSelector
+                                :departments="departments"
                                 :selected-department-id="selectedDepartmentId"
                                 @department-changed="handleDepartmentChange" />
                         </div>
                         <div class="w-full sm:w-auto">
-                            <SearchFilter 
+                            <SearchFilter
                                 :search="searchQuery"
-                                :searchPlaceholder="'Search sub departments...'" 
-                                @update:search="handleSearch" 
+                                :searchPlaceholder="'Search sub departments...'"
+                                @update:search="handleSearch"
                                 class="w-full sm:w-auto"
                             />
                         </div>
@@ -52,7 +52,7 @@
 
                 <!-- Table Container - Show when department is selected -->
                 <div v-if="selectedDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="subDepartments"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -167,11 +167,10 @@ const selectedSubDepartmentId = ref(null);
 const handleSelectSubDepartment = (subDepartment) => {
     selectedSubDepartmentId.value = subDepartment.id;
     emit('sub-department-selected', subDepartment.id);
-    
+
     // Navigate to RiskControl with selected subdepartment
     router.push({
         path: '/risk-control',
-        query: { subDepartmentId: subDepartment.id }
     });
 };
 

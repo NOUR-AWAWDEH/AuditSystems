@@ -117,7 +117,6 @@ const { getSubLocationById } = useGetSubLocationById();
 const { getDepartmentsByUserId, departments } = useGetDepartmentsByUserId();
 const { getDepartmentById } = useGetDepartmentById();
 
-//const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
 const { getSubDepartmentById } = useGetSubDepartmentById();
 
 const isLoading = ref(false);
@@ -175,7 +174,7 @@ const handleRouteQueries = async () => {
   if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }
   if (subLocationId) { selectedSubLocationId.value = subLocationId; await getSubLocationById(subLocationId); }
   if (departmentId) { selectedDepartmentId.value = departmentId; await getDepartmentById(departmentId); }
-  if (subDepartmentId) {selectedDepartmentId.value= subDepartmentId; await getSubDepartmentById(subDepartmentId);}
+  if (subDepartmentId) {selectedSubDepartmentId.value= subDepartmentId; await getSubDepartmentById(subDepartmentId);}
   // Clean up URL
   if (locationId || subLocationId || departmentId || subDepartmentId) {
     await router.replace({ path: '/organization' });

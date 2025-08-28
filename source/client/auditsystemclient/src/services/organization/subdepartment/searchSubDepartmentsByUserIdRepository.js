@@ -5,7 +5,7 @@ import api from "@/services/api/api";
 const SUBDEPARTMENT_BASE_ENDPOINT = "api/SubDepartment";
 const SUBDEPARTMENT_SEARCH_BY_USER_ID_ENDPOINT = "/search-sub-department-by-user-id";
 
-export const searchSubDepartmentByUserIdRepository = {
+export const searchSubDepartmentsByUserIdRepository = {
   async searchSubDepartmentsByUserId(searchParams = {}) {
     try {
       const token = authService.getLocalToken();
@@ -46,20 +46,20 @@ export const searchSubDepartmentByUserIdRepository = {
       const url = `${SUBDEPARTMENT_BASE_ENDPOINT}${SUBDEPARTMENT_SEARCH_BY_USER_ID_ENDPOINT}${
         queryString ? `?${queryString}` : ""
       }`;
-      
+
       const response = await api.get(url, {
           headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
           },
       });
-      
+
       // Fix: Access response.data and response.status correctly
       const { data, status } = response;
 
       if (status === 200 && data?.success) {
           return ApiResponseT.ok(
-              data.result, 
+              data.result,
               data.successMessage || "Subdepartments retrieved successfully"
           );
       }
@@ -68,10 +68,10 @@ export const searchSubDepartmentByUserIdRepository = {
           data?.errors || [{ message: data?.message || "Failed to retrieve subdepartments" }],
           data?.message || "Failed to retrieve subdepartments"
       );
-      
+
     } catch (error) {
         console.error("Error searching subdepartments:", error);
-        
+
         const responseData = error.response?.data;
 
         if (error.response?.status === 401) {
@@ -80,9 +80,9 @@ export const searchSubDepartmentByUserIdRepository = {
                 "Authentication required"
             );
         }
-        
+
         if (error.response?.status === 400) {
-            const errors = responseData?.errors || 
+            const errors = responseData?.errors ||
                 [{ message: responseData?.message || "Bad request" }];
             return ApiResponseT.badRequest(errors, responseData?.message || "Bad request");
         }

@@ -1,94 +1,46 @@
-import { ref } from 'vue';
-import { useDeleteSubDepartmentById } from '@/composables/organization/subdepartment/useDeleteSubDepartmentById';
-
-export function useSubDepartmentActions(refreshData, showNotification) {
-    const { deleteSubDepartment } = useDeleteSubDepartmentById();
-
-    // Modal states
-    const showAddSubDepartmentModal = ref(false);
-    const showEditSubDepartmentModal = ref(false);
-    const subDepartmentToEdit = ref(null);
-    const showDeleteDialog = ref(false);
-    const deleteDialogTitle = ref('');
-    const deleteDialogMessage = ref('');
-    const itemToDelete = ref(null);
-
-    // Action handlers
-    const handleAddSubDepartment = () => {
-        showAddSubDepartmentModal.value = true;
-    };
-
-    const handleCloseAddSubDepartmentModal = () => {
-        showAddSubDepartmentModal.value = false;
-    };
-
-    const handleSubDepartment = async (newSubDepartment) => {
-        await refreshData();
-        showNotification(`Sub Department "${newSubDepartment.name}" has been added successfully!`, 'success');
-        handleCloseAddSubDepartmentModal();
-    };
-
-    const handleEditSubDepartment = (subDepartment) => {
-        subDepartmentToEdit.value = subDepartment;
-        showEditSubDepartmentModal.value = true;
-    };
-
-    const handleCloseEditSubDepartmentModal = () => {
-        showEditSubDepartmentModal.value = false;
-        subDepartmentToEdit.value = null;
-    };
-
-    const handleSubDepartmentUpdated = async () => {
-        await refreshData();
-        handleCloseEditSubDepartmentModal();
-    };
-
-    const handleDeleteSubDepartment = (subDepartment) => {
-        itemToDelete.value = subDepartment;
-        deleteDialogTitle.value = 'Delete SubDepartment';
-        deleteDialogMessage.value = `Are you sure you want to delete "${subDepartment.name}"? This action cannot be undone.`;
-        showDeleteDialog.value = true;
-    };
-
-    const confirmDelete = async () => {
-        if (itemToDelete.value) {
-            const result = await deleteSubDepartment(itemToDelete.value.id);
-
-            if (result.success) {
-                showNotification(`SubDepartment "${itemToDelete.value.name}" has been deleted successfully!`, 'success');
-                localStorage.removeItem("selectedSubDepartmentId");
-                setTimeout(async () => {
-                    await refreshData();
-                }, 100);
+export function useSubDepartmentActions({
+    searchSubDepartments,
+    getSubDepartmentsByUserId,
+    clearSearch,
+    clearDepartment,
+    allSubDepartments,
+    searchQuery,
+    selectedDepartmentId,
+    currentPage,
+    pageSize
+}) {
+    const refreshData = async () => {
+        const hasSearchOrFilter = searchQuery.value.trim() || selectedDepartmentId.value;
+        if (hasSearchOrFilter) {
+            if (searchSubDepartments) {
+                await searchSubDepartments({
+                    searchTerm: searchQuery.value || '',
+                    departmentId: selectedDepartmentId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value,
+                });
             }
-
-            cancelDelete();
+        } else {
+            if (getSubDepartmentsByUserId) {
+                await getSubDepartmentsByUserId();
+            }
         }
     };
 
-    const cancelDelete = () => {
-        itemToDelete.value = null;
-        showDeleteDialog.value = false;
-        deleteDialogTitle.value = '';
-        deleteDialogMessage.value = '';
+    const handleSubDepartmentChange = async (newDepartmentId) => {
+        if (clearSearch) clearSearch();
+        if (allSubDepartments?.value !== undefined) allSubDepartments.value = [];
+        selectedDepartmentId.value = newDepartmentId;
     };
 
-    return {
-        showAddSubDepartmentModal,
-        showEditSubDepartmentModal,
-        subDepartmentToEdit,
-        showDeleteDialog,
-        deleteDialogTitle,
-        deleteDialogMessage,
-        itemToDelete,
-        handleAddSubDepartment,
-        handleCloseAddSubDepartmentModal,
-        handleSubDepartment,
-        handleEditSubDepartment,
-        handleCloseEditSubDepartmentModal,
-        handleSubDepartmentUpdated,
-        handleDeleteSubDepartment,
-        confirmDelete,
-        cancelDelete
+    const resetToDefaultView = () => {
+        selectedDepartmentId.value = null;
+        searchQuery.value = '';
+        currentPage.value = 1;
+        if (clearSearch) clearSearch();
+        if (allSubDepartments?.value !== undefined) allSubDepartments.value = [];
+        if (clearDepartment) clearDepartment();
     };
+
+    return { refreshData, handleSubDepartmentChange, resetToDefaultView };
 }

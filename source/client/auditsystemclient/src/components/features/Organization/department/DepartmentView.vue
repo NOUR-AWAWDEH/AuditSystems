@@ -99,14 +99,12 @@ onMounted( async () => {
     }
 });
 
-
 // Watch for prop changes and update internal state
 watch(() => props.selectedSubLocationId, (newSubLocationId) => {
     if (newSubLocationId !== internalSelectedSubLocationId.value) {
         handleDepartmentChange(newSubLocationId);
     }
 }, { immediate: true });
-
 
 const {
     showAddDepartmentModal,

@@ -73,7 +73,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'sub-department-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateSubDepartment, resetState } = useUpdateSubDepartmentById();
@@ -159,7 +159,7 @@ const handleSubmit = async () => {
         ...result.data
       };
 
-      emit('updated', updatedSubDepartmentData);
+      emit('sub-department-updated', updatedSubDepartmentData);
       emit('close');
     } else {
       console.error('❌ Update failed - result not successful:', result);

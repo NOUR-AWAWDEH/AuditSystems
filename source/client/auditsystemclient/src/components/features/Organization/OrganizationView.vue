@@ -60,7 +60,7 @@
             :sub-locations="subLocations"
             :selected-sub-location-id="selectedSubLocationId"
             @department-selected="handleDepartmentSelected"
-            
+
           />
         </div>
 
@@ -85,7 +85,7 @@ import OrganizationHeader from './components/OrganizationHeader.vue';
 import LocationView from './location/LocationView.vue';
 import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
-import SubDepartmentView from './subdepartment/SubDepartmentView.vue'; 
+import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
 import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
 import { useGetLocationById } from '@/composables/organization/location/useGetLocationById';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
@@ -149,7 +149,7 @@ const handleLocationSelected = async (id) => {
 
 const handleSubLocationSelected = async (id) => {
   setSelectedId('subLocation', id);
-   await getSubLocationsByUserId();
+  await getSubLocationsByUserId();
   activeTab.value = 'departments';
 };
 
@@ -169,7 +169,7 @@ const setActiveTab = (tabId) => activeTab.value = tabId;
 
 // Handle route queries
 const handleRouteQueries = async () => {
-  
+
   const { locationId, subLocationId, departmentId, subDepartmentId } = route.query;
 
   if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }

@@ -15,12 +15,12 @@
                                 :selected-department-id="selectedDepartmentId"
                                 @department-changed="handleDepartmentChange" />
                         </div>
-                        <div v-if="validSelectedDepartment" class="w-full sm:w-auto">
+                        <div class="w-full sm:w-auto">
                             <SearchFilter 
                                 :search="searchQuery"
                                 :searchPlaceholder="'Search sub departments...'" 
                                 @update:search="handleSearch" 
-                                @refresh="refreshData" 
+                                class="w-full sm:w-auto"
                             />
                         </div>
                     </div>
@@ -52,8 +52,14 @@
 
                 <!-- Table Container - Show when department is selected -->
                 <div v-if="selectedDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable :items="subDepartments" :columns="enhancedColumns" :is-loading="isLoading"
-                        :actions="[]" :no-data-message="noDataMessage" class="sub-department-table" @row-click="handleRowClick">
+                    <ReusableTable 
+                        :items="subDepartments"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
+                        :actions="[]"
+                        :no-data-message="noDataMessage"
+                        class="sub-department-table"
+                        >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectSubDepartment(item)"
@@ -134,8 +140,7 @@ const props = defineProps({
     isDepartmentLoading: Boolean,
     searchQuery: String,
     handleDepartmentChange: Function,
-    handleSearch: Function,
-    refreshData: Function
+    handleSearch: Function
 });
 
 const emit = defineEmits([
@@ -144,6 +149,16 @@ const emit = defineEmits([
     'delete-sub-department',
     'sub-department-selected'
 ]);
+
+const internalSelectedDepartmentId = ref(props.selectedDepartmentId);
+
+watch(() => props.selectedDepartmentId, (newVal) => {
+    internalSelectedDepartmentId.value = newVal;
+});
+
+watch(() => internalSelectedDepartmentId.value, (newVal) => {
+    props.handleDepartmentChange(newVal);
+}, { immediate: true });
 
 // SubDepartment selection state
 const selectedSubDepartmentId = ref(null);
@@ -160,27 +175,6 @@ const handleSelectSubDepartment = (subDepartment) => {
     });
 };
 
-// Handle row click to select subdepartment
-const handleRowClick = (subDepartment) => {
-    handleSelectSubDepartment(subDepartment);
-};
-
-// Watch for subdepartment changes to reset selection if subdepartment is deleted
-watch(() => props.subDepartments, (newSubDepartments) => {
-    if (selectedSubDepartmentId.value && newSubDepartments) {
-        const subDepartmentExists = newSubDepartments.some(subDept => subDept.id === selectedSubDepartmentId.value);
-        if (!subDepartmentExists) {
-            selectedSubDepartmentId.value = null;
-            emit('sub-department-selected', null);
-        }
-    }
-}, { deep: true });
-
-// Reset selection when department changes
-watch(() => props.selectedDepartmentId, () => {
-    selectedSubDepartmentId.value = null;
-    emit('sub-department-selected', null);
-});
 
 const subDepartmentColumns = [
     { key: 'name', label: 'Name' },
@@ -198,9 +192,6 @@ const noDataMessage = computed(() => {
     return 'No sub departments found for this department.';
 });
 
-const validSelectedDepartment = computed(() => {
-    return props.selectedDepartmentId && props.currentDepartment?.name;
-});
 </script>
 
 <style scoped>

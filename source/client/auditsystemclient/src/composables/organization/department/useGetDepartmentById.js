@@ -23,7 +23,7 @@ export function useGetDepartmentById() {
         error.value = errorMessage;
         showNotification(errorMessage, 'error');
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -51,6 +51,7 @@ export function useGetDepartmentById() {
 
             const response = await getDepartmentByIdRepository.getDepartmentById(departmentId);
 
+            console.log('getDepartmentById response:', response);
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {

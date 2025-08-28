@@ -3,14 +3,14 @@ import { useGetSubDepartmentById } from '@/composables/organization/subdepartmen
 
 export function useSubDepartmentManagement(subDepartments) {
     // Initialize from localStorage
-    const selectedSubDepartmentId = ref(localStorage.getItem('selectedSubDepartmentId') || '');
+    const selectedSubDepartmentId = ref(localStorage.getItem('organizationSelectedSubDepartmentId') || '');
 
     // Watch for changes and persist to localStorage
     watch(selectedSubDepartmentId, (newValue) => {
         if (newValue) {
-            localStorage.setItem('selectedSubDepartmentId', newValue);
+            localStorage.setItem('organizationSelectedSubDepartmentId', newValue);
         } else {
-            localStorage.removeItem('selectedSubDepartmentId');
+            localStorage.removeItem('organizationSelectedSubDepartmentId');
         }
     });
 
@@ -62,8 +62,8 @@ export function useSubDepartmentManagement(subDepartments) {
         selectedSubDepartment,
         currentSubDepartment,
         isSubDepartmentLoading,
-        // subDepartmentsRef,
-        // getSubDepartmentById,
-        // clearSubDepartment
+        subDepartmentsRef,
+        getSubDepartmentById,
+        clearSubDepartment
     };
 }

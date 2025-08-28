@@ -10,19 +10,19 @@ export function useGetSubDepartmentById() {
 
   const handleFetchSuccess = (response) => {
     // Handle potential nested structure - extract the actual subdepartment data
-    const subDepartmentData = response.result?.subDepartmentModel || response.result;
+    const subDepartmentData = response.result.subDepartmentModel || response.result;
     subDepartment.value = subDepartmentData;
     return { success: true, data: subDepartmentData };
   };
-  
+
   const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch subDepartment') => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
-    
+
     error.value = errorMessage;
     showNotification(errorMessage, 'error');
-    
+
     return {
       success: false,
       message: errorMessage,
@@ -51,6 +51,7 @@ export function useGetSubDepartmentById() {
 
       const response = await getSubDepartmentByIdRepository.getSubDepartmentById(subDepartmentId);
 
+      console.log('getSubDepartmentById response:', response);
       if (response?.success) {
         return handleFetchSuccess(response);
       } else {

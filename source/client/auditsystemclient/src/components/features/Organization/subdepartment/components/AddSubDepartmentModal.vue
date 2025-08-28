@@ -10,8 +10,8 @@
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
             <h3 class="text-base font-medium text-secondary-shade font-poppins">Add SubDepartment</h3>
-            <button 
-              @click="$emit('close')" 
+            <button
+              @click="$emit('close')"
               class="text-gray-base hover:text-gray-shade focus:outline-none">
               <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
             </button>
@@ -25,12 +25,12 @@
                 <label for="sub-department-name" class="block text-sm font-medium text-secondary-shade mb-1">
                   SubDepartment Name *
                 </label>
-                <BaseInput 
-                  id="sub-department-name" 
+                <BaseInput
+                  id="sub-department-name"
                   v-model="formData.name"
-                  label="Sub Department Name" 
+                  label="Sub Department Name"
                   placeholder="Enter sub department name"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" 
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                 />
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
@@ -46,8 +46,8 @@
                   Cancel
                 </button>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   :disabled="!formData.name.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                   <span v-if="isCreating">Adding...</span>
@@ -114,7 +114,7 @@ const resetForm = () => {
   resetState();
 };
 
-const handleSubmit = async () => { 
+const handleSubmit = async () => {
   if (!props.departmentId) {
     showNotification('Please select a department first', 'error');
     return;
@@ -135,8 +135,14 @@ const handleSubmit = async () => {
 
 
     if (result?.success) {
+      const newSubDepartment = {
+        id: result.data.subDepartmentId,
+        ...subDepartmentData,
+        createdAt: new Date().toISOString()
+      }
+
       showNotification(`SubDepartment "${subDepartmentData.name}" has been added successfully!`, 'success');
-      emit('sub-department-added', result.data);
+      emit('sub-department-added', newSubDepartment);
       emit('close');
     } else {
       console.error('Create failed:', result);

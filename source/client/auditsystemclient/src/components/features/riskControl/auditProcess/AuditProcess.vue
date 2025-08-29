@@ -2,6 +2,7 @@
 
 <template>
     <div class="space-y-6">
+        
         <!-- Add Audit Process Modal -->
         <AddAuditProcessModal
             :is-visible="showAddAuditProcessModal"
@@ -82,7 +83,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted } from 'vue';
+import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProcessTable from './components/AuditProcessTable.vue';
 import AddAuditProcessModal from './components/AddAuditProcessModal.vue';
@@ -119,27 +120,10 @@ const {
     currentSubDepartment,
     isSubDepartmentLoading,
     searchQuery,
-    refreshData,
     handleAuditProcessChange,
     handleSearch,
     resetToDefaultView,
 } = useAuditProcessTable(props.subDepartments);
-
-// Add onMounted to refresh data on page load
-onMounted(async () => {
-    // If there's a selected sub-department, refresh the data
-    if (internalSelectedSubDepartmentId) {
-        await refreshData();
-    }
-});
-
-// Watch for prop changes and update internal state
-watch(() => props.selectedSubDepartmentId, (newSubDepartmentId) => {
-    if (newSubDepartmentId !== internalSelectedSubDepartmentId.value) {
-        handleAuditProcessChange(newSubDepartmentId);
-    }
-}, { immediate: true });
-
 
 
 // Use modal composable for dialog management

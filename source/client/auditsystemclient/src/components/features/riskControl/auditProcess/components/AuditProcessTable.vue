@@ -5,6 +5,7 @@
                 <!-- SubDepartmentSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
+                        <p> {{ auditProcesses }}</p>
                         <AuditProcessHeader/>
                         <SubDepartmentSelector
                             :subDepartments="subDepartments"
@@ -52,7 +53,7 @@
 
                 <!-- Table Container - Show when SubDepartment is Selected -->
                 <div v-if="selectedSubDepartmentId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="auditProcesses"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -164,6 +165,7 @@ const internalSelectedSubDepartmentId = ref(props.selectedSubDepartmentId);
 // Sync internal state with parent prop
 watch(() => props.selectedSubDepartmentId, (newVal) => {
     internalSelectedSubDepartmentId.value = newVal;
+    
 });
 
 // Emit change when internal selection changes

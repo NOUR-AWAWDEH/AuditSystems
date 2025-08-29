@@ -156,6 +156,7 @@ const router = useRouter();
 // State
 const activeTab = ref('processes');
 const selectedSubDepartmentId = ref(localStorage.getItem('organizationSelectedSubDepartmentId') || null);
+
 const selectedAuditProcessId = ref(localStorage.getItem('riskControlSelectedAuditProcessId') || null);
 const selectedSubProcessId = ref(localStorage.getItem('riskControlSelectedSubProcessId') || null);
 const selectedRiskControlMatrixId = ref(localStorage.getItem('riskControlSelectedRiskControlMatrixId') || null);

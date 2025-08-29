@@ -17,6 +17,7 @@ export function useAuditProcessData() {
         getAuditProcessesByUserId
     } = useGetAuditProcessesByUserId() || {};
 
+    console.log("useAuditProcessData:  allAuditProcesses: ", allAuditProcesses.value);
     return {
         searchResults,
         allAuditProcesses,

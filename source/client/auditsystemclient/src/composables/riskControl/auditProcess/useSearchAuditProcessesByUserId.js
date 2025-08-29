@@ -14,15 +14,15 @@ export function useSearchAuditProcessesByUserId() {
     const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
-        const items = response.result?.result?.items || response.result?.items || [];
-        const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
+        const items = response.result?.items || [];
+        const extractedTotalCount = response.result?.totalCount || 0;
 
         const isValidArray = Array.isArray(items);
         
         searchResults.value = isValidArray ? items : [];
         totalCount.value = extractedTotalCount;
 
-        return { success: true, data: response.result };
+        return { success: true, data: items };
     };
 
     const handleSearchFailure = (response, defaultErrorMessage = 'Failed to search processes') => {
@@ -46,10 +46,10 @@ export function useSearchAuditProcessesByUserId() {
             error.value = null;
 
             const params = {
-                searchTerm: searchParams.searchTerm || searchTerm.value,
-                subDepartmentId: searchParams.subDepartmentId || subDepartmentId.value,
-                page: searchParams.page || currentPage.value,
-                pageSize: searchParams.pageSize || pageSize.value,
+                searchTerm: searchParams.searchTerm ?? searchTerm.value,
+                subDepartmentId: searchParams.subDepartmentId ?? subDepartmentId.value,
+                page: searchParams.page ?? currentPage.value,
+                pageSize: searchParams.pageSize ?? pageSize.value,
             }
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
@@ -63,6 +63,8 @@ export function useSearchAuditProcessesByUserId() {
                 params.pageSize,
                 params.subDepartmentId
             );
+            
+            console.log('response searchAuditProcessesByUserId : ', response);
             
             if (response?.success) {
                 return handleSearchSuccess(response);

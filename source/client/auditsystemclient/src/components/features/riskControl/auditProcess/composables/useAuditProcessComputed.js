@@ -10,32 +10,32 @@ export function useAuditProcessComputed({
     isInitializing
 }) {
     const auditProcesses = computed(() => {
-        // If there's an active search query, always return search results
-        if (searchQuery?.value && searchQuery.value.trim()) {
-            return (searchResults && searchResults.value)
-                ? searchResults.value
-                : [];
+        const hasSearchQuery = searchQuery?.value && searchQuery.value.trim();
+        const hasSearchResults = searchResults && searchResults.value && searchResults.value.length > 0;
+        const hasAll = allAuditProcesses && allAuditProcesses.value && allAuditProcesses.value.length > 0;
+
+        // ✅ If user typed something → always show search results
+        if (hasSearchQuery) {
+            return searchResults?.value || [];
         }
-        
+
+        // ✅ If sub-department selected but no search → fallback to all processes
         if (selectedSubDepartmentId?.value) {
-            return (searchResults && searchResults.value)
-                ? searchResults.value
-                : [];
+            return hasSearchResults ? searchResults.value : (allAuditProcesses?.value || []);
         }
-        
-        return (allAuditProcesses && allAuditProcesses.value)
-            ? allAuditProcesses.value
-            : [];
+
+        // ✅ Default → all processes
+        return allAuditProcesses?.value || [];
     });
 
     const isLoading = computed(() => {
-        const searching = (isSearching && isSearching.value) ? isSearching.value : false;
-        const loadingAll = (isLoadingAll && isLoadingAll.value) ? isLoadingAll.value : false;
-        const initializing = (isInitializing && isInitializing.value) ? isInitializing.value : false;
-        
-        return searching || loadingAll || initializing;
+        return Boolean(
+            (isSearching && isSearching.value) ||
+            (isLoadingAll && isLoadingAll.value) ||
+            (isInitializing && isInitializing.value)
+        );
     });
-
+    
     return {
         auditProcesses,
         isLoading

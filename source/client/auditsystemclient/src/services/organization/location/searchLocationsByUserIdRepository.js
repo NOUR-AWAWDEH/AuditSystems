@@ -36,7 +36,7 @@ export const searchLocationsByUserIdRepository = {
         // Defensive check in case the result structure changes
         if (result?.items && typeof result.totalCount === 'number') {
           return ApiResponseT.ok(
-            result, // includes items and totalCount
+            result,
             data.successMessage || 'Locations fetched successfully.'
           );
         }

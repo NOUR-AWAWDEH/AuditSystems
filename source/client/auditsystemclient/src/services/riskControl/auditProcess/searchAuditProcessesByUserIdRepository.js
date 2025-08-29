@@ -36,7 +36,7 @@ export const searchAuditProcessesByUserIdRepository = {
                 // Defensive check in case the result structure changes
                 if (result?.items && typeof result.totalCount === 'number') {
                     return ApiResponseT.ok(
-                        result, // includes items and totalCount
+                        result,
                         data.successMessage || 'Audit processes fetched successfully.'
                     );
                 }

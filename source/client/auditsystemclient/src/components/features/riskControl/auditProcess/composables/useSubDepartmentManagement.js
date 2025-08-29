@@ -15,7 +15,7 @@ export function useSubDepartmentManagement(subDepartments) {
     });
 
     const {            
-        subdepartment: fetchSubDepartment,
+        subDepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
         getSubDepartmentById,
         clearSubDepartment,

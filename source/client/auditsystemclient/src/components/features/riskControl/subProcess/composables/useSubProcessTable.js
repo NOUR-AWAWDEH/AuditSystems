@@ -5,9 +5,8 @@ import { useSubProcessActions } from './useSubProcessActions';
 import { useSubProcessWatchers } from './useSubProcessWatchers';
 import { useSubProcessLifecycle } from './useSubProcessLifecycle';
 import { useSubProcessComputed } from './useSubProcessComputed';
-import { useSubProcessModals } from './useSubProcessModals';
 
-export function useSubProcessTable(auditProcesses, showNotification) {
+export function useSubProcessTable(auditProcesses) {
 
     const dataComposable = useSubProcessData();
     const auditProcessComposable = useAuditProcessManagement(auditProcesses);
@@ -41,11 +40,6 @@ export function useSubProcessTable(auditProcesses, showNotification) {
         ...lifecycleComposable
     });
 
-    const modalComposable = useSubProcessModals(
-        actionsComposable.refreshData,
-        showNotification
-    );
-
     return {
         subProcesses: computedComposable.subProcesses,
         isLoading: computedComposable.isLoading,
@@ -62,6 +56,5 @@ export function useSubProcessTable(auditProcesses, showNotification) {
         handleSubProcessChange: actionsComposable.handleSubProcessChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
-        ...modalComposable
     };
 }

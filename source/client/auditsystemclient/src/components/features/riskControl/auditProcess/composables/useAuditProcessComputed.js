@@ -9,25 +9,24 @@ export function useAuditProcessComputed({
     isLoadingAll,
     isInitializing
 }) {
-  
-
     const auditProcesses = computed(() => {
+        // If there's an active search query OR a sub-department is selected, use searchResults
         if (searchQuery?.value && searchQuery.value.trim()) {
-            return (searchResults && searchResults.value) ? searchResults.value : [];
+            return searchResults?.value || [];
         }
 
         if (selectedSubDepartmentId?.value) {
-            return (searchResults && searchResults.value) ? searchResults.value : [];
+            return searchResults?.value || [];
         }
 
-        return (allAuditProcesses && allAuditProcesses.value) ? allAuditProcesses.value : [];
+        // Otherwise, use all audit processes
+        return allAuditProcesses?.value || [];
     });
 
-
     const isLoading = computed(() => {
-        const searching = (isSearching && isSearching.value) ? isSearching.value : false;
-        const loadingAll = (isLoadingAll && isLoadingAll.value) ? isLoadingAll.value : false;
-        const initializing = (isInitializing && isInitializing.value) ? isInitializing.value : false;
+        const searching = isSearching?.value || false;
+        const loadingAll = isLoadingAll?.value || false;
+        const initializing = isInitializing?.value || false;
 
         return searching || loadingAll || initializing;
     });

@@ -1,30 +1,19 @@
-import { ref } from 'vue';
 import { useSearchAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useSearchAuditProcessesByUserId';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
 
 export function useAuditProcessData() {
-  const {
-    searchResults = ref([]),
-    isSearching = ref(false),
-    totalCount = ref(0),
-    searchAuditProcesses,
-    clearSearch
-  } = useSearchAuditProcessesByUserId() || {};
+  const searchComposable = useSearchAuditProcessesByUserId();
+  const getComposable = useGetAuditProcessesByUserId();
 
-  const {
-    auditProcesses: allAuditProcesses = ref([]),
-    isLoading: isLoadingAll = ref(false),
-    getAuditProcessesByUserId
-  } = useGetAuditProcessesByUserId() || {};
-
+  // Return the properties directly from the composables to preserve reactivity
   return {
-    searchResults,
-    allAuditProcesses,
-    isSearching,
-    isLoadingAll,
-    totalCount,
-    searchAuditProcesses,
-    clearSearch,
-    getAuditProcessesByUserId
+    searchResults: searchComposable.searchResults,
+    allAuditProcesses: getComposable.auditProcesses,
+    isSearching: searchComposable.isSearching,
+    isLoadingAll: getComposable.isLoading,
+    totalCount: searchComposable.totalCount,
+    searchAuditProcesses: searchComposable.searchAuditProcesses,
+    clearSearch: searchComposable.clearSearch,
+    getAuditProcessesByUserId: getComposable.getAuditProcessesByUserId
   };
 }

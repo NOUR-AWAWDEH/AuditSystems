@@ -41,7 +41,7 @@ export function useAuditProcessTable(subDepartments) {
     });
 
     return {
-        auditProcesses: computedComposable.auditProcesses,
+        computedAuditProcesses: computedComposable.auditProcesses,
         isLoading: computedComposable.isLoading,
         selectedSubDepartmentId: subDepartmentComposable.selectedSubDepartmentId,
         selectedSubDepartment: subDepartmentComposable.selectedSubDepartment,

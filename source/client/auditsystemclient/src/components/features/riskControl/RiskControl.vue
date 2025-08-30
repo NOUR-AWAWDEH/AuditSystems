@@ -42,7 +42,6 @@
         <div v-if="activeTab === 'processes'" class="p-3 sm:p-4 md:p-6">
           <AuditProcess
             :sub-departments="subDepartments"
-            :audit-processes="auditProcesses"
             :selected-sub-department-id="selectedSubDepartmentId"
             @audit-process-selected="handleAuditProcessSelected"
           />
@@ -233,6 +232,8 @@ const handleObjectiveSelected = async (id) => {
   activeTab.value = 'risks';
 };
 
+
+
 const handleRiskSelected = async (id) => {
   setSelectedId('risk', id);
 };
@@ -245,8 +246,35 @@ const refreshRiskControlMatrices = async () => await getRiskControlMatricesByUse
 const refreshObjectives = async () => await getObjectivesByUserId();
 //const refreshRisks = async () => await getRisksByUserId();
 
-// Tab navigation
-const setActiveTab = (tabId) => activeTab.value = tabId;
+const setActiveTab = async (tabId) => {
+  activeTab.value = tabId;
+
+  // Fetch data based on the selected tab
+  switch (tabId) {
+    case 'processes':
+      if (!subDepartments.value.length) await refreshSubDepartments();
+      break;
+    case 'subprocesses':
+      if (!auditProcesses.value.length) await refreshAuditProcesses();
+      break;
+    case 'matrix':
+      if (!subProcesses.value.length) await refreshSubProcesses();
+      break;
+    case 'objectives':
+      if (!riskControlMatrices.value.length) await refreshRiskControlMatrices();
+      break;
+    case 'risks':
+      if (!objectives.value.length) await refreshObjectives();
+      break;
+    case 'exitrisks':
+    case 'controls':
+    case 'observations':
+      // Add logic if needed for these tabs
+      break;
+  }
+};
+
+
 
 // Handle route queries
 const handleRouteQueries = async () => {
@@ -268,7 +296,6 @@ const handleRouteQueries = async () => {
 // Init
 onMounted(async () => {
   await refreshSubDepartments();
-  await refreshAuditProcesses();
   await handleRouteQueries();
 });
 

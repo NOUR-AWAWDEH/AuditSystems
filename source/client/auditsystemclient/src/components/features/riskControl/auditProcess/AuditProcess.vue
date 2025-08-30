@@ -14,7 +14,7 @@
         <AuditProcessTable
             v-if="props.subDepartments && props.subDepartments.length > 0"
             :sub-departments="props.subDepartments"
-            :audit-processes="props.auditProcesses"
+            :audit-processes="computedAuditProcesses"
             :is-loading="isLoading"
             :selected-sub-department-id="internalSelectedSubDepartmentId"
             :selected-sub-department="selectedSubDepartment"
@@ -89,14 +89,10 @@ import EditAuditProcessModal from './components/EditAuditProcessModal.vue';
 import { useAuditProcessTable } from './composables/useAuditProcessTable';
 import { useAuditProcessModals } from './composables/useAuditProcessModals';
 import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
-import { toRef } from 'vue';
+import { onMounted } from 'vue';
 
 const props = defineProps({
     subDepartments: {
-        type: Array,
-        default: () => []
-    },
-    auditProcesses: {
         type: Array,
         default: () => []
     },
@@ -114,11 +110,12 @@ const emit = defineEmits([
     'audit-process-deleted'
 ]);
 
-const auditProcessesRef = toRef(props, 'auditProcesses');
+
 
 // Use composables - now with integrated backend search
 const {
     isLoading,
+    computedAuditProcesses,
     selectedSubDepartmentId: internalSelectedSubDepartmentId,
     selectedSubDepartment,
     currentSubDepartment,
@@ -147,23 +144,16 @@ const {
     confirmDelete,
     handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(auditProcessesRef, emit);
+} = useAuditProcessModals(computedAuditProcesses, emit); // ← Pass computedAuditProcesses instead
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {
     emit('audit-process-selected', auditProcessId);
 };
 
-
 defineExpose({
-    auditProcesses: props.auditProcesses,
+    auditProcesses: computedAuditProcesses, // ← Use computed here too
     selectedSubDepartmentId: internalSelectedSubDepartmentId,
     resetToDefaultView
 });
 </script>
-
-<style scoped>
-.audit-process-table .table-row {
-    transition: all 0.2s ease;
-}
-</style>

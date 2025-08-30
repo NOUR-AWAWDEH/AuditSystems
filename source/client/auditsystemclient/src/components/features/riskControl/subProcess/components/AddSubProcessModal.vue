@@ -131,8 +131,15 @@ const handleSubmit = async () => {
         const result = await createSubProcess(subProcessData);
 
         if (result?.success) {
-            showNotification(`Sub Process "${formData.value.particular}" has been added successfully!`, 'success');
-            emit('sub-process-added', result.data);
+
+            const newSubProcess = {
+                id: result.data.subProcessId,
+                ...subProcessData,
+                createdAt: new Date().toISOString()
+            };
+
+            showNotification(`Sub Process "${newSubProcess.particular}" has been added successfully!`, 'success');
+            emit('sub-process-added', newSubProcess);
             emit('close');
         } else {
              showNotification(result?.message || 'Failed to create sub process', 'error');

@@ -89,6 +89,7 @@ import EditAuditProcessModal from './components/EditAuditProcessModal.vue';
 import { useAuditProcessTable } from './composables/useAuditProcessTable';
 import { useAuditProcessModals } from './composables/useAuditProcessModals';
 import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
+import { toRef } from 'vue';
 
 const props = defineProps({
     subDepartments: {
@@ -112,6 +113,8 @@ const emit = defineEmits([
     'audit-process-updated',
     'audit-process-deleted'
 ]);
+
+const auditProcessesRef = toRef(props, 'auditProcesses');
 
 // Use composables - now with integrated backend search
 const {
@@ -144,7 +147,7 @@ const {
     confirmDelete,
     handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(props.auditProcesses, emit);
+} = useAuditProcessModals(auditProcessesRef, emit);
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {

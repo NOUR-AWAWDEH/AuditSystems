@@ -23,7 +23,7 @@
                 <label for="edit-sub-process-particular" class="block text-sm font-medium text-secondary-shade mb-1">
                   Sub Process Particular *
                 </label>
-                <BaseInput 
+                <BaseInput
                   id="edit-sub-process-particular"
                   v-model="formData.particular"
                   placeholder="Enter Sub Process particular"
@@ -74,7 +74,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'sub-process-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateSubProcess, resetState } = useUpdateSubProcessById();
@@ -145,7 +145,8 @@ const handleSubmit = async () => {
     const subProcessData = {
       id: props.subProcess?.id,
       particular: formData.value.particular.trim(),
-      auditProcessId: props.subProcess?.auditProcessId
+      auditProcessId: props.subProcess?.auditProcessId,
+      createdAt: props.subProcess?.createdAt
     };
 
     const result = await updateSubProcess(subProcessData);
@@ -156,7 +157,7 @@ const handleSubmit = async () => {
         ...result.data
       };
 
-      emit('updated', updatedSubProcessData);
+      emit('sub-process-updated', updatedSubProcessData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update sub process. Please try again.';

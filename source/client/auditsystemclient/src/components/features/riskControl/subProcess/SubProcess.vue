@@ -63,7 +63,7 @@
       :is-visible="showEditSubProcessModal"
       :sub-process="subProcessToEdit"
       @close="handleCloseEditSubProcessModal"
-      @updated="handleSubProcessUpdated"
+      @sub-process-updated="handleSubProcessUpdated"
     />
 
     <!-- Confirmation Dialog -->
@@ -101,7 +101,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['sub-process-selected', 'sub-process-added','sub-process-updated', 'sub-process-deleted']);
+const emit = defineEmits([
+    'sub-process-selected',
+    'sub-process-added',
+    'sub-process-updated',
+    'sub-process-deleted'
+]);
 
 
 // Use composables -now with integrated backend search
@@ -169,7 +174,7 @@ const {
   handleDeleteSubProcess,
   confirmDelete,
   cancelDelete,
-} = useSubProcessModals(refreshData, emit);
+} = useSubProcessModals(subProcesses, emit);
 
 // Handle sub-process selection and forward to parent
 const handleSubProcessSelected = (subProcessId) => {

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteSubProcessById } from '@/composables/riskControl/subProcess/useDeleteSubProcessById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useSubProcessModals(refreshData, emit) {
+export function useSubProcessModals(subProcesses, emit) {
     const { deleteSubProcess } = useDeleteSubProcessById();
     const { showNotification } = useNotification();
 
@@ -22,10 +22,10 @@ export function useSubProcessModals(refreshData, emit) {
         showAddSubProcessModal.value = false;
     };
 
-    const handleSubProcessAdded = async () => {
+    const handleSubProcessAdded = async (newSubProcess) => {
         try {
-            await refreshData();
-            emit('sub-process-added');
+            subProcesses.value.push(newSubProcess);
+            emit('sub-process-added',newSubProcess);
             handleCloseAddSubProcessModal();
         } catch (error) {
             console.error('Error in handleSubProcessAdded:', error);
@@ -43,13 +43,30 @@ export function useSubProcessModals(refreshData, emit) {
         subProcessToEdit.value = null;
     };
 
-    const handleSubProcessUpdated = async () => {
-        // Store the particular subprocess name before clearing the reference
-        const particular = subProcessToEdit.value?.particular || 'Unknown Process';
-        await refreshData();
-        emit('sub-process-updated');
-        showNotification(`SubProcess "${particular}" has been updated successfully!`, 'success');
-        handleCloseEditSubProcessModal();
+    const handleSubProcessUpdated = async (updatedSubProcess) => {
+        try {
+            const index = subProcesses.value.findIndex(
+                sp => sp.id === updatedSubProcess.id);
+            if (index !== -1) {
+                subProcesses.value[index] = updatedSubProcess;
+            }
+
+            if(index !== -1) {
+                subProcesses.value[index] = { ...subProcesses.value[index], ...updatedSubProcess };
+            }
+
+            emit('sub-process-updated', updatedSubProcess);
+
+            showNotification(
+                `SubProcess "${updatedSubProcess.particular}" has been updated successfully!`,
+                'success'
+            );
+            handleCloseEditSubProcessModal();
+        }
+        catch (error) {
+            console.error('Error in handleSubProcessUpdated:', error);
+            showNotification('Failed to refresh data after updating subprocess', 'error');
+        }
     };
 
     const handleDeleteSubProcess = (subProcess) => {
@@ -61,20 +78,21 @@ export function useSubProcessModals(refreshData, emit) {
 
     const confirmDelete = async () => {
         if (itemToDelete.value) {
+
             const deletedSubProcess = { ...itemToDelete.value };
             const result = await deleteSubProcess(deletedSubProcess.id);
 
             if (result.success) {
-            showNotification(
-                `SubProcess "${deletedSubProcess.particular}" has been deleted successfully!`,
-                'success'
-            );
-            localStorage.removeItem("riskControlSelectedSubProcessId");
-
-            setTimeout(async () => {
-                await refreshData();
+              const index = subProcesses.value.findIndex(p => p.id === deletedSubProcess.id);
+              if (index !== -1) {
+                  subProcesses.value.splice(index, 1); // <-- reactive change
+              }
+                showNotification(
+                    `SubProcess "${deletedSubProcess.particular}" has been deleted successfully!`,
+                    'success'
+                );
+                localStorage.removeItem("riskControlSelectedSubProcessId");
                 emit('sub-process-deleted', deletedSubProcess.id);
-            }, 100);
             }
 
             cancelDelete();

@@ -18,9 +18,9 @@ export const deleteSubProcessByIdRepository = {
                         'Content-Type': 'application/json',
                     },
             });
-            
+
             const { data, status } = response;
-            
+
             if (status === 204 || (status === 200 && data?.success !== false)) {
                 return ApiResponseT.ok(null, 'SubProcess deleted successfully');
             }
@@ -33,7 +33,7 @@ export const deleteSubProcessByIdRepository = {
         } catch (error) {
             console.error('Delete SubProcess error:', error);
             const responseData = error.response?.data;
-            
+
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],

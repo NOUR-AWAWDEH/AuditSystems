@@ -16,7 +16,7 @@ export function useDeleteSubProcessById() {
     };
 
     const handleDeleteFailure = (response, defaultErrorMessage = 'Failed to delete sub process') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
@@ -28,7 +28,7 @@ export function useDeleteSubProcessById() {
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
         };
-        
+
         return failureResult;
     };
 
@@ -38,20 +38,20 @@ export function useDeleteSubProcessById() {
         }
         return null;
     };
-    
+
     const deleteSubProcess = async (subProcessId) => {
         try {
             isDeleting.value = true;
             error.value = null;
             deletedSubProcess.value = null;
-            
-            const validationError = validateDeleteSubProcess(subProcessId); 
+
+            const validationError = validateDeleteSubProcess(subProcessId);
             if (validationError) {
                 return handleDeleteFailure({ message: validationError });
             }
 
             const response = await deleteSubProcessByIdRepository.deleteSubProcessById(subProcessId);
-            
+
             if (response?.success) {
                 return handleDeleteSuccess(response);
             } else {

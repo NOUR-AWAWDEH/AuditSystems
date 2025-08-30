@@ -8,6 +8,7 @@
             @sub-location-added="handleSubLocationAdded"
         />
 
+        
         <!-- SubLocation Management -->
         <SubLocationTable
             v-if="props.locations && props.locations.length > 0 "

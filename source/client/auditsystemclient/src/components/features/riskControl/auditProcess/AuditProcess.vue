@@ -2,7 +2,6 @@
 
 <template>
     <div class="space-y-6">
-        
         <!-- Add Audit Process Modal -->
         <AddAuditProcessModal
             :is-visible="showAddAuditProcessModal"
@@ -15,7 +14,7 @@
         <AuditProcessTable
             v-if="props.subDepartments && props.subDepartments.length > 0"
             :sub-departments="props.subDepartments"
-            :audit-processes="auditProcesses"
+            :audit-processes="props.auditProcesses"
             :is-loading="isLoading"
             :selected-sub-department-id="internalSelectedSubDepartmentId"
             :selected-sub-department="selectedSubDepartment"
@@ -83,7 +82,6 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProcessTable from './components/AuditProcessTable.vue';
 import AddAuditProcessModal from './components/AddAuditProcessModal.vue';
@@ -94,6 +92,10 @@ import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
 
 const props = defineProps({
     subDepartments: {
+        type: Array,
+        default: () => []
+    },
+    auditProcesses: {
         type: Array,
         default: () => []
     },
@@ -113,7 +115,6 @@ const emit = defineEmits([
 
 // Use composables - now with integrated backend search
 const {
-    auditProcesses,
     isLoading,
     selectedSubDepartmentId: internalSelectedSubDepartmentId,
     selectedSubDepartment,
@@ -124,7 +125,6 @@ const {
     handleSearch,
     resetToDefaultView,
 } = useAuditProcessTable(props.subDepartments);
-
 
 // Use modal composable for dialog management
 const {
@@ -144,15 +144,16 @@ const {
     confirmDelete,
     handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(auditProcesses, emit);
+} = useAuditProcessModals(props.auditProcesses, emit);
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {
     emit('audit-process-selected', auditProcessId);
 };
 
+
 defineExpose({
-    auditProcesses,
+    auditProcesses: props.auditProcesses,
     selectedSubDepartmentId: internalSelectedSubDepartmentId,
     resetToDefaultView
 });

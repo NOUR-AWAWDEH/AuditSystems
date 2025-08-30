@@ -5,7 +5,6 @@
                 <!-- SubDepartmentSelector and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
-                        <p> {{ auditProcesses }}</p>
                         <AuditProcessHeader/>
                         <SubDepartmentSelector
                             :subDepartments="subDepartments"

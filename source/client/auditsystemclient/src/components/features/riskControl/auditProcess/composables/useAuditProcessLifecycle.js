@@ -1,22 +1,17 @@
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, watch } from 'vue';
 
 export function useAuditProcessLifecycle({
     selectedSubDepartmentId,
+    searchAuditProcesses,
     currentPage,
     pageSize,
-    searchAuditProcesses,
-    subDepartmentsRef,
-    searchQuery,
-    getAuditProcessesByUserId,
-    resetToDefaultView
+    subDepartmentsRef
 }) {
     const isInitialized = ref(false);
     const isInitializing = ref(false);
 
     const initializeData = async () => {
-        if (!selectedSubDepartmentId.value || isInitialized.value || isInitializing.value) {
-            return;
-        }
+        if (!selectedSubDepartmentId.value || isInitialized.value || isInitializing.value) return;
 
         try {
             isInitializing.value = true;
@@ -28,36 +23,23 @@ export function useAuditProcessLifecycle({
                 });
             }
             isInitialized.value = true;
-        } catch (error) {
-            console.error('Error initializing data:', error);
+        } catch (err) {
+            console.error('Error initializing audit processes:', err);
         } finally {
             isInitializing.value = false;
         }
     };
 
-    onMounted(async () => {
-        await nextTick();
+    watch(subDepartmentsRef, async (subs) => {
+        if (!subs?.length) return;
 
-        if (selectedSubDepartmentId.value && !isInitialized.value && !isInitializing.value) {
-            if (subDepartmentsRef.value?.length > 0) {
-                const subDepartmentExists = subDepartmentsRef.value.some(
-                    sub => sub.id === selectedSubDepartmentId.value);
-                if (subDepartmentExists) {
-                    await initializeData();
-                } else {
-                    resetToDefaultView();
-                }
-            }
-        } else if (!selectedSubDepartmentId.value 
-            && !searchQuery.value.trim() 
-            && getAuditProcessesByUserId) {
-                await getAuditProcessesByUserId();
+        // set default selectedSubDepartmentId if empty
+        if (!selectedSubDepartmentId.value) {
+            selectedSubDepartmentId.value = subs[0].id;
         }
-    });
 
-    return {
-        isInitialized,
-        isInitializing,
-        initializeData
-    };
+        await initializeData();
+    }, { immediate: true, deep: true });
+
+    return { isInitialized, isInitializing, initializeData };
 }

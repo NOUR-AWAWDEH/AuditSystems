@@ -9,71 +9,39 @@ export function useAuditProcessActions({
     currentPage,
     pageSize
 }) {
-
     const refreshData = async () => {
-        try {
-            const hasSearchOrFilter = searchQuery.value.trim() || selectedSubDepartmentId.value;
-
-            if (hasSearchOrFilter) {
-                if (searchAuditProcesses) {
-                    await searchAuditProcesses({
-                        searchTerm: searchQuery.value || '',
-                        subDepartmentId: selectedSubDepartmentId.value,
-                        page: currentPage.value,
-                        pageSize: pageSize.value,
-                    });
-                }
-            } else {
-                if (getAuditProcessesByUserId) {
-                    await getAuditProcessesByUserId();
-                }
+        const hasSearchOrFilter = searchQuery.value.trim() || selectedSubDepartmentId.value;
+        if (hasSearchOrFilter) {
+            if (searchAuditProcesses) {
+                await searchAuditProcesses({
+                    searchTerm: searchQuery.value || '',
+                    subDepartmentId: selectedSubDepartmentId.value,
+                    page: currentPage.value,
+                    pageSize: pageSize.value,
+                });
             }
-        } catch (error) {
-            console.error('Error refreshing audit process data:', error);
+        } else {
+            if (getAuditProcessesByUserId) {
+                await getAuditProcessesByUserId();
+            }
         }
     };
 
     const handleAuditProcessChange = async (newSubDepartmentId) => {
-        try {
-            if (clearSearch) {
-                clearSearch();
-            }
-
-            if (allAuditProcesses?.value !== undefined) {
-                allAuditProcesses.value = [];
-            }
-
-            selectedSubDepartmentId.value = newSubDepartmentId;
-        } catch (error) {
-            console.error('Error handling audit process change:', error);
-        }
+        if (clearSearch) clearSearch();
+        if (allAuditProcesses?.value !== undefined) allAuditProcesses.value = [];
+        selectedSubDepartmentId.value = newSubDepartmentId;
     };
 
     const resetToDefaultView = () => {
-        try {
-            selectedSubDepartmentId.value = null;
-            searchQuery.value = '';
-            currentPage.value = 1;
-
-            if (clearSearch) {
-                clearSearch();
-            }
-
-            if (allAuditProcesses?.value !== undefined) {
-                allAuditProcesses.value = [];
-            }
-
-            if (clearSubDepartment) {
-                clearSubDepartment();
-            }
-        } catch (error) {
-            console.error('Error resetting to default view:', error);
-        }
+        selectedSubDepartmentId.value = null;
+        searchQuery.value = '';
+        currentPage.value = 1;
+        pageSize.value = 10;
+        if (clearSearch) clearSearch();
+        if (allAuditProcesses?.value !== undefined) allAuditProcesses.value = [];
+        if (clearSubDepartment) clearSubDepartment();
     };
 
-    return {
-        refreshData,
-        handleAuditProcessChange,
-        resetToDefaultView
-    };
+    return { refreshData, handleAuditProcessChange, resetToDefaultView };
 }

@@ -63,9 +63,7 @@ export function useSearchAuditProcessesByUserId() {
                 params.pageSize,
                 params.subDepartmentId
             );
-            
-            console.log('response searchAuditProcessesByUserId : ', response);
-            
+                       
             if (response?.success) {
                 return handleSearchSuccess(response);
             } else {

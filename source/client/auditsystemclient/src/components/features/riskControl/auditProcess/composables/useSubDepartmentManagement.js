@@ -1,60 +1,36 @@
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
 
 export function useSubDepartmentManagement(subDepartments) {
-    // Initialize from localStorage
-    const selectedSubDepartmentId = ref(localStorage.getItem('organizationSelectedSubDepartmentId') || '');
+    const selectedSubDepartmentId = ref(
+        localStorage.getItem('organizationSelectedSubDepartmentId') || ''
+    );
 
-    // Watch for changes and persist to localStorage
-    watch(selectedSubDepartmentId, (newValue) => {
-        if (newValue) {
-            localStorage.setItem('organizationSelectedSubDepartmentId', newValue);
-        } else {
-            localStorage.removeItem('organizationSelectedSubDepartmentId');
-        }
+    watch(selectedSubDepartmentId, (newVal) => {
+        if (newVal) localStorage.setItem('organizationSelectedSubDepartmentId', newVal);
+        else localStorage.removeItem('organizationSelectedSubDepartmentId');
     });
 
-    const {            
+    const {
         subDepartment: fetchSubDepartment,
         isLoading: isSubDepartmentLoading,
         getSubDepartmentById,
-        clearSubDepartment,
+        clearSubDepartment
     } = useGetSubDepartmentById();
 
-    // Add watcher to fetch SubDepartment details when selectedSubDepartmentId changes
-    watch(selectedSubDepartmentId, async (newSubDepartmentId) => {
-        if (newSubDepartmentId) {
-            try {
-                await getSubDepartmentById(newSubDepartmentId);
-            } catch (error) {
-                console.error('Error fetching SubDepartment details:', error);
-            }
-        } else {
-            clearSubDepartment();
-        }
+    watch(selectedSubDepartmentId, async (id) => {
+        if (id) await getSubDepartmentById(id);
+        else clearSubDepartment();
     }, { immediate: true });
 
-    const subDepartmentsRef = computed(() => {
-        if (subDepartments && typeof subDepartments === 'object' && 'value' in subDepartments) {
-            return subDepartments.value || [];
-        }
-        return subDepartments || [];
-    });
+    const subDepartmentsRef = ref(subDepartments || []);
 
     const selectedSubDepartment = computed(() => {
-        const subDepartmentId = selectedSubDepartmentId.value;
-        const subDepartmentsList = subDepartmentsRef.value;
-
-        if (!subDepartmentId || !subDepartmentsList || subDepartmentsList.length === 0) {
-            return null;
-        }
-        const subDepartment = subDepartmentsList.find(sub => sub.id === subDepartmentId);
-        return subDepartment || null;
+        if (!selectedSubDepartmentId.value) return null;
+        return subDepartmentsRef.value.find(s => s.id === selectedSubDepartmentId.value) || null;
     });
 
-    const currentSubDepartment = computed(() => {
-        return fetchSubDepartment?.value || selectedSubDepartment?.value;
-    });
+    const currentSubDepartment = computed(() => fetchSubDepartment.value || selectedSubDepartment.value);
 
     return {
         selectedSubDepartmentId,

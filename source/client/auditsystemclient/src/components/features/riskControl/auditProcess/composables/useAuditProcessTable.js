@@ -5,6 +5,7 @@ import { useAuditProcessActions } from './useAuditProcessActions';
 import { useAuditProcessWatchers } from './useAuditProcessWatchers';
 import { useAuditProcessLifecycle } from './useAuditProcessLifecycle';
 import { useAuditProcessComputed } from './useAuditProcessComputed';
+import { onMounted } from 'vue';
 
 export function useAuditProcessTable(subDepartments) {
 
@@ -51,6 +52,7 @@ export function useAuditProcessTable(subDepartments) {
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
+        refreshData: actionsComposable.refreshData,
         handleAuditProcessChange: actionsComposable.handleAuditProcessChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,

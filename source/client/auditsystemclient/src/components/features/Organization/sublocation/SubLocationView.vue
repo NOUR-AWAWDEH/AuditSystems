@@ -58,7 +58,7 @@ import { watch, onMounted } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubLocationTable from './components/SubLocationTable.vue';
 import AddSubLocationModal from './components/AddSubLocationModal.vue';
-import EditSubLocationModal from './components/EditSubLocationModal.vue';
+import EditSubLocationModal from './components/EditSubLocationModals.vue';
 import { useSubLocationTable } from './composables/useSubLocationTable';
 import { useSubLocationModals } from './composables/useSubLocationModals';
 

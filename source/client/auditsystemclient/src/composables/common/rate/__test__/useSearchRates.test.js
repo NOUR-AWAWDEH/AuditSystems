@@ -1,8 +1,6 @@
-import { ref } from 'vue';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSearchRates } from '../useSearchRates';
 import { searchRatesRepository } from '@/services/common/rate/searchRatesRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 vi.mock('@/services/common/rate/searchRatesRepository', () => ({
   searchRatesRepository: { searchRates: vi.fn() },

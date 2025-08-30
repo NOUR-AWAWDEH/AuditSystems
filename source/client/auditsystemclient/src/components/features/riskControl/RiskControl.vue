@@ -172,7 +172,7 @@ const { getRiskControlMatrixById } = useGetRiskControlMatrixById();
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getObjectiveById } = useGetObjectiveById();
 
-const { getRisksByUserId, risks } = useGetRisksByUserId();
+const {  risks } = useGetRisksByUserId();
 const { getRiskById } = useGetRiskById();
 
 // Computed normalized lists
@@ -243,7 +243,7 @@ const refreshAuditProcesses = async () => await getAuditProcessesByUserId();
 const refreshSubProcesses = async () => await getSubProcessesByUserId();
 const refreshRiskControlMatrices = async () => await getRiskControlMatricesByUserId();
 const refreshObjectives = async () => await getObjectivesByUserId();
-const refreshRisks = async () => await getRisksByUserId();
+//const refreshRisks = async () => await getRisksByUserId();
 
 // Tab navigation
 const setActiveTab = (tabId) => activeTab.value = tabId;

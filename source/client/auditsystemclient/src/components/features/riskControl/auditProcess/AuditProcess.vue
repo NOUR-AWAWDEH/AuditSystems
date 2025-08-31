@@ -89,7 +89,6 @@ import EditAuditProcessModal from './components/EditAuditProcessModal.vue';
 import { useAuditProcessTable } from './composables/useAuditProcessTable';
 import { useAuditProcessModals } from './composables/useAuditProcessModals';
 import DepartmentIcon from '@/components/common/icons/DepartmentIcon.vue';
-import { onMounted } from 'vue';
 
 const props = defineProps({
     subDepartments: {

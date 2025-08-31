@@ -13,8 +13,6 @@
                             <LocationSelector
                                 :locations="locations"
                                 :selected-location-id="selectedLocationId"
-                                value-key="id"
-                                label-key="name"
                                 @location-changed="handleLocationChange"
                             />
                         </div>

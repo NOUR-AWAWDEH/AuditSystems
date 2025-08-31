@@ -143,6 +143,7 @@ const setSelectedId = (key, value) => {
 // Event handlers
 const handleLocationSelected = async (id) => {
   setSelectedId('location', id);
+  await getLocationsByUserId();
   activeTab.value = 'sublocations';
 };
 

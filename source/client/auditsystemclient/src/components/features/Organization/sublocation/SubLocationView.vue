@@ -137,6 +137,10 @@ const handleSubLocationSelected = (subLocationId) => {
     emit('sub-location-selected', subLocationId);
 };
 
+// const handleSubLocatonDeleted = (subLocationId) => {
+//     emit('sub-location-deleted', subLocationId);
+// }
+
 defineExpose({
     subLocations,
     selectedLocationId: internalSelectedLocationId,

@@ -60,7 +60,6 @@
             :sub-locations="subLocations"
             :selected-sub-location-id="selectedSubLocationId"
             @department-selected="handleDepartmentSelected"
-
           />
         </div>
 
@@ -164,8 +163,32 @@ const handleSubDepartmentSelected = async (id) => {
 };
 
 
-// Tab navigation
-const setActiveTab = (tabId) => activeTab.value = tabId;
+// Tab navigation - always refresh list when switching
+const setActiveTab = async (tabId) => {
+  activeTab.value = tabId;
+  try {
+    isLoading.value = true;
+    errorMessage.value = null;
+
+    switch (tabId) {
+
+      case 'sublocations':
+        await getLocationsByUserId();
+        break;
+      case 'departments':
+        await getSubLocationsByUserId();
+        break;
+      case 'subdepartments':
+        await getDepartmentsByUserId();
+        break;
+    }
+  } catch (err) {
+    errorMessage.value = 'Failed to load data';
+    console.error(err);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 // Handle route queries
 const handleRouteQueries = async () => {

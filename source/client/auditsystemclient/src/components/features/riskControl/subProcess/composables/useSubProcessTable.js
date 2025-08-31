@@ -1,6 +1,6 @@
 import { useSubProcessData } from './useSubProcessData';
 import { useAuditProcessManagement } from './useAuditProcessManagement';
-import { useSearchAndPagination } from './useSearchAndPagination';
+import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 import { useSubProcessActions } from './useSubProcessActions';
 import { useSubProcessWatchers } from './useSubProcessWatchers';
 import { useSubProcessLifecycle } from './useSubProcessLifecycle';
@@ -51,7 +51,6 @@ export function useSubProcessTable(auditProcesses) {
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
-        refreshData: actionsComposable.refreshData,
         handleSubProcessAdded: actionsComposable.handleSubProcessAdded,
         handleSubProcessChange: actionsComposable.handleSubProcessChange,
         handleSearch: searchComposable.handleSearch,

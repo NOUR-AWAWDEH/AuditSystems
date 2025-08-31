@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useDeleteRiskControlMatrixById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useRiskControlMatrixModals(refreshData, emit) {
+export function useRiskControlMatrixModals(riskControlMatrices, emit) {
     const { deleteRiskControlMatrix } = useDeleteRiskControlMatrixById();
     const { showNotification } = useNotification();
 
@@ -22,9 +22,9 @@ export function useRiskControlMatrixModals(refreshData, emit) {
         showAddRiskControlMatrixModal.value = false;
     };
 
-    const handleRiskControlMatrixAdded = async () => {
+    const handleRiskControlMatrixAdded = async (newRiskControlMatrix) => {
         try {
-            await refreshData();
+            riskControlMatrices.value.push(newRiskControlMatrix);
             emit('risk-control-matrix-added');
             handleCloseAddRiskControlMatrixModal();
         } catch (error) {
@@ -43,13 +43,29 @@ export function useRiskControlMatrixModals(refreshData, emit) {
         riskControlMatrixToEdit.value = null;
     };
 
-    const handleRiskControlMatrixUpdated = async () => {
-        // Store the description risk control matrix name before clearing the reference
-        const description = riskControlMatrixToEdit.value?.description || 'Unknown Risk Control Matrix';
-        await refreshData();
-        emit('risk-control-matrix-updated');
-        showNotification(`Risk Control Matrix "${description}" has been updated successfully!`, 'success');
-        handleCloseEditRiskControlMatrixModal();
+    const handleRiskControlMatrixUpdated = async (updatedRiskControlMatrix) => {
+        try {
+            // Find and replace the updated risk control matrix in the local list
+            const index = riskControlMatrices.value.findIndex(
+                matrix => matrix.id === updatedRiskControlMatrix.id
+            );
+
+            if (index !== -1) {
+                riskControlMatrices.value[index] = { ...riskControlMatrices.value[index], ...updatedRiskControlMatrix };
+            }
+
+            emit('risk-control-matrix-updated', updatedRiskControlMatrix);
+
+            showNotification(
+                `Risk Control Matrix "${updatedRiskControlMatrix.description}" has been updated successfully!`, 
+                'success'
+            );
+
+            handleCloseEditRiskControlMatrixModal();
+        } catch (error) {
+            console.error('Error in handleRiskControlMatrixUpdated:', error);
+            showNotification('Failed to refresh data after updating risk control matrix', 'error');
+        }
     };
 
     const handleDeleteRiskControlMatrix = (riskControlMatrix) => {
@@ -60,27 +76,31 @@ export function useRiskControlMatrixModals(refreshData, emit) {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete.value) {
-            const deletedMatrix = { ...itemToDelete.value };
-            const result = await deleteRiskControlMatrix(deletedMatrix.id);
+        if (!itemToDelete.value) return; 
+        
+        const deletedMatrix = { ...itemToDelete.value };
+        const result = await deleteRiskControlMatrix(deletedMatrix.id);
 
-            if (result.success) {
+        if (result.success) {
+            
+            const index = riskControlMatrices.value.findIndex(
+                matrix => matrix.id === deletedMatrix.id
+            );
+            if (index !== -1) {
+                riskControlMatrices.value.splice(index, 1);
+            }
+
             showNotification(
                 `Risk Control Matrix "${deletedMatrix.description}" has been deleted successfully!`,
                 'success'
             );
+
             localStorage.removeItem("riskControlSelectedRiskControlMatrixId");
 
-            setTimeout(async () => {
-                await refreshData();
-                emit('risk-control-matrix-deleted', deletedMatrix.id);
-            }, 100);
-            }
-
-            cancelDelete();
+            emit('risk-control-matrix-deleted', deletedMatrix.id);
         }
+        cancelDelete();
     };
-
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

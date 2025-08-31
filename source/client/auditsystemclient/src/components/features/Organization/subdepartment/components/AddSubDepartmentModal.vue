@@ -141,7 +141,7 @@ const handleSubmit = async () => {
         createdAt: new Date().toISOString()
       }
 
-      showNotification(`SubDepartment "${subDepartmentData.name}" has been added successfully!`, 'success');
+      showNotification(`SubDepartment "${newSubDepartment.name}" has been added successfully!`, 'success');
       emit('sub-department-added', newSubDepartment);
       emit('close');
     } else {

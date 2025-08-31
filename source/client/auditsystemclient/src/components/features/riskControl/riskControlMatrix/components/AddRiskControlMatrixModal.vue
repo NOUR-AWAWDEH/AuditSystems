@@ -131,11 +131,17 @@ const handleSubmit = async () => {
         const result = await createRiskControlMatrix(riskControlMatrixData);
 
         if (result?.success) {
-            showNotification(`Risk Control Matrix "${formData.value.description}" has been added successfully!`, 'success');
-            emit('risk-control-matrix-added', result.data);
+            const newRiskControlMatrix = {
+                id: result.data.riskControlMatrixId,
+                ...riskControlMatrixData,
+                createdAt: new Date().toISOString(),
+            };
+
+            showNotification(`Risk Control Matrix "${newRiskControlMatrix.description}" has been added successfully!`, 'success');
+            emit('risk-control-matrix-added', newRiskControlMatrix);
             emit('close');
         } else {
-             showNotification(result?.message || 'Failed to create risk control matrix', 'error');
+            showNotification(result?.message || 'Failed to create risk control matrix', 'error');
         }
 
     } catch (error) {

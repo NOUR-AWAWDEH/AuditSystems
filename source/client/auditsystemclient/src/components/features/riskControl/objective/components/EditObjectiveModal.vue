@@ -74,7 +74,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'objective-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateObjective, resetState } = useUpdateObjectiveById();
@@ -157,7 +157,8 @@ const handleSubmit = async () => {
         ...result.data
       };
 
-      emit('updated', updatedObjectiveData);
+      showNotification(`Objective "${updatedObjectiveData.description}" has been updated successfully!`, 'success');
+      emit('objective-updated', updatedObjectiveData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update objective. Please try again.';

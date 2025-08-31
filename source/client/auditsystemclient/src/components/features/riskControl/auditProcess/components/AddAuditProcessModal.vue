@@ -138,8 +138,7 @@ const handleSubmit = async () => {
                 createdAt: new Date().toISOString()
             };
 
-            showNotification(`Audit Process "${formData.value.name}" has been added successfully!`, 'success');
-
+            showNotification(`Audit Process "${newAuditProcess.processName}" has been added successfully!`, 'success');
             emit('audit-process-added', newAuditProcess);
             emit('close');
         }

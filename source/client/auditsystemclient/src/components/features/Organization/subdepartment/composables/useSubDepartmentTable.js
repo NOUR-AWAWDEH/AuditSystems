@@ -50,7 +50,6 @@ export function useSubDepartmentTable(departments) {
     currentPage: searchComposable.currentPage,
     pageSize: searchComposable.pageSize,
     totalCount: dataComposable.totalCount,
-    refreshData: actionsComposable.refreshData,
     handleSubDepartmentChange: actionsComposable.handleSubDepartmentChange,
     handleSearch: searchComposable.handleSearch,
     resetToDefaultView: actionsComposable.resetToDefaultView,

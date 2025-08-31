@@ -57,15 +57,13 @@
 
 import { useRiskData } from './useRiskData';
 import { useObjectiveManagement } from './useObjectiveManagement';
-import { useSearchAndPagination } from './useSearchAndPagination';
+import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 import { useRiskActions } from './useRiskActions';
 import { useRiskLifecycle } from './useRiskLifecycle';
 import { useRiskComputed } from './useRiskComputed';
 import { useRiskWatchers } from './useRiskWatchers';
-import { useRiskModals } from './useRiskModals';
 
-
-export function useRiskTable(objectives, showNotification) {
+export function useRiskTable(objectives) {
     const dataComposable = useRiskData();
     const objectiveComposable = useObjectiveManagement(objectives);
     const searchComposable = useSearchAndPagination();
@@ -98,11 +96,6 @@ export function useRiskTable(objectives, showNotification) {
         ...lifecycleComposable
     });
 
-    const modalComposable = useRiskModals(
-        actionsComposable.refreshData,
-        showNotification
-    );
-
     return {
         risks: computedComposable.risks,
         isLoading: computedComposable.isLoading,
@@ -114,11 +107,9 @@ export function useRiskTable(objectives, showNotification) {
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
-        refreshData: actionsComposable.refreshData,
         handleRiskAdded: actionsComposable.handleRiskAdded,
         handleRiskChange: actionsComposable.handleRiskChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
-        ...modalComposable
     };
 }

@@ -50,7 +50,6 @@ export function useSubLocationTable(locations) {
     currentPage: searchComposable.currentPage,
     pageSize: searchComposable.pageSize,
     totalCount: dataComposable.totalCount,
-    refreshData: actionsComposable.refreshData,
     handleSubLocationChange: actionsComposable.handleSubLocationChange,
     handleSearch: searchComposable.handleSearch,
     resetToDefaultView: actionsComposable.resetToDefaultView,

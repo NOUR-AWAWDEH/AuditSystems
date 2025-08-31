@@ -22,7 +22,6 @@
             :search-query="searchQuery"
             :handle-objective-change="handleRiskChange"
             :handle-search="handleSearch"
-            :refresh-data="refreshData"
             @add-risk="handleAddRisk"
             @edit-risk="handleEditRisk"
             @delete-risk="handleDeleteRisk"
@@ -81,7 +80,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, ref  } from 'vue';
+import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskTable from './components/RiskTable.vue';
 import AddRiskModal from './components/AddRiskModal.vue';
@@ -101,14 +100,15 @@ const props = defineProps({
     }
 });
 
-
-
 // Define emit first
-const emit = defineEmits(['risk-selected', 'risk-added', 'risk-updated','risk-deleted']);
-
+const emit = defineEmits([
+    'risk-selected',
+    'risk-added',
+    'risk-updated',
+    'risk-deleted'
+]);
 
 // Use composables - now with integrated backend search
-
 const {
     risks,
     isLoading,
@@ -117,43 +117,18 @@ const {
     currentObjective,
     isObjectiveLoading,
     searchQuery,
-    refreshData,
     handleRiskChange,
     handleSearch,
     resetToDefaultView,
 } = useRiskTable(props.objectives);
 
-// Local ref to manage selectedObjectiveId
-const localSelectedObjectiveId = ref(props.selectedObjectiveId);
-
-// Add onMounted to refresh data on page load
-onMounted(async () => {
-    if (localSelectedObjectiveId.value) {
-        await refreshData();
-    }
-});
-
 // Watch for prop changes and update internal state
-watch(
-    () => props.selectedObjectiveId,
-    async (newObjectiveId) => {
-        localSelectedObjectiveId.value = newObjectiveId;
+watch( () => props.selectedObjectiveId, (newObjectiveId) => {
         if (newObjectiveId !== internalSelectedObjectiveId.value) {
-            await handleRiskChange(newObjectiveId);
+            handleRiskChange(newObjectiveId);
         }
     },
     { immediate: true }
-);
-
-// Watch for objectives prop changes
-watch(
-    () => props.objectives,
-    async (newObjectives) => {
-        if (newObjectives.length > 0 && localSelectedObjectiveId.value) {
-            await refreshData();
-        }
-    },
-    { immediate: true, deep: true }
 );
 
 // Use modal composable for dialog management
@@ -174,7 +149,7 @@ const {
     handleDeleteRisk,
     confirmDelete,
     cancelDelete
-} = useRiskModals(refreshData, emit);
+} = useRiskModals(risks, emit);
 
 
 // Handle risk selection and forward to parent
@@ -184,7 +159,7 @@ const handleRiskSelected = (riskId) => {
 
 defineExpose({
     risks,
-    selectedObjectiveId: localSelectedObjectiveId,
+    selectedObjectiveId: internalSelectedObjectiveId,
     resetToDefaultView
 });
 </script>

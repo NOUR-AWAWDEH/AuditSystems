@@ -109,8 +109,6 @@ const emit = defineEmits([
     'audit-process-deleted'
 ]);
 
-
-
 // Use composables - now with integrated backend search
 const {
     isLoading,
@@ -143,7 +141,7 @@ const {
     confirmDelete,
     handleCloseEditAuditProcessModal,
     cancelDelete
-} = useAuditProcessModals(computedAuditProcesses, emit); // ← Pass computedAuditProcesses instead
+} = useAuditProcessModals(computedAuditProcesses, emit);
 
 // Handle audit process selection and forward to parent
 const handleAuditProcessSelected = (auditProcessId) => {
@@ -151,7 +149,7 @@ const handleAuditProcessSelected = (auditProcessId) => {
 };
 
 defineExpose({
-    auditProcesses: computedAuditProcesses, // ← Use computed here too
+    auditProcesses: computedAuditProcesses,
     selectedSubDepartmentId: internalSelectedSubDepartmentId,
     resetToDefaultView
 });

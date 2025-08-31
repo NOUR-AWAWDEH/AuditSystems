@@ -202,6 +202,7 @@ const setActiveTab = async (tabId) => {
         break;
     }
   } catch (err) {
+    console.error('Error fetching data:', err);
     errorMessage.value = 'Failed to load data';
   } finally {
     isLoading.value = false;

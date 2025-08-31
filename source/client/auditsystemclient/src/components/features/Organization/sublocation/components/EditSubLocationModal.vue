@@ -175,6 +175,7 @@ const handleSubmit = async () => {
         createdAt: new Date().toISOString()
       };
 
+      showNotification(`Sub Location "${updatedSubLocationData.name}" has been updated successfully!`, 'success');
       emit('sub-location-updated', updatedSubLocationData);
       emit('close');
     } else {

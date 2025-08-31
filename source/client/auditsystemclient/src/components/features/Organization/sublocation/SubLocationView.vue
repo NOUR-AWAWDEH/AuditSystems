@@ -81,7 +81,6 @@ const emit = defineEmits([
     'sub-location-deleted'
 ]);
 
-
 // Use composables - now with integrated backend search
 const {
     subLocations,
@@ -91,18 +90,10 @@ const {
     currentLocation,
     isLocationLoading,
     searchQuery,
-    refreshData,
     handleSubLocationChange,
     handleSearch,
     resetToDefaultView,
 } = useSubLocationTable(props.locations);
-
-
-onMounted( async () => {
-    if(internalSelectedLocationId.value) {
-      await refreshData();
-    }
-});
 
 
 // Watch for prop changes and update internal state
@@ -136,10 +127,6 @@ const {
 const handleSubLocationSelected = (subLocationId) => {
     emit('sub-location-selected', subLocationId);
 };
-
-// const handleSubLocatonDeleted = (subLocationId) => {
-//     emit('sub-location-deleted', subLocationId);
-// }
 
 defineExpose({
     subLocations,

@@ -148,8 +148,8 @@ const handleSubmit = async () => {
         ...subLocationData,
         createdAt: new Date().toISOString()
       };
+
       showNotification(`SubLocation "${newSubLocation.name}" has been added successfully!`, 'success');
-      
       emit('sub-location-added', newSubLocation);
       emit('close');
     }

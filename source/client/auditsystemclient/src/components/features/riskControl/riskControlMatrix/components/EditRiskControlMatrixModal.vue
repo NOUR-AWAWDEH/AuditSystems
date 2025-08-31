@@ -74,7 +74,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close', 'updated']);
+const emit = defineEmits(['close', 'risk-control-matrix-updated']);
 
 const { showNotification } = useNotification();
 const { isUpdating, error, updateRiskControlMatrix, resetState } = useUpdateRiskControlMatrixById();
@@ -155,8 +155,9 @@ const handleSubmit = async () => {
         ...riskControlMatrixData,
         ...result.data
       };
-
-      emit('updated', updatedRiskControlMatrixData);
+      
+      showNotification(`Risk Control Matrix "${updatedRiskControlMatrixData.description}" has been updated successfully!`, 'success');
+      emit('risk-control-matrix-updated', updatedRiskControlMatrixData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update risk control matrix. Please try again.';

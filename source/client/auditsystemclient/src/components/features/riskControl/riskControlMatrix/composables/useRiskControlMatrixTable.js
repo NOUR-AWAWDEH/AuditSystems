@@ -5,9 +5,8 @@ import { useRiskControlMatrixActions } from './useRiskControlMatrixActions';
 import { useRiskControlMatrixWatchers } from './useRiskControlMatrixWatchers';
 import { useRiskControlMatrixLifecycle } from './useRiskControlMatrixLifecycle';
 import { useRiskControlMatrixComputed } from './useRiskControlMatrixComputed';
-import { useRiskControlMatrixModals } from './useRiskControlMatrixModals';
 
-export function useRiskControlMatrixTable(subProcesses, showNotification) {
+export function useRiskControlMatrixTable(subProcesses) {
 
     const dataComposable = useRiskControlMatrixData();
     const subProcessComposable = useSubProcessManagement(subProcesses);
@@ -41,11 +40,6 @@ export function useRiskControlMatrixTable(subProcesses, showNotification) {
         ...lifecycleComposable
     });
 
-    const modalComposable = useRiskControlMatrixModals(
-        actionsComposable.refreshData,
-        showNotification
-    );
-
     return {
         riskControlMatrices: computedComposable.riskControlMatrices,
         isLoading: computedComposable.isLoading,
@@ -57,11 +51,9 @@ export function useRiskControlMatrixTable(subProcesses, showNotification) {
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
-        refreshData: actionsComposable.refreshData,
         handleRiskControlMatrixAdded: actionsComposable.handleRiskControlMatrixAdded,
         handleRiskControlMatrixChange: actionsComposable.handleRiskControlMatrixChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
-        ...modalComposable
     };
 }

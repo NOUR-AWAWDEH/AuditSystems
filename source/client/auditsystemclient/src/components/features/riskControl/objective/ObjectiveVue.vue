@@ -22,7 +22,6 @@
             :search-query="searchQuery"
             :handle-risk-control-matrix-change="handleObjectiveChange"
             :handle-search="handleSearch"
-            :refresh-data="refreshData"
             @add-objective="handleAddObjective"
             @edit-objective="handleEditObjective"
             @delete-objective="handleDeleteObjective"
@@ -62,7 +61,7 @@
             :is-visible="showEditObjectiveModal"
             :objective="objectiveToEdit"
             @close="handleCloseEditObjectiveModal"
-            @updated="handleObjectiveUpdated"
+            @objective-updated="handleObjectiveUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -80,7 +79,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, ref  } from 'vue';
+import { watch} from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import ObjectiveTable from './components/ObjectiveTable.vue';
 import AddObjectiveModal from './components/AddObjectiveModal.vue';
@@ -100,15 +99,15 @@ const props = defineProps({
     }
 });
 
-
-
 // Define emit first
-const emit = defineEmits(['objective-selected', 'objective-added', 'objective-updated', 'objective-deleted']);
-
-
+const emit = defineEmits([
+    'objective-selected',
+    'objective-added',
+    'objective-updated',
+    'objective-deleted'
+]);
 
 // Use composables - now with integrated backend search
-
 const {
     objectives,
     isLoading,
@@ -117,43 +116,18 @@ const {
     currentRiskControlMatrix,
     isRiskControlMatrixLoading,
     searchQuery,
-    refreshData,
     handleObjectiveChange,
     handleSearch,
     resetToDefaultView,
 } = useObjectiveTable(props.riskControlMatrices);
 
-// Local ref to manage selectedRiskControlMatrixId
-const localSelectedRiskControlMatrixId = ref(props.selectedRiskControlMatrixId);
-
-// Add onMounted to refresh data on page load
-onMounted(async () => {
-    if (localSelectedRiskControlMatrixId.value) {
-        await refreshData();
-    }
-});
-
 // Watch for prop changes and update internal state
-watch(
-    () => props.selectedRiskControlMatrixId,
-    async (newRiskControlMatrixId) => {
-        localSelectedRiskControlMatrixId.value = newRiskControlMatrixId;
+watch( () => props.selectedRiskControlMatrixId, (newRiskControlMatrixId) => {
         if (newRiskControlMatrixId !== internalSelectedRiskControlMatrixId.value) {
-            await handleObjectiveChange(newRiskControlMatrixId);
+             handleObjectiveChange(newRiskControlMatrixId);
         }
     },
     { immediate: true }
-);
-
-// Watch for RiskControlMatrices prop changes
-watch(
-    () => props.riskControlMatrices,
-    async (newRiskControlMatrices) => {
-        if (newRiskControlMatrices.length > 0 && localSelectedRiskControlMatrixId.value) {
-            await refreshData();
-        }
-    },
-    { immediate: true, deep: true }
 );
 
 // Use modal composable for dialog management
@@ -174,7 +148,7 @@ const {
     handleCloseEditObjectiveModal,
     handleDeleteObjective,
     cancelDelete
-} = useObjectiveModals(refreshData, emit);
+} = useObjectiveModals(objectives, emit);
 
 
 // Handle objective selection and forward to parent
@@ -185,7 +159,7 @@ const handleObjectiveSelected = (objectiveId) => {
 
 defineExpose({
     objectives,
-    selectedRiskControlMatrixId: localSelectedRiskControlMatrixId,
+    selectedRiskControlMatrixId: internalSelectedRiskControlMatrixId,
     resetToDefaultView
 });
 </script>

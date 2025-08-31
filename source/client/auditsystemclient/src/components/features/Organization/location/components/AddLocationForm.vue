@@ -59,6 +59,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useCreateLocation } from '@/composables/organization/location/useCreateLocation';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
+import { useNotification } from '@/composables/notification/useNotification';
 
 const emit = defineEmits(['location-added']);
 
@@ -68,6 +69,7 @@ const newLocation = ref({
     address: ''
 });
 
+const { showNotification } = useNotification();
 const { isCreating, error, createLocation, clearState } = useCreateLocation();
 const { authStatus, checkAuthStatus, initCheck } = useAuthStatus();
 
@@ -122,7 +124,7 @@ const handleAddLocation = async () => {
            id: result.data.result.locationId,
            ...locationData
         };
-
+        showNotification(`Location "${fullLocation.name}" has been added successfully!`, 'success');
         emit('location-added', fullLocation); // emit the full location object
         resetForm();
         showAddForm.value = false;

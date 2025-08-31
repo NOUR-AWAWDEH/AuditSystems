@@ -204,17 +204,21 @@ const handleSubmit = async () => {
 
     const result = await updateRisk(riskData);
 
-
     if (result?.success) {
-      showNotification(`Risk "${formData.value.riskName}" has been added successfully!`, 'success');
-      emit('risk-updated', result.data);
+      const updatedRiskData = {
+        ...props.risk,
+        ...result.data
+      };
+
+      showNotification(`Risk "${formData.value.riskName}" has been updated successfully!`, 'success');
+      emit('risk-updated', updatedRiskData);
       emit('close');
     } else {
-      showNotification(result?.message || 'Failed to create risk', 'error');
+      showNotification(result?.message || 'Failed to update risk', 'error');
     }
   } catch (err) {
-    console.error('Error creating risk:', err);
-    showNotification('Failed to create risk. Please try again.', 'error');
+    console.error('Error updating risk:', err);
+    showNotification('Failed to update risk. Please try again.', 'error');
   }
 };
 </script>

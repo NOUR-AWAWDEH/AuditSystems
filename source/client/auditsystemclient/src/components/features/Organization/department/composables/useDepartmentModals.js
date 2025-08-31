@@ -68,7 +68,6 @@ export function useDepartmentModals(departments, emit) {
         }
     };
 
-
     const handleDeleteDepartment = (department) => {
         itemToDelete.value = department;
         deleteDialogTitle.value = 'Delete Department';
@@ -95,7 +94,6 @@ export function useDepartmentModals(departments, emit) {
 
             emit('department-deleted', deletedDepartment.id);
         }
-        
         cancelDelete();
     };
 

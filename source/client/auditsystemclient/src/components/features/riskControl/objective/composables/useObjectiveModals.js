@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useDeleteObjectiveById } from '@/composables/riskControl/objective/useDeleteObjectiveById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useObjectiveModals(refreshData, emit) {
+export function useObjectiveModals(objectives, emit) {
 
     const { deleteObjective } = useDeleteObjectiveById();
     const { showNotification } = useNotification();
@@ -23,11 +23,10 @@ export function useObjectiveModals(refreshData, emit) {
         showAddObjectiveModal.value = false;
     };
 
-    const handleObjectiveAdded = async () => {
+    const handleObjectiveAdded = async (newObjective) => {
         try {
-            await refreshData();
-            emit('objective-added');
-
+            objectives.value.push(newObjective);
+            emit('objective-added', newObjective);
             handleCloseAddObjectiveModal();
         } catch (error) {
             console.error('Error in handleObjectiveAdded:', error);
@@ -45,14 +44,28 @@ export function useObjectiveModals(refreshData, emit) {
         objectiveToEdit.value = null;
     };
 
-    const handleObjectiveUpdated = async () => {
-        // Store the description objective name before clearing the reference
-        const description = objectiveToEdit.value?.description || 'Unknown Objective';
-        await refreshData();
-        emit('objective-updated');
+    const handleObjectiveUpdated = async (updatedObjective) => {
+       try {
+        const index = objectives.value.findIndex(obj => obj.id === updatedObjective.id);
+        if (index !== -1) {
+            objectives.value[index] = updatedObjective;
+        }
 
-        showNotification(`Objective "${description}" has been updated successfully!`, 'success');
+        if(index !== -1){
+           objectives.value[index] = { ...objectives.value[index], ...updatedObjective };
+        }
+        emit('objective-updated', updatedObjective);
+
+        showNotification(
+            `Objective "${updatedObjective.description}" has been updated successfully!`,
+             'success'
+        );
+
         handleCloseEditObjectiveModal();
+       }catch (error) {
+            console.error('Error in handleObjectiveUpdated:', error);
+            showNotification('Failed to refresh data after updating objective', 'error');
+       }
     };
 
     const handleDeleteObjective = (objective) => {
@@ -63,27 +76,29 @@ export function useObjectiveModals(refreshData, emit) {
     };
 
     const confirmDelete = async () => {
-      if (itemToDelete.value) {
+      if (!itemToDelete.value) return;
+      
         const deletedObjective = { ...itemToDelete.value };
         const result = await deleteObjective(deletedObjective.id);
 
         if (result.success) {
-          showNotification(
-            `Objective "${deletedObjective.description}" has been deleted successfully!`,
-            'success'
-          );
-          localStorage.removeItem('riskControlSelectedObjectiveId');
+            const index = objectives.value.findIndex(obj => obj.id === deletedObjective.id);
+            if (index !== -1) {
+                objectives.value.splice(index, 1);
+            }
 
-          setTimeout(async () => {
-            await refreshData();
+            showNotification(
+                `Objective "${deletedObjective.description}" has been deleted successfully!`,
+                'success'
+            );
+
+            localStorage.removeItem('riskControlSelectedObjectiveId');
+            
             emit('objective-deleted', deletedObjective.id);
-          }, 100);
         }
 
         cancelDelete();
-      }
     };
-
 
     const cancelDelete = () => {
         showDeleteDialog.value = false;

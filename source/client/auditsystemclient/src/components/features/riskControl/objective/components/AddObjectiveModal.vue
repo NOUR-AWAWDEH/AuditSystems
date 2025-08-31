@@ -131,8 +131,14 @@ const handleSubmit = async () => {
         const result = await createObjective(objectiveData);
 
         if (result?.success) {
-            showNotification(`Objective "${formData.value.description}" has been added successfully!`, 'success');
-            emit('objective-added', result.data);
+            const newObjective = {
+                id: result.data.objectiveId,
+                ...objectiveData,
+                createdAt: new Date().toISOString(),
+            };
+
+            showNotification(`Objective "${newObjective.description}" has been added successfully!`, 'success');
+            emit('objective-added', newObjective);
             emit('close');
         } else {
              showNotification(result?.message || 'Failed to create objective', 'error');

@@ -55,7 +55,7 @@ import AddSubDepartmentModal from './components/AddSubDepartmentModal.vue'
 import EditSubDepartmentModal from './components/EditSubDepartmentModal.vue';
 import { useSubDepartmentTable } from './composables/useSubDepartmentTable';
 import { useSubDepartmentModals } from './composables/useSubDepartmentModals';
-import { watch, onMounted } from 'vue';
+import { watch} from 'vue';
 
 const props = defineProps({
     departments: {
@@ -84,17 +84,11 @@ const {
     currentDepartment,
     isDepartmentLoading,
     searchQuery,
-    refreshData,
     handleSubDepartmentChange,
     handleSearch,
     resetToDefaultView,
 } = useSubDepartmentTable(props.departments);
 
-onMounted( async () => {
-    if(internalSelectedDepartmentId) {
-        await refreshData();
-    }
-});
 
 // Watch for prop changes and update internal state
 watch(() => props.selectedDepartmentId, (newDepartmentId) => {

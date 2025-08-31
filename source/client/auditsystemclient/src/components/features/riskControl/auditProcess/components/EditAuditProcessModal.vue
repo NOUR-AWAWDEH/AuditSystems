@@ -153,7 +153,8 @@ const handleSubmit = async () => {
         ...auditProcessData,
         ...result.data
       };
-
+      
+      showNotification(`Audit Process "${updatedAuditProcessData.processName}" has been updated successfully!`, 'success');
       emit('audit-process-updated', updatedAuditProcessData);
       emit('close');
     } else {

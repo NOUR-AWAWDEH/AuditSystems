@@ -55,7 +55,7 @@ import DepartmentTable from './components/DepartmentTable.vue';
 import AddDepartmentModal from './components/AddDepartmentModal.vue';
 import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
-import { onMounted, watch } from 'vue';
+import { watch } from 'vue';
 import { useDepartmentModals } from './composables/useDepartmentModals';
 
 const props = defineProps({
@@ -77,7 +77,6 @@ const emit = defineEmits([
     'department-deleted',
 ]);
 
-
 // Use composables - now with integrated backend search
 const {
     departments,
@@ -87,17 +86,10 @@ const {
     currentSubLocation,
     isSubLocationLoading,
     searchQuery,
-    refreshData,
     handleDepartmentChange,
     handleSearch,
     resetToDefaultView,
 } = useDepartmentTable(props.subLocations);
-
-onMounted( async () => {
-    if(internalSelectedSubLocationId) {
-        await refreshData();
-    }
-});
 
 // Watch for prop changes and update internal state
 watch(() => props.selectedSubLocationId, (newSubLocationId) => {

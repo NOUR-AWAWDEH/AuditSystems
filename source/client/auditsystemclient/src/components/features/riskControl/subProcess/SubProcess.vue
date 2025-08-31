@@ -22,7 +22,6 @@
       :search-query="searchQuery"
       :handle-audit-process-change="handleSubProcessChange"
       :handle-search="handleSearch"
-      :refresh-data="refreshData"
       @add-sub-process="handleAddSubProcess"
       @edit-sub-process="handleEditSubProcess"
       @delete-sub-process="handleDeleteSubProcess"
@@ -81,7 +80,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, ref } from 'vue';
+import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import SubProcessTable from './components/SubProcessTable.vue';
 import AddSubProcessModal from './components/AddSubProcessModal.vue';
@@ -118,42 +117,19 @@ const {
   currentAuditProcess,
   isAuditProcessLoading,
   searchQuery,
-  refreshData,
   handleSubProcessChange,
   handleSearch,
   resetToDefaultView,
 } = useSubProcessTable(props.auditProcesses);
 
-// Local ref to manage selectedAuditProcessId
-const localSelectedAuditProcessId = ref(props.selectedAuditProcessId);
-
-onMounted(async () => {
-  if (localSelectedAuditProcessId.value) {
-    await refreshData();
-  }
-});
 
 // Watch for prop changes and update internal state
-watch(
-  () => props.selectedAuditProcessId,
-  async (newAuditProcessId) => {
-    localSelectedAuditProcessId.value = newAuditProcessId;
+watch(() => props.selectedAuditProcessId, (newAuditProcessId) => {
     if (newAuditProcessId !== internalSelectedAuditProcessId.value) {
-      await handleSubProcessChange(newAuditProcessId);
+       handleSubProcessChange(newAuditProcessId);
     }
   },
   { immediate: true },
-);
-
-// Watch for auditProcesses prop changes
-watch(
-  () => props.auditProcesses,
-  async (newAuditProcesses) => {
-    if (newAuditProcesses.length > 0 && localSelectedAuditProcessId.value) {
-      await refreshData();
-    }
-  },
-  { immediate: true, deep: true },
 );
 
 // Use modal composable for dialog management
@@ -181,11 +157,9 @@ const handleSubProcessSelected = (subProcessId) => {
   emit('sub-process-selected', subProcessId);
 };
 
-
-
 defineExpose({
   subProcesses,
-  selectedAuditProcessId: localSelectedAuditProcessId,
+  selectedAuditProcessId: internalSelectedAuditProcessId,
   resetToDefaultView,
 });
 </script>

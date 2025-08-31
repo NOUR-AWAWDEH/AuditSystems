@@ -157,6 +157,7 @@ const handleSubmit = async () => {
         ...result.data
       };
 
+      showNotification(`Sub Process "${updatedSubProcessData.particular}" has been updated successfully!`, 'success');
       emit('sub-process-updated', updatedSubProcessData);
       emit('close');
     } else {

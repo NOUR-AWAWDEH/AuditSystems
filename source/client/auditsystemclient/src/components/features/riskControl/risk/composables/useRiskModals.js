@@ -40,7 +40,7 @@ import { ref } from 'vue';
 import { useDeleteRiskById } from '@/composables/riskControl/risk/useDeleteRiskById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useRiskModals(refreshData, emit) {
+export function useRiskModals(risks, emit) {
     const { deleteRisk } = useDeleteRiskById();
     const { showNotification } = useNotification();
 
@@ -60,9 +60,9 @@ export function useRiskModals(refreshData, emit) {
         showAddRiskModal.value = false;
     };
 
-    const handleRiskAdded = async () => {
+    const handleRiskAdded = async (newRisk) => {
         try {
-            await refreshData();
+            risks.value.push(newRisk);
             emit('risk-added');
             handleCloseAddRiskModal();
         } catch (error) {
@@ -81,12 +81,24 @@ export function useRiskModals(refreshData, emit) {
         riskToEdit.value = null;
     };
 
-    const handleRiskUpdated = async () => {
-        const riskName = riskToEdit.value?.riskName || 'Unknown risk';
-        await refreshData();
-        emit('risk-updated');
-        showNotification(`Risk "${riskName}" has been updated successfully!`, 'success');
-        handleCloseEditRiskModal();
+    const handleRiskUpdated = async (updatedRisk) => {
+        try {
+            const index = risks.value.findIndex(
+                r => r.id === updatedRisk.id
+            );
+            
+            if (index !== -1) {
+                risks.value[index] = { ...risks.value[index], ...updatedRisk }
+            }
+
+            emit('risk-updated', updatedRisk);
+            showNotification(
+                `Risk "${updatedRisk.riskName}" has been updated successfully!`, 'success');
+            handleCloseEditRiskModal();
+        } catch (error) {
+            console.error('Error in handleRiskUpdated:', error);
+            showNotification('Failed to update risk', 'error');
+        }
     };
 
     const handleDeleteRisk = (risk) => {
@@ -97,25 +109,28 @@ export function useRiskModals(refreshData, emit) {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete.value) {
+        if (!itemToDelete.value) return;
             const deletedRisk = { ...itemToDelete.value };
             const result = await deleteRisk(deletedRisk.id);
 
             if (result.success) {
+                const index = risks.value.findIndex(
+                    r => r.id === deletedRisk.id
+                );
+                if (index !== -1) {
+                    risks.value.splice(index, 1);
+                }
+
                 showNotification(
                     `Risk "${deletedRisk.riskName}" has been deleted successfully!`,
                     'success'
                 );
+
                 localStorage.removeItem('riskControlSelectedRiskId');
-
-            setTimeout(async () => {
-                await refreshData();
+            
                 emit('risk-deleted', deletedRisk.id);
-            }, 100);
             }
-
             cancelDelete();
-        }
     };
 
     const cancelDelete = () => {

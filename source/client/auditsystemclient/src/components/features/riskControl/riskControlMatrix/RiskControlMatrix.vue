@@ -22,7 +22,6 @@
             :search-query="searchQuery"
             :handle-sub-process-change="handleRiskControlMatrixChange"
             :handle-search="handleSearch"
-            :refresh-data="refreshData"
             @add-risk-control-matrix="handleAddRiskControlMatrix"
             @edit-risk-control-matrix="handleEditRiskControlMatrix"
             @delete-risk-control-matrix="handleDeleteRiskControlMatrix"
@@ -62,7 +61,7 @@
             :is-visible="showEditRiskControlMatrixModal"
             :risk-control-matrix="riskControlMatrixToEdit"
             @close="handleCloseEditRiskControlMatrixModal"
-            @updated="handleRiskControlMatrixUpdated"
+            @risk-control-matrix-updated="handleRiskControlMatrixUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -80,7 +79,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, ref  } from 'vue';
+import { watch } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
 import AddRiskControlMatrixModal from './components/AddRiskControlMatrixModal.vue';
@@ -100,23 +99,15 @@ const props = defineProps({
     },
 });
 
-
-const internalRCM = ref([]);
-
-watch(
-  () => props.riskControlMatrices,
-  (newVal) => {
-    internalRCM.value = newVal;
-  },
-  { immediate: true }
-);
-
 // Define emit first
-const emit = defineEmits(['risk-control-matrix-selected', 'risk-control-matrix-added', 'risk-control-matrix-updated', 'risk-control-matrix-deleted']);
-
+const emit = defineEmits([
+    'risk-control-matrix-selected',
+    'risk-control-matrix-added',
+    'risk-control-matrix-updated',
+    'risk-control-matrix-deleted'
+]);
 
 // Use composables - now with integrated backend search
-
 const {
     riskControlMatrices,
     isLoading,
@@ -125,44 +116,21 @@ const {
     currentSubProcess,
     isSubProcessLoading,
     searchQuery,
-    refreshData,
     handleRiskControlMatrixChange,
     handleSearch,
     resetToDefaultView,
 } = useRiskControlMatrixTable(props.subProcesses);
 
-// Local ref to manage selectedSubProcessId
-const localSelectedSubProcessId = ref(props.selectedSubProcessId);
-
-// Add onMounted to refresh data on page load
-onMounted(async () => {
-    if (localSelectedSubProcessId.value) {
-        await refreshData();
-    }
-});
 
 // Watch for prop changes and update internal state
-watch(
-    () => props.selectedSubProcessId,
-    async (newSubProcessId) => {
-        localSelectedSubProcessId.value = newSubProcessId;
+watch(() => props.selectedSubProcessId, (newSubProcessId) => {
         if (newSubProcessId !== internalSelectedSubProcessId.value) {
-            await handleRiskControlMatrixChange(newSubProcessId);
+            handleRiskControlMatrixChange(newSubProcessId);
         }
     },
     { immediate: true }
 );
 
-// Watch for subProcesses prop changes
-watch(
-    () => props.subProcesses,
-    async (newSubProcesses) => {
-        if (newSubProcesses.length > 0 && localSelectedSubProcessId.value) {
-            await refreshData();
-        }
-    },
-    { immediate: true, deep: true }
-);
 
 // Use modal composable for dialog management
 const {
@@ -182,7 +150,7 @@ const {
     handleDeleteRiskControlMatrix,
     confirmDelete,
     cancelDelete
-} = useRiskControlMatrixModals(refreshData, emit);
+} = useRiskControlMatrixModals(riskControlMatrices, emit);
 
 // Handle risk control matrix selection and forward to parent
 const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
@@ -191,7 +159,7 @@ const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
 
 defineExpose({
     riskControlMatrices,
-    selectedSubProcessId: localSelectedSubProcessId,
+    selectedSubProcessId: internalSelectedSubProcessId,
     resetToDefaultView
 });
 

@@ -205,9 +205,16 @@ const handleSubmit = async () => {
     const result = await createRisk(riskData);
 
     if (result?.success) {
-      showNotification(`Risk "${formData.value.riskName}" has been added successfully!`, 'success');
-      emit('risk-added', result.data);
+      const newRisk = {
+        id: result.data.riskId,
+        ...riskData,
+        createdAt: new Date().toISOString(),
+      };
+
+      showNotification(`Risk "${newRisk.riskName}" has been added successfully!`, 'success');
+      emit('risk-added', newRisk);
       emit('close');
+
     } else {
       showNotification(result?.message || 'Failed to create risk', 'error');
     }

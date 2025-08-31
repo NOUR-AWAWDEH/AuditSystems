@@ -137,7 +137,7 @@ const handleSubmit = async () => {
                 createdAt: new Date().toISOString(),
             };
 
-            showNotification(`Department ${departmentData.name} has been added successfully!`, 'success');
+            showNotification(`Department ${newDepartment.name} has been added successfully!`, 'success');
             emit('department-added', newDepartment);
             emit('close');
         }
@@ -153,14 +153,14 @@ const validateForm = () => {
         name: ''
     };
 
-    let isValid = true;  // Fixed: was 'isVisible' which conflicts with the prop
+    let isValid = true;
 
     if (!formData.value.name.trim()) {
         errors.value.name = 'Department name is required';
-        isValid = false;  // Fixed: was 'isVisible'
+        isValid = false;
     }
 
-    return isValid;  // Fixed: was 'isVisible'
+    return isValid;
 };
 </script>
 

@@ -63,7 +63,7 @@ export function useRiskModals(risks, emit) {
     const handleRiskAdded = async (newRisk) => {
         try {
             risks.value.push(newRisk);
-            emit('risk-added');
+            emit('risk-added', newRisk);
             handleCloseAddRiskModal();
         } catch (error) {
             console.error('Error in handleRiskAdded:', error);

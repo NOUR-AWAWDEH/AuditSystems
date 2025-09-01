@@ -28,5 +28,10 @@ public sealed class RisksMappingProfile : Profile
         CreateMap<RiskModel, Risk>().ReverseMap();
         CreateMap<CreateRiskCommand, RiskModel>();
         CreateMap<UpdateRiskCommand, RiskModel>();
+
+        //ExitControl
+        CreateMap<ExitControlModel, ExitControl>().ReverseMap();
+        CreateMap<CreateExitControlCommand, ExitControlModel>();
+        CreateMap<UpdateExitControlCommand, ExitControlModel>();
     }
 }

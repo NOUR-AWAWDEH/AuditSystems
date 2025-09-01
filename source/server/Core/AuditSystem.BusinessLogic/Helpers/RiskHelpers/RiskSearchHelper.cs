@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
 using AuditSystem.Application.Constants.Risks.RiskConst;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
@@ -79,7 +78,7 @@ public class RiskSearchHelper : IRiskSearch
         Guid userId, string? searchTerm, Guid objectiveId, Page page, string cacheKey, string countCacheKey)
     {
         var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, objectiveId));
-         
+        
         var totalCount = query.Count;
         var items = query
             .Skip((page.Number - 1) * page.Size)

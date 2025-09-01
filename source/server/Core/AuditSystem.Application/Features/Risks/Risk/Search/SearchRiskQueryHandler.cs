@@ -18,10 +18,22 @@ internal sealed class SearchRiskQueryHandler(
         CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
-        var searchResult = await riskService.SearchByUserIdAsync(request.UserId,request.SearchTerm, request.ObjectiveId, page);
 
-        logger.LogInformation("Risks with user id: {UserId} was retrieved", request.UserId);
-        var response = new PaginationRequestResponse<RiskModel>(searchResult.Items, searchResult.TotalCount);
+        var searchResult = await riskService.SearchByUserIdAsync(
+            request.UserId, 
+            request.SearchTerm, 
+            request.ObjectiveId, 
+            page);
+
+        logger.LogInformation(
+            "Risks with user id: {UserId} retrieved, count: {Count}", 
+            request.UserId, 
+            searchResult.TotalCount);
+
+        var response = new PaginationRequestResponse<RiskModel>(
+            searchResult.Items, 
+            searchResult.TotalCount);
+
         return Result.Success(response);
     }
 }

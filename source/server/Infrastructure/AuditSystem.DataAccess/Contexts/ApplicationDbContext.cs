@@ -77,6 +77,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
 
     // Risks
     public required DbSet<Risk> Risks { get; set; }
+    public required DbSet<ExitControl> ExitControls { get; set; }
     public required DbSet<RiskAssessment> RiskAssessments { get; set; }
     public required DbSet<RiskFactor> RiskFactors { get; set; }
     public required DbSet<SpecificRiskFactor> SpecificRiskFactors { get; set; }

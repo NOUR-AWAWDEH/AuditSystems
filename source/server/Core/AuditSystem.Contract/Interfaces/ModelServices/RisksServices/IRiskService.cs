@@ -9,7 +9,7 @@ public interface IRiskService
     Task UpdateRiskAsync(RiskModel riskModel, Guid userId);
     Task DeleteRiskAsync(Guid riskId, Guid userId);
     Task<RiskModel> GetRiskByIdAsync(Guid id, Guid userId);
-    Task<ICollection<RiskModel>> GetRisksByUserIdAsync(Guid userId);
+    Task<IReadOnlyList<RiskModel>> GetRisksByUserIdAsync(Guid userId);
 
     Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid objectiveId, Page? page);
     // The existing SearchAsync for admin/system use if needed

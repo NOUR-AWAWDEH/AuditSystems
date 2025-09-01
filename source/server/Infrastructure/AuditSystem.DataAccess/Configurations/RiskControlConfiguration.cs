@@ -8,6 +8,9 @@ public class RiskControlConfiguration : IEntityTypeConfiguration<RiskControls>
 {
     public void Configure(EntityTypeBuilder<RiskControls> builder)
     {
+        // Table Name
+        builder.ToTable("RiskControls");
+        
         // Primary Key
         builder.HasKey(rc => rc.Id);
 

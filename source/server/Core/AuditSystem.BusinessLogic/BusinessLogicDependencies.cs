@@ -81,6 +81,8 @@ using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelp
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
+using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
+using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -228,6 +230,12 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, Risk, RiskModel>, RiskService>()
             .AddScoped<IRiskValidation, RiskValidationHelper>()
             .AddScoped<IRiskSearch, RiskSearchHelper>()
+
+            // Exit Controls
+            .AddScoped<IExitControlService, ExitControlService>()
+            .AddScoped<IUnifiedCacheService<Guid, ExitControl, ExitControlModel>, ExitControlService>()
+            .AddScoped<IExitControlValidation, ExitControlValidationHelper>()
+            .AddScoped<IExitControlSearch, ExitControlSearchHelper>()
 
 
             .AddScoped<IRiskAssessmentService, RiskAssessmentService>()

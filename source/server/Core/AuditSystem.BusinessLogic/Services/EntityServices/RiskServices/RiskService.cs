@@ -115,21 +115,14 @@ internal sealed class RiskService(
         logger.LogInformation("Successfully updated risk {RiskId}", riskModel.Id);
     }
     
-    public async Task<ICollection<RiskModel>> GetRisksByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<RiskModel>> GetRisksByUserIdAsync(Guid userId)
     {
         RiskValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all risks for user {UserId}", userId);
 
-        var query = repository.GetAll()
-            .Include(r => r.Objective)
-            .ThenInclude(o => o.RiskControlMatrix)
-            .ThenInclude(rcm => rcm.SubProcess)
-            .ThenInclude(sp => sp.AuditProcess)
-            .ThenInclude(ap => ap.SubDepartment)
-            .ThenInclude(sd => sd.Department)
-            .ThenInclude(d => d.SubLocation)
-            .ThenInclude(sl => sl.Location)
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(ap => new RiskModel
             {
@@ -139,12 +132,8 @@ internal sealed class RiskService(
                 RateId = ap.RateId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
-            });
-        
-        var risks = await query.ToListAsync();
-        logger.LogDebug("Retrieved {Count} risks for user {UserId}", risks.Count, userId);
-
-        return risks;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid objectiveId, Page? page)
@@ -153,7 +142,7 @@ internal sealed class RiskService(
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching risks for user {UserId} with term: {SearchTerm} and objective: {ObjectiveId}",
-             userId, searchTerm ?? "(none)", objectiveId.ToString() ?? "(none)");
+            userId, searchTerm ?? "(none)", objectiveId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, objectiveId, page);
 

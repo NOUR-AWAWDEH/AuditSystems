@@ -65,6 +65,7 @@ public static class CacheKeys
     public const string RiskAssessment = "risk-assessment";
     public const string RiskFactor = "risk-factor";
     public const string Risk = "risk";
+    public const string ExitControl = "exit-control";
     public const string SpecificRiskFactor = "special-risk-factor";
 
     //Skills

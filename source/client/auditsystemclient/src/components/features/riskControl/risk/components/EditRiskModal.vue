@@ -213,7 +213,6 @@ const handleSubmit = async () => {
 
       showNotification(`Risk "${updatedRiskData.riskName}" has been updated successfully!`, 'success');
       emit('risk-updated', updatedRiskData);
-      console.log(updatedRiskData);
       emit('close');
     } else {
       showNotification(result?.message || 'Failed to update risk', 'error');

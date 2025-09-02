@@ -144,10 +144,10 @@ const errors = ref({
 
 onMounted( async () => {
     resetForm();
-    isLoadingRates.value = true; // Start loading
-    await searchRates(); // Fetch rates
-    rates.value = searchResults.value; // Assign fetched rates to the reactive rates ref
-    isLoadingRates.value = false; // End loading
+    isLoadingRates.value = true; 
+    await searchRates(); 
+    rates.value = searchResults.value; 
+    isLoadingRates.value = false; 
 });
 
 const resetForm = () => {
@@ -200,18 +200,20 @@ const handleSubmit = async () => {
       description: formData.value.description.trim(),
       objectiveId: props.risk.objectiveId,
       rateId: selectedRateId.value,
+      createdAt: props.risk.createdAt,
     };
 
     const result = await updateRisk(riskData);
 
     if (result?.success) {
       const updatedRiskData = {
-        ...props.risk,
+        ...riskData,
         ...result.data
       };
 
-      showNotification(`Risk "${formData.value.riskName}" has been updated successfully!`, 'success');
+      showNotification(`Risk "${updatedRiskData.riskName}" has been updated successfully!`, 'success');
       emit('risk-updated', updatedRiskData);
+      console.log(updatedRiskData);
       emit('close');
     } else {
       showNotification(result?.message || 'Failed to update risk', 'error');

@@ -146,6 +146,8 @@ const handleSubmit = async () => {
         id: props.objective?.id,
         riskControlMatrixId: props.objective?.riskControlMatrixId,
         description: formData.value.description.trim(),
+        createdAt: props.objective?.createdAt,
+        updatedAt: new Date().toISOString()
       };
 
 

@@ -83,12 +83,9 @@ export function useRiskModals(risks, emit) {
 
     const handleRiskUpdated = async (updatedRisk) => {
         try {
-            const index = risks.value.findIndex(
-                r => r.id === updatedRisk.id
-            );
-            
+           const index = risks.value.findIndex(r => r.id === updatedRisk.id);
             if (index !== -1) {
-                risks.value[index] = { ...risks.value[index], ...updatedRisk }
+                risks.value[index] = { ...risks.value[index], ...updatedRisk };
             }
 
             emit('risk-updated', updatedRisk);

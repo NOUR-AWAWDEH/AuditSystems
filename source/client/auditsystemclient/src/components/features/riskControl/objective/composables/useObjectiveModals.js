@@ -47,10 +47,7 @@ export function useObjectiveModals(objectives, emit) {
     const handleObjectiveUpdated = async (updatedObjective) => {
        try {
         const index = objectives.value.findIndex(obj => obj.id === updatedObjective.id);
-        if (index !== -1) {
-            objectives.value[index] = updatedObjective;
-        }
-
+       
         if(index !== -1){
            objectives.value[index] = { ...objectives.value[index], ...updatedObjective };
         }

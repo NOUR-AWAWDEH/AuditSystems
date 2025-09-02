@@ -1,4 +1,6 @@
-﻿using AuditSystem.Application.Features.Risks.Risk.Create;
+﻿using AuditSystem.Application.Features.Risks.ExitControl.Create;
+using AuditSystem.Application.Features.Risks.ExitControl.Update;
+using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.Risk.Update;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Create;
 using AuditSystem.Application.Features.Risks.RiskAssessment.Update;

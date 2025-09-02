@@ -16,18 +16,15 @@ namespace AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 public class ExitControlSearchHelper : IExitControlSearch
 {
     private readonly IRepository<Guid, ExitControl> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
     private readonly ILogger<ExitControlSearchHelper> _logger;
 
     public ExitControlSearchHelper(
         IRepository<Guid, ExitControl> repository,
-        IMapper mapper,
         ILogger<ExitControlSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -103,7 +100,7 @@ public class ExitControlSearchHelper : IExitControlSearch
                 CreatedAt = ec.CreatedAt,
                 UpdatedAt = ec.UpdatedAt
             })
-            .ToListAsync();
+            .ToArrayAsync();
 
         var result = new PaginationResult<ExitControlModel>
         {
@@ -120,10 +117,9 @@ public class ExitControlSearchHelper : IExitControlSearch
                 .ContinueWith(t => _logger.LogError(t.Exception, "Cache count failed"), TaskContinuationOptions.OnlyOnFaulted);
 
         return result;
-
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<ExitControlModel> items)
+    private async Task CacheSearchResultsAsync(string cacheKey, ExitControlModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, ExitControlConstants.ExitControlTags, CacheExpirations.MediumTerm);
     }

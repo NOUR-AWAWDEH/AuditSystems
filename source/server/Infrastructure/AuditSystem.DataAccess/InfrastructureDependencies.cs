@@ -140,6 +140,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, RiskProgram>()
         //Risks
         .AddRepository<Guid, Risk>()
+        .AddRepository<Guid, ExitControl>()
         .AddRepository<Guid, RiskAssessment>()
         .AddRepository<Guid, RiskFactor>()
         .AddRepository<Guid, SpecificRiskFactor>()

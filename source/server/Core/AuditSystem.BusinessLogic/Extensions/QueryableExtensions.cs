@@ -44,7 +44,7 @@ public static class QueryableExtensions
 
         return new PaginationResult<TModel>
         {
-            Items = models,
+            Items = (IReadOnlyList<TModel>)models,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size

@@ -135,7 +135,6 @@ internal sealed class ExitControlService(
             .ToListAsync();
     }
 
-
     public async Task<PaginationResult<ExitControlModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid riskId, Page? page)
     {
         ExitControlValidationHelper.ValidateUserId(userId);

@@ -1117,7 +1117,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("RiskId");
 
-                    b.ToTable("RisksControls");
+                    b.ToTable("RiskControls", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskProgram", b =>
@@ -1166,7 +1166,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<bool>("Inadequate")
                         .HasColumnType("boolean");
@@ -1179,9 +1180,11 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Inadequate");
+
                     b.HasIndex("RiskId");
 
-                    b.ToTable("ExitControl");
+                    b.ToTable("ExitControls", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
@@ -2090,7 +2093,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasOne("AuditSystem.Domain.Entities.Risks.Risk", "Risk")
                         .WithMany("ExitControls")
                         .HasForeignKey("RiskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Risk");

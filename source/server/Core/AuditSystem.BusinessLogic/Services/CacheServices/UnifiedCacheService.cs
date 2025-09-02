@@ -62,6 +62,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         var predicate = BuildSearchPredicate<TEntity>("Name", name);
 
         var query = repository.GetAll()
+            .AsNoTracking()
             .Where(predicate)
             .OrderBy(x => x.Id);
 

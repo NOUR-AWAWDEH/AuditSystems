@@ -9,7 +9,7 @@ public interface IAuditProcessService
     Task UpdateAuditProcessAsync(AuditProcessModel auditProcessModel, Guid userId);
     Task DeleteAuditProcessAsync(Guid auditProcessId, Guid userId);
     Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid id, Guid userId);
-    Task<ICollection<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId);
+    Task<IReadOnlyList<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId);
 
     Task<PaginationResult<AuditProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subDepartmentId, Page? page);
     // The existing SearchAsync for admin/system use if needed

@@ -194,7 +194,7 @@ internal sealed class SupportingDocService(
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
     }
 
-    public async Task<List<SupportingDocModel>> GetSupportingDocsByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<SupportingDocModel>> GetSupportingDocsByUserIdAsync(Guid userId)
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
         

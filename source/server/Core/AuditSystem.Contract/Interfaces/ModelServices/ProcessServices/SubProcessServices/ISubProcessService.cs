@@ -10,7 +10,7 @@ public interface ISubProcessService
     Task UpdateSubProcessAsync(SubProcessModel subProcessModel, Guid userId);
     Task DeleteSubProcessAsync(Guid subProcessId, Guid userId);
     Task<SubProcessModel> GetSubProcessByIdAsync(Guid id, Guid userId);
-    Task<ICollection<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId); 
+    Task<IReadOnlyList<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId); 
     Task<PaginationResult<SubProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page? page);
     
     // The existing SearchAsync for admin/system use if needed

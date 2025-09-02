@@ -7,30 +7,31 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.SupportingDocs;
 using AuditSystem.Domain.Entities.SupportingDocs;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
 public class SupportingDocSearchHelper : ISupportingDocSearch
 {
     private readonly IRepository<Guid, SupportingDoc> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<SupportingDocSearchHelper> _logger;
 
     public SupportingDocSearchHelper(
         IRepository<Guid, SupportingDoc> repository,
-        IMapper mapper,
+        ILogger<SupportingDocSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public static Expression<Func<SupportingDoc, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {
         return s => s.UserId == userId && 
-                   (string.IsNullOrEmpty(searchTerm) || s.FileName.Contains(searchTerm));
+                (string.IsNullOrEmpty(searchTerm) || s.FileName.Contains(searchTerm));
     }
 
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
@@ -49,32 +50,45 @@ public class SupportingDocSearchHelper : ISupportingDocSearch
     public async Task<PaginationResult<SupportingDocModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm));
+        var predicate = BuildUserSearchPredicate(userId, searchTerm);
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
     
-        var totalCount = query.Count;
-        var items = query
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderBy(s => s.FileName)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
+            .Select( s => new SupportingDocModel
+            {
+                Id = s.Id,
+                UserId = s.UserId,
+                FileName = s.FileName,
+                FileSize = s.FileSize,
+                DriveFileId = s.DriveFileId,
+                CreatedAt = s.CreatedAt,
+                UpdatedAt = s.UpdatedAt,
+            })
+            .ToArrayAsync();
     
-        var mappedItems = _mapper.Map<List<SupportingDocModel>>(items);
         var result = new PaginationResult<SupportingDocModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
     
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+        _ = CacheSearchResultsAsync(cacheKey, items)
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+        
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<SupportingDoc> items)
+    private async Task CacheSearchResultsAsync(string cacheKey, SupportingDocModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, SupportingDocsConstants.SupportingDocTags, CacheExpirations.MediumTerm);
     }

@@ -7,24 +7,25 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 
 public class RiskControlMatrixSearchHelper : IRiskControlMatrixSearch
 {
     private readonly IRepository<Guid, RiskControlMatrix> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<RiskControlMatrixSearchHelper> _logger;
 
     public RiskControlMatrixSearchHelper(
         IRepository<Guid, RiskControlMatrix> repository,
-        IMapper mapper,
+        ILogger<RiskControlMatrixSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Expression<Func<RiskControlMatrix, bool>> BuildUserSearchPredicate(
@@ -75,35 +76,49 @@ public class RiskControlMatrixSearchHelper : IRiskControlMatrixSearch
     }
 
     public async Task<PaginationResult<RiskControlMatrixModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid subProcessId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid subProcessId, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, subProcessId));
-         
-    
-        var totalCount = query.Count;
-        var items = query
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, subProcessId);
+
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(rcm => rcm.Description)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
-    
-        var mappedItems = _mapper.Map<List<RiskControlMatrixModel>>(items);
+            .Select(rcm => new RiskControlMatrixModel
+            {
+                Id = rcm.Id,
+                Description = rcm.Description,
+                SubProcessId = rcm.SubProcessId,
+                CreatedAt = rcm.CreatedAt,
+                UpdatedAt = rcm.UpdatedAt
+            })
+            .ToArrayAsync();
+
         var result = new PaginationResult<RiskControlMatrixModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
-    
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+
+        _ = CacheSearchResultsAsync(cacheKey, items)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<RiskControlMatrix> items)
+
+    private async Task CacheSearchResultsAsync(string cacheKey, RiskControlMatrixModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, RiskControlMatrixConstants.RiskControlMatrixTags, CacheExpirations.MediumTerm);
     }

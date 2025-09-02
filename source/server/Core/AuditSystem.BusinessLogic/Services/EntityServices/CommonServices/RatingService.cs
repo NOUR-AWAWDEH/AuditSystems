@@ -137,7 +137,6 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
         return result;
     }
 
-
     public async Task<RateModel> GetRateByIdAsync(Guid id)
     {
         _logger.LogInformation("Fetching rate by ID {Id}", id);

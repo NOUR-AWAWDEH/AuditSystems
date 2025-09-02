@@ -17,7 +17,7 @@ internal sealed class GetSubLocationsByUserIdQueryHandler(
         var subLocations = await subLocationService.GetSubLocationsByUserIdAsync(request.UserId);
        
         logger.LogInformation("Sub-locations retrieved successfully for user {UserId}", request.UserId);
-        return Result<GetSubLocationsByUserIdQueryResponse>.Success(new(subLocations), 
+        return Result<GetSubLocationsByUserIdQueryResponse>.Success(new GetSubLocationsByUserIdQueryResponse(subLocations), 
             "Sub-locations retrieved successfully");
     }
 }

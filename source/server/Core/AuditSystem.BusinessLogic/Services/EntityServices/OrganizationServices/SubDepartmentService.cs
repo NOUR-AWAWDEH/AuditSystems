@@ -119,14 +119,15 @@ internal sealed class SubDepartmentService(
         logger.LogInformation("Successfully updated subdepartment {SubDepartmentId}", subDepartmentModel.Id);
     }
 
-    public async Task<ICollection<SubDepartmentModel>> GetSubDepartmentsByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<SubDepartmentModel>> GetSubDepartmentsByUserIdAsync(Guid userId)
     {
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all subdepartments for user {UserId}", userId);
 
         // Create the LINQ query equivalent to your SQL
-        var query = repository.GetAll()
+        return await repository.GetAll()
+            .AsNoTracking()
             .Include(s => s.Department) // Include the Department navigation property
             .Where(s => s.Department.SubLocation.Location.UserId == userId)
             .Select(s => new SubDepartmentModel
@@ -136,13 +137,8 @@ internal sealed class SubDepartmentService(
                 DepartmentId = s.DepartmentId,
                 CreatedAt = s.CreatedAt,
                 UpdatedAt = s.UpdatedAt
-            });
-
-        // Execute the query and get results
-        var subDepartments = await query.ToListAsync();
-        logger.LogDebug("Retrieved {Count} subdepartments for user {UserId}", subDepartments.Count, userId);
-
-        return subDepartments;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<SubDepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid departmentId, Page? page)

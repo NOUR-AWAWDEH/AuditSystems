@@ -109,20 +109,14 @@ internal class ObjectiveService(
         logger.LogInformation("Successfully updated objective {ObjectiveId} for user {UserId}", existingEntity.Id, userId);
     }
 
-    public async Task<ICollection<ObjectiveModel>> GetObjectivesByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<ObjectiveModel>> GetObjectivesByUserIdAsync(Guid userId)
     {
         ObjectiveValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all objectives for user {UserId}", userId);
 
-        var query = repository.GetAll()
-            .Include(ob => ob.RiskControlMatrix)
-            .ThenInclude(ob => ob.SubProcess)
-            .ThenInclude(ob => ob.AuditProcess)
-            .ThenInclude(ob => ob.SubDepartment)
-            .ThenInclude(ob => ob.Department)
-            .ThenInclude(ob => ob.SubLocation)
-            .ThenInclude(ob => ob.Location)
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(ob => ob.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(ob => new ObjectiveModel
             {
@@ -131,12 +125,8 @@ internal class ObjectiveService(
                 RiskControlMatrixId = ob.RiskControlMatrixId,
                 CreatedAt = ob.CreatedAt,
                 UpdatedAt = ob.UpdatedAt,
-            });
-
-        var objectives = await query.ToListAsync();
-        logger.LogDebug("Retrieved {ObjectivesCount} objectives for user {UserId}", objectives.Count, userId);
-
-        return objectives;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<ObjectiveModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid riskControlMatrixId, Page? page)

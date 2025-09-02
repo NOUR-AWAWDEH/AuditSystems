@@ -22,7 +22,7 @@ namespace AuditSystem.BusinessLogic.Services.DownloadFile
         {
             if (!Uri.TryCreate(signedUrl, UriKind.Absolute, out var uri))
             {
-                return Result<DownloadFileResult>.Invalid(new[] { new ValidationError("Invalid signed URL.") });
+                return  Result<DownloadFileResult>.Invalid(new[] { new ValidationError("Invalid signed URL.") });
             }
 
             var query = HttpUtility.ParseQueryString(uri.Query);

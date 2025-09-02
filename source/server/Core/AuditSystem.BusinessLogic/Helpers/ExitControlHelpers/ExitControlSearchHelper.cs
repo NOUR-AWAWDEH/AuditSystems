@@ -7,7 +7,6 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -88,7 +87,7 @@ public class ExitControlSearchHelper : IExitControlSearch
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderBy(ec => ec.CreatedAt).ThenBy(ec => ec.Id)
+            .OrderBy(ec => ec.Description)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
             .Select(ec => new ExitControlModel

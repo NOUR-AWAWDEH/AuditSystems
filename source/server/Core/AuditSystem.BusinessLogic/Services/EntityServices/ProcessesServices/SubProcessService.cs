@@ -113,18 +113,14 @@ internal sealed class SubProcessService(
         logger.LogInformation("Successfully updated sub process {SubProcessId} for user {UserId}", existingEntity.Id, userId);
     }
 
-    public async Task<ICollection<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId)
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all sub processes for user {UserId}", userId);
 
-        var query = repository.GetAll()
-            .Include(sp => sp.AuditProcess)
-            .ThenInclude(ap => ap.SubDepartment)
-            .ThenInclude(sd => sd.Department)
-            .ThenInclude(d => d.SubLocation)
-            .ThenInclude(l => l.Location)
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(sp => new SubProcessModel
             {
@@ -133,12 +129,9 @@ internal sealed class SubProcessService(
                 AuditProcessId = sp.AuditProcessId,
                 CreatedAt = sp.CreatedAt,
                 UpdatedAt = sp.UpdatedAt,
-            });
+            })
+            .ToListAsync();
 
-        var subProcesses = await query.ToListAsync();
-        logger.LogDebug("Retrieved {SubProcessesCount} sub processes for user {UserId}", subProcesses.Count, userId);
-
-        return subProcesses;
     }
 
     public async Task<PaginationResult<SubProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page? page)

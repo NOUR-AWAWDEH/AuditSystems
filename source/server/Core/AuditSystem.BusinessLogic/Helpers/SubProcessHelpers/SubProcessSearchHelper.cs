@@ -7,24 +7,25 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Processes;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 
 public class SubProcessSearchHelper : ISubProcessSearch
 {
     private readonly IRepository<Guid, SubProcess> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<SubProcessSearchHelper> _logger;
 
     public SubProcessSearchHelper(
         IRepository<Guid, SubProcess> repository,
-        IMapper mapper,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        ILogger<SubProcessSearchHelper> logger)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Expression<Func<SubProcess, bool>> BuildUserSearchPredicate(
@@ -74,35 +75,51 @@ public class SubProcessSearchHelper : ISubProcessSearch
         return (cacheKey, countCacheKey);
     }
 
+    // Updated method with nullable auditProcessId support (for internal use)
     public async Task<PaginationResult<SubProcessModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid auditProcessId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid auditProcessId, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, auditProcessId));
-    
-        var totalCount = query.Count;
-        var items = query
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, auditProcessId);
+
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(sp => sp.Particular)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
-    
-        var mappedItems = _mapper.Map<List<SubProcessModel>>(items);
+            .Select(sp => new SubProcessModel
+            {
+                Id = sp.Id,
+                Particular = sp.Particular,
+                AuditProcessId = sp.AuditProcessId,
+                CreatedAt = sp.CreatedAt,
+                UpdatedAt = sp.UpdatedAt
+            })
+            .ToArrayAsync();
+
         var result = new PaginationResult<SubProcessModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
-    
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+
+        _ = CacheSearchResultsAsync(cacheKey, items)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<SubProcess> items)
+
+    private async Task CacheSearchResultsAsync(string cacheKey, SubProcessModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, SubProcessConstants.SubProcessTags, CacheExpirations.MediumTerm);
     }

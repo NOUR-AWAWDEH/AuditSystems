@@ -7,23 +7,24 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Domain.Entities.Processes;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 
 public class AuditProcessSearchHelper : IAuditProcessSearch
 {
     private readonly IRepository<Guid, AuditProcess> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<AuditProcessSearchHelper> _logger;
 
     public AuditProcessSearchHelper(
         IRepository<Guid, AuditProcess> repository,
-        IMapper mapper,
+        ILogger<AuditProcessSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
@@ -73,18 +74,29 @@ public class AuditProcessSearchHelper : IAuditProcessSearch
     public async Task<PaginationResult<AuditProcessModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Guid subDepartmentId, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, subDepartmentId));
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, subDepartmentId);
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
     
-        var totalCount = query.Count;
-        var items = query
+        var totalCount = await query.CountAsync();
+        
+        var items = await query
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
+            .Select(ap => new AuditProcessModel
+            {
+                Id = ap.Id,
+                ProcessName = ap.ProcessName,
+                SubDepartmentId = ap.SubDepartmentId,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt,
+            })
+            .ToArrayAsync();
     
-        var mappedItems = _mapper.Map<List<AuditProcessModel>>(items);
         var result = new PaginationResult<AuditProcessModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
@@ -98,7 +110,7 @@ public class AuditProcessSearchHelper : IAuditProcessSearch
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<AuditProcess> items)
+    private async Task CacheSearchResultsAsync(string cacheKey, AuditProcessModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, AuditProcessConstants.AuditProcessTags, CacheExpirations.MediumTerm);
     }

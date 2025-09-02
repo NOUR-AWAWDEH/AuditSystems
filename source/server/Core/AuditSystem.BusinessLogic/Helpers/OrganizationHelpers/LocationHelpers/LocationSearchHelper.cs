@@ -8,23 +8,26 @@ using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 
 public class LocationSearchHelper : ILocationSearch
 {
     private readonly IRepository<Guid, Location> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<LocationSearchHelper> _logger;
 
     public LocationSearchHelper(
         IRepository<Guid, Location> repository,
-        IMapper mapper,
-        ICacheService cacheService)
+        ILogger<LocationSearchHelper> logger,
+        ICacheService cacheService
+        )
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
@@ -49,32 +52,47 @@ public class LocationSearchHelper : ILocationSearch
     public async Task<PaginationResult<LocationModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm));
+        var predicate = BuildUserSearchPredicate(userId, searchTerm);
+
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
     
-        var totalCount = query.Count;
-        var items = query
+        var totalCount = await query.CountAsync();
+        
+        var items = await query
+            .OrderBy(l => l.Name)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
-    
-        var mappedItems = _mapper.Map<List<LocationModel>>(items);
+            .Select(l => new LocationModel
+            {
+                Id = l.Id,
+                Name = l.Name,
+                Address = l.Address,
+                CompanyId = l.CompanyId,
+                UserId = l.UserId,
+                CreatedAt = l.CreatedAt,
+                UpdatedAt = l.UpdatedAt
+            })
+            .ToArrayAsync();
+       
         var result = new PaginationResult<LocationModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
-    
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+
+         _ = CacheSearchResultsAsync(cacheKey, items)
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+        
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<Location> items)
+    private async Task CacheSearchResultsAsync(string cacheKey, LocationModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, LocationConstants.LocationTags, CacheExpirations.MediumTerm);
     }

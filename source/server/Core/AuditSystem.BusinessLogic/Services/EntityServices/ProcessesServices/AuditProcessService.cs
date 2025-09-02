@@ -114,17 +114,14 @@ internal sealed class AuditProcessService(
         logger.LogInformation("Successfully updated audit process {ProcessId}", processModel.Id);
     }
     
-    public async Task<ICollection<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId)
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all audit processes for user {UserId}", userId);
 
-        var query = repository.GetAll()
-            .Include(ap => ap.SubDepartment)
-            .ThenInclude(sd => sd.Department)
-            .ThenInclude(d => d.SubLocation)
-            .ThenInclude(sl => sl.Location)
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(ap => ap.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(ap => new AuditProcessModel
             {
@@ -133,12 +130,8 @@ internal sealed class AuditProcessService(
                 SubDepartmentId = ap.SubDepartmentId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
-            });
-        
-        var processes = await query.ToListAsync();
-        logger.LogDebug("Retrieved {Count} audit processes for user {UserId}", processes.Count, userId);
-
-        return processes;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<AuditProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subDepartmentId, Page? page)

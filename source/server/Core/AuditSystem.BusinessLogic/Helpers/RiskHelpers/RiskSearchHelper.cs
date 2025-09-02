@@ -88,7 +88,7 @@ public class RiskSearchHelper : IRiskSearch
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderBy(r => r.CreatedAt).ThenBy(r => r.Id)
+            .OrderBy(r => r.RiskName)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
             .Select(r => new RiskModel

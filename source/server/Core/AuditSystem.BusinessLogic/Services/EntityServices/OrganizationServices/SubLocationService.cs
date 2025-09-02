@@ -117,15 +117,16 @@ internal sealed class SubLocationService(
         logger.LogInformation("Successfully updated sublocation {SubLocationId}", subLocationModel.Id);
     }
 
-    public async Task<ICollection<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all sublocations for user {UserId}", userId);
 
         // Create the LINQ query equivalent to your SQL
-        var query = repository.GetAll()
-            .Include(s => s.Location) // Include the Location navigation property
+        return await repository.GetAll()
+            .AsNoTracking()
+            .Include(s => s.Location)
             .Where(s => s.Location.UserId == userId)
             .Select(s => new SubLocationModel
             {
@@ -135,13 +136,8 @@ internal sealed class SubLocationService(
                 CreatedAt = s.CreatedAt,
                 UpdatedAt = s.UpdatedAt,
                 Address = s.Address
-            });
-
-        // Execute the query and get results
-        var subLocations = await query.ToListAsync();
-        logger.LogDebug("Retrieved {Count} sublocations for user {UserId}", subLocations.Count, userId);
-
-        return subLocations;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page)

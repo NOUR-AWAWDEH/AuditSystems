@@ -8,22 +8,24 @@ using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 
 public class ObjectiveSearchHelper : IObjectiveSearch
 {
     private readonly IRepository<Guid, Objective> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<ObjectiveSearchHelper> _logger;
 
     public ObjectiveSearchHelper(
         IRepository<Guid, Objective> repository,
-        IMapper mapper,
+        ILogger<ObjectiveSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     }
 
@@ -75,35 +77,49 @@ public class ObjectiveSearchHelper : IObjectiveSearch
     }
 
     public async Task<PaginationResult<ObjectiveModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid riskControlMatrixId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid riskControlMatrixId, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, riskControlMatrixId));
-         
-    
-        var totalCount = query.Count;
-        var items = query
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, riskControlMatrixId);
+
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(o => o.Description)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
-    
-        var mappedItems = _mapper.Map<List<ObjectiveModel>>(items);
+            .Select(o => new ObjectiveModel
+            {
+                Id = o.Id,
+                Description = o.Description,
+                RiskControlMatrixId = o.RiskControlMatrixId,
+                CreatedAt = o.CreatedAt,
+                UpdatedAt = o.UpdatedAt
+            })
+            .ToArrayAsync();
+
         var result = new PaginationResult<ObjectiveModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
-    
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+
+        _ = CacheSearchResultsAsync(cacheKey, items)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<Objective> items)
+
+    private async Task CacheSearchResultsAsync(string cacheKey, ObjectiveModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, ObjectiveConstants.ObjectiveTags, CacheExpirations.MediumTerm);
     }

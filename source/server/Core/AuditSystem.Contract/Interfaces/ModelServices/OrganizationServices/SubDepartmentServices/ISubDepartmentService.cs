@@ -11,7 +11,7 @@ public interface ISubDepartmentService
     Task DeleteSubDepartmentAsync(Guid subDepartmentId, Guid userId);
     Task<SubDepartmentModel> GetSubDepartmentByIdAsync(Guid id, Guid userId);
     Task<PaginationResult<SubDepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid departmentId, Page? page);
-    Task<ICollection<SubDepartmentModel>> GetSubDepartmentsByUserIdAsync(Guid userId);
+    Task<IReadOnlyList<SubDepartmentModel>> GetSubDepartmentsByUserIdAsync(Guid userId);
     
     // The existing SearchAsync for admin/system use if needed
     Task<PaginationResult<SubDepartmentModel>> SearchAsync(string? name, Page? page);

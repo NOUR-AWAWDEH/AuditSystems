@@ -10,7 +10,7 @@ public interface IRiskControlMatrixService
     Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel, Guid userId);
     Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId, Guid userId);
     Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid id, Guid userId);
-    Task<ICollection<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId);
+    Task<IReadOnlyList<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId);
     Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid SubProcessId, Page? page);
 
     // The Exiting SearchAsync for admin/system use if needed

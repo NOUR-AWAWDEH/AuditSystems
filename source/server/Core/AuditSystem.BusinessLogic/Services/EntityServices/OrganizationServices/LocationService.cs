@@ -158,13 +158,14 @@ internal sealed class LocationService(
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
     }
 
-    public async Task<ICollection<LocationModel>> GetLocationsByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<LocationModel>> GetLocationsByUserIdAsync(Guid userId)
     {
         LocationValidationHelper.ValidateUserId(userId);
         
         logger.LogDebug("Retrieving all locations for user {UserId}", userId);
 
-        var query = repository.GetAll()
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(l => l.UserId == userId)
             .Select(l => new LocationModel
             {
@@ -175,11 +176,7 @@ internal sealed class LocationService(
                 UpdatedAt = l.UpdatedAt,
                 Address = l.Address,
                 CompanyId = l.CompanyId,
-            });
-
-        var locations = await query.ToListAsync();
-        logger.LogDebug("Retrieved {Count} locations for user {UserId}", locations.Count, userId);
-        
-        return locations;
+            })
+            .ToListAsync();
     }
 }

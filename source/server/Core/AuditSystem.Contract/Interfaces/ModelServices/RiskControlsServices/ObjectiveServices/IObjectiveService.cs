@@ -8,7 +8,7 @@ public interface IObjectiveService
     Task UpdateObjectiveAsync(ObjectiveModel objectiveModel, Guid userId);
     Task DeleteObjectiveAsync(Guid objectiveId, Guid userId);
     Task<ObjectiveModel> GetObjectiveByIdAsync(Guid id, Guid userId);
-    Task<ICollection<ObjectiveModel>> GetObjectivesByUserIdAsync(Guid userId);
+    Task<IReadOnlyList<ObjectiveModel>> GetObjectivesByUserIdAsync(Guid userId);
     Task<PaginationResult<ObjectiveModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid riskControlMatrixId, Page? page);
 
     // The Exiting SearchAsync for admin/system use if needed

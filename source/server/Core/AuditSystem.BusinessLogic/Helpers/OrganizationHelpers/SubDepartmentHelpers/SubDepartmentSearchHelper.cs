@@ -7,24 +7,25 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Organization;
-using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 
 public class SubDepartmentSearchHelper : ISubDepartmentSearch
 {
     private readonly IRepository<Guid, SubDepartment> _repository;
-    private readonly IMapper _mapper;
     private readonly ICacheService _cacheService;
+    private readonly ILogger<SubDepartmentSearchHelper> _logger;
 
     public SubDepartmentSearchHelper(
         IRepository<Guid, SubDepartment> repository,
-        IMapper mapper,
+        ILogger<SubDepartmentSearchHelper> logger,
         ICacheService cacheService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public Expression<Func<SubDepartment, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid departmentId)
@@ -77,36 +78,50 @@ public class SubDepartmentSearchHelper : ISubDepartmentSearch
         return await GetUserSearchFromRepositoryAsync(userId, searchTerm, null, page, cacheKey, countCacheKey);
     }
 
-    // Updated method with departmentId support
     public async Task<PaginationResult<SubDepartmentModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid? departmentId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid? departmentId, Page page, string cacheKey, string countCacheKey)
     {
-        var query = await _repository.GetAllAsync(BuildUserSearchPredicate(userId, searchTerm, departmentId ?? Guid.Empty));
-    
-        var totalCount = query.Count;
-        var items = query
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, departmentId ?? Guid.Empty);
+
+        var query = _repository.GetAll()
+            .Where(predicate)
+            .AsNoTracking();
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
+            .OrderBy(sd => sd.Name)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .ToList();
-    
-        var mappedItems = _mapper.Map<List<SubDepartmentModel>>(items);
+            .Select(sd => new SubDepartmentModel
+            {
+                Id = sd.Id,
+                Name = sd.Name,
+                DepartmentId = sd.DepartmentId,
+                CreatedAt = sd.CreatedAt,
+                UpdatedAt = sd.UpdatedAt
+            })
+            .ToArrayAsync();
+
         var result = new PaginationResult<SubDepartmentModel>
         {
-            Items = mappedItems,
+            Items = items,
             TotalCount = totalCount,
             PageNumber = page.Number,
             PageSize = page.Size
         };
-    
-        await Task.WhenAll(
-            CacheSearchResultsAsync(cacheKey, items),
-            CacheSearchCountAsync(countCacheKey, totalCount)
-        );
-    
+
+        _ = CacheSearchResultsAsync(cacheKey, items)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
+        _ = CacheSearchCountAsync(countCacheKey, totalCount)
+            .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
+
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, List<SubDepartment> items)
+
+    private async Task CacheSearchResultsAsync(string cacheKey, SubDepartmentModel[] items)
     {
         await _cacheService.SetAsync(cacheKey, items, SubDepartmentConstants.SubDepartmentTags, CacheExpirations.MediumTerm);
     }

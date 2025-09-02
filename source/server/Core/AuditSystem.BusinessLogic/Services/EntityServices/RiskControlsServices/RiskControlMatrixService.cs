@@ -109,19 +109,14 @@ internal sealed class RiskControlMatrixService(
         logger.LogInformation("Successfully updated risk control matrix {RiskControlMatrixId} for user {UserId}", existingEntity.Id, userId);
     }
 
-    public async Task<ICollection<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId)
     {
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all risk control matrices for user {UserId}", userId);
 
-        var query = repository.GetAll()
-            .Include(rcm => rcm.SubProcess)
-            .ThenInclude(rcm => rcm.AuditProcess)
-            .ThenInclude(rcm => rcm.SubDepartment)
-            .ThenInclude(rcm => rcm.Department)
-            .ThenInclude(rcm => rcm.SubLocation)
-            .ThenInclude(rcm => rcm.Location)
+        return await repository.GetAll()
+            .AsNoTracking()
             .Where(rcm => rcm.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(rcm => new RiskControlMatrixModel
             {
@@ -130,12 +125,8 @@ internal sealed class RiskControlMatrixService(
                 SubProcessId = rcm.SubProcessId,
                 CreatedAt = rcm.CreatedAt,
                 UpdatedAt = rcm.UpdatedAt,
-            });
-
-        var riskControlMatrices = await query.ToListAsync();
-        logger.LogDebug("Retrieved {RiskControlMatricesCount} risk control matrices for user {UserId}", riskControlMatrices.Count, userId);
-
-        return riskControlMatrices;
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subProcessId, Page? page)

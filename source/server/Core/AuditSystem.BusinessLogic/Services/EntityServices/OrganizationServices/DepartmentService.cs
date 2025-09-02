@@ -115,26 +115,26 @@ internal sealed class DepartmentService(
         logger.LogInformation("Successfully updated department {DepartmentId}", departmentModel.Id);
     }
     
-    public async Task<ICollection<DepartmentModel>> GetDepartmentsByUserIdAsync(Guid userId)
+    public async Task<IReadOnlyList<DepartmentModel>> GetDepartmentsByUserIdAsync(Guid userId)
     {
         DepartmentValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retriving all departments for user {UserId}", userId);
 
-        var query = repository.GetAll()
+
+        return await repository.GetAll()
+            .AsNoTracking()
             .Include(s => s.SubLocation)
-            .Where(s => s.SubLocation.Location.UserId == userId)
+            .Where(r => r.SubLocation.Location.UserId == userId)
             .Select(d => new DepartmentModel
             { 
                 Id = d.Id,
                 Name = d.Name,
                 SubLocationId = d.SubLocationId,
-            });
-        
-        var departments = await query.ToListAsync();
-        logger.LogDebug("Retrived {Count} sublocations for user {UserId}", departments.Count, userId);
-
-        return departments;
+                CreatedAt = d.CreatedAt,
+                UpdatedAt = d.UpdatedAt,
+            })
+            .ToListAsync();
     }
 
     public async Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subLocationId, Page? page)

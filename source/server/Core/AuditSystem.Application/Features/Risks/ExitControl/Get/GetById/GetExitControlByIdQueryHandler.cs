@@ -1,6 +1,5 @@
 using MediatR;
 using Ardalis.Result;
-using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using Microsoft.Extensions.Logging;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 

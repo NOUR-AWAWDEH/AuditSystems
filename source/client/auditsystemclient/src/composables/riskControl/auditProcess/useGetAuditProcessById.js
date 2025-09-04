@@ -38,7 +38,7 @@ export function useGetAuditProcessById() {
         }
     };
 
-    const fetchAuditProcessById = async (auditProcessId) => {
+    const getAuditProcessById = async (auditProcessId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -75,7 +75,7 @@ export function useGetAuditProcessById() {
         auditProcess,
         isLoading,
         error,
-        fetchAuditProcessById,
+        getAuditProcessById,
         clearAuditProcess,
     };
 }

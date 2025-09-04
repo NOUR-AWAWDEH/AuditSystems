@@ -34,8 +34,8 @@ internal sealed class ExitControlService(
     IExitControlService
 {
     private readonly IExitControlValidation _validationHelper = validationHelper;
-    private readonly IExitControlSearch _searchHelper = searchHelper;
-
+    private readonly IExitControlSearch _searchHelper = searchHelper;  
+    
     public async Task<Guid> CreateExitControlAsync(ExitControlModel exitControlModel, Guid userId)
     {
         ArgumentNullException.ThrowIfNull(exitControlModel, nameof(exitControlModel));

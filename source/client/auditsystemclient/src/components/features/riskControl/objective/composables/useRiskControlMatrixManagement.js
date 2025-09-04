@@ -17,7 +17,7 @@ export function useRiskControlMatrixManagement(riskControlMatrices) {
     const {
         riskControlMatrix: fetchRiskControlMatrix,
         isLoading: isRiskControlMatrixLoading,
-        fetchRiskControlMatrixById,
+        getRiskControlMatrixById,
         clearRiskControlMatrix
     } = useGetRiskControlMatrixById();
 
@@ -25,7 +25,7 @@ export function useRiskControlMatrixManagement(riskControlMatrices) {
     watch(selectedRiskControlMatrixId, async (newRiskControlMatrixId) => {
         if (newRiskControlMatrixId) {
             try {
-                await fetchRiskControlMatrixById(newRiskControlMatrixId);
+                await getRiskControlMatrixById(newRiskControlMatrixId);
             } catch (error) {
                 console.error('Error fetching RiskControlMatrix details:', error);
             }
@@ -63,7 +63,7 @@ export function useRiskControlMatrixManagement(riskControlMatrices) {
         currentRiskControlMatrix,
         isRiskControlMatrixLoading,
         riskControlMatricesRef,
-        fetchRiskControlMatrixById,
+        getRiskControlMatrixById,
         clearRiskControlMatrix
     };
 }

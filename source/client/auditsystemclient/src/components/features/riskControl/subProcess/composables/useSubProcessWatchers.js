@@ -14,7 +14,7 @@ export function useSubProcessWatchers({
     getSubProcessesByUserId,
     allSubProcesses,
     clearAuditProcess,
-    fetchAuditProcessById,
+    getAuditProcessById,
     initializeData,
     resetToDefaultView
 }) {
@@ -89,7 +89,7 @@ export function useSubProcessWatchers({
         
         if (newAuditProcessId) {
             try {
-                await fetchAuditProcessById(newAuditProcessId);
+                await getAuditProcessById(newAuditProcessId);
             } catch (error) {
                 console.error('[Process] Error fetching audit process:', error);
             }

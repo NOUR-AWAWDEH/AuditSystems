@@ -38,7 +38,7 @@ export function useGetRiskById() {
         }
     };
 
-    const fetchRiskById = async (riskId) => {
+    const getRiskById = async (riskId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -76,7 +76,7 @@ export function useGetRiskById() {
         risk,
         isLoading,
         error,
-        fetchRiskById,
+        getRiskById,
         clearRisk,
     };
 }

@@ -14,7 +14,7 @@ export function useObjectiveWatchers({
     getObjectivesByUserId,
     allObjectives,
     clearRiskControlMatrix,
-    fetchRiskControlMatrixById,
+    getRiskControlMatrixById,
     initializeData,
     resetToDefaultView
 }) {
@@ -89,7 +89,7 @@ export function useObjectiveWatchers({
         
         if (newRiskControlMatrixId) {
             try {
-                await fetchRiskControlMatrixById(newRiskControlMatrixId);
+                await getRiskControlMatrixById(newRiskControlMatrixId);
             } catch (error) {
                 console.error('[RiskControlMatrix] Error fetching risk control matrix:', error);
             }

@@ -105,4 +105,4 @@ coverage
 Uploads/
 
 # Entity Framework Migrations
-src/server/Infrastructure/AuditSystem.DataAccess/Migrations/
+source/server/Infrastructure/AuditSystem.DataAccess/Migrations/

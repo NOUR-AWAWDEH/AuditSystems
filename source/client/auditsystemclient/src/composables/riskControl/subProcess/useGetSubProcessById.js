@@ -39,7 +39,7 @@ export function useGetSubProcessById() {
         }
     };
 
-    const fetchSubProcessById = async (subProcessId) => {
+    const getSubProcessById = async (subProcessId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -76,7 +76,7 @@ export function useGetSubProcessById() {
         subProcess,
         isLoading,
         error,
-        fetchSubProcessById,
+        getSubProcessById,
         clearSubProcess,
     };
 }

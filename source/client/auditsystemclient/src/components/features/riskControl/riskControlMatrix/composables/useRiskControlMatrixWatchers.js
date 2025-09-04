@@ -14,7 +14,7 @@ export function useRiskControlMatrixWatchers({
     getRiskControlMatricesByUserId,
     allRiskControlMatrices,
     clearSubProcess,
-    fetchSubProcessById,
+    getSubProcessById,
     initializeData,
     resetToDefaultView
 }) {
@@ -89,7 +89,7 @@ export function useRiskControlMatrixWatchers({
         
         if (newSubProcessId) {
             try {
-                await fetchSubProcessById(newSubProcessId);
+                await getSubProcessById(newSubProcessId);
             } catch (error) {
                 console.error('[SubProcess] Error fetching sub process:', error);
             }

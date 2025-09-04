@@ -38,7 +38,7 @@ export function useGetRiskControlMatrixById() {
         }
     };
 
-    const fetchRiskControlMatrixById = async (riskControlMatrixId) => {
+    const getRiskControlMatrixById = async (riskControlMatrixId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -75,7 +75,7 @@ export function useGetRiskControlMatrixById() {
         riskControlMatrix,
         isLoading,
         error,
-        fetchRiskControlMatrixById,
+        getRiskControlMatrixById,
         clearRiskControlMatrix,
     };
 }

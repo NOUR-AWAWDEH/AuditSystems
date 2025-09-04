@@ -38,7 +38,7 @@ export function useGetObjectiveById() {
         }
     };
 
-    const fetchObjectiveById = async (objectiveId) => {
+    const getObjectiveById = async (objectiveId) => {   
         try {
             isLoading.value = true;
             error.value = null;
@@ -75,7 +75,7 @@ export function useGetObjectiveById() {
         objective,
         isLoading,
         error,
-        fetchObjectiveById,
+        getObjectiveById,
         clearObjective,
     };
 }

@@ -17,7 +17,7 @@ export function useSubProcessManagement(subProcesses) {
     const {
         subProcess: fetchSubProcess,
         isLoading: isSubProcessLoading,
-        fetchSubProcessById,
+        getSubProcessById,
         clearSubProcess
     } = useGetSubProcessById();
 
@@ -25,7 +25,7 @@ export function useSubProcessManagement(subProcesses) {
     watch(selectedSubProcessId, async (newSubProcessId) => {
         if (newSubProcessId) {
             try {
-                await fetchSubProcessById(newSubProcessId);
+                await getSubProcessById(newSubProcessId);
             } catch (error) {
                 console.error('Error fetching SubProcess details:', error);
             }
@@ -63,7 +63,7 @@ export function useSubProcessManagement(subProcesses) {
         currentSubProcess,
         isSubProcessLoading,
         subProcessesRef,
-        fetchSubProcessById,
+        getSubProcessById,
         clearSubProcess
     };
 }

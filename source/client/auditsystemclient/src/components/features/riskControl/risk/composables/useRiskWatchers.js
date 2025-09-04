@@ -20,7 +20,7 @@ import { watch, nextTick } from 'vue';
  * @param {Function} params.getRisksByUserId - Function to load all risks for the user.
  * @param {Ref<Array>} params.allRisks - Reactive list of all risks (mutable).
  * @param {Function} params.clearObjective - Function to reset selected objective.
- * @param {Function} params.fetchObjectiveById - Function to fetch a specific objective by ID.
+ * @param {Function} params.getObjectiveById - Function to fetch a specific objective by ID.
  * @param {Function} params.initializeData - Function to initialize data when an objective is valid.
  * @param {Function} params.resetToDefaultView - Function to reset view when objective is invalid.
  *
@@ -55,7 +55,7 @@ export function useRiskWatchers({
     getRisksByUserId,
     allRisks,
     clearObjective,
-    fetchObjectiveById,
+    getObjectiveById,
     initializeData,
     resetToDefaultView
 }) {
@@ -131,7 +131,7 @@ export function useRiskWatchers({
         }
 
         try {
-            await fetchObjectiveById(newObjectiveId);
+            await getObjectiveById(newObjectiveId);
         } catch (error) {
             console.error('[Objective] Error fetching objective:', error);
         }

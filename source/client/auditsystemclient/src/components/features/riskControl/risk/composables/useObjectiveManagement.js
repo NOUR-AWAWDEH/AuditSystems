@@ -8,7 +8,7 @@
  *   @property {import('vue').Ref<Object|null>} currentObjective - Full details of selected objective.
  *   @property {import('vue').Ref<boolean>} isObjectiveLoading - Loading state for fetching.
  *   @property {import('vue').Ref<Array>} objectivesRef - Normalized objectives array.
- *   @property {Function} fetchObjectiveById - Fetch objective by ID from backend.
+ *   @property {Function} getObjectiveById - Fetch objective by ID from backend.
  *   @property {Function} clearObjective - Clears fetched objective.
  */
 
@@ -32,7 +32,7 @@ export function useObjectiveManagement(objectives) {
   const {
     objective: fetchObjective,
     isLoading: isObjectiveLoading,
-    fetchObjectiveById,
+    getObjectiveById,
     clearObjective
   } = useGetObjectiveById();
 
@@ -40,7 +40,7 @@ export function useObjectiveManagement(objectives) {
   watch(selectedObjectiveId, async (newObjectiveId) => {
     if (newObjectiveId) {
       try {
-        await fetchObjectiveById(newObjectiveId);
+        await getObjectiveById(newObjectiveId);
       } catch (error) {
         console.error('Error fetching Objective details:', error);
       }
@@ -62,7 +62,7 @@ export function useObjectiveManagement(objectives) {
     return objectivesList.find(obj => obj.id === objectiveId) || null;
   });
 
-  // Look for the objective from the server (fetchObjective.value).
+  // Look for the objective from the server (getObjective.value).
   // If the server one is not there, use the selected one from the list (selectedObjective.value).
   // If the chosen object has a property called objectiveModel, return that instead. 
   // If not, just return the object itself.
@@ -77,7 +77,7 @@ export function useObjectiveManagement(objectives) {
     currentObjective,
     isObjectiveLoading,
     objectivesRef,
-    fetchObjectiveById,
+    getObjectiveById,
     clearObjective
   };
 }

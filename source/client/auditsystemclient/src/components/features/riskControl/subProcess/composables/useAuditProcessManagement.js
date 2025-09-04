@@ -17,7 +17,7 @@ export function useAuditProcessManagement(auditProcesses) {
     const {
         auditProcess: fetchAuditProcess,
         isLoading: isAuditProcessLoading,
-        fetchAuditProcessById,
+        getAuditProcessById,
         clearAuditProcess
     } = useGetAuditProcessById();
 
@@ -25,7 +25,7 @@ export function useAuditProcessManagement(auditProcesses) {
     watch(selectedAuditProcessId, async (newAuditProcessId) => {
         if (newAuditProcessId) {
             try {
-                await fetchAuditProcessById(newAuditProcessId);
+                await getAuditProcessById(newAuditProcessId);
             } catch (error) {
                 console.error('Error fetching AuditProcess details:', error);
             }
@@ -63,7 +63,7 @@ export function useAuditProcessManagement(auditProcesses) {
         currentAuditProcess,
         isAuditProcessLoading,
         auditProcessesRef,
-        fetchAuditProcessById,
+        getAuditProcessById,
         clearAuditProcess
     };
 }

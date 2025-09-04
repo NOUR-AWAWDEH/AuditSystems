@@ -1,58 +1,61 @@
-import { useObjectiveData } from './useExitControlData';
-import { useRiskControlMatrixManagement } from './useRiskManagement';
+import { useExitControlData } from './useExitControlData';
+import { useRiskManagement } from './useRiskManagement';
 import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
-import { useObjectiveActions } from './useExitControlActions';
-import { useObjectiveWatchers } from './useExitControlWatchers';
-import { useObjectiveLifecycle } from './useExitControlLifecycle';
-import { useObjectiveComputed } from './useExitControlComputed';
+import { useExitControlActions } from './useExitControlActions';
+import { useExitControlWatchers } from './useExitControlWatchers';
+import { useExitControlLifecycle } from './useExitControlLifecycle';
+import { useExitControlComputed } from './useExitControlComputed';
 
-export function useObjectiveTable(riskControlMatrixes) {
+export function useExitControlTable(risks) {
 
-    const dataComposable = useObjectiveData();
-    const riskControlMatrixComposable = useRiskControlMatrixManagement(riskControlMatrixes);
+    const dataComposable = useExitControlData();
+    const riskComposable = useRiskManagement(risks);
     const searchComposable = useSearchAndPagination();
 
-    const actionsComposable = useObjectiveActions({
+    const actionsComposable = useExitControlActions({
         ...dataComposable,
-        ...riskControlMatrixComposable,
+        ...riskComposable,
         ...searchComposable
     });
 
-    const lifecycleComposable = useObjectiveLifecycle({
+    const lifecycleComposable = useExitControlLifecycle({
         ...dataComposable,
-        ...riskControlMatrixComposable,
+        ...riskComposable,
         ...searchComposable,
         ...actionsComposable
     });
 
-    const computedComposable = useObjectiveComputed({
+    const computedComposable = useExitControlComputed({
         ...dataComposable,
-        ...riskControlMatrixComposable,
+        ...riskComposable,
         ...searchComposable,
         ...lifecycleComposable
     });
 
-    useObjectiveWatchers({
+    useExitControlWatchers({
         ...dataComposable,
-        ...riskControlMatrixComposable,
+        ...riskComposable,
         ...searchComposable,
         ...actionsComposable,
         ...lifecycleComposable
     });
 
     return {
-        objectives: computedComposable.objectives,
+        exitControls: computedComposable.exitControls,
         isLoading: computedComposable.isLoading,
-        selectedRiskControlMatrixId: riskControlMatrixComposable.selectedRiskControlMatrixId,
-        selectedRiskControlMatrix: riskControlMatrixComposable.selectedRiskControlMatrix,
-        currentRiskControlMatrix: riskControlMatrixComposable.currentRiskControlMatrix,
-        isRiskControlMatrixLoading: riskControlMatrixComposable.isRiskControlMatrixLoading,
+        
+        selectedRiskId: riskComposable.selectedRiskId,
+        selectedRisk: riskComposable.selectedRisk,
+        currentRisk: riskComposable.currentRisk,
+        isRiskLoading: riskComposable.isRiskLoading,
+        
         searchQuery: searchComposable.searchQuery,
         currentPage: searchComposable.currentPage,
         pageSize: searchComposable.pageSize,
         totalCount: dataComposable.totalCount,
-        handleObjectiveAdded: actionsComposable.handleObjectiveAdded,
-        handleObjectiveChange: actionsComposable.handleObjectiveChange,
+
+        handleExitControlAdded: actionsComposable.handleExitControlAdded,
+        handleExitControlChange: actionsComposable.handleExitControlChange,
         handleSearch: searchComposable.handleSearch,
         resetToDefaultView: actionsComposable.resetToDefaultView,
     };

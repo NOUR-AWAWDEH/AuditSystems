@@ -1,69 +1,69 @@
 import { ref, computed, watch } from 'vue';
-import { useGetRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useGetRiskControlMatrixById';
+import { useGetRiskById } from '@/composables/riskControl/risk/useGetRiskById';
 
-export function useRiskControlMatrixManagement(riskControlMatrices) {
+export function useRiskManagement(risks) {
     // Initialize from localStorage - USE THE SAME KEY AS RiskControl.vue
-    const selectedRiskControlMatrixId = ref(localStorage.getItem('riskControlSelectedRiskControlMatrixId') || '');
+    const selectedRiskId = ref(localStorage.getItem('riskControlSelectedRiskId') || '');
 
     // Watch for changes and persist to localStorage
-    watch(selectedRiskControlMatrixId, (newValue) => {
+    watch(selectedRiskId, (newValue) => {
         if (newValue) {
-            localStorage.setItem('riskControlSelectedRiskControlMatrixId', newValue);
+            localStorage.setItem('riskControlSelectedRiskId', newValue);
         } else {
-            localStorage.removeItem('riskControlSelectedRiskControlMatrixId');
+            localStorage.removeItem('riskControlSelectedRiskId');
         }
     });
 
     const {
-        riskControlMatrix: fetchRiskControlMatrix,
-        isLoading: isRiskControlMatrixLoading,
-        getRiskControlMatrixById,
-        clearRiskControlMatrix
-    } = useGetRiskControlMatrixById();
+        risk: fetchRisk,
+        isLoading: isRiskLoading,
+        getRiskById,
+        clearRisk
+    } = useGetRiskById();
 
-    // Add watcher to fetch RiskControlMatrix details when selectedRiskControlMatrixId changes
-    watch(selectedRiskControlMatrixId, async (newRiskControlMatrixId) => {
-        if (newRiskControlMatrixId) {
+    // Add watcher to fetch Risk details when selectedRiskId changes
+    watch(selectedRiskId, async (newRiskId) => {
+        if (newRiskId) {
             try {
-                await getRiskControlMatrixById(newRiskControlMatrixId);
+                await getRiskById(newRiskId);
             } catch (error) {
-                console.error('Error fetching RiskControlMatrix details:', error);
+                console.error('Error fetching risk details:', error);
             }
         } else {
-            clearRiskControlMatrix();
+            clearRisk();
         }
     }, { immediate: true });
 
     const riskControlMatricesRef = computed(() => {
-        if (riskControlMatrices && typeof riskControlMatrices === 'object' && 'value' in riskControlMatrices) {
-            return riskControlMatrices.value || [];
+        if (risks && typeof risks === 'object' && 'value' in risks) {
+            return risks.value || [];
         }
-        return riskControlMatrices || [];
+        return risks || [];
     });
 
-    const selectedRiskControlMatrix = computed(() => {
-        const riskControlMatrixId = selectedRiskControlMatrixId.value;
+    const selectedRisk = computed(() => {
+        const riskId = selectedRiskId.value;
         const riskControlMatricesList = riskControlMatricesRef.value;
 
-        if (!riskControlMatrixId || !riskControlMatricesList || riskControlMatricesList.length === 0) {
+        if (!riskId || !riskControlMatricesList || riskControlMatricesList.length === 0) {
             return null;
         }
-        const riskControlMatrix = riskControlMatricesList.find(riskControlMatrix => riskControlMatrix.id === riskControlMatrixId);
-        return riskControlMatrix || null;
+        const risk = riskControlMatricesList.find(risk => risk.id === riskId);
+        return risk || null;
     });
 
-    const currentRiskControlMatrix = computed(() => {
-        const riskControlMatrix = fetchRiskControlMatrix?.value || selectedRiskControlMatrix?.value;
-        return riskControlMatrix?.riskControlMatrixModel || riskControlMatrix;
+    const currentRisk = computed(() => {
+        const risk = fetchRisk?.value || selectedRisk?.value;
+        return risk?.RiskModel || risk;
     });
 
     return {
-        selectedRiskControlMatrixId,
-        selectedRiskControlMatrix,
-        currentRiskControlMatrix,
-        isRiskControlMatrixLoading,
+        selectedRiskId,
+        selectedRisk,
+        currentRisk,
+        isRiskLoading,
         riskControlMatricesRef,
-        getRiskControlMatrixById,
-        clearRiskControlMatrix
+        getRiskById,
+        clearRisk
     };
 }

@@ -1,97 +1,97 @@
 import { ref } from 'vue';
-import { useDeleteObjectiveById } from '@/composables/riskControl/objective/useDeleteObjectiveById';
+import { useDeleteExitControlById } from '@/composables/riskControl/exitControl/useDeleteExitControlById';
 import { useNotification } from '@/composables/notification/useNotification';
 
-export function useObjectiveModals(objectives, emit) {
+export function useExitControlModals(exitControls, emit) {
 
-    const { deleteObjective } = useDeleteObjectiveById();
+    const { deleteExitControl } = useDeleteExitControlById();
     const { showNotification } = useNotification();
 
-    const showAddObjectiveModal = ref(false);
-    const showEditObjectiveModal = ref(false);
-    const objectiveToEdit = ref(null);
+    const showAddExitControlModal = ref(false);
+    const showEditExitControlModal = ref(false);
+    const exitControlToEdit = ref(null);
     const showDeleteDialog = ref(false);
     const deleteDialogTitle = ref('');
     const deleteDialogMessage = ref('');
     const itemToDelete = ref(null);
 
-    const handleAddObjective = () => {
-        showAddObjectiveModal.value = true;
+    const handleAddExitControl = () => {
+        showAddExitControlModal.value = true;
     };
 
-    const handleCloseAddObjectiveModal = () => {
-        showAddObjectiveModal.value = false;
+    const handleCloseAddExitControlModal = () => {
+        showAddExitControlModal.value = false;
     };
 
-    const handleObjectiveAdded = async (newObjective) => {
+    const handleExitControlAdded = async (newExitControl) => {
         try {
-            objectives.value.push(newObjective);
-            emit('objective-added', newObjective);
-            handleCloseAddObjectiveModal();
+            exitControls.value.push(newExitControl);
+            emit('exit-control-added', newExitControl);
+            handleCloseAddExitControlModal();
         } catch (error) {
-            console.error('Error in handleObjectiveAdded:', error);
-            showNotification('Failed to refresh data after adding objective', 'error');
+            console.error('Error in handleExitControlAdded:', error);
+            showNotification('Failed to refresh data after adding exit control', 'error');
         }
     };
 
-    const handleEditObjective = (objective) => {
-        objectiveToEdit.value = objective;
-        showEditObjectiveModal.value = true;
+    const handleEditExitControl = (exitControl) => {
+        exitControlToEdit.value = exitControl;
+        showEditExitControlModal.value = true;
     };
 
-    const handleCloseEditObjectiveModal = () => {
-        showEditObjectiveModal.value = false;
-        objectiveToEdit.value = null;
+    const handleCloseEditExitControlModal = () => {
+        showEditExitControlModal.value = false;
+        exitControlToEdit.value = null;
     };
 
-    const handleObjectiveUpdated = async (updatedObjective) => {
+    const handleExitControlUpdated = async (updatedExitControl) => {
        try {
-        const index = objectives.value.findIndex(obj => obj.id === updatedObjective.id);
+        const index = exitControls.value.findIndex(obj => obj.id === updatedExitControl.id);
        
         if(index !== -1){
-           objectives.value[index] = { ...objectives.value[index], ...updatedObjective };
+           exitControls.value[index] = { ...exitControls.value[index], ...updatedExitControl };
         }
-        emit('objective-updated', updatedObjective);
+        emit('exit-control-updated', updatedExitControl);
 
         showNotification(
-            `Objective "${updatedObjective.description}" has been updated successfully!`,
+            `Exit Control "${updatedExitControl.description}" has been updated successfully!`,
              'success'
         );
 
-        handleCloseEditObjectiveModal();
+        handleCloseEditExitControlModal();
        }catch (error) {
-            console.error('Error in handleObjectiveUpdated:', error);
-            showNotification('Failed to refresh data after updating objective', 'error');
+            console.error('Error in handleExitControlUpdated:', error);
+            showNotification('Failed to refresh data after updating exit control', 'error');
        }
     };
 
-    const handleDeleteObjective = (objective) => {
-        itemToDelete.value = objective;
-        deleteDialogTitle.value = 'Delete Objective';
-        deleteDialogMessage.value = `Are you sure you want to delete the objective "${objective.description}"?`;
+    const handleDeleteExitControl = (exitControl) => {
+        itemToDelete.value = exitControl;
+        deleteDialogTitle.value = 'Delete Exit Control';
+        deleteDialogMessage.value = `Are you sure you want to delete the exit control "${exitControl.description}"?`;
         showDeleteDialog.value = true;
     };
 
     const confirmDelete = async () => {
       if (!itemToDelete.value) return;
       
-        const deletedObjective = { ...itemToDelete.value };
-        const result = await deleteObjective(deletedObjective.id);
+        const deletedExitControl = { ...itemToDelete.value };
+        const result = await deleteExitControl(deletedExitControl.id);
 
         if (result.success) {
-            const index = objectives.value.findIndex(obj => obj.id === deletedObjective.id);
+            const index = exitControls.value.findIndex(obj => obj.id === deletedExitControl.id);
             if (index !== -1) {
-                objectives.value.splice(index, 1);
+                exitControls.value.splice(index, 1);
             }
 
             showNotification(
-                `Objective "${deletedObjective.description}" has been deleted successfully!`,
+                `Exit Control "${deletedExitControl.description}" has been deleted successfully!`,
                 'success'
             );
 
-            localStorage.removeItem('riskControlSelectedObjectiveId');
+            localStorage.removeItem('riskControlSelectedExitControlId');
             
-            emit('objective-deleted', deletedObjective.id);
+            emit('exit-control-deleted', deletedExitControl.id);    
         }
 
         cancelDelete();
@@ -105,20 +105,20 @@ export function useObjectiveModals(objectives, emit) {
     };
 
     return {
-        showAddObjectiveModal,
-        showEditObjectiveModal,
-        objectiveToEdit,
+        showAddExitControlModal,
+        showEditExitControlModal,
+        exitControlToEdit,
         showDeleteDialog,
         deleteDialogTitle,
         deleteDialogMessage,
         itemToDelete,
-        handleAddObjective,
-        handleCloseAddObjectiveModal,
-        handleObjectiveAdded,
-        handleEditObjective,
-        handleCloseEditObjectiveModal,
-        handleObjectiveUpdated,
-        handleDeleteObjective,
+        handleAddExitControl,
+        handleCloseAddExitControlModal,
+        handleExitControlAdded,
+        handleEditExitControl,
+        handleCloseEditExitControlModal,
+        handleExitControlUpdated,
+        handleDeleteExitControl,
         confirmDelete,
         cancelDelete,
     };

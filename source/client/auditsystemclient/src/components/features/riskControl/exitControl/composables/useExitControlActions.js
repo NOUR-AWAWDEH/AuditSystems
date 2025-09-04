@@ -1,66 +1,66 @@
-export function useObjectiveActions({
-    searchObjectives,
-    getObjectivesByUserId,
+export function useExitControlActions({
+    searchExitControls,
+    getExitControlsByUserId,
     clearSearch,
-    clearRiskControlMatrix,
-    allObjectives,
+    clearRisk,
+    allExitControls,
     searchQuery,
-    selectedRiskControlMatrixId,
+    selectedRiskId,
     currentPage,
     pageSize
 }) {
 
     const refreshData = async () => {
         try {
-            const hasSearchOrFilter = searchQuery.value.trim() || selectedRiskControlMatrixId.value;
+            const hasSearchOrFilter = searchQuery.value.trim() || selectedRiskId.value;
 
             if (hasSearchOrFilter) {
-                if (searchObjectives) {
-                    await searchObjectives({
+                if (searchExitControls) {
+                    await searchExitControls({
                         searchTerm: searchQuery.value || '',
-                        riskControlMatrixId: selectedRiskControlMatrixId.value,
+                        riskId: selectedRiskId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
                 }
             } else {
-                if (getObjectivesByUserId) {
-                    await getObjectivesByUserId();
+                if (getExitControlsByUserId) {
+                    await getExitControlsByUserId();
                 }
             }
             
         } catch (error) {
-            console.error('Error refreshing objective data:', error);
+            console.error('Error refreshing Exit Control data:', error);
         }
     };
 
-    const handleObjectiveAdded = async () => {
+    const handleExitControlAdded = async () => {
         try {
             await refreshData();
         } catch (error) {
-            console.error('Error handling objective addition:', error);
+            console.error('Error handling Exit Control addition:', error);
         }
     };
 
-    const handleObjectiveChange = async (newRiskControlMatrixId) => {
+    const handleExitControlChange = async (newRiskId) => {
         try {
             if (clearSearch) {
                 clearSearch();
             }
 
-            if (allObjectives?.value !== undefined) {
-                allObjectives.value = [];
+            if (allExitControls?.value !== undefined) {
+                allExitControls.value = [];
             }
 
-            selectedRiskControlMatrixId.value = newRiskControlMatrixId;
+            selectedRiskId.value = newRiskId;
         } catch (error) {
-            console.error('Error handling objective change:', error);
+            console.error('Error handling Exit Control change:', error);
         }
     };
 
     const resetToDefaultView = () => {
         try {
-            selectedRiskControlMatrixId.value = null;
+            selectedRiskId.value = null;
             searchQuery.value = '';
             currentPage.value = 1;
 
@@ -68,12 +68,12 @@ export function useObjectiveActions({
                 clearSearch();
             }
 
-            if (allObjectives?.value !== undefined) {
-                allObjectives.value = [];
+            if (allExitControls?.value !== undefined) {
+                allExitControls.value = [];
             }
 
-            if (clearRiskControlMatrix) {
-                clearRiskControlMatrix();
+            if (clearRisk) {
+                clearRisk();
             }
         } catch (error) {
             console.error('Error resetting to default view:', error);
@@ -82,8 +82,8 @@ export function useObjectiveActions({
 
     return {
         refreshData,
-        handleObjectiveAdded,
-        handleObjectiveChange,
+        handleExitControlAdded,
+        handleExitControlChange,
         resetToDefaultView
     };
 }

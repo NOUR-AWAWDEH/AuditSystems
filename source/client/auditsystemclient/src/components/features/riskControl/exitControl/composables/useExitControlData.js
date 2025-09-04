@@ -1,30 +1,30 @@
 import { ref } from 'vue';
-import { useSearchObjectivesByUserId } from '@/composables/riskControl/objective/useSearchObjectivesByUserId';
-import { useGetObjectivesByUserId } from '@/composables/riskControl/objective/useGetObjectivesByUserId';
+import { useSearchExitControlsByUserId } from '@/composables/riskControl/exitControl/useSearchExitControlsByUserId';
+import { useGetExitControlsByUserId } from '@/composables/riskControl/exitControl/useGetExitControlsByUserId';
 
-export function useObjectiveData() {
+export function useExitControlData() {
     const {
         searchResults = ref([]),
         isSearching = ref(false),
         totalCount = ref(0),
-        searchObjectives,
+        searchExitControls,
         clearSearch
-    } = useSearchObjectivesByUserId() || {};
+    } = useSearchExitControlsByUserId() || {};
 
     const {
-        objectives: allObjectives = ref([]),
+        exitControls: allExitControls = ref([]),
         isLoading: isLoadingAll = ref(false),
-        getObjectivesByUserId
-    } = useGetObjectivesByUserId() || {};
+        getExitControlsByUserId
+    } = useGetExitControlsByUserId() || {};
 
     return {
         searchResults,
-        allObjectives,
+        allExitControls,
         isSearching,
         isLoadingAll,
         totalCount,
-        searchObjectives,
+        searchExitControls,
         clearSearch,
-        getObjectivesByUserId
+        getExitControlsByUserId
     };
 }

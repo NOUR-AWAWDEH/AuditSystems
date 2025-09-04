@@ -1,28 +1,28 @@
 import { ref, onMounted, nextTick } from 'vue';
 
-export function useObjectiveLifecycle({
-    selectedRiskControlMatrixId,
+export function useExitControlLifecycle({
+    selectedRiskId,
     currentPage,
     pageSize,
-    searchObjectives,
-    riskControlMatricesRef,
+    searchExitControls,
+    risksRef,
     searchQuery,
-    getObjectivesByUserId,
+    getExitControlsByUserId,
     resetToDefaultView
 }) {
     const isInitialized = ref(false);
     const isInitializing = ref(false);
 
     const initializeData = async () => {
-        if (!selectedRiskControlMatrixId.value || isInitialized.value || isInitializing.value) {
+        if (!selectedRiskId.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
         try {
             isInitializing.value = true;
-            if (searchObjectives) {
-                await searchObjectives({
-                    riskControlMatrixId: selectedRiskControlMatrixId.value,
+            if (searchExitControls) {
+                await searchExitControls({
+                    riskId: selectedRiskId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });
@@ -38,20 +38,20 @@ export function useObjectiveLifecycle({
     onMounted(async () => {
         await nextTick();
 
-        if (selectedRiskControlMatrixId.value && !isInitialized.value && !isInitializing.value) {
-            if (riskControlMatricesRef.value?.length > 0) {
-                const riskControlMatrixExists = riskControlMatricesRef.value.some(
-                    riskControlMatrix => riskControlMatrix.id === selectedRiskControlMatrixId.value);
-                if (riskControlMatrixExists) {
+        if (selectedRiskId.value && !isInitialized.value && !isInitializing.value) {
+            if (risksRef.value?.length > 0) {
+                const riskExists = risksRef.value.some(
+                    risk => risk.id === selectedRiskId.value);
+                if (riskExists) {
                     await initializeData();
                 } else {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedRiskControlMatrixId.value 
+        } else if (!selectedRiskId.value 
             && !searchQuery.value.trim() 
-            && getObjectivesByUserId) {
-                await getObjectivesByUserId();
+            && getExitControlsByUserId) {
+                await getExitControlsByUserId();
         }
     });
 

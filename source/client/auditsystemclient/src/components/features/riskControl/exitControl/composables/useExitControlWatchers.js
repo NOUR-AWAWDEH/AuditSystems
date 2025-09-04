@@ -1,31 +1,31 @@
 import { watch, nextTick } from 'vue';
 
-export function useObjectiveWatchers({
-    riskControlMatricesRef,
-    selectedRiskControlMatrix,
-    selectedRiskControlMatrixId,
+export function useExitControlWatchers({
+    risksRef,
+    selectedRisk,
+    selectedRiskId,
     searchQuery,
     currentPage,
     pageSize,
     isInitialized,
     isInitializing,
-    searchObjectives,
+    searchExitControls,
     clearSearch,
-    getObjectivesByUserId,
-    allObjectives,
-    clearRiskControlMatrix,
-    getRiskControlMatrixById,
+    getExitControlsByUserId,
+    allExitControls,
+    clearRisk,
+    getExitControlById,
     initializeData,
     resetToDefaultView
 }) {
-    // Watch Risk Control Matrix
-    watch(riskControlMatricesRef, async (newRiskControlMatrices) => {
-        if (!newRiskControlMatrices?.length || !selectedRiskControlMatrix.value || isInitialized.value || isInitializing.value) {
+    // Watch Risk
+    watch(risksRef, async (newRisks) => {
+        if (!newRisks?.length || !selectedRisk.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
-        const riskControlMatrixExists = newRiskControlMatrices.some(matrix => matrix.id === selectedRiskControlMatrixId.value);
-        if (riskControlMatrixExists) {
+        const riskExists = newRisks.some(risk => risk.id === selectedRiskId.value);
+        if (riskExists) {
             await nextTick();
             await initializeData();
         } else {
@@ -37,10 +37,10 @@ export function useObjectiveWatchers({
     watch(searchQuery, async (search) => {
             if (search.trim()) {
                 // Perform search when there's a search term
-                if (searchObjectives) {
-                    await searchObjectives({
+                if (searchExitControls) {
+                    await searchExitControls({
                         searchTerm: search,
-                        riskControlMatrixId: selectedRiskControlMatrixId.value,
+                        riskId: selectedRiskId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -51,61 +51,61 @@ export function useObjectiveWatchers({
                     clearSearch();
                 }
                 
-                // Reload risk control matrices based on current state
-                if (selectedRiskControlMatrixId.value) {
-                    // If a risk control matrix is selected, reload risk control matrices for that risk control matrix
-                    if (searchObjectives) {
-                        await searchObjectives({
+                // Reload risk based on current state
+                if (selectedRiskId.value) {
+                    // If a risk is selected, reload risk for that risk
+                    if (searchExitControls) {
+                        await searchExitControls({
                             searchTerm: '',
-                            riskControlMatrixId: selectedRiskControlMatrixId.value,
+                            riskId: selectedRiskId.value,
                             page: currentPage.value,
                             pageSize: pageSize.value,
                         });
                     }
                 } else {
-                    // If no risk control matrix is selected, load all risk control matrices
-                    if (getObjectivesByUserId) {
-                        await getObjectivesByUserId();
+                    // If no risk is selected, load all risks
+                    if (getExitControlsByUserId) {
+                        await getExitControlsByUserId();
                     }
                 }
             }
     });
 
-    // Watch selected risk control matrix
-    watch(selectedRiskControlMatrixId, async (newRiskControlMatrixId) => {
+    // Watch selected risk
+    watch(selectedRiskId, async (newRiskId) => {
         if (clearSearch) {
             clearSearch();
         }
 
-        if (allObjectives?.value !== undefined) {
-            allObjectives.value = [];
+        if (risksRef.value !== undefined) {
+            risksRef.value = [];
         }
 
-        if (!newRiskControlMatrixId) {
-            if (clearRiskControlMatrix) {
-                clearRiskControlMatrix();
+        if (!newRiskId) {
+            if (clearRisk) {
+                clearRisk();
             }
         }
         
-        if (newRiskControlMatrixId) {
+        if (newRiskId) {
             try {
-                await getRiskControlMatrixById(newRiskControlMatrixId);
+                await getExitControlById(newRiskId);
             } catch (error) {
-                console.error('[RiskControlMatrix] Error fetching risk control matrix:', error);
+                console.error('[ExitControl] Error fetching exit control:', error);
             }
         }
 
-        if (!newRiskControlMatrixId) {
-            if (!searchQuery.value.trim() && getObjectivesByUserId) {
-                getObjectivesByUserId();
+        if (!newRiskId) {
+            if (!searchQuery.value.trim() && getExitControlsByUserId) {
+                getExitControlsByUserId();
             }
             return;
         }
 
-        if (newRiskControlMatrixId) {
-            await searchObjectives({
+        if (newRiskId) {
+            await searchExitControls({
                 searchTerm: searchQuery.value || '',
-                riskControlMatrixId: newRiskControlMatrixId,
+                riskId: newRiskId,
                 page: currentPage.value,
                 pageSize: pageSize.value,
             });

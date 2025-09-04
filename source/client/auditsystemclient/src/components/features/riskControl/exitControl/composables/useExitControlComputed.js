@@ -1,29 +1,29 @@
 import { computed } from 'vue';
 
-export function useObjectiveComputed({
+export function useExitControlComputed({
     searchQuery,
-    selectedRiskControlMatrixId,
+    selectedRiskId,
     searchResults,
-    allObjectives,
+    allExitControls,
     isSearching,
     isLoadingAll,
     isInitializing
 }) {
-    const objectives = computed(() => {
+    const exitControls = computed(() => {
         if (searchQuery?.value && searchQuery.value.trim()) {
             return (searchResults && searchResults.value)
                 ? searchResults.value
                 : [];
         }
         
-        if (selectedRiskControlMatrixId?.value) {
-            return (searchResults && searchResults.value)
-                ? searchResults.value
+        if (selectedRiskId?.value) {
+            return (allExitControls && allExitControls.value)
+                ? allExitControls.value
                 : [];
         }
         
-        return (allObjectives && allObjectives.value)
-            ? allObjectives.value
+        return (allExitControls && allExitControls.value)
+            ? allExitControls.value
             : [];
     });
 
@@ -36,7 +36,7 @@ export function useObjectiveComputed({
     });
 
     return {
-        objectives,
+        exitControls,
         isLoading
     };
 }

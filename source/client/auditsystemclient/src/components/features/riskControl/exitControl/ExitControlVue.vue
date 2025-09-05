@@ -1,41 +1,41 @@
 <template>
-  <!-- Objective.vue -->
+  <!-- ExitControl.vue -->
     <div class="space-y-6">
-        <!-- Add Objective Modal -->
-        <AddObjectiveModal
-            :is-visible="showAddObjectiveModal"
-            :risk-control-matrix-id="internalSelectedRiskControlMatrixId"
-            @close="handleCloseAddObjectiveModal"
-            @objective-added="handleObjectiveAdded"
+        <!-- Add Exit Control Modal -->
+        <AddExitControlModal
+            :is-visible="showAddExitControlModal"
+            :risk-id="internalSelectedRiskId"
+            @close="handleCloseAddExitControlModal"
+            @exit-control-added="handleExitControlAdded"
         />
 
-        <!-- Show ObjectiveTable only when risk control matrices exist -->
-        <ObjectiveTable
-            v-if="props.riskControlMatrices && props.riskControlMatrices.length > 0"
-            :risk-control-matrices="props.riskControlMatrices"
-            :objectives="objectives"
+        <!-- Show Exit Control Table only when risks exist -->
+        <ExitControlTable
+            v-if="props.risks && props.risks.length > 0"
+            :risks="props.risks"
+            :exit-controls="exitControls"
             :is-loading="isLoading"
-            :selected-risk-control-matrix-id="internalSelectedRiskControlMatrixId"
-            :selected-risk-control-matrix="selectedRiskControlMatrix"
-            :current-risk-control-matrix="currentRiskControlMatrix"
-            :is-risk-control-matrix-loading="isRiskControlMatrixLoading"
+            :selected-risk-id="internalSelectedRiskId"
+            :selected-risk="selectedRisk"
+            :current-risk="currentRisk"
+            :is-risk-loading="isRiskLoading"
             :search-query="searchQuery"
-            :handle-risk-control-matrix-change="handleObjectiveChange"
+            :handle-risk-change="handleExitControlChange"
             :handle-search="handleSearch"
-            @add-objective="handleAddObjective"
-            @edit-objective="handleEditObjective"
-            @delete-objective="handleDeleteObjective"
-            @objective-selected="handleObjectiveSelected"
+            @add-ExitControl="handleAddExitControl"
+            @edit-ExitControl="handleEditExitControl"
+            @delete-ExitControl="handleDeleteExitControl"
+            @exit-control-selected="handleExitControlSelected"
         />
 
-        <!-- Show big RiskControlMatrix icon when no Risk Control Matrix  exist -->
+        <!-- Show big Risk icon when no Risk exist -->
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
-                    <RiskControlMatrixIcon size="xxxl" custom-class="text-primary-shade" />
+                    <RiskIcon size="xxxl" custom-class="text-primary-shade" />
                 </div>
-                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Risk Control Matrices Available</h3>
-                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create risk control matrices first before you can manage objectives</p>
+                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Risks Available</h3>
+                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create risks first before you can manage Exit Controls</p>
                 <div class="bg-white border border-tertiary-shade rounded-lg p-6">
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
@@ -47,21 +47,21 @@
                             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
                             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
                                 <li>Navigate to the Risk Control section</li>
-                                <li>Create or select a risk control matrix</li>
-                                <li>Return here to manage objectives</li>
+                                <li>Create or select a risk </li>
+                                <li>Return here to manage Exit Controls</li>
                             </ol>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Edit Objective Modal -->
-        <EditObjectiveModal
-            v-if="showEditObjectiveModal"
-            :is-visible="showEditObjectiveModal"
-            :objective="objectiveToEdit"
-            @close="handleCloseEditObjectiveModal"
-            @objective-updated="handleObjectiveUpdated"
+        <!-- Edit Exit Control Modal -->
+        <EditExitControlModal
+            v-if="showEditExitControlModal"
+            :is-visible="showEditExitControlModal"
+            :exit-control="exitControlToEdit"
+            @close="handleCloseEditExitControlModal"
+            @exit-control-updated="handleExitControlUpdated"
         />
 
         <!-- Confirmation Dialog -->
@@ -81,19 +81,19 @@
 <script setup>
 import { watch} from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import ObjectiveTable from './components/ExitControlTable.vue';
-import AddObjectiveModal from './components/AddExitControlModal.vue';
-import EditObjectiveModal from './components/EditExitControlModal.vue';
-import { useObjectiveTable } from './composables/useExitControlTable';
-import { useObjectiveModals } from './composables/useExitControlModals';
-import RiskControlMatrixIcon from '@/components/common/icons/RiskControlMatrixIcon.vue';
+import ExitControlTable from './components/ExitControlTable.vue';
+import AddExitControlModal from './components/AddExitControlModal.vue';
+import EditExitControlModal from './components/EditExitControlModal.vue';
+import { useExitControlTable } from './composables/useExitControlTable';
+import { useExitControlModals } from './composables/useExitControlModals';
+import RiskIcon from '@/components/common/icons/RiskIcon.vue';
 
 const props = defineProps({
-    riskControlMatrices: {
+    risks: {
         type: Array,
         default: () => [],
     },
-    selectedRiskControlMatrixId: {
+    selectedRiskId: {
         type: [String, Number],
         default: null
     }
@@ -101,30 +101,30 @@ const props = defineProps({
 
 // Define emit first
 const emit = defineEmits([
-    'objective-selected',
-    'objective-added',
-    'objective-updated',
-    'objective-deleted'
+    'exit-control-selected',
+    'exit-control-added',
+    'exit-control-updated',
+    'exit-control-deleted'
 ]);
 
 // Use composables - now with integrated backend search
 const {
-    objectives,
+    exitControls,
     isLoading,
-    selectedRiskControlMatrixId : internalSelectedRiskControlMatrixId,
-    selectedRiskControlMatrix,
-    currentRiskControlMatrix,
-    isRiskControlMatrixLoading,
+    selectedRiskId : internalSelectedRiskId,
+    selectedRisk,
+    currentRisk,
+    isRiskLoading,
     searchQuery,
-    handleObjectiveChange,
+    handleExitControlChange,
     handleSearch,
     resetToDefaultView,
-} = useObjectiveTable(props.riskControlMatrices);
+} = useExitControlTable(props.risks);
 
 // Watch for prop changes and update internal state
-watch( () => props.selectedRiskControlMatrixId, (newRiskControlMatrixId) => {
-        if (newRiskControlMatrixId !== internalSelectedRiskControlMatrixId.value) {
-             handleObjectiveChange(newRiskControlMatrixId);
+watch( () => props.selectedRiskId, (newRiskId) => {
+        if (newRiskId !== internalSelectedRiskId.value) {
+             handleExitControlChange(newRiskId);
         }
     },
     { immediate: true }
@@ -132,40 +132,40 @@ watch( () => props.selectedRiskControlMatrixId, (newRiskControlMatrixId) => {
 
 // Use modal composable for dialog management
 const {
-    showAddObjectiveModal,
-    showEditObjectiveModal,
-    objectiveToEdit,
+    showAddExitControlModal,
+    showEditExitControlModal,
+    exitControlToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,
     itemToDelete,
-    handleAddObjective,
-    handleEditObjective,
-    handleObjectiveAdded,
-    handleObjectiveUpdated,
+    handleAddExitControl,
+    handleEditExitControl,
+    handleExitControlAdded,
+    handleExitControlUpdated,
     confirmDelete,
-    handleCloseAddObjectiveModal,
-    handleCloseEditObjectiveModal,
-    handleDeleteObjective,
+    handleCloseAddExitControlModal,
+    handleCloseEditExitControlModal,
+    handleDeleteExitControl,
     cancelDelete
-} = useObjectiveModals(objectives, emit);
+} = useExitControlModals(exitControls, emit);
 
 
-// Handle objective selection and forward to parent
-const handleObjectiveSelected = (objectiveId) => {
-    emit('objective-selected', objectiveId);
+// Handle ExitControl selection and forward to parent
+const handleExitControlSelected = (exitControlId) => {
+    emit('exit-control-selected', exitControlId);
 };
 
 
 defineExpose({
-    objectives,
-    selectedRiskControlMatrixId: internalSelectedRiskControlMatrixId,
+    exitControls,
+    selectedRiskId: internalSelectedRiskId,
     resetToDefaultView
 });
 </script>
 
 <style scoped>
-.objective-table .table-row {
+.exit-control-table .table-row {
     transition: all 0.2s ease;
 }
 </style>

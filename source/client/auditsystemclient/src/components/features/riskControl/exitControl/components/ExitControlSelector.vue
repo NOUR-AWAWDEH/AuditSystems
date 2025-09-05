@@ -1,13 +1,13 @@
 <template>
   <CustomSelect
-    :model-value="selectedObjectiveId"
-    :options="objectives"
-    label="Select Objective"
-    placeholder="Choose an objective"
+    :model-value="selectedExitControlId"
+    :options="exitControls"
+    label="Select Exit Control"
+    placeholder="Choose an exit control"
     value-key="id"
     label-key="description"
-    :error="objectiveError"
-    @update:modelValue="handleObjectiveChange"
+    :error="exitControlError"
+    @update:modelValue="handleExitControlChange"
   />
 </template>
 
@@ -15,24 +15,24 @@
 import CustomSelect from '@/components/common/CustomSelect.vue';
 
 defineProps({
-  objectives: {
+  exitControls: {
     type: Array,
     default: () => []
   },
-  selectedObjectiveId: { 
+  selectedExitControlId: { 
     type: String,
     default: ''
   },
-  objectiveError: {
+  exitControlError: {
     type: String,
     default: ''
   }
 });
 
-const emit = defineEmits(['update:selectedObjective', 'objective-changed']);
+const emit = defineEmits(['update:selectedExitControl', 'exit-control-changed']);
 
-const handleObjectiveChange = (value) => {  
-    emit('update:selectedObjective', value);
-    emit('objective-changed', value);
+const handleExitControlChange = (value) => {  
+    emit('update:selectedExitControl', value);
+    emit('exit-control-changed', value);
 };
 </script>

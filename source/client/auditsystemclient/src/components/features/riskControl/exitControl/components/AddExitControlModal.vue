@@ -8,31 +8,50 @@
                 <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Objective</h3>
+                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Exit Control</h3>
                         <button
                             @click="$emit('close')"
                             class="text-gray-base hover:text-gray-shade focus:outline-none">
                             <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
                         </button>
                     </div>
-
+                    
                     <!-- Content -->
                     <div class="p-4">
                         <form @submit.prevent="handleSubmit" class="space-y-4">
-                            <!--  Objective description Field -->
+                            <!--  Exit Control description Field -->
                             <div>
-                                <label for="objective-description" class="block text-sm font-medium text-gray-700">
-                                    Objective Description *
+                                <label for="exit-control-description" class="block text-sm font-medium text-gray-700">
+                                    Exit Control Description *
                                 </label>
                                 <BaseInput
-                                    id="objective-description"
+                                    id="ExitControl-description"
                                     v-model="formData.description"
-                                    label="Objective Description"
-                                    placeholder="Enter Objective Description"
+                                    label="ExitControl Description"
+                                    placeholder="Enter ExitControl Description"
                                     :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
                                 <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
                             </div>
+
+                            <!-- Inadequate -->
+                            <div>
+                                <label for="exit-control-inadequate" class="block text-sm font-medium text-gray-700">
+                                    Exit Control Inadequate *
+                                </label>
+                                <select
+                                    id="exit-control-inadequate"
+                                    v-model="formData.inadequate"
+                                    class="w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2"
+                                    :class="errors.inadequate ? 'border-error focus:ring-error' : 'border-gray-tint focus:ring-primary-base'"
+                                >
+                                    <option disabled value="">-- Select an option --</option>
+                                    <option :value="true">True</option>
+                                    <option :value="false">False</option>
+                                </select>
+                                <p v-if="errors.inadequate" class="text-error text-sm mt-1">{{ errors.inadequate }}</p>
+                            </div>
+
 
                             <!--Error Display -->
                             <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -54,7 +73,7 @@
                                     :disabled="!formData.description.trim() || isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     <span v-if="isCreating">Adding...</span>
-                                    <span v-else>Add Objective</span>
+                                    <span v-else>Add ExitControl</span>
                                 </button>
                             </div>
                         </form>
@@ -68,7 +87,7 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import { useCreateObjective } from '@/composables/riskControl/objective/useCreateObjective.js';
+import { useCreateExitControl } from '@/composables/riskControl/exitControl/useCreateExitControl.js';
 import { useNotification } from '@/composables/notification/useNotification';
 
 const props = defineProps({
@@ -76,23 +95,25 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    riskControlMatrixId: {
+    riskId: {
         type: [String, Number],
         default: null
     }
 });
 
-const emit = defineEmits(['close', 'objective-added']);
+const emit = defineEmits(['close', 'exit-control-added']);
 
 const { showNotification } = useNotification();
-const { isCreating, error, createObjective, resetState } = useCreateObjective();
+const { isCreating, error, createExitControl, resetState } = useCreateExitControl();
 
 const formData = ref({
-    description: ''
+    description: '',
+    inadequate: null
 });
 
 const errors = ref({
-    description: ''
+    description: '',
+    inadequate: null
 });
 
 watch(() => props.isVisible, (newValue) => {
@@ -103,18 +124,21 @@ watch(() => props.isVisible, (newValue) => {
 
 const resetForm = () => {
     formData.value = {
-        description: ''
+        description: '',
+        inadequate: null
+
     };
     errors.value = {
-        description: ''
+        description: '',
+        inadequate: null
     };
 
     resetState();
 };
 
 const handleSubmit = async () => {
-    if (!props.riskControlMatrixId) {
-        showNotification('risk control matrix is required', 'error');
+    if (!props.riskId) {
+        showNotification('risk is required', 'error');
         return;
     }
 
@@ -123,44 +147,51 @@ const handleSubmit = async () => {
     }
 
     try {
-        const objectiveData = {
+        const exitControlData = {
             description: formData.value.description.trim(),
-            riskControlMatrixId: props.riskControlMatrixId
+            inadequate: formData.value.inadequate,
+            riskId: props.riskId
         };
 
-        const result = await createObjective(objectiveData);
+        const result = await createExitControl(exitControlData);
 
         if (result?.success) {
-            const newObjective = {
-                id: result.data.objectiveId,
-                ...objectiveData,
+            const newExitControl = {
+                id: result.data.ExitControlId,
+                ...exitControlData,
                 createdAt: new Date().toISOString(),
             };
 
-            showNotification(`Objective "${newObjective.description}" has been added successfully!`, 'success');
-            emit('objective-added', newObjective);
+            showNotification(`ExitControl "${newExitControl.description}" has been added successfully!`, 'success');
+            emit('exit-control-added', newExitControl);
             emit('close');
         } else {
-             showNotification(result?.message || 'Failed to create objective', 'error');
+             showNotification(result?.message || 'Failed to create Exit Control', 'error');
         }
 
     } catch (error) {
-        console.error('Error creating objective:', error);
-        showNotification('Failed to create objective. Please try again.', 'error');
+        console.error('Error creating Exit Control:', error);
+        showNotification('Failed to create Exit Control. Please try again.', 'error');
     }
 };
 
 const validateForm = () => {
     errors.value = {
-        description: ''
+        description: '',
+        inadequate: null
     };
 
     let isValid = true;
 
     if (!formData.value.description.trim()) {
-        errors.value.description = 'Objective description is required';
+        errors.value.description = 'ExitControl description is required';
         isValid = false;
     }
+
+    if (formData.value.inadequate === '') {
+        errors.value.inadequate = 'Exit Control inadequate is required';
+    }
+
 
     return isValid;
 };

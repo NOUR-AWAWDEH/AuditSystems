@@ -27,7 +27,6 @@ export const createExitControlRepository = {
                 }
             );
 
-            console.log('Response of Create Exit Control Repositroy: ', response.data);
             const { data, status } = response;
             if (status === 201 && data?.success) {
                 return ApiResponseT.ok(data.result, data.successMessage || 'Exit Control created successfully');

@@ -14,17 +14,20 @@ export function useExitControlWatchers({
     getExitControlsByUserId,
     allExitControls,
     clearRisk,
-    getExitControlById,
+    getRiskById,
     initializeData,
     resetToDefaultView
 }) {
+   
     // Watch Risk
     watch(risksRef, async (newRisks) => {
         if (!newRisks?.length || !selectedRisk.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
-        const riskExists = newRisks.some(risk => risk.id === selectedRiskId.value);
+        const riskExists = newRisks.some(
+            risk => risk.id === selectedRiskId.value
+        );
         if (riskExists) {
             await nextTick();
             await initializeData();
@@ -77,8 +80,8 @@ export function useExitControlWatchers({
             clearSearch();
         }
 
-        if (risksRef.value !== undefined) {
-            risksRef.value = [];
+        if (allExitControls?.value !== undefined) {
+            allExitControls.value = [];
         }
 
         if (!newRiskId) {
@@ -87,11 +90,11 @@ export function useExitControlWatchers({
             }
         }
         
-        if (newRiskId) {
+        if (!newRiskId) {
             try {
-                await getExitControlById(newRiskId);
+                await getRiskById(newRiskId);
             } catch (error) {
-                console.error('[ExitControl] Error fetching exit control:', error);
+                console.error('[Risk] Error fetching risk:', error);
             }
         }
 

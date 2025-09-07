@@ -39,7 +39,6 @@ export function useCreateExitControl() {
 
             const response = await createExitControlRepository.createExitControl(exitControlData);
 
-            console.log('useCreateExitControl: Create response:', response);
             if (response?.success) {
                 return handleCreateSuccess(response);
             } else {

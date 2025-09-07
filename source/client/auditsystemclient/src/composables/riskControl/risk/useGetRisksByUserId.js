@@ -9,7 +9,7 @@ export function useGetRisksByUserId() {
     const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
-        const risksData = response.result?.risks || [];
+        const risksData = response.result?.riskModels || [];
         risks.value = risksData;
         return { success: true, data: risksData };
     };

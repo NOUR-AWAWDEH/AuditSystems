@@ -23,7 +23,6 @@ export const getExitControlsByUserIdRepository = {
 
             const { data, status } = response;
             responseData = data;
-            console.log('Response of Get Exit Controls By User ID Repositroy: ', response.data);
             if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result?.exitControlModels, data?.successMessage || 'Exit Controls retrieved successfully');
             }

@@ -18,13 +18,16 @@ export function useObjectiveWatchers({
     initializeData,
     resetToDefaultView
 }) {
+  
     // Watch Risk Control Matrix
     watch(riskControlMatricesRef, async (newRiskControlMatrices) => {
         if (!newRiskControlMatrices?.length || !selectedRiskControlMatrix.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
-        const riskControlMatrixExists = newRiskControlMatrices.some(matrix => matrix.id === selectedRiskControlMatrixId.value);
+        const riskControlMatrixExists = newRiskControlMatrices.some(
+          matrix => matrix.id === selectedRiskControlMatrixId.value
+        );
         if (riskControlMatrixExists) {
             await nextTick();
             await initializeData();
@@ -50,7 +53,7 @@ export function useObjectiveWatchers({
                 if (clearSearch) {
                     clearSearch();
                 }
-                
+
                 // Reload risk control matrices based on current state
                 if (selectedRiskControlMatrixId.value) {
                     // If a risk control matrix is selected, reload risk control matrices for that risk control matrix
@@ -86,7 +89,7 @@ export function useObjectiveWatchers({
                 clearRiskControlMatrix();
             }
         }
-        
+
         if (newRiskControlMatrixId) {
             try {
                 await getRiskControlMatrixById(newRiskControlMatrixId);

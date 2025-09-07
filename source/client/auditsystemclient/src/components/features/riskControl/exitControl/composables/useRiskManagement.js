@@ -34,7 +34,7 @@ export function useRiskManagement(risks) {
         }
     }, { immediate: true });
 
-    const riskControlMatricesRef = computed(() => {
+    const risksRef = computed(() => {
         if (risks && typeof risks === 'object' && 'value' in risks) {
             return risks.value || [];
         }
@@ -43,12 +43,12 @@ export function useRiskManagement(risks) {
 
     const selectedRisk = computed(() => {
         const riskId = selectedRiskId.value;
-        const riskControlMatricesList = riskControlMatricesRef.value;
+        const risksList = risksRef.value;
 
-        if (!riskId || !riskControlMatricesList || riskControlMatricesList.length === 0) {
+        if (!riskId || !risksList || risksList.length === 0) {
             return null;
         }
-        const risk = riskControlMatricesList.find(risk => risk.id === riskId);
+        const risk = risksList.find(risk => risk.id === riskId);
         return risk || null;
     });
 
@@ -62,7 +62,7 @@ export function useRiskManagement(risks) {
         selectedRisk,
         currentRisk,
         isRiskLoading,
-        riskControlMatricesRef,
+        risksRef,
         getRiskById,
         clearRisk
     };

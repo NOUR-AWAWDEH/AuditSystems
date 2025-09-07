@@ -17,8 +17,8 @@ export function useExitControlComputed({
         }
         
         if (selectedRiskId?.value) {
-            return (allExitControls && allExitControls.value)
-                ? allExitControls.value
+            return (searchResults && searchResults.value)
+                ? searchResults.value
                 : [];
         }
         

@@ -51,7 +51,6 @@ export function useGetRiskById() {
 
             const response = await getRiskByIdRepository.getRiskById(riskId);
 
-
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {

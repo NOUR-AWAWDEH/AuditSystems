@@ -53,7 +53,6 @@ export function useDeleteExitControlById() {
 
             const response = await deleteExitControlByIdRepository.deleteExitControlById(exitControlId);
 
-            console.log('Response of Delete Exit Control By ID Repositroy: ', response.data);
             if (response?.success) {
                 return handleDeleteSuccess(response);
             } else {

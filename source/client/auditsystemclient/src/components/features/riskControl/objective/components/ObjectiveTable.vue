@@ -29,31 +29,33 @@
 
                 <!-- Keep only this Selected risk control matrix Info section -->
                 <div v-if="selectedRiskControlMatrixId"
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                     <div class="flex items-center justify-between">
-                         <div class="flex items-center">
-                             <RiskControlMatrixIcon size="xxl" custom-class="text-blue-600 mr-2" />
-
-                             <p class="text-sm text-gray-700">
-                                 Showing Objectives for: &nbsp;&nbsp;
-                                 <span class="font-semibold text-blue-800">
-                                     <span v-if="isRiskControlMatrixLoading">Loading risk control matrix...</span>
-                                     <span v-else>{{ currentRiskControlMatrix?.description || 'Loading...' }}</span>
-                                 </span>
-                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
-                             </p>
-                         </div>
-                         <button @click="$emit('add-objective')"
-                             class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
-                             <PlusIcon :stroke-width="3" />
-                             Add Objective
-                         </button>
-                     </div>
-                 </div>
+                    class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border
+                      border-blue-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <RiskControlMatrixIcon size="xxl" custom-class="text-blue-600 mr-2" />
+                            <p class="text-sm text-gray-700">
+                                Showing Objectives for: &nbsp;&nbsp;
+                                <span class="font-semibold text-blue-800">
+                                    <span v-if="isRiskControlMatrixLoading">Loading risk control matrix...</span>
+                                    <span v-else>{{ currentRiskControlMatrix?.description || 'Loading...' }}</span>
+                                </span>
+                                <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"
+                                </span>
+                            </p>
+                        </div>
+                        <button @click="$emit('add-objective')"
+                            class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base
+                              hover:bg-secondary-shade text-white">
+                            <PlusIcon :stroke-width="3" />
+                            Add Objective
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Table Container - Show when risk control matrix is Selected -->
                 <div v-if="selectedRiskControlMatrixId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="objectives"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -64,14 +66,18 @@
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectObjective(item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700
+                                      bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500
+                                      focus:ring-offset-1 transition-all duration-200"
                                     :class="{ 'bg-green-200': selectedObjectiveId === item.id }">
                                     <CheckIcon v-if="selectedObjectiveId === item.id" size="sm" custom-class="mr-1" />
                                     <SelectIcon v-else size="sm" custom-class="mr-1" />
                                     {{ selectedObjectiveId === item.id ? 'Selected' : 'Select' }}
                                 </button>
                                 <button @click.stop="$emit('edit-objective', item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium
+                                      text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2
+                                      focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
@@ -178,10 +184,6 @@ const props = defineProps({
         default: () => {}
     },
     handleSearch: {
-        type: Function,
-        default: () => {}
-    },
-    refreshData: {
         type: Function,
         default: () => {}
     }

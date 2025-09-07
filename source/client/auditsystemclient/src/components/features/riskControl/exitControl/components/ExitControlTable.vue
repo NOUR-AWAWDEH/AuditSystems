@@ -19,7 +19,7 @@
                         <div class="flex-1 sm:flex-initial">
                             <SearchFilter
                                 :search="searchQuery"
-                                :search-placeholder="'Search objectives...'"
+                                :search-placeholder="'Search exit controls...'"
                                 @update:search="handleSearch"
                                 class="w-full sm:w-auto"
                             />
@@ -32,7 +32,7 @@
                      class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                      <div class="flex items-center justify-between">
                          <div class="flex items-center">
-                             <RiskControlMatrixIcon size="xxl" custom-class="text-blue-600 mr-2" />
+                             <RiskIcon size="xxl" custom-class="text-blue-600 mr-2" />
 
                              <p class="text-sm text-gray-700">
                                  Showing Exit Controls for: &nbsp;&nbsp;
@@ -53,7 +53,7 @@
 
                 <!-- Table Container - Show when risk is Selected -->
                 <div v-if="selectedRiskId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="exitControls"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -61,22 +61,37 @@
                         :no-data-message="noDataMessage"
                         class="exit-control-table"
                         >
+                        <template #cell-inadequate="{ item }">
+                            <span :class="inadequateColorMap[item.inadequate]" class="px-2 py-1 rounded-full text-xs font-semibold">
+                                {{ item.inadequate }}
+                            </span>
+                        </template>
+
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                <button @click.stop="handleSelectObjective(item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                <button @click.stop="handleSelectExitControl(item)"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium
+                                         text-green-700 bg-green-100 rounded-md hover:bg-green-200
+                                         focus:outline-none focus:ring-2 focus:ring-green-500
+                                         focus:ring-offset-1 transition-all duration-200"
                                     :class="{ 'bg-green-200': selectedExitControlId === item.id }">
                                     <CheckIcon v-if="selectedExitControlId === item.id" size="sm" custom-class="mr-1" />
                                     <SelectIcon v-else size="sm" custom-class="mr-1" />
                                     {{ selectedExitControlId === item.id ? 'Selected' : 'Select' }}
                                 </button>
                                 <button @click.stop="$emit('edit-exit-control', item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium
+                                     text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200
+                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+                                     transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
                                 <button @click.stop="$emit('delete-exit-control', item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium
+                                     text-red-700 bg-red-100 rounded-md hover:bg-red-200
+                                     focus:outline-none focus:ring-2 focus:ring-red-500
+                                     focus:ring-offset-1 transition-all duration-200">
                                     <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
                                 </button>
@@ -88,7 +103,10 @@
                     <div v-if="searchQuery && exitControls.length === 0 && !isLoading"
                         class="text-center py-4 border-t border-gray-200">
                         <button @click="handleSearch('')"
-                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200">
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium
+                                text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100
+                                focus:outline-none focus:ring-2 focus:ring-blue-500
+                                focus:ring-offset-2 transition-all duration-200">
                             <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
                             Clear Search
                         </button>
@@ -100,7 +118,9 @@
                 <div v-else class="text-center py-20">
                     <!-- When risks are available but none selected -->
                     <div v-if="risks && risks.length > 0" class="max-w-md mx-auto">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100
+                            rounded-full w-32 h-32 mx-auto mb-8 flex items-center
+                            justify-center shadow-lg">
                             <RiskIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Risk</h3>
@@ -114,7 +134,8 @@
 
                     <!-- When no risks are available -->
                     <div v-else class="max-w-lg mx-auto">
-                        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
+                        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32
+                             mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
                             <RiskIcon size="xxxl" custom-class="text-gray-400" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">No Risks Available</h3>
@@ -130,7 +151,7 @@
 import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
-import RiskSelector from '@/components/features/riskControl/riskControlMatrix/components/RiskSelector.vue';
+import RiskSelector from '@/components/features/riskControl/risk/components/RiskSelector.vue';
 import RiskIcon from '@/components/common/icons/RiskIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
@@ -180,10 +201,6 @@ const props = defineProps({
     handleSearch: {
         type: Function,
         default: () => {}
-    },
-    refreshData: {
-        type: Function,
-        default: () => {}
     }
 });
 
@@ -204,10 +221,10 @@ const emit = defineEmits([
     'exit-control-selected'
 ]);
 
-// Objective selection state
+// Exit control selection state
 const selectedExitControlId = ref(null);
 
-// Handle objective selection from table row or button
+// Handle exit control selection from table row or button
 const handleSelectExitControl = (exitControl) => {
     selectedExitControlId.value = exitControl.id;
     emit('exit-control-selected', exitControl.id);
@@ -231,6 +248,15 @@ const noDataMessage = computed(() => {
     return 'No Exit Controls found for this Risk Control Matrix.';
 });
 
+const inadequateColorMap = {
+    'false': 'bg-red-100 text-red-800',
+    'true': 'bg-green-100 text-green-800',
+    'Unknown': 'bg-gray-100 text-gray-800'
+};
+
+
+
+
 </script>
 
 <style scoped>
@@ -239,7 +265,7 @@ const noDataMessage = computed(() => {
     cursor: pointer;
 }
 
-.exit-control-table .table-row:hover {  
+.exit-control-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);

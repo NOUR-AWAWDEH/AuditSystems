@@ -15,7 +15,7 @@ export const updateExitControlByIdRepository = {
                 id: exitControlData.id,
                 description: exitControlData.description,
                 riskId: exitControlData.riskId,
-                enadequate: exitControlData.enadequate,
+                inadequate: exitControlData.inadequate,
             };
 
             const response = await api.put(
@@ -31,7 +31,7 @@ export const updateExitControlByIdRepository = {
 
             const { data, status } = response;
             responseData = data;
-            console.log("Update Exit Control By ID Response: ", responseData);
+            
             if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(null, data?.successMessage || 'Exit Control updated successfully.');
             }

@@ -27,7 +27,7 @@
                 </div>
 
                 <div v-if="selectedObjectiveId"
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                    class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />

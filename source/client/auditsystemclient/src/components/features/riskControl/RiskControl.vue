@@ -80,39 +80,19 @@
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @risk-selected="handleRiskSelected"
-            @exit-risk-selected="handleExitRiskSelected"
           />
         </div>
 
-        <!-- Exit Risks -->
-        <div v-if="activeTab === 'exitrisks'" class="p-3 sm:p-4 md:p-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Exit Risk Management</h2>
-            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-              Add Exit Risk
-            </button>
-          </div>
+        <!-- Exit Controls -->
+        <div v-if="activeTab === 'exitcontrols'" class="p-3 sm:p-4 md:p-6">
+          <ExitControlVue 
+            :risks="risks"
+            :selected-risk-id="selectedRiskId"
+            @exit-control-selected="handleExitControlSelected"
+          />
         </div>
 
-        <!-- Control Design -->
-        <div v-if="activeTab === 'controls'" class="p-3 sm:p-4 md:p-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Control Design</h2>
-            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-              Add Control
-            </button>
-          </div>
-        </div>
-
-        <!-- Observations -->
-        <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-semibold text-secondary-base">Observations</h2>
-            <button class="bg-primary-base text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-shade transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto">
-              Add Observation
-            </button>
-          </div>
-        </div>
+      
       </div>
     </div>
   </div>
@@ -134,6 +114,7 @@ import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess
 import { useGetRiskControlMatricesByUserId } from '@/composables/riskControl/riskControlMatrix/useGetRiskControlMatricesByUserId';
 import { useGetObjectivesByUserId } from '@/composables/riskControl/objective/useGetObjectivesByUserId';
 import { useGetRisksByUserId } from '@/composables/riskControl/risk/useGetRisksByUserId';
+import ExitControlVue from './exitControl/ExitControlVue.vue';
 
 // State
 const activeTab = ref('processes');
@@ -147,6 +128,7 @@ const selectedSubProcessId = ref(null);
 const selectedRiskControlMatrixId = ref(null);
 const selectedObjectiveId = ref(null);
 const selectedRiskId = ref(null);
+const selectedExitControlId = ref(null);
 
 // Composables
 const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
@@ -163,7 +145,7 @@ const tabs = ref([
   { id: 'matrix', name: 'Risk Control Matrix' },
   { id: 'objectives', name: 'Objectives' },
   { id: 'risks', name: 'Risks' },
-  { id: 'exitrisks', name: 'Exit Risks' },
+  { id: 'exitcontrols', name: 'Exit Controls' },
   { id: 'controls', name: 'Control Design' },
   { id: 'observations', name: 'Observations' }
 ]);
@@ -191,14 +173,8 @@ const setActiveTab = async (tabId) => {
       case 'risks':
         await getObjectivesByUserId();
         break;
-      case 'exitrisks':
-        // if you want to fetch exit risks, put call here
-        break;
-      case 'controls':
-        // fetch controls if needed
-        break;
-      case 'observations':
-        // fetch observations if needed
+      case 'exitcontrols':
+        await getRisksByUserId();
         break;
     }
   } catch (err) {
@@ -232,12 +208,12 @@ const handleObjectiveSelected = (id) => {
 
 const handleRiskSelected = (id) => {
   selectedRiskId.value = id;
-  setActiveTab('exitrisks');
+  setActiveTab('exitcontrols');
 };
 
-const handleExitRiskSelected = (id) => {
-  selectedRiskId.value = id;
-  setActiveTab('controls');
+const handleExitControlSelected = (id) => {
+  selectedExitControlId.value = id;
+  setActiveTab('exitcontrols');
 };
 
 // Init -> load processes tab

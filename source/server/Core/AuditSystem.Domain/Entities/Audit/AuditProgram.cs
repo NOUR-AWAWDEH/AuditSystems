@@ -10,10 +10,8 @@ public class AuditProgram : Entity<Guid>
     public required Guid ExitControlId { get; set; } = Guid.Empty;
     public Guid? ControlDesignId { get; set; } = Guid.Empty;
 
-
     // Navigation properties
     public virtual ControlDesign? ControlDesign { get; set; } 
     public virtual ExitControl ExitControl { get; set; } = null!;
     public virtual ICollection<Observation> Observations { get; set; } = new HashSet<Observation>();
-
 }

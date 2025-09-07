@@ -25,5 +25,5 @@ public class User : IdentityUser<Guid>
 
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public virtual Role Role { get; set; } = null!;
-    public virtual Company? Company { get; set; }
+    public virtual Company? Company { get; set; } = null!;
 }

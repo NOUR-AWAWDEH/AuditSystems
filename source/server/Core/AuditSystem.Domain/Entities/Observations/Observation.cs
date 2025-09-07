@@ -1,3 +1,4 @@
+using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Risks;
 
@@ -11,6 +12,6 @@ public class Observation : Entity<Guid>
     public required DateTime ActionDate { get; set; }
     public required Guid AuditProgramId { get; set; } = Guid.Empty;
 
-    // Nevigation property 
-    public AuditProgram AuditProgram { get; set; } = null!;
+    // Navigation property 
+    public virtual AuditProgram? AuditProgram { get; set; } = null!;
 }

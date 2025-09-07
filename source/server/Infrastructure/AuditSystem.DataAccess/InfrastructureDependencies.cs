@@ -3,20 +3,13 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.DataAccess.Constants;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.DataAccess.Repositories;
-using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Auth;
-using AuditSystem.Domain.Entities.Checklists;
 using AuditSystem.Domain.Entities.Common;
-using AuditSystem.Domain.Entities.Compliance;
-using AuditSystem.Domain.Entities.Jobs;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
-using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
-using AuditSystem.Domain.Entities.Skills;
 using AuditSystem.Domain.Entities.SupportingDocs;
-using AuditSystem.Domain.Entities.Tasks;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +22,10 @@ namespace AuditSystem.DataAccess;
 public static class InfrastructureDependencies
 {
     public static IServiceCollection AddDataAccess(
-         this IServiceCollection services,
-         IConfiguration configuration,
-         IHealthChecksBuilder healthChecksBuilder,
-         bool isProduction)
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHealthChecksBuilder healthChecksBuilder,
+        bool isProduction)
     {
         // Register DbContext, repositories, and identity
         services
@@ -88,9 +81,9 @@ public static class InfrastructureDependencies
 
         return services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString)
-                   .EnableSensitiveDataLogging(false)
-                   .LogTo(Console.WriteLine, LogLevel.Information)
-                   .ConfigureWarnings(warnings => warnings.Ignore(
+                    .EnableSensitiveDataLogging(false)
+                    .LogTo(Console.WriteLine, LogLevel.Information)
+                    .ConfigureWarnings(warnings => warnings.Ignore(
                         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning))
         );
     }
@@ -98,27 +91,13 @@ public static class InfrastructureDependencies
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
     services
         //Audits
-        .AddRepository<Guid, AuditDomain>()
-        .AddRepository<Guid, AuditEngagement>()
-        .AddRepository<Guid, AuditPlanSummary>()
-        .AddRepository<Guid, AuditUniverseObjective>()
-        .AddRepository<Guid, AuditUniverse>()
-        .AddRepository<Guid, BusinessObjective>()
-        .AddRepository<Guid, BusinessObjective>()
-        .AddRepository<Guid, SpecialProject>()
+
         .AddRepository<Guid, Objective>()
-        //Checklists
-        .AddRepository<Guid, Checklist>()
-        .AddRepository<Guid, Remark>()
+
         //Common
         .AddRepository<Guid, Rate>()
-        //Compliance
-        .AddRepository<Guid, ComplianceChecklist>()
-        //Jobs
-        .AddRepository<Guid, JobScheduling>()
-        .AddRepository<Guid, JobPrioritization>()
-        .AddRepository<Guid, AuditJob>()
-        //Organisation
+
+        //Organization
         .AddRepository<Guid, SubLocation>()
         .AddRepository<Guid, SubDepartment>()
         .AddRepository<Guid, Location>()
@@ -127,33 +106,16 @@ public static class InfrastructureDependencies
         //Processes
         .AddRepository<Guid, SubProcess>()
         .AddRepository<Guid, AuditProcess>()
-        //Reports
-        .AddRepository<Guid, PlanningReport>()
-        .AddRepository<Guid, JobTimeAllocationReport>()
-        .AddRepository<Guid, InternalAuditConsolidationReport>()
-        .AddRepository<Guid, AuditPlanSummaryReport>()
-        .AddRepository<Guid, AuditExceptionReport>()
-        .AddRepository<Guid, ReportingFollowUp>()
+
         //RiskControls
         .AddRepository<Guid, RiskControlMatrix>()
-        .AddRepository<Guid, RiskControls>()
-        .AddRepository<Guid, RiskProgram>()
+
         //Risks
         .AddRepository<Guid, Risk>()
         .AddRepository<Guid, ExitControl>()
-        .AddRepository<Guid, RiskAssessment>()
-        .AddRepository<Guid, RiskFactor>()
-        .AddRepository<Guid, SpecificRiskFactor>()
+
         //SupportingDocs
         .AddRepository<Guid, SupportingDoc>()
-        //Tasks
-        .AddRepository<Guid, TaskManagement>()
-        //Skills
-        .AddRepository<Guid, Skill>()
-        .AddRepository<Guid, SkillSet>()
-        .AddRepository<Guid, SkillCategory>()
-        //Users
-        .AddRepository<Guid, UserDesignation>()
         //Auth
         .AddRepository<Guid, RefreshToken>();
 

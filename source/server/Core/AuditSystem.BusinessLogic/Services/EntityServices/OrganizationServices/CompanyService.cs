@@ -86,7 +86,7 @@ internal sealed class CompanyService(
     public async Task UpdateCompanyAsync(CompanyModel companyModel)
     {
         ArgumentNullException.ThrowIfNull(companyModel, nameof(companyModel));
-       
+    
         var entity = mapper.Map<Company>(companyModel);
         await repository.UpdateAsync(entity);
         

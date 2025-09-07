@@ -140,7 +140,7 @@ internal sealed class AuditProcessService(
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching audit processes for user {UserId} with term: {SearchTerm} and subdepartment: {SubDepartmentId}",
-             userId, searchTerm ?? "(none)", subDepartmentId.ToString() ?? "(none)");
+            userId, searchTerm ?? "(none)", subDepartmentId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subDepartmentId, page);
 

@@ -1,9 +1,7 @@
-﻿using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create;
+﻿using AuditSystem.Application.Features.RiskControls.Objective.Create;
+using AuditSystem.Application.Features.RiskControls.Objective.Update;
+using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create;
 using AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Update;
-using AuditSystem.Application.Features.RiskControls.RiskControls.Create;
-using AuditSystem.Application.Features.RiskControls.RiskControls.Update;
-using AuditSystem.Application.Features.RiskControls.RiskProgram.Create;
-using AuditSystem.Application.Features.RiskControls.RiskProgram.Update;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Domain.Entities.RiskControls;
 using AutoMapper;
@@ -19,14 +17,9 @@ public sealed class RiskControlsMappingProfile : Profile
         CreateMap<CreateRiskControlMatrixCommand, RiskControlMatrixModel>();
         CreateMap<UpdateRiskControlMatrixCommand, RiskControlMatrixModel>();
 
-        //RiskControls
-        CreateMap<RiskControlsModel, RiskControls>().ReverseMap();
-        CreateMap<CreateRiskControlsCommand, RiskControlsModel>();
-        CreateMap<UpdateRiskControlsCommand, RiskControlsModel>();
-
-        //RiskProgram
-        CreateMap<RiskProgramModel, RiskProgram>().ReverseMap();
-        CreateMap<CreateRiskProgramCommand, RiskProgramModel>();
-        CreateMap<UpdateRiskProgramCommand, RiskProgramModel>();
+        //Objective
+        CreateMap<ObjectiveModel, Objective>().ReverseMap();
+        CreateMap<CreateObjectiveCommand, ObjectiveModel>();
+        CreateMap<UpdateObjectiveCommand, ObjectiveModel>();
     }
 }

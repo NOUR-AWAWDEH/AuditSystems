@@ -141,7 +141,7 @@ internal sealed class ExitControlService(
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching exit controls for user {UserId} with term: {SearchTerm} and risk: {RiskId}",
-             userId, searchTerm ?? "(none)", riskId.ToString() ?? "(none)");
+            userId, searchTerm ?? "(none)", riskId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, riskId, page);
 

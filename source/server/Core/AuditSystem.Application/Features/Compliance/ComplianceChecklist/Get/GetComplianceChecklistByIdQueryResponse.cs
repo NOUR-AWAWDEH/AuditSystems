@@ -1,5 +1,0 @@
-using AuditSystem.Contract.Models.Compliance;
-
-namespace AuditSystem.Application.Features.Compliance.ComplianceChecklist.Get;
-
-public sealed record class GetComplianceChecklistByIdQueryResponse(ComplianceChecklistModel ComplianceChecklistModel);

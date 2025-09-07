@@ -24,24 +24,24 @@ public sealed class OrganizationMappingProfile : Profile
         CreateMap<CreateCompanyCommand, CompanyModel>();
         CreateMap<UpdateCompanyCommand, CompanyModel>();
 
-        //Department
-        CreateMap<DepartmentModel, Department>().ReverseMap();
-        CreateMap<CreateDepartmentCommand, DepartmentModel>();
-        CreateMap<UpdateDepartmentCommand, DepartmentModel>();
-
         //Location
         CreateMap<LocationModel, Location>().ReverseMap();
         CreateMap<CreateLocationCommand, LocationModel>();
         CreateMap<UpdateLocationCommand, LocationModel>();
         
-        //SubDepartment
-        CreateMap<SubDepartmentModel, SubDepartment>().ReverseMap();
-        CreateMap<CreateSubDepartmentCommand, SubDepartmentModel>();
-        CreateMap<UpdateSubDepartmentCommand, SubDepartmentModel>();
-
         //SubLocation
         CreateMap<SubLocationModel, SubLocation>().ReverseMap();
         CreateMap<CreateSubLocationCommand, SubLocationModel>();
         CreateMap<UpdateSubLocationCommand, SubLocationModel>();
+
+        //Department
+        CreateMap<DepartmentModel, Department>().ReverseMap();
+        CreateMap<CreateDepartmentCommand, DepartmentModel>();
+        CreateMap<UpdateDepartmentCommand, DepartmentModel>();
+
+        //SubDepartment
+        CreateMap<SubDepartmentModel, SubDepartment>().ReverseMap();
+        CreateMap<CreateSubDepartmentCommand, SubDepartmentModel>();
+        CreateMap<UpdateSubDepartmentCommand, SubDepartmentModel>();
     }
 }

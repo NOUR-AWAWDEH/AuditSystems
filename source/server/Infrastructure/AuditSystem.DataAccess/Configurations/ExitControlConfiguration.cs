@@ -16,15 +16,15 @@ public class ExitControlConfiguration : IEntityTypeConfiguration<ExitControl>
 
         // Properties
         builder.Property(ec => ec.Description)
-               .IsRequired()
-               .HasMaxLength(500);
+            .IsRequired()
+            .HasMaxLength(500);
 
         // Relationship with Risk (Restrict delete to prevent cascade path)
         builder.HasOne(ec => ec.Risk)
-               .WithMany(r => r.ExitControls)
-               .HasForeignKey(ec => ec.RiskId)
-               .OnDelete(DeleteBehavior.Restrict);
-        
+            .WithMany(r => r.ExitControls)
+            .HasForeignKey(ec => ec.RiskId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes
         builder.HasIndex(ec => ec.RiskId);
         builder.HasIndex(ec => ec.Inadequate);

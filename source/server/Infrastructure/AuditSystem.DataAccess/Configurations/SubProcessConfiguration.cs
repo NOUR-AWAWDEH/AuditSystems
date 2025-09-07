@@ -26,11 +26,11 @@ public class SubProcessConfiguration : IEntityTypeConfiguration<SubProcess>
                      .OnDelete(DeleteBehavior.Restrict);
 
               builder.HasMany(sp => sp.RiskControlMatrices)
-                  .WithOne(rcm => rcm.SubProcess)
-                  .HasForeignKey(rcm => rcm.SubProcessId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                     .WithOne(rcm => rcm.SubProcess)
+                     .HasForeignKey(rcm => rcm.SubProcessId)
+                     .OnDelete(DeleteBehavior.Restrict);
 
               builder.HasIndex(sp => sp.AuditProcessId);
               builder.HasIndex(sp => sp.Particular);
-    }
+       }
 }

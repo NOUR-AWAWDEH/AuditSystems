@@ -143,7 +143,7 @@ internal sealed class DepartmentService(
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and sublocation: {SubLocationId}",
-             userId, searchTerm ?? "(none)", subLocationId.ToString() ?? "(none)");
+            userId, searchTerm ?? "(none)", subLocationId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subLocationId, page);
 

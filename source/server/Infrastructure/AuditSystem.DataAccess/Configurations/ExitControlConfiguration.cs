@@ -18,6 +18,9 @@ public class ExitControlConfiguration : IEntityTypeConfiguration<ExitControl>
         builder.Property(ec => ec.Description)
             .IsRequired()
             .HasMaxLength(500);
+        
+        builder.Property(ec => ec.Inadequate)
+            .IsRequired();
 
         // Relationship with Risk (Restrict delete to prevent cascade path)
         builder.HasOne(ec => ec.Risk)

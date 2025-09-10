@@ -16,11 +16,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 
         // Required properties
         builder.Property(d => d.Name)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(200);
 
         builder.Property(d => d.SubLocationId)
-            .IsRequired();
+            .IsRequired(true);
 
         // Relationships
         builder.HasOne(d => d.SubLocation)

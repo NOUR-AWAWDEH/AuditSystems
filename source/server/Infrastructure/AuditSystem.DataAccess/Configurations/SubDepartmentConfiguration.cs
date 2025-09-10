@@ -21,7 +21,7 @@ public class SubDepartmentConfiguration : IEntityTypeConfiguration<SubDepartment
             .HasMaxLength(100);
 
         builder.Property(sd => sd.DepartmentId)
-            .IsRequired();
+            .IsRequired(true);
 
         builder.HasOne(sd => sd.Department)
             .WithMany(d => d.SubDepartments)

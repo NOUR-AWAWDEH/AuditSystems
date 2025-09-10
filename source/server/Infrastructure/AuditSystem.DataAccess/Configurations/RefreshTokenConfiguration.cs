@@ -17,18 +17,18 @@ public void Configure(EntityTypeBuilder<RefreshToken> builder)
               .HasMaxLength(2000);
 
        builder.Property(rt => rt.ExpiresAt)
-              .IsRequired();
+              .IsRequired(true);
 
        builder.Property(rt => rt.IsRevoked)
-              .IsRequired();
+              .IsRequired(true);
 
        builder.Property(rt => rt.CreatedAt)
-              .IsRequired();
+              .IsRequired(true);
 
        // Relationship: Many RefreshTokens belong to one User
        builder.HasOne(rt => rt.User)
               .WithMany(u => u.RefreshTokens)
               .HasForeignKey(rt => rt.UserId)
-              .OnDelete(DeleteBehavior.Cascade); // Use Cascade or Restrict as per your needs
+              .OnDelete(DeleteBehavior.Cascade);
 }
 }

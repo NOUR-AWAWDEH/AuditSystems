@@ -5,7 +5,7 @@ namespace AuditSystem.Contract.Models.Risks;
 
 public class ExitControlModel : BaseModel<Guid> 
 {
-    public required Guid RiskId { get; set; } = Guid.Empty;
-    public required string Description { get; set; } = string.Empty;
+    public required Guid RiskId { get; set; }
+    public required string Description { get; set; }
     public required bool Inadequate { get; set; }
 }

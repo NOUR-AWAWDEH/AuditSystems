@@ -16,15 +16,15 @@ public class SubLocationConfiguration : IEntityTypeConfiguration<SubLocation>
 
         // Required properties
         builder.Property(sl => sl.Name)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(100);
 
         builder.Property(sl => sl.Address)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(500);
 
         builder.Property(sl => sl.LocationId)
-            .IsRequired();
+            .IsRequired(true);
 
         // Relationships
         builder.HasOne(sl => sl.Location)
@@ -35,7 +35,7 @@ public class SubLocationConfiguration : IEntityTypeConfiguration<SubLocation>
         builder.HasMany(sl => sl.Departments)
             .WithOne(d => d.SubLocation)
             .HasForeignKey(d => d.SubLocationId)
-            .OnDelete(DeleteBehavior.Restrict); // Change from Cascade to Restrict
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes for performance
         builder.HasIndex(sl => sl.LocationId);

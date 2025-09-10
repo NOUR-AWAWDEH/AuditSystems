@@ -4,6 +4,6 @@ namespace AuditSystem.Contract.Models.Organization;
 
 public sealed class DepartmentModel : BaseModel<Guid>
 {
-    public required string Name { get; set; } = string.Empty;
-    public required Guid SubLocationId { get; set; } = Guid.Empty;
+    public required string Name { get; set; }
+    public required Guid SubLocationId { get; set; }
 }

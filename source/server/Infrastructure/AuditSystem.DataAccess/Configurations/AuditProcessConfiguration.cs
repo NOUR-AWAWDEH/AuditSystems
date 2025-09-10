@@ -1,3 +1,4 @@
+using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,15 +14,15 @@ public class AuditProcessConfiguration : IEntityTypeConfiguration<AuditProcess>
 
               // Properties
               builder.Property(ap => ap.ProcessName)
-                     .IsRequired()
-                     .HasMaxLength(500);
+                     .IsRequired(true)
+                     .HasMaxLength(250);
 
               builder.Property(ap => ap.SubDepartmentId)
-                     .IsRequired();
+                     .IsRequired(true);
 
               // Relationships
               builder.HasOne(ap => ap.SubDepartment)
-                     .WithMany()
+                     .WithMany(ap => ap.AuditProcesses)
                      .HasForeignKey(ap => ap.SubDepartmentId)
                      .OnDelete(DeleteBehavior.Restrict);
 

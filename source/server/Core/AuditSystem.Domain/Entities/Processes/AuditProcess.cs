@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.Processes;
 
 public class AuditProcess : Entity<Guid>
 {
-    public required string ProcessName { get; set; } = string.Empty;
+    public required string ProcessName { get; set; }
     public required Guid SubDepartmentId { get; set; }
 
     // Navigation property

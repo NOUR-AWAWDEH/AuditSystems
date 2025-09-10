@@ -14,13 +14,13 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         // Required properties
         builder.Property(l => l.Name)
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(250);
 
         builder.Property(l => l.CompanyId)
-            .IsRequired();
+            .IsRequired(true);
 
         builder.Property(l => l.UserId)
-            .IsRequired();
+            .IsRequired(true);
 
         // Optional properties with constraints
         builder.Property(l => l.Address)
@@ -33,11 +33,10 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(l => l.User)
-            .WithMany()
+            .WithMany(l => l.Locations)
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Location to SubLocations relationship with Restrict delete behavior
         builder.HasMany(l => l.SubLocations)
             .WithOne(sl => sl.Location)
             .HasForeignKey(sl => sl.LocationId)

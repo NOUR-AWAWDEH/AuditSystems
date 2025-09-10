@@ -7,4 +7,6 @@ public class Role : IdentityRole<Guid>
     public const string Admin = "Admin";
     public const string Auditor = "Auditor";
     public const string User = "User";
+
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

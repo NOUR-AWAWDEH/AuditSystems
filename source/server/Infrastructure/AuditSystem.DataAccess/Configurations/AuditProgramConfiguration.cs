@@ -1,4 +1,5 @@
 using AuditSystem.Domain.Entities.Audit;
+using AuditSystem.Domain.Entities.Observations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,5 +33,8 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
             .WithOne(o => o.AuditProgram)
             .HasForeignKey(o => o.AuditProgramId)
             .OnDelete(DeleteBehavior.Restrict);
-        }
+        
+        builder.HasIndex(ap => ap.ExitControlId);
+        builder.HasIndex(ap => ap.ControlDesignId);
+    }
 }

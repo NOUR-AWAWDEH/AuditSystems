@@ -44,7 +44,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<SupportingDoc> SupportingDocs { get; set; }
 
     public new required DbSet<Role> Roles { get; set; }
-
     // Auth
     public required DbSet<RefreshToken> RefreshTokens { get; set; }
 

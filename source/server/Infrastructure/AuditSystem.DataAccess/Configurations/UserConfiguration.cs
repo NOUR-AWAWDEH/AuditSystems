@@ -18,10 +18,10 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
             .HasMaxLength(50);
 
         builder.Property(u => u.RoleId)
-            .IsRequired();
+            .IsRequired(true);
 
         builder.Property(u => u.CompanyId)
-            .IsRequired();
+            .IsRequired(true);
 
         // Optional properties with constraints
         builder.Property(u => u.PasswordResetCode)
@@ -32,7 +32,7 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
 
         // Relationships
         builder.HasOne(u => u.Role)
-            .WithMany()
+            .WithMany(u => u.Users)
             .HasForeignKey(u => u.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
 

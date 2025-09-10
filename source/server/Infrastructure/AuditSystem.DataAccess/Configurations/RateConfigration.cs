@@ -11,7 +11,7 @@ public class RateConfiguration : IEntityTypeConfiguration<Rate>
         builder.HasKey(r => r.Id);
 
         builder.Property(r => r.Level)
-            .IsRequired()
+            .IsRequired(true)
             .HasConversion<string>()
             .HasMaxLength(20);
 

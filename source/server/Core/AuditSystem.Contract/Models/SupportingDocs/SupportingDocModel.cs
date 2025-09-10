@@ -5,10 +5,9 @@ namespace AuditSystem.Contract.Models.SupportingDocs;
 public sealed class SupportingDocModel : BaseModel<Guid>
 {
     public required Guid UserId { get; set; }
-    public required string FileName { get; set; } = string.Empty;
+    public required string FileName { get; set; }
     public required long FileSize { get; set; }
-    public Guid DriveFileId { get; set; }
+    public Guid DriveFileId { get; set; } = Guid.Empty;
     
-    // Add these new properties
     public string FileType => Path.GetExtension(FileName)?.TrimStart('.').ToUpperInvariant() ?? "Unknown";
 }

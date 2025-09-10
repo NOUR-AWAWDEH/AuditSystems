@@ -6,7 +6,7 @@ namespace AuditSystem.Domain.Entities.Risks;
 public class ExitControl : Entity<Guid>
 {
     public required Guid RiskId { get; set; }
-    public required string Description { get; set; } = string.Empty;
+    public required string Description { get; set; }
     public required bool Inadequate { get; set; }
 
 

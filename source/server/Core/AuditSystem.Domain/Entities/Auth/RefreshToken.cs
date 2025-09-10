@@ -6,8 +6,8 @@ namespace AuditSystem.Domain.Entities.Auth;
 
 public class RefreshToken : Entity<Guid>
 {
-    public required string Token { get; set; } = string.Empty;
-    public Guid UserId { get; set; }
+    public required string Token { get; set; }
+    public Guid UserId { get; set; } = Guid.Empty;
     public required DateTime ExpiresAt { get; set; }
     public required bool IsRevoked { get; set; }
     public new DateTime CreatedAt { get; set; } = DateTime.UtcNow;

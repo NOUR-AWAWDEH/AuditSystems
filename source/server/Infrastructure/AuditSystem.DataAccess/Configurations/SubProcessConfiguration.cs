@@ -17,7 +17,7 @@ public class SubProcessConfiguration : IEntityTypeConfiguration<SubProcess>
                      .HasMaxLength(500);
 
               builder.Property(sp => sp.AuditProcessId)
-                     .IsRequired();
+                     .IsRequired(true);
 
               // Relationships
               builder.HasOne(sp => sp.AuditProcess)
@@ -30,6 +30,7 @@ public class SubProcessConfiguration : IEntityTypeConfiguration<SubProcess>
                      .HasForeignKey(rcm => rcm.SubProcessId)
                      .OnDelete(DeleteBehavior.Restrict);
 
+              // Indexes for performance
               builder.HasIndex(sp => sp.AuditProcessId);
               builder.HasIndex(sp => sp.Particular);
        }

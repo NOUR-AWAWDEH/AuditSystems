@@ -11,7 +11,7 @@ public class AuditProgram : Entity<Guid>
     public Guid? ControlDesignId { get; set; } = Guid.Empty;
 
     // Navigation properties
-    public virtual ControlDesign? ControlDesign { get; set; } 
+    public virtual ControlDesign? ControlDesign { get; set; } = null;
     public virtual ExitControl ExitControl { get; set; } = null!;
     public virtual ICollection<Observation> Observations { get; set; } = new HashSet<Observation>();
 }

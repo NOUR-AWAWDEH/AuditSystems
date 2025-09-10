@@ -5,8 +5,8 @@ namespace AuditSystem.Domain.Entities.Risks;
 
 public class ControlDesign : Entity<Guid>
 {
-    public required string Description { get; set; } = string.Empty;
-    public required Guid ExitControlId { get; set; } = Guid.Empty;
+    public required string Description { get; set; }
+    public required Guid ExitControlId { get; set; }
     public required bool Inadequate { get; set; } = true;
 
     // Navigation properties

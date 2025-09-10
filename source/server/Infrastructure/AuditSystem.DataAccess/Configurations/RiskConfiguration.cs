@@ -13,18 +13,18 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
 
                 // Properties
                 builder.Property(r => r.Description)
-                        .IsRequired()
+                        .IsRequired(true)
                         .HasMaxLength(500);
 
                 builder.Property(r => r.RiskName)
-                        .IsRequired()
-                        .HasMaxLength(200);
+                        .IsRequired(true)
+                        .HasMaxLength(250);
 
                 builder.Property(r => r.RateId)
-                        .IsRequired();
+                        .IsRequired(true);
 
                 builder.Property(r => r.ObjectiveId)
-                        .IsRequired();
+                        .IsRequired(true);
 
 
                 // Relationship with Objective
@@ -35,7 +35,7 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
 
                 // Relationship with Rate
                 builder.HasOne(r => r.Rate)
-                        .WithMany()
+                        .WithMany(r => r.Risks)
                         .HasForeignKey(r => r.RateId)
                         .OnDelete(DeleteBehavior.Restrict);
 

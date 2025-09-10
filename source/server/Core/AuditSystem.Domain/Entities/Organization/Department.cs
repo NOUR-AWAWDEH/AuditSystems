@@ -4,7 +4,7 @@ namespace AuditSystem.Domain.Entities.Organization;
 
 public class Department : Entity<Guid>
 {
-    public required string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
     public required Guid SubLocationId { get; set; }
 
     // Navigation properties

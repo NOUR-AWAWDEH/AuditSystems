@@ -5,8 +5,8 @@ namespace AuditSystem.Domain.Entities.Organization;
 
 public class Location : Entity<Guid>
 {
-    public required string Name { get; set; } = string.Empty;
-    public string? Address { get; set; }
+    public required string Name { get; set; }
+    public string? Address { get; set; } = string.Empty;
     public required Guid CompanyId { get; set; }
     public required Guid UserId { get; set; }
     

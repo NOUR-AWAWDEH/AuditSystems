@@ -1,4 +1,3 @@
-using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -33,6 +32,5 @@ public class AuditProcessConfiguration : IEntityTypeConfiguration<AuditProcess>
 
               builder.HasIndex(ap => ap.SubDepartmentId);
               builder.HasIndex(ap => ap.ProcessName);
-
        }
 }

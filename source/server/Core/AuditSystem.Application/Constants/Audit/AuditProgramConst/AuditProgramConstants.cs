@@ -28,7 +28,7 @@ public static class AuditProgramConstants
     public const string UnauthorizedExitControlAccessMessage = "User {0} is not authorized to access exit control {1}.";
     public const string AuditProgramNotFoundMessage = "Audit program with ID {0} not found.";
     public const string ExitControlNotFoundMessage = "Exit control with ID {0} not found.";
-    public const string UnauthorizedAuditProgramAccessMessage = "User {0} is not authorized to create audit program under exist control {1}.";
+    public const string UnauthorizedAuditProgramAccessMessage = "User {0} is not authorized to access audit program with id: {1}.";
     public const string UserIdEmptyMessage = "UserId cannot be empty";
     public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";
     public const string RetrievedSearchResultsFromCacheMessage = "Retrieved audit programs search results from cache";

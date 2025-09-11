@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuditSystem.DataAccess.Configurations;
 
-public class SupportingDocConfigration : IEntityTypeConfiguration<SupportingDoc>
+public class SupportingDocConfiguration : IEntityTypeConfiguration<SupportingDoc>
 {
     public void Configure(EntityTypeBuilder<SupportingDoc> builder)
     {
@@ -31,7 +31,7 @@ public class SupportingDocConfigration : IEntityTypeConfiguration<SupportingDoc>
             .WithMany(u => u.SupportingDocs)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict) 
-            .IsRequired();
+            .IsRequired(true);
 
         // Optional: Add indexes for performance
         builder.HasIndex(x => x.UserId);

@@ -17,7 +17,7 @@ public class SubDepartmentConfiguration : IEntityTypeConfiguration<SubDepartment
 
         // Required properties
         builder.Property(sd => sd.Name)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(100);
 
         builder.Property(sd => sd.DepartmentId)

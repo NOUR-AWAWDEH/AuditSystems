@@ -1,4 +1,6 @@
-﻿using AuditSystem.Contract.Models.Audit;
+﻿using AuditSystem.Application.Features.Audit.AuditProgram.Create;
+using AuditSystem.Application.Features.Audit.AuditProgram.Update;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 
@@ -11,7 +13,7 @@ public sealed class AuditMappingProfile : Profile
     {
         // Audit Program
         CreateMap<AuditProgramModel, AuditProgram>().ReverseMap();
-        //CreateMap<CreateAuditProgramCommand, AuditProgramModel>();
-        //CreateMap<UpdateAuditProgramCommand, AuditProgramModel>();
+        CreateMap<CreateAuditProgramCommand, AuditProgramModel>();
+        CreateMap<UpdateAuditProgramCommand, AuditProgramModel>();
     }
 }

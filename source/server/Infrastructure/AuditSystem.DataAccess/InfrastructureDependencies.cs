@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.DataAccess.Constants;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.DataAccess.Repositories;
+using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Organization;
@@ -91,7 +92,7 @@ public static class InfrastructureDependencies
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
     services
         //Audits
-
+        .AddRepository<Guid, AuditProgram>()
         .AddRepository<Guid, Objective>()
 
         //Common

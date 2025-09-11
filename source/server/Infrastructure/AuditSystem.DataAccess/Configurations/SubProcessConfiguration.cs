@@ -13,7 +13,7 @@ public class SubProcessConfiguration : IEntityTypeConfiguration<SubProcess>
 
               // Properties
               builder.Property(sp => sp.Particular)
-                     .IsRequired()
+                     .IsRequired(true)
                      .HasMaxLength(500);
 
               builder.Property(sp => sp.AuditProcessId)

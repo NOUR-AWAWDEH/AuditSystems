@@ -13,7 +13,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         // Required properties
         builder.Property(l => l.Name)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(250);
 
         builder.Property(l => l.CompanyId)

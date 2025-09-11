@@ -5,6 +5,6 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Dep
 
 public interface IDepartmentValidation
 {
-    Task<Department> ValidateDepartmentOwnerShipAsync(Guid departmentId, Guid userId);
-    Task<SubLocation> ValidateSubLocationOwnerShipAsync(Guid subLocationId, Guid userId);
+    Task<Department> ValidateDepartmentOwnershipAsync(Guid departmentId, Guid userId);
+    Task<SubLocation> ValidateSubLocationOwnershipAsync(Guid subLocationId, Guid userId);
 }

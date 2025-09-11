@@ -44,7 +44,7 @@ internal sealed class DepartmentService(
 
         logger.LogInformation("Creating department {DepartmentName} for user {UserId}", departmentModel.Name, userId);
 
-        await _validationHelper.ValidateSubLocationOwnerShipAsync(departmentModel.SubLocationId, userId);
+        await _validationHelper.ValidateSubLocationOwnershipAsync(departmentModel.SubLocationId, userId);
 
         var entity = mapper.Map<Department>(departmentModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -60,7 +60,7 @@ internal sealed class DepartmentService(
     {
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retriving department {DepartmentId} for user {UserId}",id,userId);
+        logger.LogDebug("Retrieving department {DepartmentId} for user {UserId}",id,userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<DepartmentModel>(
             id,
@@ -70,11 +70,11 @@ internal sealed class DepartmentService(
 
         if (cashedResult != null) 
         {
-            logger.LogDebug("Retrived department {DepartmentId} from cahe", id);
+            logger.LogDebug("Retrieved department {DepartmentId} from cache", id);
             return cashedResult;
         }
 
-        var entity = await _validationHelper.ValidateDepartmentOwnerShipAsync(id, userId);
+        var entity = await _validationHelper.ValidateDepartmentOwnershipAsync(id, userId);
         await CacheEntityAsync(entity);
         return mapper.Map<DepartmentModel>(entity);
     }
@@ -85,12 +85,9 @@ internal sealed class DepartmentService(
         
         logger.LogInformation("Deleting department {DepartmentId} for user {UserId}", departmentId, userId);
 
-        await _validationHelper.ValidateDepartmentOwnerShipAsync(departmentId, userId);
-        
+        await _validationHelper.ValidateDepartmentOwnershipAsync(departmentId, userId);
         await repository.DeleteAsync(departmentId);
-
         await ClearEntityCacheAsync(departmentId);
-        
         await ClearUserRelatedCachesAsync(userId, "Department");
 
         logger.LogInformation("Successfully deleted department {departmentId}",departmentId);
@@ -103,7 +100,7 @@ internal sealed class DepartmentService(
 
         logger.LogInformation("Updating department {DepartmentId} for user {UserId}", departmentModel.Id, userId);
 
-        var existingEntity = await _validationHelper.ValidateDepartmentOwnerShipAsync(departmentModel.Id, userId);
+        var existingEntity = await _validationHelper.ValidateDepartmentOwnershipAsync(departmentModel.Id, userId);
         
         mapper.Map(departmentModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -160,7 +157,7 @@ internal sealed class DepartmentService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searcing departments whith name filter: {Name}", name ?? "(none)");
+        logger.LogDebug("Searching departments with name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 

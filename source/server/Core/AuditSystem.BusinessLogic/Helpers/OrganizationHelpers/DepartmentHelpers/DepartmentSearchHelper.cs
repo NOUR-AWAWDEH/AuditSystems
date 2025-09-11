@@ -12,33 +12,20 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
 
-public class DepartmentSearchHelper : IDepartmentSearch
+public class DepartmentSearchHelper(
+    IRepository<Guid, Department> repository,
+    ICacheService cacheService,
+    ILogger<DepartmentSearchHelper> logger) : IDepartmentSearch
 {
-    private readonly IRepository<Guid, Department> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<DepartmentSearchHelper> _logger;
-
-    public DepartmentSearchHelper(
-        IRepository<Guid, Department> repository,
-        ICacheService cacheService,
-        ILogger<DepartmentSearchHelper> logger)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, Department> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<DepartmentSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subLocationId)
     {
         return d => d.SubLocation.Location.UserId == userId && 
                 (string.IsNullOrEmpty(searchTerm) || d.Name.Contains(searchTerm)) &&
                 d.SubLocationId == subLocationId;
-    }
-
-    // Original method for backward compatibility
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
-    {
-        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
     }
 
     // Method with required Guid subLocationId (not nullable) - matches interface
@@ -56,14 +43,23 @@ public class DepartmentSearchHelper : IDepartmentSearch
         return (cacheKey, countCacheKey);
     }
 
+    // Original method for backward compatibility
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
+    {
+        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
+    }
+
     // Updated method with nullable subLocationId support (for internal use)
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var subLocationIdStr = subLocationId.ToString() ?? "all";
         
-        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr, page.Number, page.Size);
+        var cacheKey = string.Format(
+            CacheKeys.UserSearchCacheKey, 
+            CacheKeys.Department, 
+            userId, normalizedSearchTerm, subLocationIdStr,
+            page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
             CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr);

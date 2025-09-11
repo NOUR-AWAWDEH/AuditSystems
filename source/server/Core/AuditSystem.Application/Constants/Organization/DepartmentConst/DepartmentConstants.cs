@@ -20,7 +20,7 @@ public static class DepartmentConstants
     public const string UnauthorizedSubLocationAccessMessage = "User {0} is not authorized to access sublocation {1}.";
     public const string DepartmentNotFoundMessage = "Department with ID {0} not found.";
     public const string SubLocationNotFoundMessage = "SubLocation with ID {0} not found.";
-    public const string UnauthorizedDepartmentCreationMessage = "User {0} is not authorized to create a department under sublocation {1}.";
+    public const string UnauthorizedDepartmentAccessMessage = "User {0} is not authorized to access department with Id: {1}.";
     public const string UserIdEmptyMessage = "UserId cannot be empty";
     public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";
     public const string RetrievedSearchResultsFromCacheMessage = "Retrieved departments search results from cache";

@@ -1,5 +1,18 @@
+using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
+using AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
+using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
+using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
+using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
+using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
+using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
+using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
+using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
@@ -9,26 +22,32 @@ using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.BusinessLogic.Services.UrlServices;
-using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
-using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
-using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Download;
 using AuditSystem.Contract.Interfaces.FileStorage;
+using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramServices;
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Transaction;
+using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Common;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Processes;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Contract.Models.SupportingDocs;
+using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
@@ -36,20 +55,6 @@ using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
 using Microsoft.Extensions.DependencyInjection;
-using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
-using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
-using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
-using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
-using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
-using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
-using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
-using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
-using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 
 namespace AuditSystem.BusinessLogic;
 
@@ -82,6 +87,13 @@ public static class BusinessLogicDependencies
             // Common
             .AddScoped<IRateService, RateService>()
             .AddScoped<IUnifiedCacheService<Guid, Rate, RateModel>, RateService>()
+
+
+            //Audit 
+            .AddScoped<IAuditProgramService, AuditProgramService>()
+            .AddScoped<IUnifiedCacheService<Guid, AuditProgram, AuditProgramModel>, AuditProgramService>()
+            .AddScoped<IAuditProgramValidation, AuditProgramValidationHelper>()
+            .AddScoped<IAuditProgramSearch, AuditProgramSearchHelper>()
 
             // Organization
             //Company

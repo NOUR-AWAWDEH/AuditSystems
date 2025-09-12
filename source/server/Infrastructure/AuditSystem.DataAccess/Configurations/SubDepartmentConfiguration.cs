@@ -28,7 +28,7 @@ public class SubDepartmentConfiguration : IEntityTypeConfiguration<SubDepartment
             .HasForeignKey(sd => sd.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany<AuditProcess>()
+        builder.HasMany(sd => sd.AuditProcesses)
             .WithOne(ap => ap.SubDepartment)
             .HasForeignKey(ap => ap.SubDepartmentId)
             .OnDelete(DeleteBehavior.Restrict);

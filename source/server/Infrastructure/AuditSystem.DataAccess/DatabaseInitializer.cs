@@ -14,7 +14,7 @@ public class DatabaseInitializer
 
             if (!isProduction)
             {
-                context.Database.Migrate(); // Auto-migrate in non-production
+                context.Database.Migrate();
             }
         }
     }

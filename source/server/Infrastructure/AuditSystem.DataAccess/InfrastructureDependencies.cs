@@ -81,11 +81,12 @@ public static class InfrastructureDependencies
                 ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
 
         return services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString)
-                    .EnableSensitiveDataLogging(false)
-                    .LogTo(Console.WriteLine, LogLevel.Information)
-                    .ConfigureWarnings(warnings => warnings.Ignore(
-                        Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning))
+        options.UseNpgsql(connectionString, 
+            npgsqlOptions => npgsqlOptions.MigrationsAssembly("AuditSystem.DataAccess"))
+                .EnableSensitiveDataLogging(false)
+                .LogTo(Console.WriteLine, LogLevel.Information)
+                .ConfigureWarnings(warnings => warnings.Ignore(
+                    Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning))
         );
     }
 

@@ -154,7 +154,6 @@ const handleSubmit = async () => {
         };
 
         const result = await createExitControl(exitControlData);
-        console.log(result);
         if (result?.success) {
             const newExitControl = {
                 id: result.data.exitControlId,
@@ -162,7 +161,6 @@ const handleSubmit = async () => {
                 createdAt: new Date().toISOString(),
             };
 
-            console.log(newExitControl);
             showNotification(`ExitControl "${newExitControl.description}" has been added successfully!`, 'success');
             emit('exit-control-added', newExitControl);
             emit('close');

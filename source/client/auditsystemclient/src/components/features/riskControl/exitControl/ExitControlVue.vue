@@ -124,10 +124,6 @@ const {
     resetToDefaultView,
 } = useExitControlTable(props.risks);
 
-onMounted(() => {
-    console.log(exitControls.value);
-});
-
 // Watch for prop changes and update internal state
 watch( () => props.selectedRiskId, (newRiskId) => {
         if (newRiskId !== internalSelectedRiskId.value) {

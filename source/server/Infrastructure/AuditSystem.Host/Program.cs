@@ -58,7 +58,7 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 // Auto-migrate database
-app.MigrateDatabase();
+//app.MigrateDatabase();
 
 // Swagger UI
 app.UseSwagger();

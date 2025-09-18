@@ -52,10 +52,10 @@ public class RiskSearchHelper : IRiskSearch
         var objectiveIdStr = objectiveId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
+            CacheKeys.Risk, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr);
+            CacheKeys.Risk, userId, normalizedSearchTerm, objectiveIdStr);
 
         return (cacheKey, countCacheKey);
     }

@@ -43,10 +43,5 @@
     <ProjectReference Include="..\AuditSystem.Auth\AuditSystem.Auth.csproj" />
 </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="appsettings.json" />
-    <None Remove="appsettings.Development.json" />
-  </ItemGroup>
-
 
 </Project>

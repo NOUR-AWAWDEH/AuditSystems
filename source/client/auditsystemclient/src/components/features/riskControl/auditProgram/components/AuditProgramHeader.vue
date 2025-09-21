@@ -3,9 +3,9 @@
         <div class="flex items-center">
             <div>
                 <h2 class="text-2xl font-bold text-secondary-base">
-                    Exit Controls
+                    Audit Programs
                 </h2>
-                <p class="text-sm text-gray-500 mt-1">Manage your exit controls</p>
+                <p class="text-sm text-gray-500 mt-1">Manage your audit programs</p>
             </div>
         </div>
     </div>

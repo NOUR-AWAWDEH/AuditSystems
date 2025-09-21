@@ -1,13 +1,13 @@
 <template>
   <CustomSelect
-    :model-value="selectedExitControlId"
-    :options="exitControls"
-    label="Select Exit Control"
-    placeholder="Choose an exit control"
+    :model-value="selectedAuditProgramId"
+    :options="auditPrograms"
+    label="Select Audit Program"
+    placeholder="Choose an audit program"
     value-key="id"
     label-key="description"
-    :error="exitControlError"
-    @update:modelValue="handleExitControlChange"
+    :error="auditProgramError"
+    @update:modelValue="handleAuditProgramChange"
   />
 </template>
 
@@ -15,24 +15,24 @@
 import CustomSelect from '@/components/common/CustomSelect.vue';
 
 defineProps({
-  exitControls: {
+  auditPrograms: {
     type: Array,
     default: () => []
   },
-  selectedExitControlId: { 
+  selectedAuditProgramId: { 
     type: String,
     default: ''
   },
-  exitControlError: {
+  auditProgramError: {
     type: String,
     default: ''
   }
 });
 
-const emit = defineEmits(['update:selectedExitControl', 'exit-control-changed']);
+const emit = defineEmits(['update:selectedAuditProgram', 'audit-program-changed']);
 
-const handleExitControlChange = (value) => {  
-    emit('update:selectedExitControl', value);
-    emit('exit-control-changed', value);
+const handleAuditProgramChange = (value) => {  
+    emit('update:selectedAuditProgram', value);
+    emit('audit-program-changed', value);
 };
 </script>

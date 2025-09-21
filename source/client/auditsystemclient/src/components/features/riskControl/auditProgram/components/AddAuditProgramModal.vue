@@ -8,7 +8,7 @@
                 <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
                     <!-- Header -->
                     <div class="flex items-center justify-between p-4 border-b border-gray-tint">
-                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Exit Control</h3>
+                        <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Audit Program</h3>
                         <button
                             @click="$emit('close')"
                             class="text-gray-base hover:text-gray-shade focus:outline-none">
@@ -19,39 +19,22 @@
                     <!-- Content -->
                     <div class="p-4">
                         <form @submit.prevent="handleSubmit" class="space-y-4">
-                            <!--  Exit Control description Field -->
+                            <!--  Audit Program description Field -->
                             <div>
-                                <label for="exit-control-description" class="block text-sm font-medium text-gray-700">
-                                    Exit Control Description *
+                                <label for="audit-program-description" class="block text-sm font-medium text-gray-700">
+                                    Audit Program Description *
                                 </label>
                                 <BaseInput
-                                    id="ExitControl-description"
+                                    id="audit-program-description"
                                     v-model="formData.description"
-                                    label="ExitControl Description"
-                                    placeholder="Enter ExitControl Description"
+                                    label="Audit Program Description"
+                                    placeholder="Enter Audit Program Description"
                                     :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
-                                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
-                            </div>
+                                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}
 
-                            <!-- Inadequate -->
-                            <div>
-                                <label for="exit-control-inadequate" class="block text-sm font-medium text-gray-700">
-                                    Exit Control Inadequate *
-                                </label>
-                                <select
-                                    id="exit-control-inadequate"
-                                    v-model="formData.inadequate"
-                                    class="w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2"
-                                    :class="errors.inadequate ? 'border-error focus:ring-error' : 'border-gray-tint focus:ring-primary-base'"
-                                >
-                                    <option disabled value="">-- Select an option --</option>
-                                    <option :value="true">True</option>
-                                    <option :value="false">False</option>
-                                </select>
-                                <p v-if="errors.inadequate" class="text-error text-sm mt-1">{{ errors.inadequate }}</p>
+                                </p>
                             </div>
-
 
                             <!--Error Display -->
                             <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -73,7 +56,7 @@
                                     :disabled="!formData.description.trim() || isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     <span v-if="isCreating">Adding...</span>
-                                    <span v-else>Add ExitControl</span>
+                                    <span v-else>Add Audit Program</span>
                                 </button>
                             </div>
                         </form>
@@ -87,7 +70,7 @@
 import { ref, watch } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import { useCreateExitControl } from '@/composables/riskControl/exitControl/useCreateExitControl.js';
+import { useCreateAuditProgram } from '@/composables/riskControl/auditProgram/useCreateAuditProgram.js';
 import { useNotification } from '@/composables/notification/useNotification';
 
 const props = defineProps({
@@ -95,25 +78,27 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    riskId: {
-        type: [String, Number],
+    exitControlId: {
+        type: String,
+        default: null
+    },
+    controlDesignId: {
+        type: String,
         default: null
     }
 });
 
-const emit = defineEmits(['close', 'exit-control-added']);
+const emit = defineEmits(['close', 'audit-program-added']);
 
 const { showNotification } = useNotification();
-const { isCreating, error, createExitControl, resetState } = useCreateExitControl();
+const { isCreating, error, createAuditProgram, resetState } = useCreateAuditProgram();
 
 const formData = ref({
-    description: '',
-    inadequate: null
+    description: ''
 });
 
 const errors = ref({
-    description: '',
-    inadequate: null
+    description: ''
 });
 
 watch(() => props.isVisible, (newValue) => {
@@ -124,21 +109,18 @@ watch(() => props.isVisible, (newValue) => {
 
 const resetForm = () => {
     formData.value = {
-        description: '',
-        inadequate: null
-
+        description: ''
     };
     errors.value = {
-        description: '',
-        inadequate: null
+        description: ''
     };
 
     resetState();
 };
 
 const handleSubmit = async () => {
-    if (!props.riskId) {
-        showNotification('risk is required', 'error');
+    if (!props.exitControlId) {
+        showNotification('Exit Control Id is required', 'error');
         return;
     }
 
@@ -147,50 +129,47 @@ const handleSubmit = async () => {
     }
 
     try {
-        const exitControlData = {
+        const auditProgramData = {
             description: formData.value.description.trim(),
-            inadequate: formData.value.inadequate,
-            riskId: props.riskId
+            exitControlId: props.exitControlId,
+            controlDesignId: props.controlDesignId ?? null
         };
 
-        const result = await createExitControl(exitControlData);
+        const result = await createAuditProgram(auditProgramData);
         if (result?.success) {
-            const newExitControl = {
-                id: result.data.exitControlId,
-                ...exitControlData,
+            const newAuditProgram = {
+                id: result.data.auditProgramId,
+                ...auditProgramData,
                 createdAt: new Date().toISOString(),
             };
 
-            showNotification(`ExitControl "${newExitControl.description}" has been added successfully!`, 'success');
-            emit('exit-control-added', newExitControl);
+            showNotification(
+                `Audit Program "${newAuditProgram.description}" has been added successfully!`,
+                'success'
+            );
+            emit('audit-program-added', newAuditProgram);
             emit('close');
         } else {
-             showNotification(result?.message || 'Failed to create Exit Control', 'error');
+            showNotification(result?.message || 'Failed to create Audit Program', 'error');
         }
-
     } catch (error) {
-        console.error('Error creating Exit Control:', error);
-        showNotification('Failed to create Exit Control. Please try again.', 'error');
+        console.error('Error creating Audit Program:', error);
+        showNotification('Failed to create Audit Program. Please try again.', 'error');
     }
 };
 
+
 const validateForm = () => {
     errors.value = {
-        description: '',
-        inadequate: null
+        description: ''
     };
 
     let isValid = true;
 
     if (!formData.value.description.trim()) {
-        errors.value.description = 'ExitControl description is required';
+        errors.value.description = 'Audit Program description is required';
         isValid = false;
     }
-
-    if (formData.value.inadequate === '') {
-        errors.value.inadequate = 'Exit Control inadequate is required';
-    }
-
 
     return isValid;
 };

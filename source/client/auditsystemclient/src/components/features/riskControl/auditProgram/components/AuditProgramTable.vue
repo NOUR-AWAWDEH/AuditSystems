@@ -3,15 +3,15 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
 
-                <!-- Risk and Filters - Stack on mobile -->
+                <!-- Exit Control and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
-                        <ExitControlHeader/>
-                        <RiskSelector
-                            :risks="risks"
-                            :selected-risk-id="internalSelectedRiskId"
-                            @update:selected-risk="(id) => internalSelectedRiskId = id"
-                            @risk-changed="(id) => internalSelectedRiskId = id"
+                        <AuditProgramHeader/>
+                        <ExitControlSelector
+                            :exit-controls="exitControls"
+                            :selectedExitControlId="internalSelectedExitControlId"
+                            @update:selectedExitControl="(id) => internalSelectedExitControlId = id"
+                            @exit-control-changed="(id) => internalSelectedExitControlId = id"
                         />
                     </div>
 
@@ -19,7 +19,7 @@
                         <div class="flex-1 sm:flex-initial">
                             <SearchFilter
                                 :search="searchQuery"
-                                :search-placeholder="'Search exit controls...'"
+                                :search-placeholder="'Search Audit Programs...'"
                                 @update:search="handleSearch"
                                 class="w-full sm:w-auto"
                             />
@@ -27,59 +27,53 @@
                     </div>
                 </div>
 
-                <!-- Keep only this Selected risk Info section -->
-                <div v-if="selectedRiskId"
+                <!-- Keep only this Selected exit control Info section -->
+                <div v-if="selectedExitControlId"
                      class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                      <div class="flex items-center justify-between">
                          <div class="flex items-center">
-                             <RiskIcon size="xxl" custom-class="text-blue-600 mr-2" />
+                             <ExitControlIcon size="xxl" custom-class="text-blue-600 mr-2" />
 
                              <p class="text-sm text-gray-700">
-                                 Showing Exit Controls for: &nbsp;&nbsp;
+                                 Showing Audit Programs for: &nbsp;&nbsp;
                                  <span class="font-semibold text-blue-800">
-                                     <span v-if="isRiskLoading">Loading risk...</span>
-                                     <span v-else>{{ currentRisk?.description || 'Loading...' }}</span>
+                                     <span v-if="isExitControlLoading">Loading exit control...</span>
+                                     <span v-else>{{ currentExitControl?.description || 'Loading...' }}</span>
                                  </span>
                                  <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                              </p>
                          </div>
-                         <button @click="$emit('add-exit-control')"
+                         <button @click="$emit('add-audit-program')"
                              class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white">
                              <PlusIcon :stroke-width="3" />
-                             Add Exit Control
+                             Add Audit Program
                          </button>
                      </div>
                  </div>
 
-                <!-- Table Container - Show when risk is Selected -->
-                <div v-if="selectedRiskId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <!-- Table Container - Show when exit control is Selected -->
+                <div v-if="selectedExitControlId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
-                        :items="exitControls"
+                        :items="auditPrograms"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
                         :actions="[]"
                         :no-data-message="noDataMessage"
-                        class="exit-control-table"
+                        class="audit-program-table"
                         >
-                        <template #cell-inadequate="{ item }">
-                            <span :class="inadequateColorMap[item.inadequate]" class="px-2 py-1 rounded-full text-xs font-semibold">
-                                {{ item.inadequate }}
-                            </span>
-                        </template>
-
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                <button @click.stop="handleSelectExitControl(item)"
+                                <button @click.stop="handleSelectAuditProgram(item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium
                                          text-green-700 bg-green-100 rounded-md hover:bg-green-200
                                          focus:outline-none focus:ring-2 focus:ring-green-500
                                          focus:ring-offset-1 transition-all duration-200"
-                                    :class="{ 'bg-green-200': selectedExitControlId === item.id }">
-                                    <CheckIcon v-if="selectedExitControlId === item.id" size="sm" custom-class="mr-1" />
+                                    :class="{ 'bg-green-200': selectedAuditProgramId === item.id }">
+                                    <CheckIcon v-if="selectedAuditProgramId === item.id" size="sm" custom-class="mr-1" />
                                     <SelectIcon v-else size="sm" custom-class="mr-1" />
-                                    {{ selectedExitControlId === item.id ? 'Selected' : 'Select' }}
+                                    {{ selectedAuditProgramId === item.id ? 'Selected' : 'Select' }}
                                 </button>
-                                <button @click.stop="$emit('edit-exit-control', item)"
+                                <button @click.stop="$emit('edit-audit-program', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium
                                      text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200
                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
@@ -87,7 +81,7 @@
                                     <EditIcon size="sm" custom-class="mr-1" />
                                     Edit
                                 </button>
-                                <button @click.stop="$emit('delete-exit-control', item)"
+                                <button @click.stop="$emit('delete-audit-program', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium
                                      text-red-700 bg-red-100 rounded-md hover:bg-red-200
                                      focus:outline-none focus:ring-2 focus:ring-red-500
@@ -100,7 +94,7 @@
                     </ReusableTable>
 
                     <!-- Clear Search Button (shown when no results and searching) -->
-                    <div v-if="searchQuery && exitControls.length === 0 && !isLoading"
+                    <div v-if="searchQuery && auditPrograms.length === 0 && !isLoading"
                         class="text-center py-4 border-t border-gray-200">
                         <button @click="handleSearch('')"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium
@@ -113,33 +107,34 @@
                     </div>
                 </div>
 
-                <!-- No Risk  Selected - Show when no risk is selected -->
+                <!-- No exit control  Selected - Show when no exit control is selected -->
 
                 <div v-else class="text-center py-20">
-                    <!-- When risks are available but none selected -->
-                    <div v-if="risks && risks.length > 0" class="max-w-md mx-auto">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100
+                    <!-- When exit Control are available but none selected -->
+                    <div v-if="exitControls && exitControls.length > 0" class="max-w-md mx-auto">
+                        <div class="
+                            bg-gradient-to-br from-blue-50 to-indigo-100
                             rounded-full w-32 h-32 mx-auto mb-8 flex items-center
                             justify-center shadow-lg">
-                            <RiskIcon size="xxxl" custom-class="text-blue-600" />
+                                <ExitControlIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Risk</h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">Choose a risk from the dropdown above to view and manage exit controls</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Exit Control</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Choose a exit control from the dropdown above to view and manage exit controls</p>
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <p class="text-sm text-blue-700">
-                                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a risk and start managing exit controls
+                                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a exit control and start managing exit controls
                             </p>
                         </div>
                     </div>
 
-                    <!-- When no risks are available -->
+                    <!-- When no exit controls are available -->
                     <div v-else class="max-w-lg mx-auto">
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32
                              mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
-                            <RiskIcon size="xxxl" custom-class="text-gray-400" />
+                            <ExitControlIcon size="xxxl" custom-class="text-gray-400" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Risks Available</h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">You need to create risks first before you can manage exit controls</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Exit Controls Available</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">You need to create exit controls first before you can manage exit controls</p>
                     </div>
                 </div>
             </div>
@@ -151,22 +146,21 @@
 import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
-import RiskSelector from '@/components/features/riskControl/risk/components/RiskSelector.vue';
-import RiskIcon from '@/components/common/icons/RiskIcon.vue';
+import ExitControlIcon from '@/components/common/icons/ExitControlIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
-import ExitControlHeader from './AuditProgramHeader.vue';
+import ExitControlSelector from '../../exitControl/components/ExitControlSelector.vue';
 
 const props = defineProps({
-    risks: {
+    exitControls: {
         type: Array,
         default: () => []
     },
-    exitControls: {
+    auditPrograms: {
         type: Array,
         default: () => []
     },
@@ -174,19 +168,19 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    selectedRiskId: {
+    selectedExitControlId: {
         type: [String, Number],
         default: null
     },
-    selectedRisk: {
+    selectedExitControl: {
         type: Object,
         default: () => null
     },
-    currentRisk: {
+    currentExitControl: {
         type: Object,
         default: () => null
     },
-    isRiskLoading: {
+    isExitControlLoading: {
         type: Boolean,
         default: false
     },
@@ -194,7 +188,7 @@ const props = defineProps({
         type: String,
         default: ''
     },
-    handleRiskChange: {
+    handleExitControlChange: {
         type: Function,
         default: () => {}
     },
@@ -204,74 +198,64 @@ const props = defineProps({
     }
 });
 
-const internalSelectedRiskId = ref(props.selectedRiskId);
+const internalSelectedExitControlId = ref(props.selectedExitControlId);
 
-watch(() => props.selectedRiskId, (newVal) => {
-    internalSelectedRiskId.value = newVal;
+watch(() => props.selectedExitControlId, (newVal) => {
+    internalSelectedExitControlId.value = newVal;
 });
 
-watch(internalSelectedRiskId, (newVal) => {
-    props.handleRiskChange(newVal);
+watch(internalSelectedExitControlId, (newVal) => {
+    props.handleExitControlChange(newVal);
 });
 
 const emit = defineEmits([
-    'add-exit-control',
-    'edit-exit-control',
-    'delete-exit-control',
-    'exit-control-selected'
+    'add-audit-program',
+    'edit-audit-program',
+    'delete-audit-program',
+    'audit-program-selected'
 ]);
 
-// Exit control selection state
-const selectedExitControlId = ref(null);
+// Audit program selection state
+const selectedAuditProgramId = ref(null);
 
-// Handle exit control selection from table row or button
-const handleSelectExitControl = (exitControl) => {
-    selectedExitControlId.value = exitControl.id;
-    emit('exit-control-selected', exitControl.id);
+// Handle audit program selection from table row or button
+const handleSelectAuditProgram = (auditProgram) => {
+    selectedAuditProgramId.value = auditProgram.id;
+    emit('audit-program-selected', auditProgram.id);
 };
 
 
-const exitControlColumns = [
+const auditProgramColumns = [
     { key: 'description', label: 'Description' },
-    { key: 'inadequate', label: 'Inadequate' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
 const enhancedColumns = computed(() => {
-    return [...exitControlColumns, { key: 'actions', label: 'Actions' }];
+    return [...auditProgramColumns, { key: 'actions', label: 'Actions' }];
 });
 
 const noDataMessage = computed(() => {
     if (props.searchQuery) {
-        return `No Exit Controls found for "${props.searchQuery}".`;
+        return `No Audit Programs found for "${props.searchQuery}".`;
     }
-    return 'No Exit Controls found for this Risk Control Matrix.';
+    return 'No Audit Programs found for this Risk Control Matrix.';
 });
-
-const inadequateColorMap = {
-    'false': 'bg-red-100 text-red-800',
-    'true': 'bg-green-100 text-green-800',
-    'Unknown': 'bg-gray-100 text-gray-800'
-};
-
-
-
 
 </script>
 
 <style scoped>
-.exit-control-table .table-row {
+.audit-program-table .table-row {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.exit-control-table .table-row:hover {
+.audit-program-table .table-row:hover {
     background-color: #f8fafc;
     transform: translateY(-1px);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.exit-control-table .table-row.selected {
+.audit-program-table .table-row.selected {
     background-color: #e6f7ff;
     border-left: 4px solid #3b82f6;
 }

@@ -35,21 +35,15 @@ export function useExitControlManagement(exitControls) {
     }, { immediate: true });
 
     const exitControlsRef = computed(() => {
-        if (exitControls && typeof exitControls === 'object' && 'value' in exitControls) {
-            return exitControls.value || [];
-        }
-        return exitControls || [];
+        return exitControls && 'value' in exitControls ? exitControls.value || [] : exitControls || [];
     });
 
     const selectedExitControl = computed(() => {
         const exitControlId = selectedExitControlId.value;
         const exitControlsList = exitControlsRef.value;
 
-        if (!exitControlId || !exitControlsList || exitControlsList.length === 0) {
-            return null;
-        }
-        const exitControl = exitControlsList.find(exitControl => exitControl.id === exitControlId);
-        return exitControl || null;
+        if (!exitControlId || exitControlsList.length) return null;
+        return exitControlsList.find(exitControl => exitControl.id === exitControlId) || null;
     });
 
     const currentExitControl = computed(() => {

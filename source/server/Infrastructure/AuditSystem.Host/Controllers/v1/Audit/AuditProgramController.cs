@@ -30,7 +30,7 @@ public sealed class AuditProgramController(IMediator mediator) : ApiControllerBa
         await ProcessRequestToActionResultAsync(command);
 
     //Update Audit Program
-    [HttpPut("update-audit-program")]
+    [HttpPut("update-audit-program-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -62,7 +62,7 @@ public sealed class AuditProgramController(IMediator mediator) : ApiControllerBa
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search Audit Program
-    [HttpGet("search-audit-program-by-user-id")]
+    [HttpGet("search-audit-programs-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<AuditProgramModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchAuditProgram([FromQuery] SearchAuditProgramQuery query) =>

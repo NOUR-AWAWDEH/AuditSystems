@@ -155,8 +155,8 @@ const {
 
 
 // Handle ExitControl selection and forward to parent
-const handleExitControlSelected = (exitControlId) => {
-    emit('exit-control-selected', exitControlId);
+const handleExitControlSelected = (exitControl) => {
+    emit('exit-control-selected', exitControl);
 };
 
 

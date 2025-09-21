@@ -62,7 +62,7 @@
         <EditAuditProgramModal
             v-if="showEditAuditProgramModal"
             :is-visible="showEditAuditProgramModal"
-            :audit-program="AuditProgramToEdit"
+            :audit-program="auditProgramToEdit"
             @close="handleCloseEditAuditProgramModal"
             @audit-program-updated="handleAuditProgramUpdated"
         />
@@ -87,9 +87,9 @@ import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProgramTable from './components/AuditProgramTable.vue';
 import AddAuditProgramModal from './components/AddAuditProgramModal.vue';
 import EditAuditProgramModal from './components/EditAuditProgramModal.vue';
-import { useAuditProgramTable } from '../composables/useAuditProgramTable';
-import { useAuditProgramModals } from '../composables/useAuditProgramModals';
-import ExitControlIcon from '@/components/common/icons/ExitControlIcon.vue';
+import { useAuditProgramTable } from './composables/useAuditProgramTable';
+import { useAuditProgramModals } from './composables/useAuditProgramModals';
+import ExitControlIcon from '@/components/common/icons/RiskIcon.vue';
 
 const props = defineProps({
     exitControls: {
@@ -137,7 +137,7 @@ watch( () => props.selectedExitControlId, (newExitControlId) => {
 const {
     showAddAuditProgramModal,
     showEditAuditProgramModal,
-    AuditProgramToEdit,
+    auditProgramToEdit,
     showDeleteDialog,
     deleteDialogTitle,
     deleteDialogMessage,

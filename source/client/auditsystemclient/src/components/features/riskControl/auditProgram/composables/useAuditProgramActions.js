@@ -44,6 +44,7 @@ export function useAuditProgramActions({
 
     const handleAuditProgramChange = async (newExitControlId) => {
         try {
+            
             if (clearSearch) {
                 clearSearch();
             }
@@ -53,6 +54,7 @@ export function useAuditProgramActions({
             }
 
             selectedExitControlId.value = newExitControlId;
+                   
         } catch (error) {
             console.error('Error handling Audit Program change:', error);
         }

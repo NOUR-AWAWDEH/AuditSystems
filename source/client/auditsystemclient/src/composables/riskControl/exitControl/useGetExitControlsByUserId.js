@@ -44,7 +44,7 @@ export function useGetExitControlsByUserId() {
             }
 
         } catch (error) {
-            return handleFetchFailure(error, error.message || 'Failed to fetch objectives');
+            return handleFetchFailure(error, error.message || 'Failed to fetch exit controls');
 
         } finally {
             isLoading.value = false;

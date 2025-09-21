@@ -9,8 +9,8 @@
                         <AuditProgramHeader/>
                         <ExitControlSelector
                             :exit-controls="exitControls"
-                            :selectedExitControlId="internalSelectedExitControlId"
-                            @update:selectedExitControl="(id) => internalSelectedExitControlId = id"
+                            :selected-exit-control-id="internalSelectedExitControlId"
+                            @update:selected-exit-control="(id) => internalSelectedExitControlId = id"
                             @exit-control-changed="(id) => internalSelectedExitControlId = id"
                         />
                     </div>
@@ -145,8 +145,9 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
+import AuditProgramHeader from './AuditProgramHeader.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
-import ExitControlIcon from '@/components/common/icons/ExitControlIcon.vue';
+import ExitControlIcon from '@/components/common/icons/RiskIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';

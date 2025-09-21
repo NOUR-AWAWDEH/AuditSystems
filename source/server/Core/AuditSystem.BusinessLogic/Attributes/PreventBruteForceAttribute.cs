@@ -34,7 +34,7 @@ public sealed class PreventBruteForceAttribute : Attribute, IAsyncActionFilter
         {
             var cacheKey = $"BruteForceProtection_{ip}";
 
-            if (!cache.TryGetValue(cacheKey, out BruteForceProtectionEntry entry))
+            if (!cache.TryGetValue(cacheKey, out BruteForceProtectionEntry? entry))
             {
                 entry = new BruteForceProtectionEntry();
                 cache.Set(cacheKey, entry, CacheOptionsFactory.CreateBruteForceProtectionOptions());

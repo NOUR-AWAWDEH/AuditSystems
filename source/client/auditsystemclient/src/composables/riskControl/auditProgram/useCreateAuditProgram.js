@@ -38,7 +38,7 @@ export function useCreateAuditProgram() {
             createdAuditProgram.value = null;
 
             const response = await createAuditProgramRepository.createAuditProgram(auditProgramData);
-
+            
             if (response?.success) {
                 return handleCreateSuccess(response);
             } else {

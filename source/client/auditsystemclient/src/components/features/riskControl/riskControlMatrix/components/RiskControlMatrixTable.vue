@@ -9,7 +9,7 @@
                       <RiskControlMatrixHeader/>
                       <SubProcessSelector
                             :sub-processes="subProcesses"
-                            :selected-sub-processId="internalSelectedSubProcessId"
+                            :selected-sub-process-id="internalSelectedSubProcessId"
                             @update:selected-sub-process="(id) => internalSelectedSubProcessId = id"
                             @sub-process-changed="(id) => internalSelectedSubProcessId = id"
                         />

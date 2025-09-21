@@ -71,7 +71,8 @@ const props = defineProps({
   },
   auditProgram: {
     type: Object,
-    default: () => ({})
+    // Remove the default value to ensure it's either passed or undefined
+    // default: () => ({})
   }
 });
 
@@ -124,6 +125,7 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
+
   // Check if user is authenticated
   if (!authStatus.value) {
     console.error('Authentication status not loaded');

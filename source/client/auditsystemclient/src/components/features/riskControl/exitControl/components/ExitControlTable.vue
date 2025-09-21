@@ -227,7 +227,7 @@ const selectedExitControlId = ref(null);
 // Handle exit control selection from table row or button
 const handleSelectExitControl = (exitControl) => {
     selectedExitControlId.value = exitControl.id;
-    emit('exit-control-selected', exitControl.id);
+    emit('exit-control-selected', exitControl); 
 };
 
 

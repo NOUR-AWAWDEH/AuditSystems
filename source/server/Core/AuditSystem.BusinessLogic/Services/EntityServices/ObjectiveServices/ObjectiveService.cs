@@ -12,7 +12,7 @@ using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.ObjectiveServices;
 
 internal class ObjectiveService(
     IRepository<Guid, Objective> repository,

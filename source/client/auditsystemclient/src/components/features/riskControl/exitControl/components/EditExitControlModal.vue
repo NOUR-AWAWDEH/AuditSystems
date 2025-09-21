@@ -170,9 +170,7 @@ const handleSubmit = async () => {
         id: props.exitControl?.id,
         riskId: props.exitControl?.riskId,
         description: formData.value.description.trim(),
-        inadequate: formData.value.inadequate,
-        createdAt: props.exitControl?.createdAt,
-        updatedAt: new Date().toISOString()
+        inadequate: formData.value.inadequate
       };
 
 

@@ -12,7 +12,7 @@ export function useGetExitControlById() {
         exitControl.value = response.result;
         const message = response?.successMessage || 'Exit Control fetched successfully!';
         showNotification(message, 'success');
-        return { success: true, data: response.result };
+        return { success: true, data: exitControl.value };
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch exit control!') => {
@@ -50,7 +50,7 @@ export function useGetExitControlById() {
             }
 
             const response = await getExitControlByIdRepository.getExitControlById(exitControlId);
-
+            
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {

@@ -27,8 +27,6 @@ public sealed class UpdateExitControlValidator : AbstractValidator<UpdateExitCon
             .WithMessage("Description must not exceed 500 characters.");
         
         RuleFor(x => x.Inadequate)
-            .NotEmpty()
-            .WithMessage("Inadequate is required.")
             .NotNull()
             .WithMessage("Inadequate is required.");
     }

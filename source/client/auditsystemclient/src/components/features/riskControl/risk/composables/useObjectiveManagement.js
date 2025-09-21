@@ -58,6 +58,7 @@ export function useObjectiveManagement(objectives) {
   const selectedObjective = computed(() => {
     const objectiveId = selectedObjectiveId.value;
     const objectivesList = objectivesRef.value;
+    
     if (!objectiveId || !objectivesList.length) return null;
     return objectivesList.find(obj => obj.id === objectiveId) || null;
   });

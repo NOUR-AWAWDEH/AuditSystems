@@ -132,7 +132,7 @@ internal sealed class SupportingDocService(
         
         await ClearEntityCacheAsync(supportingDocId);
         
-        await ClearUserRelatedCachesAsync(userId, "SupportingDoc");
+        await ClearUserRelatedCachesAsync(userId, SupportingDocsConstants.EntityName);
         
         logger.LogInformation("Successfully deleted supporting document {SupportingDocId}", supportingDocId);
     }

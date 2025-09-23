@@ -84,14 +84,15 @@ internal sealed class AuditProcessService(
         logger.LogDebug("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
 
         await _validationHelper.ValidateAuditProcessOwnerShipAsync(processId, userId);
-        
+    
+        var auditProcess = await repository.GetByIdAsync(processId);
+        Guid? subDepartmentId = auditProcess?.SubDepartmentId;
+
         await repository.DeleteAsync(processId);
-
         await ClearEntityCacheAsync(processId);
-        
-        await ClearUserRelatedCachesAsync(userId, AuditProcessConstants.EntityName);
+        await ClearUserRelatedCachesAsync(userId, AuditProcessConstants.EntityName, subDepartmentId);
 
-        logger.LogInformation("Successfully deleted audit process {ProcessId}", processId);
+        logger.LogInformation("Successfully deleted audit process {ProcessId} for user {UserId}", processId, userId);
     }
     
     public async Task UpdateAuditProcessAsync(AuditProcessModel processModel, Guid userId)

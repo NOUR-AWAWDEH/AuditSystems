@@ -239,7 +239,7 @@ const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No Audit Programs found for "${props.searchQuery}".`;
     }
-    return 'No Audit Programs found for this Risk Control Matrix.';
+    return 'No Audit Programs found for this Exit Control.';
 });
 
 </script>

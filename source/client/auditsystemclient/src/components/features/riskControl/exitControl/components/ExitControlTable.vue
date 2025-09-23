@@ -245,7 +245,7 @@ const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No Exit Controls found for "${props.searchQuery}".`;
     }
-    return 'No Exit Controls found for this Risk Control Matrix.';
+    return 'No Exit Controls found for this Risk.';
 });
 
 const inadequateColorMap = {

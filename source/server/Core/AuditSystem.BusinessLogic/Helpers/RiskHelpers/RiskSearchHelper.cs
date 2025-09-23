@@ -13,21 +13,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 
-public class RiskSearchHelper : IRiskSearch
+public class RiskSearchHelper(
+    IRepository<Guid, Risk> repository,
+    ICacheService cacheService,
+    ILogger<RiskSearchHelper> logger) : IRiskSearch
 {
-    private readonly IRepository<Guid, Risk> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<RiskSearchHelper> _logger;
-
-    public RiskSearchHelper(
-        IRepository<Guid, Risk> repository,
-        ICacheService cacheService,
-        ILogger<RiskSearchHelper> logger)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, Risk> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<RiskSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Risk, bool>> BuildUserSearchPredicate(
         Guid userId, string? searchTerm, Guid objectiveId)
@@ -49,13 +42,25 @@ public class RiskSearchHelper : IRiskSearch
         Guid userId, string? searchTerm, Guid objectiveId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var objectiveIdStr = objectiveId.ToString();
-        
-        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Risk, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
+        var objectiveIdStr = objectiveId == Guid.Empty ? "all" : objectiveId.ToString();
 
-        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Risk, userId, normalizedSearchTerm, objectiveIdStr);
+        var cacheKey = string.Format(
+            CacheKeys.UserSearchCacheKey,
+            CacheKeys.Risk,
+            userId,
+            normalizedSearchTerm,
+            objectiveIdStr,
+            page.Number,
+            page.Size
+        );
+
+        var countCacheKey = string.Format(
+            CacheKeys.UserSearchCountCacheKey, 
+            CacheKeys.Risk,
+            userId,
+            normalizedSearchTerm,
+            objectiveIdStr
+        );
 
         return (cacheKey, countCacheKey);
     }
@@ -67,11 +72,23 @@ public class RiskSearchHelper : IRiskSearch
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var objectiveIdStr = objectiveId?.ToString() ?? "all";
         
-        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
+        var cacheKey = string.Format(
+            CacheKeys.UserSearchCacheKey, 
+            CacheKeys.Objective,
+            userId,
+            normalizedSearchTerm,
+            objectiveIdStr,
+            page.Number,
+            page.Size
+        );
 
-        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Objective, userId, normalizedSearchTerm, objectiveIdStr);
+        var countCacheKey = string.Format(
+            CacheKeys.UserSearchCountCacheKey, 
+            CacheKeys.Objective,
+            userId,
+            normalizedSearchTerm,
+            objectiveIdStr
+        );
 
         return (cacheKey, countCacheKey);
     }
@@ -88,7 +105,7 @@ public class RiskSearchHelper : IRiskSearch
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderBy(r => r.RiskName)
+            .OrderBy( r => r.Description)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
             .Select(r => new RiskModel
@@ -111,10 +128,19 @@ public class RiskSearchHelper : IRiskSearch
             PageSize = page.Size
         };
 
-        _ = CacheSearchResultsAsync(cacheKey, items)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
-        _ = CacheSearchCountAsync(countCacheKey, totalCount)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+         // Proper async error handling
+        try
+        {
+            await Task.WhenAll(
+                CacheSearchResultsAsync(cacheKey, items),
+                CacheSearchCountAsync(countCacheKey, totalCount)
+            );
+            _logger.LogDebug("Successfully cached risk search results");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to cache risk search results");
+        }
         
         return result;
     }

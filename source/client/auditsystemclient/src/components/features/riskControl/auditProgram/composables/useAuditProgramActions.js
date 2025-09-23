@@ -54,6 +54,7 @@ export function useAuditProgramActions({
             }
 
             selectedExitControlId.value = newExitControlId;
+            await refreshData(); // This line is crucial for refreshing the data
                    
         } catch (error) {
             console.error('Error handling Audit Program change:', error);

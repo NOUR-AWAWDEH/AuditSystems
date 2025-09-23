@@ -51,10 +51,10 @@ public class SubProcessSearchHelper : ISubProcessSearch
         var auditProcessIdStr = auditProcessId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProcessIdStr, page.Number, page.Size);
+            CacheKeys.SubProcess, userId, normalizedSearchTerm, auditProcessIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProcessIdStr);
+            CacheKeys.SubProcess, userId, normalizedSearchTerm, auditProcessIdStr);
 
         return (cacheKey, countCacheKey);
     }

@@ -71,7 +71,7 @@ internal class CacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+    public async Task RemoveByPatternAsync(string key, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(key, nameof(key));
 

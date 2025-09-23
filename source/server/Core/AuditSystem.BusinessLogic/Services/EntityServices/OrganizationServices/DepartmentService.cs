@@ -86,11 +86,16 @@ internal sealed class DepartmentService(
         logger.LogInformation("Deleting department {DepartmentId} for user {UserId}", departmentId, userId);
 
         await _validationHelper.ValidateDepartmentOwnershipAsync(departmentId, userId);
+        
+        var department = await repository.GetByIdAsync(departmentId);
+        Guid? subLocationId = department?.SubLocationId;
+        
         await repository.DeleteAsync(departmentId);
         await ClearEntityCacheAsync(departmentId);
-        await ClearUserRelatedCachesAsync(userId, "Department");
+        
+        await ClearUserRelatedCachesAsync(userId, DepartmentConstants.EntityName, subLocationId);
 
-        logger.LogInformation("Successfully deleted department {departmentId}",departmentId);
+        logger.LogInformation("Successfully deleted department {DepartmentId} for user {UserId}", departmentId, userId);
     }
     
     public async Task UpdateDepartmentAsync(DepartmentModel departmentModel, Guid userId)

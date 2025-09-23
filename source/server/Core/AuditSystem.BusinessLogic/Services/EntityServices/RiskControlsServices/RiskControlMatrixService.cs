@@ -83,9 +83,14 @@ internal sealed class RiskControlMatrixService(
         logger.LogDebug("Deleting risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
         
         await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(riskControlMatrixId, userId);
+        
+        // Get the risk control matrix first to retrieve the SubProcessId before deletion
+        var riskControlMatrix = await repository.GetByIdAsync(riskControlMatrixId);
+        Guid? subProcessId = riskControlMatrix?.SubProcessId;
+
         await repository.DeleteAsync(riskControlMatrixId);
         await ClearEntityCacheAsync(riskControlMatrixId);
-        await ClearUserRelatedCachesAsync(userId, RiskControlMatrixConstants.EntityName);
+        await ClearUserRelatedCachesAsync(userId, RiskControlMatrixConstants.EntityName, subProcessId);
 
         logger.LogInformation("Successfully deleted risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
     }

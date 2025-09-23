@@ -9,6 +9,7 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Application.Constants;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.Application.Constants.Audit.AuditProgramConst;
+
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
 public class AuditProgramSearchHelper(
@@ -27,44 +28,62 @@ public class AuditProgramSearchHelper(
                     ap.ExitControlId == exitControlId;
     }
 
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid exitControlId, Page page)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid exitControlId, Page page)
     {
         string normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var exitControlIdStr = exitControlId.ToString();
+        var exitControlIdStr = exitControlId == Guid.Empty ? "all" : exitControlId.ToString();
 
         string cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey,
-            CacheKeys.AuditProgram,
-            userId, normalizedSearchTerm, exitControlIdStr,
-            page.Number, page.Size);
+            CacheKeys.AuditProgram,  
+            userId,                  
+            normalizedSearchTerm,    
+            exitControlIdStr,        
+            page.Number,             
+            page.Size                
+        );
 
         string countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
-            CacheKeys.AuditProgram,
-            userId, normalizedSearchTerm, exitControlIdStr);
+            CacheKeys.AuditProgram,  
+            userId,                  
+            normalizedSearchTerm,    
+            exitControlIdStr         
+        );
 
         return (cacheKey, countCacheKey);
     }
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
+
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Page page)
     {
         return GetUserSearchCacheKeys(userId, searchTerm, Guid.Empty, page);
     }
 
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? exitControlId, Page page)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
+        Guid userId, string? searchTerm, Guid? exitControlId, Page page)
     {
         string normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var exitControlIdStr = exitControlId.ToString();
+        var exitControlIdStr = exitControlId?.ToString() ?? "all";
 
         string cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey,
             CacheKeys.AuditProgram,
-            userId, normalizedSearchTerm, exitControlIdStr,
-            page.Number, page.Size);
+            userId,
+            normalizedSearchTerm,
+            exitControlIdStr,
+            page.Number,
+            page.Size
+        );
 
         string countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
             CacheKeys.AuditProgram,
-            userId, normalizedSearchTerm, exitControlIdStr);
+            userId,
+            normalizedSearchTerm,
+            exitControlIdStr
+        );
 
         return (cacheKey, countCacheKey);
     }
@@ -88,7 +107,9 @@ public class AuditProgramSearchHelper(
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
-                ControlDesignId = ap.ControlDesignId
+                ControlDesignId = ap.ControlDesignId,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt
             })
             .ToArrayAsync();
 
@@ -100,10 +121,19 @@ public class AuditProgramSearchHelper(
             PageSize = page.Size
         };
 
-        _ = CacheSearchResultsAsync(cacheKey, items)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
-        _ = CacheSearchCountAsync(countCacheKey, totalCount)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+        // Proper async error handling
+        try
+        {
+            await Task.WhenAll(
+                CacheSearchResultsAsync(cacheKey, items),
+                CacheSearchCountAsync(countCacheKey, totalCount)
+            );
+            _logger.LogDebug("Successfully cached audit program search results");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to cache audit program search results");
+        }
 
         return result;
     }

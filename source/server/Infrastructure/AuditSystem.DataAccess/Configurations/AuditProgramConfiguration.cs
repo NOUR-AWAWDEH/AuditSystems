@@ -17,24 +17,27 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
             .IsRequired(true)
             .HasMaxLength(500);
 
+        // Change this from WithOne to WithMany
         builder.HasOne(ap => ap.ExitControl)
-            .WithOne(ap => ap.AuditProgram)
-            .HasForeignKey<AuditProgram>(ap => ap.ExitControlId)
+            .WithMany(ec => ec.AuditPrograms) 
+            .HasForeignKey(ap => ap.ExitControlId)
             .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(ap => ap.ControlDesign)
-            .WithOne(cd => cd.AuditProgram)
-            .HasForeignKey<AuditProgram>(ap => ap.ControlDesignId)
+            .WithMany(cd => cd.AuditPrograms)
+            .HasForeignKey(ap => ap.ControlDesignId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(ap => ap.Observations)
             .WithOne(o => o.AuditProgram)
             .HasForeignKey(o => o.AuditProgramId)
+            .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
         
         builder.HasIndex(ap => ap.ExitControlId);
         builder.HasIndex(ap => ap.ControlDesignId);
+        builder.HasIndex(ap => ap.Description);
     }
 }

@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import {watch} from 'vue';
+import {onMounted, watch} from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProgramTable from './components/AuditProgramTable.vue';
 import AddAuditProgramModal from './components/AddAuditProgramModal.vue';

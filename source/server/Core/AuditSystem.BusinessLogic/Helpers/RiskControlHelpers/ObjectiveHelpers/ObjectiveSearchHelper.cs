@@ -52,10 +52,10 @@ public class ObjectiveSearchHelper : IObjectiveSearch
         var riskControlMatrixIdStr = riskControlMatrixId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, riskControlMatrixIdStr, page.Number, page.Size);
+            CacheKeys.Objective, userId, normalizedSearchTerm, riskControlMatrixIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, riskControlMatrixIdStr);
+            CacheKeys.Objective, userId, normalizedSearchTerm, riskControlMatrixIdStr);
 
         return (cacheKey, countCacheKey);
     }

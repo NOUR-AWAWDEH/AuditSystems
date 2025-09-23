@@ -87,15 +87,15 @@ internal sealed class LocationService(
 
         await _validationHelper.ValidateLocationOwnershipAsync(locationId, userId);
         
+        // Get the location first to retrieve the CompanyId before deletion
+        var location = await repository.GetByIdAsync(locationId);
+        Guid? companyId = location?.CompanyId;
+        
         await repository.DeleteAsync(locationId);
-        
-        // Clear individual entity cache using generic method
         await ClearEntityCacheAsync(locationId);
+        await ClearUserRelatedCachesAsync(userId, LocationConstants.EntityName, companyId);
         
-        // Add this line to clear user-related caches
-        await ClearUserRelatedCachesAsync(userId, "Location");
-        
-        logger.LogInformation("Successfully deleted location {LocationId}", locationId);
+        logger.LogInformation("Successfully deleted location {LocationId} for user {UserId}", locationId, userId);
     }
 
     public async Task UpdateLocationAsync(LocationModel locationModel, Guid userId)

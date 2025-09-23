@@ -12,5 +12,5 @@ public class ExitControl : Entity<Guid>
 
     // Navigation properties
     public virtual Risk Risk { get; set; } = null!;
-    public virtual AuditProgram AuditProgram { get; set; } = null!; // Reference navigation to dependent
+    public ICollection<AuditProgram> AuditPrograms { get; set; } = new List<AuditProgram>();
 }

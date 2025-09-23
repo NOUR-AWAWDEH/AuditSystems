@@ -132,7 +132,7 @@ const handleSubmit = async () => {
         const auditProgramData = {
             description: formData.value.description.trim(),
             exitControlId: props.exitControlId,
-            controlDesignId: props.controlDesignId ?? null
+            controlDesignId: props.controlDesignId
         };
 
         const result = await createAuditProgram(auditProgramData);

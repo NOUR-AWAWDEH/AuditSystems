@@ -91,6 +91,11 @@
             @exit-control-selected="handleExitControlSelected"
           />
         </div>
+        
+        <div v-if="activeTab === 'controldesigns'" class="p-3 sm:p-4 md:p-6">
+         <h2>Control Designs Comming Soon</h2>
+        </div>
+
         <!-- Audit Programs -->
         <div v-if="activeTab === 'auditprograms'" class="p-3 sm:p-4 md:p-6">
           <AuditProgramVue
@@ -98,10 +103,6 @@
             :selected-exit-control-id="selectedExitControlId"
             @audit-program-selected="handleAuditProgramSelected"
           />
-        </div>
-
-        <div v-if="activeTab === 'controldesigns'" class="p-3 sm:p-4 md:p-6">
-         <h2>Control Designs Comming Soon</h2>
         </div>
 
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
@@ -204,7 +205,7 @@ const setActiveTab = async (tabId) => {
         await getRisksByUserId();
         break;
       case 'auditprograms':
-        await getExitControlsByUserId();
+        await getExitControlsByUserId(); // This fetches exit controls
         break;
     }
   } catch (err) {

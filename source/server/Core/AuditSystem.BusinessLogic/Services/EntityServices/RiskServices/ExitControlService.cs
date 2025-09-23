@@ -86,13 +86,14 @@ internal sealed class ExitControlService(
 
         await _validationHelper.ValidateExitControlOwnershipAsync(exitControlId, userId);
         
+        var exitControl = await repository.GetByIdAsync(exitControlId);
+        Guid? riskId = exitControl?.RiskId;
+
         await repository.DeleteAsync(exitControlId);
-
         await ClearEntityCacheAsync(exitControlId);
-        
-        await ClearUserRelatedCachesAsync(userId, ExitControlConstants.EntityName);
+        await ClearUserRelatedCachesAsync(userId, ExitControlConstants.EntityName, riskId);
 
-        logger.LogInformation("Successfully deleted exit Control {ExitControlId}", exitControlId);
+        logger.LogInformation("Successfully deleted exit Control {ExitControlId} for user {UserId}", exitControlId, userId);
     }
     
     public async Task UpdateExitControlAsync(ExitControlModel exitControlModel, Guid userId)

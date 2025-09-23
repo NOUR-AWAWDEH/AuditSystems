@@ -83,13 +83,22 @@ internal class ObjectiveService(
         logger.LogDebug("Deleting objective {ObjectiveId} for user {UserId}", objectiveId, userId);
         
         await _validationHelper.ValidateObjectiveOwnershipAsync(objectiveId, userId);
+        
+        var objective = await repository.GetByIdAsync(objectiveId);
+        Guid? riskControlMatrixId = objective?.RiskControlMatrixId;
+        
         await repository.DeleteAsync(objectiveId);
         await ClearEntityCacheAsync(objectiveId);
-        await ClearUserRelatedCachesAsync(userId, ObjectiveConstants.EntityName);
+
+        await ClearUserRelatedCachesAsync(
+            userId, 
+            ObjectiveConstants.EntityName, 
+            riskControlMatrixId
+        );
         
         logger.LogInformation("Successfully deleted objective {ObjectiveId} for user {UserId}", objectiveId, userId);
     }
-    
+
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel, Guid userId)
     {
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));

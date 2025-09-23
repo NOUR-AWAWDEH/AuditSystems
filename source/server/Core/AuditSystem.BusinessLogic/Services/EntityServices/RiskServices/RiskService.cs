@@ -85,14 +85,15 @@ internal sealed class RiskService(
         logger.LogDebug("Deleting risk {RiskId} for user {UserId}", riskId, userId);
 
         await _validationHelper.ValidateRiskOwnershipAsync(riskId, userId);
-        
+    
+        var risk = await repository.GetByIdAsync(riskId);
+        Guid? objectiveId = risk?.ObjectiveId;
+
         await repository.DeleteAsync(riskId);
-
         await ClearEntityCacheAsync(riskId);
-        
-        await ClearUserRelatedCachesAsync(userId, RiskConstants.EntityName);
+        await ClearUserRelatedCachesAsync(userId, RiskConstants.EntityName, objectiveId);
 
-        logger.LogInformation("Successfully deleted risk {RiskId}", riskId);
+        logger.LogInformation("Successfully deleted risk {RiskId} for user {UserId}", riskId, userId);
     }
     
     public async Task UpdateRiskAsync(RiskModel riskModel, Guid userId)

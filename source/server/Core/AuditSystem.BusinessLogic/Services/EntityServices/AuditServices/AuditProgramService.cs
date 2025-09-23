@@ -57,15 +57,20 @@ internal sealed class AuditProgramService(
     public async Task DeleteAuditProgramAsync(Guid auditProgramId, Guid userId)
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
-        
+            
         logger.LogInformation("Deleting audit program {AuditProgramId} for user {UserId}", auditProgramId, userId);
 
         await _validationHelper.ValidateAuditProgramOwnershipAsync(auditProgramId, userId);
+
+        var auditProgram = await repository.GetByIdAsync(auditProgramId);
+        var exitControlId = auditProgram?.ExitControlId;
+
         await repository.DeleteAsync(auditProgramId);
         await ClearEntityCacheAsync(auditProgramId);
-        await ClearUserRelatedCachesAsync(userId, "AuditProgram");
         
-        logger.LogInformation("Successfully deleted audit program {AuditProgramId}",auditProgramId);
+        await ClearUserRelatedCachesAsync(userId, AuditProgramConstants.EntityName, exitControlId);
+        
+        logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
     }
 
     public async Task<AuditProgramModel> GetAuditProgramByIdAsync(Guid id, Guid userId)
@@ -148,7 +153,8 @@ internal sealed class AuditProgramService(
             logger.LogDebug(AuditProgramConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, exitControlId, page, cacheKey, countCacheKey);
+        var result = await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, exitControlId, page, cacheKey, countCacheKey);
+        return result;
     }
 
     public async Task UpdateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId)

@@ -11,7 +11,7 @@ export const searchAuditProgramsByUserIdRepository = {
             const token = authService.getLocalToken();
 
             const params = {
-                searchTerm: searchTerm,
+                searchTerm: searchTerm || '',
                 exitControlId: exitControlId,
                 page: pageNumber,
                 pageSize: pageSize
@@ -27,7 +27,7 @@ export const searchAuditProgramsByUserIdRepository = {
                     }
                 }
             );
-
+            console.log("searchAuditProgramsByUserIdRepo response",response);
             const { data, status } = response;
             
             if (status === 200 && data?.success) {

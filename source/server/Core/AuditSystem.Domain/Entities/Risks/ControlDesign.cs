@@ -11,5 +11,6 @@ public class ControlDesign : Entity<Guid>
 
     // Navigation properties
     public ExitControl ExitControl { get; set; } = null!;
-    public virtual AuditProgram? AuditProgram { get; set; } = null!;
+    public virtual ICollection<AuditProgram> AuditPrograms { get; set; } = new List<AuditProgram>();
+    
 }

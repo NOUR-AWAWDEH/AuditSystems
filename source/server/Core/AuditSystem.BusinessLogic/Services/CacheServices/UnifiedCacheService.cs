@@ -133,7 +133,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
 
     public async Task ClearCacheAsync(string cacheKey)
     {
-        await _cacheService.RemoveAsync(cacheKey);
+        await _cacheService.RemoveByPatternAsync(cacheKey);
         await _cacheService.RemoveCacheByTagAsync(_listTags);
     }
 
@@ -217,27 +217,46 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         await ClearCacheAsync(cacheKey);
     }
     
-    public async Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName)
+    public async Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName, Guid? relatedId = null)
     {
-        // Clear search caches for this user
-        var searchPattern = $"{entityTypeName.ToLower()}_search_user_{userId}_*";
-        await _cacheService.RemoveAsync(searchPattern);
-        
-        // Clear user entity list cache
-        var userListKey = $"{entityTypeName.ToLower()}_list_user_{userId}";
-        await _cacheService.RemoveAsync(userListKey);
-        
-        _logger.LogDebug("Cleared user-related caches for user {UserId} and entity type {EntityType}", userId, entityTypeName);
+        if (string.IsNullOrWhiteSpace(entityTypeName))
+            throw new ArgumentException("Entity type name must be provided", nameof(entityTypeName));
+
+        var normalizedEntity = entityTypeName.ToLowerInvariant();
+
+        var searchPattern = $"{normalizedEntity}_search_user_{userId}_*";
+        await _cacheService.RemoveByPatternAsync(searchPattern);
+
+        var countPattern = $"{normalizedEntity}_search_count_user_{userId}_*";
+        await _cacheService.RemoveByPatternAsync(countPattern); 
+
+        var listKey = $"{normalizedEntity}_list_user_{userId}";
+        await _cacheService.RemoveByPatternAsync(listKey); 
+
+        if (relatedId.HasValue)
+        {
+            var searchWithRelated = $"{normalizedEntity}_search_user_{userId}_*_{relatedId.Value}_*";
+            var countWithRelated = $"{normalizedEntity}_search_count_user_{userId}_*_{relatedId.Value}";
+            await _cacheService.RemoveByPatternAsync(searchWithRelated);
+            await _cacheService.RemoveByPatternAsync(countWithRelated); 
+        }
+
+        // Invalidate list tags associated with this UnifiedCacheService instance
+        await _cacheService.RemoveCacheByTagAsync(_listTags);
+
+        _logger.LogDebug("Cleared caches for {EntityType}, user {UserId}, relatedId {RelatedId}", 
+            entityTypeName, userId, relatedId);
     }
+
 
     public async Task<PaginationResult<TTargetModel>> GetAllFromRepositoryAsync<TTargetModel>(
     string cacheKey,
     string countCacheKey,
     Page page,
-    string? name = null) // keep the parameter but ignore it
+    string? name = null)
     {
         var query = repository.GetAll()
-                              .OrderBy(x => x.Id); // just order by Id
+                              .OrderBy(x => x.Id);
 
         var modelQuery = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
         var result = await modelQuery.PaginateAsync(page, repository);

@@ -51,10 +51,10 @@ public class RiskControlMatrixSearchHelper : IRiskControlMatrixSearch
         var subProcessIdStr = subProcessId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.SubProcess, userId, normalizedSearchTerm, subProcessIdStr, page.Number, page.Size);
+            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, subProcessIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.SubProcess, userId, normalizedSearchTerm, subProcessIdStr);
+            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, subProcessIdStr);
 
         return (cacheKey, countCacheKey);
     }

@@ -86,9 +86,13 @@ internal sealed class SubProcessService(
         logger.LogDebug("Deleting sub process {SubProcessId} for user {UserId}", subProcessId, userId);
 
         await _validationHelper.ValidateSubProcessOwnershipAsync(subProcessId, userId);
+        
+        var subProcess = await repository.GetByIdAsync(subProcessId);
+        Guid? auditProcessId = subProcess?.AuditProcessId;
+
         await repository.DeleteAsync(subProcessId);
         await ClearEntityCacheAsync(subProcessId);
-        await ClearUserRelatedCachesAsync(userId, SubProcessConstants.EntityName);
+        await ClearUserRelatedCachesAsync(userId, SubProcessConstants.EntityName, auditProcessId);
 
         logger.LogInformation("Successfully deleted sub process {SubProcessId} for user {UserId}", subProcessId, userId);
     }

@@ -90,13 +90,14 @@ internal sealed class SubDepartmentService(
 
         await _validationHelper.ValidateSubDepartmentOwnershipAsync(subDepartmentId, userId);
 
+        var subDepartment = await repository.GetByIdAsync(subDepartmentId);
+        Guid? departmentId = subDepartment?.DepartmentId;
+
         await repository.DeleteAsync(subDepartmentId);
-
         await ClearEntityCacheAsync(subDepartmentId);
+        await ClearUserRelatedCachesAsync(userId, SubDepartmentConstants.EntityName, departmentId);
 
-        await ClearUserRelatedCachesAsync(userId, SubDepartmentConstants.EntityName);
-
-        logger.LogInformation("Successfully deleted subdepartment {SubDepartmentId}", subDepartmentId);
+        logger.LogInformation("Successfully deleted subdepartment {SubDepartmentId} for user {UserId}", subDepartmentId, userId);
     }
 
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel, Guid userId)

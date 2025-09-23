@@ -88,13 +88,15 @@ internal sealed class SubLocationService(
 
         await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationId, userId);
 
+        // Get the sublocation first to retrieve the LocationId before deletion
+        var subLocation = await repository.GetByIdAsync(subLocationId);
+        Guid? locationId = subLocation?.LocationId;
+
         await repository.DeleteAsync(subLocationId);
-
         await ClearEntityCacheAsync(subLocationId);
+        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName, locationId);
 
-        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName);
-
-        logger.LogInformation("Successfully deleted sublocation {SubLocationId}", subLocationId);
+        logger.LogInformation("Successfully deleted sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
     }
 
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)

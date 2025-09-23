@@ -226,7 +226,7 @@ const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No risk control matrices found for "${props.searchQuery}".`;
     }
-    return 'No risk control matrices found for this audit process.';
+    return 'No risk control matrices found for this sub process.';
 });
 
 </script>

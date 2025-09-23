@@ -4,37 +4,32 @@ public static class CacheKeys
 {
     public const string CacheKey = "{0}-{1}-{2}"; //0 - prefix; 1 - resource id; 2 - language
     public const string SearchCacheKey = "{0}_search_{1}_page_{2}_size_{3}"; // 0-prefix, 1-term, 2-page, 3-size
-    public const string SearchCountCacheKey = "{0}_search_count_{1}"; // NEW → 0: prefix, 1: search term
+    public const string SearchCountCacheKey = "{0}_search_count_{1}"; 
     
-    // User-specific search cache keys
-    public const string UserSearchCacheKey = "{0}_user_{1}_search_{2}_page_{3}_size_{4}"; // 0-prefix, 1-userId, 2-term, 3-page, 4-size
-    public const string UserSearchCountCacheKey = "{0}_user_{1}_search_count_{2}"; // 0-prefix, 1-userId, 2-term
+    public const string UserSearchCacheKey = "{0}_search_user_{1}_{2}_{3}_{4}_{5}"; // 0-prefix, 1-userId, 2-term, 3-relatedId, 4-page, 5-size
+    public const string UserSearchCountCacheKey = "{0}_search_count_user_{1}_{2}_{3}"; 
 
-    //Audit
-    public const string AuditProgram = "audit-program";
+    public const string UserListCacheKey = "{0}_list_user_{1}";
+
+    public const string AuditProgram = "auditprogram";
     
     //Common
     public const string Rate = "rate";
 
-    //Organization
     public const string Company = "company";
     public const string Department = "department";
     public const string Location = "location";
-    public const string SubDepartment = "sub-department";
-    public const string SubLocation = "sub-location";
+    public const string SubDepartment = "subdepartment";
+    public const string SubLocation = "sublocation";
 
-    //Processes
-    public const string AuditProcess = "audit-process";
-    public const string SubProcess = "sub-process";
+    public const string AuditProcess = "auditprocess";
+    public const string SubProcess = "subprocess";
 
-    //RiskControl
-    public const string RiskControlMatrix = "risk-control-matrix";
+    public const string RiskControlMatrix = "riskcontrolmatrix";
     public const string Objective = "objective";
 
-    //Risk
     public const string Risk = "risk";
-    public const string ExitControl = "exit-control";
+    public const string ExitControl = "exitcontrol";
 
-    //SupportingDocs
-    public const string SupportingDoc = "supporting-doc";
+    public const string SupportingDoc = "supportingdoc";
 }

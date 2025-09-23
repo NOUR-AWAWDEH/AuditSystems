@@ -58,12 +58,14 @@ export function useSearchAuditProgramsByUserId() {
             if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-            const response = await searchAuditProgramsByUserIdRepository.searchAuditProgramsByUserId(
+            console.log("searchAuditPrograms params", params);            const response = await searchAuditProgramsByUserIdRepository.searchAuditProgramsByUserId(
                 params.searchTerm,
                 params.pageNumber,
                 params.pageSize,
                 params.exitControlId
             );
+            
+            console.log(response);
 
             if (response?.success) {
                 return handleSearchSuccess(response);

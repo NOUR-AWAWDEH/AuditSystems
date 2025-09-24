@@ -47,7 +47,8 @@ internal sealed class AuditProgramService(
         var entity = mapper.Map<AuditProgram>(auditProgramModel);
         var createdEntity = await repository.CreateAsync(entity);
 
-        await CacheEntityAsync(createdEntity);
+        await CacheEntityAsync(createdEntity); 
+        await InvalidateEntityTagsCacheAsync();
 
         logger.LogInformation("Successfully created audit program {AuditProgramId} for user {UserId}", createdEntity.Id, userId);
 
@@ -69,7 +70,7 @@ internal sealed class AuditProgramService(
         await ClearEntityCacheAsync(auditProgramId);
         
         await ClearUserRelatedCachesAsync(userId, AuditProgramConstants.EntityName, exitControlId);
-        
+
         logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
     }
 

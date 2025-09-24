@@ -11,8 +11,8 @@
 
         <!-- Show Exit Control Table only when exitControls exist -->
         <AuditProgramTable
-            v-if="props.exitControls && props.exitControls.length > 0"
-            :exit-controls="props.exitControls"
+            v-if="filteredExitControls && filteredExitControls.length > 0"
+            :exit-controls="filteredExitControls"
             :audit-programs="auditPrograms"
             :is-loading="isLoading"
             :selected-exit-control-id="internalSelectedExitControlId"
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import {onMounted, watch} from 'vue';
+import {onMounted, watch, computed} from 'vue'; // Added 'computed' import
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import AuditProgramTable from './components/AuditProgramTable.vue';
 import AddAuditProgramModal from './components/AddAuditProgramModal.vue';
@@ -110,6 +110,11 @@ const emit = defineEmits([
     'audit-program-deleted'
 ]);
 
+// Computed property to filter exitControls for display
+const filteredExitControls = computed(() => {
+  return props.exitControls.filter(control => control.inadequate);
+});
+
 // Use composables - now with integrated backend search
 const {
     auditPrograms,
@@ -122,13 +127,25 @@ const {
     handleAuditProgramChange,
     handleSearch,
     resetToDefaultView,
-} = useAuditProgramTable(props.exitControls);
+} = useAuditProgramTable(props.exitControls); // Pass the original props.exitControls here
 
 // Watch for prop changes and update internal state
 watch( () => props.selectedExitControlId, (newExitControlId) => {
-        if (newExitControlId !== internalSelectedExitControlId.value) {
-            handleAuditProgramChange(newExitControlId);
+        // Ensure the newExitControlId is valid for the filtered list
+        if (newExitControlId && !filteredExitControls.value.some(ec => ec.id === newExitControlId)) {
+            // If the previously selected ID is no longer in the filtered list, clear it
+            internalSelectedExitControlId.value = ''; // Set to empty string
+            localStorage.removeItem("riskControlSelectedExitControlId");
+        } else {
+            internalSelectedExitControlId.value = newExitControlId || ''; // Use new ID or empty string
         }
+
+        // If no exit control is selected, and there are filtered exit controls, select the first one
+        if (!internalSelectedExitControlId.value && filteredExitControls.value.length > 0) {
+            internalSelectedExitControlId.value = filteredExitControls.value[0].id;
+            localStorage.setItem("riskControlSelectedExitControlId", filteredExitControls.value[0].id);
+        }
+        handleAuditProgramChange(internalSelectedExitControlId.value); // Trigger search with the (potentially updated) ID
     },
     { immediate: true }
 );

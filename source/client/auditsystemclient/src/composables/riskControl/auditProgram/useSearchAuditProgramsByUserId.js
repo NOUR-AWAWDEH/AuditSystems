@@ -58,14 +58,13 @@ export function useSearchAuditProgramsByUserId() {
             if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
-            console.log("searchAuditPrograms params", params);            const response = await searchAuditProgramsByUserIdRepository.searchAuditProgramsByUserId(
+            // This line was missing! It calls the repository and assigns the result to 'response'.
+            const response = await searchAuditProgramsByUserIdRepository.searchAuditProgramsByUserId(
                 params.searchTerm,
                 params.pageNumber,
                 params.pageSize,
                 params.exitControlId
             );
-            
-            console.log(response);
 
             if (response?.success) {
                 return handleSearchSuccess(response);

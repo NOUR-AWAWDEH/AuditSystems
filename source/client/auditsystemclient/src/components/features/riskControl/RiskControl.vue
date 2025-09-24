@@ -92,10 +92,11 @@
           />
         </div>
         
+
         <div v-if="activeTab === 'controldesigns'" class="p-3 sm:p-4 md:p-6">
          <h2>Control Designs Comming Soon</h2>
         </div>
-
+        
         <!-- Audit Programs -->
         <div v-if="activeTab === 'auditprograms'" class="p-3 sm:p-4 md:p-6">
           <AuditProgramVue
@@ -104,6 +105,7 @@
             @audit-program-selected="handleAuditProgramSelected"
           />
         </div>
+       
 
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
          <h2>Observations Comming Soon</h2>
@@ -116,7 +118,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'; // Removed 'computed' import
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
@@ -150,8 +152,7 @@ const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubPro
 const selectedRiskControlMatrixId = ref(localStorage.getItem("riskControlSelectedRiskControlMatrixId"));
 const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId"));
 const selectedRiskId = ref(localStorage.getItem("riskControlSelectedRiskId"));
-const selectedExitControlId = ref(localStorage.getItem
-("riskControlSelectedExitControlId"));
+const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || ''); // Initialize with empty string if null
 const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId"));
 
 
@@ -173,8 +174,8 @@ const tabs = ref([
   { id: 'objectives', name: 'Objectives' },
   { id: 'risks', name: 'Risks' },
   { id: 'exitcontrols', name: 'Exit Controls' },
-  { id: 'auditprograms', name: 'Audit Programs' },
   { id: 'controldesigns', name: 'Control Design' },
+  { id: 'auditprograms', name: 'Audit Programs' },
   { id: 'observations', name: 'Observations' }
 ]);
 
@@ -206,6 +207,7 @@ const setActiveTab = async (tabId) => {
         break;
       case 'auditprograms':
         await getExitControlsByUserId(); // This fetches exit controls
+        // The logic for selectedExitControlId validation will be handled inside AuditProgramVue
         break;
     }
   } catch (err) {

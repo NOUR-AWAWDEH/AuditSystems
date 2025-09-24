@@ -24,4 +24,5 @@ public interface IUnifiedCacheService<TId, TEntity, TModel>
     Task CacheEntityAsync(TEntity entity);
     Task ClearEntityCacheAsync(TId id);
     Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName, Guid? relatedId = null);
+    Task InvalidateEntityTagsCacheAsync();
 }

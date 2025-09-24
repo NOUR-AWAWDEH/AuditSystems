@@ -93,18 +93,13 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
         if (string.IsNullOrEmpty(searchTerm))
             return Expression.Lambda<Func<T, bool>>(Expression.Constant(true), parameter);
 
-        // Build: entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
-
         var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
         var containsMethod = typeof(string).GetMethod(nameof(string.Contains), [typeof(string)])!;
 
-        // entity.PropertyName.ToLower()
         var propertyToLower = Expression.Call(property, toLowerMethod);
 
-        // searchTerm.ToLower()
         var searchTermToLower = Expression.Constant(searchTerm.ToLower(), typeof(string));
 
-        // entity.PropertyName.ToLower().Contains(searchTerm.ToLower())
         var containsCall = Expression.Call(propertyToLower, containsMethod, searchTermToLower);
 
         return Expression.Lambda<Func<T, bool>>(containsCall, parameter);
@@ -128,13 +123,14 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             tags: _entityTags,
             expiration: CacheExpirations.MediumTerm);
 
-        await _cacheService.RemoveCacheByTagAsync(_listTags);
+        await InvalidateListTagsCacheAsync();
     }
 
     public async Task ClearCacheAsync(string cacheKey)
     {
         await _cacheService.RemoveByPatternAsync(cacheKey);
-        await _cacheService.RemoveCacheByTagAsync(_listTags);
+        await InvalidateListTagsCacheAsync(); 
+        await InvalidateEntityTagsCacheAsync(); 
     }
 
     public string GetSearchCountCacheKey(string? searchTerm) =>
@@ -192,7 +188,6 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             return default;
         }
 
-        // Compile the expression to get the userId from the entity
         var compiledSelector = userIdSelector.Compile();
         var entityUserId = compiledSelector(cachedEntity);
 
@@ -241,13 +236,22 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             await _cacheService.RemoveByPatternAsync(countWithRelated); 
         }
 
-        // Invalidate list tags associated with this UnifiedCacheService instance
-        await _cacheService.RemoveCacheByTagAsync(_listTags);
+        await InvalidateListTagsCacheAsync();
 
         _logger.LogDebug("Cleared caches for {EntityType}, user {UserId}, relatedId {RelatedId}", 
             entityTypeName, userId, relatedId);
     }
 
+
+    public async Task InvalidateEntityTagsCacheAsync()
+    {
+        await _cacheService.RemoveCacheByTagAsync(_entityTags);
+    }
+
+    public async Task InvalidateListTagsCacheAsync()
+    {
+        await _cacheService.RemoveCacheByTagAsync(_listTags);
+    }
 
     public async Task<PaginationResult<TTargetModel>> GetAllFromRepositoryAsync<TTargetModel>(
     string cacheKey,
@@ -274,5 +278,4 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
             PageSize = page.Size
         };
     }
-
 }

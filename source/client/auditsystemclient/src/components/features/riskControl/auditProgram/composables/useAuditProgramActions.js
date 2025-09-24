@@ -43,19 +43,28 @@ export function useAuditProgramActions({
     };
 
     const handleAuditProgramChange = async (newExitControlId) => {
-        try {
-            
+        try { 
             if (clearSearch) {
                 clearSearch();
             }
 
+            // Clear allAuditPrograms if it's being used for display when no filter is applied
             if (allAuditPrograms?.value !== undefined) {
                 allAuditPrograms.value = [];
             }
 
-            selectedExitControlId.value = newExitControlId;
-            await refreshData(); // This line is crucial for refreshing the data
-                   
+            selectedExitControlId.value = newExitControlId;                   
+            
+            // IMPORTANT: Trigger the search immediately after changing the selectedExitControlId
+            if (searchAuditPrograms) {
+                await searchAuditPrograms({
+                    searchTerm: searchQuery.value || '',
+                    exitControlId: newExitControlId,
+                    page: currentPage.value,
+                    pageSize: pageSize.value,
+                });
+            }
+
         } catch (error) {
             console.error('Error handling Audit Program change:', error);
         }
@@ -63,7 +72,7 @@ export function useAuditProgramActions({
 
     const resetToDefaultView = () => {
         try {
-            selectedExitControlId.value = null;
+            selectedExitControlId.value = ''; // Changed from null to empty string for consistency
             searchQuery.value = '';
             currentPage.value = 1;
 

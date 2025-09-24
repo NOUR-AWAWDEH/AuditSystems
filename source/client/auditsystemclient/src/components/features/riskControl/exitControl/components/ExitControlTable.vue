@@ -62,8 +62,10 @@
                         class="exit-control-table"
                         >
                         <template #cell-inadequate="{ item }">
-                            <span :class="inadequateColorMap[item.inadequate]" class="px-2 py-1 rounded-full text-xs font-semibold">
-                                {{ item.inadequate }}
+                            <span 
+                                :class="inadequateColorMap[item.inadequate]" 
+                                class="px-2 py-1 rounded-full text-xs font-semibold">
+                                {{ inadequateLabelMap[item.inadequate] }}
                             </span>
                         </template>
 
@@ -254,6 +256,11 @@ const inadequateColorMap = {
     'Unknown': 'bg-gray-100 text-gray-800'
 };
 
+const inadequateLabelMap = {
+  true: 'Inadequate',
+  false: 'Adequate',
+  Unknown: 'Unknown'
+};
 
 
 

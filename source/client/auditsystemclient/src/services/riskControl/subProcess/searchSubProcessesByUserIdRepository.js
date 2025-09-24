@@ -27,7 +27,7 @@ export const searchSubProcessesByUserIdRepository = {
                     }
                 }
             );
-
+            
             const { data, status } = response;
 
             if (status === 200 && data?.success) {

@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue'; // Added nextTick
 import { useRoute, useRouter } from 'vue-router';
 
 import OrganizationHeader from './components/OrganizationHeader.vue';
@@ -85,14 +85,13 @@ import LocationView from './location/LocationView.vue';
 import SubLocationView from './sublocation/SubLocationView.vue';
 import DepartmentView from './department/DepartmentView.vue';
 import SubDepartmentView from './subdepartment/SubDepartmentView.vue';
-import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
 import { useGetLocationById } from '@/composables/organization/location/useGetLocationById';
 import { useGetSubLocationsByUserId } from '@/composables/organization/sublocation/useGetSubLocationsByUserId';
 import { useGetSubLocationById } from '@/composables/organization/sublocation/useGetSubLocationById';
 import { useGetDepartmentsByUserId } from '@/composables/organization/department/useGetDepartmentsByUserId';
 import { useGetDepartmentById } from '@/composables/organization/department/useGetDepartmentById';
 import { useGetSubDepartmentById } from '@/composables/organization/subdepartment/useGetSubDepartmentById';
-
+import { useGetLocationsByUserId } from '@/composables/organization/location/useGetLocationsByUserId';
 // Router
 const route = useRoute();
 const router = useRouter();
@@ -121,6 +120,9 @@ const { getSubDepartmentById } = useGetSubDepartmentById();
 const isLoading = ref(false);
 const errorMessage = ref(null);
 
+// Add ref for LocationView and a ref for locations data from LocationView
+const locationViewRef = ref(null);
+const organizationLocations = ref([]); 
 // Tabs
 const tabs = ref([
   { id: 'locations', name: 'Locations' },
@@ -171,15 +173,22 @@ const setActiveTab = async (tabId) => {
     errorMessage.value = null;
 
     switch (tabId) {
-
-      case 'sublocations':
-        await getLocationsByUserId();
+      case 'locations':
+        if (locationViewRef.value) {
+          await nextTick(); 
+          if (typeof locationViewRef.value.refreshData === 'function') {
+            await locationViewRef.value.refreshData();
+            organizationLocations.value = locationViewRef.value.locations; 
+          }
+        }
         break;
-      case 'departments':
+      case 'sublocations':
         await getSubLocationsByUserId();
         break;
-      case 'subdepartments':
+      case 'departments':
         await getDepartmentsByUserId();
+        break;
+      case 'subdepartments':
         break;
     }
   } catch (err) {
@@ -192,7 +201,6 @@ const setActiveTab = async (tabId) => {
 
 // Handle route queries
 const handleRouteQueries = async () => {
-
   const { locationId, subLocationId, departmentId, subDepartmentId } = route.query;
 
   if (locationId) { selectedLocationId.value = locationId; await getLocationById(locationId); }
@@ -207,8 +215,8 @@ const handleRouteQueries = async () => {
 
 // Init
 onMounted(async () => {
-  await getLocationsByUserId();
   await handleRouteQueries();
+  await setActiveTab(activeTab.value);
 });
 
 watch(() => route.query, handleRouteQueries);

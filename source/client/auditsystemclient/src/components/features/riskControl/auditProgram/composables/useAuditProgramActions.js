@@ -54,17 +54,7 @@ export function useAuditProgramActions({
             }
 
             selectedExitControlId.value = newExitControlId;                   
-            
-            // IMPORTANT: Trigger the search immediately after changing the selectedExitControlId
-            if (searchAuditPrograms) {
-                await searchAuditPrograms({
-                    searchTerm: searchQuery.value || '',
-                    exitControlId: newExitControlId,
-                    page: currentPage.value,
-                    pageSize: pageSize.value,
-                });
-            }
-
+          
         } catch (error) {
             console.error('Error handling Audit Program change:', error);
         }

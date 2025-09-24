@@ -173,6 +173,7 @@ internal sealed class AuditProgramService(
         await repository.UpdateAsync(existingEntity);
 
         await CacheEntityAsync(existingEntity);
+        await InvalidateEntityTagsCacheAsync();
 
         logger.LogInformation("Successfully updated audit program {AuditProgramId}", auditProgramModel.Id);
     }

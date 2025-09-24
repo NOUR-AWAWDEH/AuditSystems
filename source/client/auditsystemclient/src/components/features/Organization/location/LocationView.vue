@@ -63,7 +63,8 @@ const {
     isLoading,
     searchQuery,
     handleSearch,
-    resetToDefaultView
+    resetToDefaultView,
+    refreshData
 } = useLocationTable();
 
 const {
@@ -91,7 +92,8 @@ const handleLocationSelected = (locationId) => {
 // Expose locations for parent component
 defineExpose({
     locations,
-    resetToDefaultView
+    resetToDefaultView,
+    refreshData
 });
 </script>
 

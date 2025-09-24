@@ -36,8 +36,9 @@ export function useLocationTable() {
   };
 
   // ✅ Ensure refresh happens as soon as composable is used
+  // Removed onMounted hook here. The parent component will now be responsible for triggering the initial data load.
   onMounted(() => {
-    refreshData();
+     refreshData();
   });
 
   // 🔍 Optional: refresh on search changes (e.g., when typing)

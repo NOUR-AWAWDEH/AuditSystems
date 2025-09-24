@@ -18,11 +18,8 @@ export const getSupportingDocsByUserIdRepository = {
         }
       });
 
-
       if (response && response.status === 200) {
-        // Fix: Access response.data instead of response directly
         if (response.data?.success && response.data?.result) {
-            // The documents are in response.data.result
             const documents = response.data.result.supportingDocs || response.data.result || [];
             return ApiResponseT.ok(documents, response.data.successMessage || 'Successfully retrieved supporting documents.');
         } else if (response.data?.success === false) {

@@ -28,7 +28,6 @@ export const searchRisksByUserIdRepository = {
                 }
             );
 
-
             const { data, status } = response;
 
             if (status === 200 && data?.success) {

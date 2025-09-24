@@ -54,7 +54,6 @@ export const searchSubDepartmentsByUserIdRepository = {
           },
       });
 
-      // Fix: Access response.data and response.status correctly
       const { data, status } = response;
 
       if (status === 200 && data?.success) {

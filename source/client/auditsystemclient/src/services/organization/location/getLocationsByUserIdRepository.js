@@ -21,6 +21,7 @@ export const getLocationsByUserIdRepository = {
         }
       });
 
+
       if (response.status === 200) {
         const locations = response.data?.result?.locations || [];
 

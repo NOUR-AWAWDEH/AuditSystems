@@ -112,5 +112,5 @@ export function useAuditProcessWatchers({
                 pageSize: pageSize.value,
             });
         }
-    }, { immediate: true });  // Immediate trigger for initial load
+    }); // Removed { immediate: true }
 }

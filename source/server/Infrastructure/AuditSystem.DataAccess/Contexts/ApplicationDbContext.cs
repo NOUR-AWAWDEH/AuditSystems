@@ -38,11 +38,11 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<Objective> Objectives { get; set; }
     public required DbSet<Risk> Risks { get; set; }
     public required DbSet<ExitControl> ExitControls { get; set; }
+    public required DbSet<ControlDesign> ControlDesigns { get; set; }
     public required DbSet<AuditProgram> AuditPrograms { get; set; }
 
     // Supporting Docs
     public required DbSet<SupportingDoc> SupportingDocs { get; set; }
-
     public new required DbSet<Role> Roles { get; set; }
     // Auth
     public required DbSet<RefreshToken> RefreshTokens { get; set; }

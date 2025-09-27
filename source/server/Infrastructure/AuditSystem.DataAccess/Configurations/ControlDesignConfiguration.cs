@@ -13,7 +13,7 @@ public class ControlDesignConfiguration : IEntityTypeConfiguration<ControlDesign
         builder.HasKey(controlDesign => controlDesign.Id);
 
         builder.Property(controlDesign => controlDesign.Description)
-            .IsRequired()
+            .IsRequired(true)
             .HasMaxLength(500);
         
         builder.Property(controlDesign => controlDesign.Inadequate)

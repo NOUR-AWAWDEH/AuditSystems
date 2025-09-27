@@ -1,4 +1,5 @@
 ﻿namespace AuditSystem.Application.Features.Risks.ExitControl.Delete;
+
 using FluentValidation;
 
 public sealed class DeleteExitControlValidator : AbstractValidator<DeleteExitControlCommand>

@@ -1,0 +1,35 @@
+using System.Linq.Expressions;
+using AuditSystem.Domain.Entities.Risks;
+
+
+namespace AuditSystem.Application.Constants.Risks.ControlDesignConst;
+
+public static class ControlDesignConstants
+{
+    public static readonly string[] ControlDesignTags = ["control-designs", "control-design-list"];
+    public static readonly string[] ListTags = ["control-design-list"];
+    public static readonly Expression<Func<ControlDesign, object?>>[] IncludeHierarchy =
+    [
+        cd => cd.ExitControl,
+        cd => cd.ExitControl.Risk,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.Company,
+    ];
+
+    public const string EntityName = "ControlDesign";
+
+    public const string UnauthorizedAccessMessage = "User {0} is not authorized to access control design {1}.";
+    public const string UnauthorizedExitControlAccessMessage = "User {0} is not authorized to access exit control {1}.";
+    public const string ControlDesignNotFoundMessage = "Control Design with ID {0} not found.";
+    public const string ExitControlNotFoundMessage = "Exit Control with ID {0} not found.";
+    public const string UnauthorizedControlDesignAccessMessage = "User {0} is not authorized to access control design {1}.";
+    public const string UserIdEmptyMessage = "UserId cannot be empty";
+    public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";
+    public const string RetrievedSearchResultsFromCacheMessage = "Retrieved exit control search results from cache";
+}

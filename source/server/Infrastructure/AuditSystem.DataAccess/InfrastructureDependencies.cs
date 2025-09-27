@@ -115,6 +115,7 @@ public static class InfrastructureDependencies
         //Risks
         .AddRepository<Guid, Risk>()
         .AddRepository<Guid, ExitControl>()
+        .AddRepository<Guid, ControlDesign>()
 
         //SupportingDocs
         .AddRepository<Guid, SupportingDoc>()

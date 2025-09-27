@@ -6,13 +6,9 @@ using AuditSystem.Domain.Entities.Risks;
 
 namespace AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 
-public class ExitControlValidationHelper : IExitControlValidation
+public class ExitControlValidationHelper(IRepository<Guid, ExitControl> repository) : IExitControlValidation
 {
-    private readonly IRepository<Guid, ExitControl> _repository;
-    public ExitControlValidationHelper(IRepository<Guid, ExitControl> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, ExitControl> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId) 
     {

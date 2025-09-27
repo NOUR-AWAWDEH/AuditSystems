@@ -1,5 +1,6 @@
 using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
+using AuditSystem.BusinessLogic.Helpers.ControlDesignHelpers;
 using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
@@ -38,6 +39,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessSe
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ControlDesignServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Transaction;
@@ -160,6 +162,13 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, ExitControl, ExitControlModel>, ExitControlService>()
             .AddScoped<IExitControlValidation, ExitControlValidationHelper>()
             .AddScoped<IExitControlSearch, ExitControlSearchHelper>()
+
+            // Control Designs
+            .AddScoped<IControlDesignService, ControlDesignService>()
+            .AddScoped<IUnifiedCacheService<Guid, ControlDesign, ControlDesignModel>, ControlDesignService>()
+            .AddScoped<IControlDesignValidation, ControlDesignValidationHelper>()
+            .AddScoped<IControlDesignSearch, ControlDesignSearchHelper>()
+
 
             // Supporting Docs
             .AddScoped<ISupportingDocService, SupportingDocService>()

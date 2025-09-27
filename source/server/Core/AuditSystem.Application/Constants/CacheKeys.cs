@@ -10,8 +10,6 @@ public static class CacheKeys
     public const string UserSearchCountCacheKey = "{0}_search_count_user_{1}_{2}_{3}"; 
 
     public const string UserListCacheKey = "{0}_list_user_{1}";
-
-    public const string AuditProgram = "auditprogram";
     
     //Common
     public const string Rate = "rate";
@@ -30,6 +28,8 @@ public static class CacheKeys
 
     public const string Risk = "risk";
     public const string ExitControl = "exitcontrol";
+    public const string ControlDesign = "controldesign";
+    public const string AuditProgram = "auditprogram";
 
     public const string SupportingDoc = "supportingdoc";
 }

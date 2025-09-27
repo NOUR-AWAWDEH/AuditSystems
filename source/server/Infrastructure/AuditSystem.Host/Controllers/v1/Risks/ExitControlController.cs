@@ -1,5 +1,11 @@
 ﻿using Ardalis.Result;
 using AuditSystem.Application.Features.Common.Pagination;
+using AuditSystem.Application.Features.Risks.ControlDesign.Create;
+using AuditSystem.Application.Features.Risks.ControlDesign.Delete;
+using AuditSystem.Application.Features.Risks.ControlDesign.Get.GetById;
+using AuditSystem.Application.Features.Risks.ControlDesign.Get.GetByUserId;
+using AuditSystem.Application.Features.Risks.ControlDesign.Search;
+using AuditSystem.Application.Features.Risks.ControlDesign.Update;
 using AuditSystem.Application.Features.Risks.ExitControl.Create;
 using AuditSystem.Application.Features.Risks.ExitControl.Delete;
 using AuditSystem.Application.Features.Risks.ExitControl.Get.GetById;

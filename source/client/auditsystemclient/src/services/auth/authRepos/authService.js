@@ -17,7 +17,6 @@ const removeLocalTokens = () => {
 
 const refreshToken = async () => {
   const refreshTokenValue = getLocalRefreshToken();
-  console.log('Sending refresh token:', refreshTokenValue);
 
   if (!refreshTokenValue) {
     console.error('No refresh token available.');
@@ -28,7 +27,6 @@ const refreshToken = async () => {
     // POST body must match backend DTO
     const { data } = await api.post('/api/Auth/refresh-token', { refreshToken: refreshTokenValue });
 
-    console.log(data);
     if (data.success && data.result) {
       const { jwtToken, refreshToken: newRefreshToken } = data.result;
 

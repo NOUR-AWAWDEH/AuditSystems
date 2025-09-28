@@ -70,7 +70,6 @@ export function useLogin() {
     token.value = null;
     refreshToken.value = null;
     authService.removeLocalTokens();
-    authService.removeLocalRefreshToken();
   };
 
   return {

@@ -42,6 +42,7 @@ const routes = [
     name: 'Logout',
     beforeEnter: (to, from, next) => {
       localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
       next('/login');
     }
   },

@@ -1,6 +1,7 @@
 // authService.js
 import api from '@/services/api/api';
 
+const REFRESH_TOKEN_API_ENDPOINT = '/api/Auth/refresh-token';
 const TOKEN_KEY = 'token';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const REFRESH_INTERVAL = 55 * 60 * 1000;
@@ -24,14 +25,13 @@ const refreshToken = async () => {
   }
 
   try {
-    // POST body must match backend DTO
-    const { data } = await api.post('/api/Auth/refresh-token', { refreshToken: refreshTokenValue });
+    const { data } = await api.post(REFRESH_TOKEN_API_ENDPOINT, { refreshToken: refreshTokenValue });
 
     if (data.success && data.result) {
       const { jwtToken, refreshToken: newRefreshToken } = data.result;
 
       setLocalToken(jwtToken);
-      setLocalRefreshToken(newRefreshToken); // now updates localStorage
+      setLocalRefreshToken(newRefreshToken);
       scheduleRefreshToken();
       return true;
     } else {

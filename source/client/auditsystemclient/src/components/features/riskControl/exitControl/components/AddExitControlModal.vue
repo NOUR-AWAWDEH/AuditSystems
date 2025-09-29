@@ -46,8 +46,8 @@
                                     :class="errors.inadequate ? 'border-error focus:ring-error' : 'border-gray-tint focus:ring-primary-base'"
                                 >
                                     <option disabled value="">-- Select an option --</option>
-                                    <option :value="true">True</option>
-                                    <option :value="false">False</option>
+                                    <option :value="true">Inadequate</option>
+                                    <option :value="false">Adequate</option>
                                 </select>
                                 <p v-if="errors.inadequate" class="text-error text-sm mt-1">{{ errors.inadequate }}</p>
                             </div>

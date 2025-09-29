@@ -33,7 +33,6 @@ export const navigationItems = [
     icon: RiskControlIcon,
     requiresAuth: true
   }
-  // Removed User Menu from sidebar navigation
 ]
 
 // Filter navigation items based on authentication status

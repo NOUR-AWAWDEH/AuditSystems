@@ -112,7 +112,7 @@ const emit = defineEmits([
 
 // Computed property to filter exitControls for display
 const filteredExitControls = computed(() => {
-  return props.exitControls.filter(control => control.inadequate);
+  return props.exitControls.filter(control => !control.inadequate);
 });
 
 // Use composables - now with integrated backend search
@@ -127,7 +127,7 @@ const {
     handleAuditProgramChange,
     handleSearch,
     resetToDefaultView,
-} = useAuditProgramTable(props.exitControls); // Pass the original props.exitControls here
+} = useAuditProgramTable(props.exitControls);
 
 // Watch for prop changes and update internal state
 watch( () => props.selectedExitControlId, (newExitControlId) => {

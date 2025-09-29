@@ -9,7 +9,7 @@
                         <AuditProgramHeader/>
                         <ExitControlSelector
                             :exit-controls="exitControls"
-                            label="Select Exit Control (Inadequate)"
+                            label="Select Exit Control (Adequate)"
                             :selected-exit-control-id="internalSelectedExitControlId"
                             @update:selected-exit-control="(id) => internalSelectedExitControlId = id"
                             @exit-control-changed="(id) => internalSelectedExitControlId = id"

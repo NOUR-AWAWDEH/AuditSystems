@@ -94,7 +94,11 @@
         
 
         <div v-if="activeTab === 'controldesigns'" class="p-3 sm:p-4 md:p-6">
-         <h2>Control Designs Comming Soon</h2>
+         <ControlDesignVue
+            :exit-controls="exitControls"
+            :selected-exit-control-id="selectedExitControlId"
+            @control-design-selected="handleControlDesignSelected"
+         />
         </div>
         
         <!-- Audit Programs -->
@@ -105,7 +109,6 @@
             @audit-program-selected="handleAuditProgramSelected"
           />
         </div>
-       
 
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
          <h2>Observations Comming Soon</h2>
@@ -118,7 +121,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'; // Removed 'computed' import
+import { ref, onMounted } from 'vue'; 
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
@@ -127,6 +130,7 @@ import Objective from './objective/ObjectiveVue.vue';
 import RiskVue from './risk/RiskVue.vue';
 import ExitControlVue from './exitControl/ExitControlVue.vue';
 import AuditProgramVue from './auditProgram/AuditProgramVue.vue';
+import ControlDesignVue from './controlDesign/ControlDesignVue.vue';
 
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
@@ -135,8 +139,7 @@ import { useGetRiskControlMatricesByUserId } from '@/composables/riskControl/ris
 import { useGetObjectivesByUserId } from '@/composables/riskControl/objective/useGetObjectivesByUserId';
 import { useGetRisksByUserId } from '@/composables/riskControl/risk/useGetRisksByUserId';
 import { useGetExitControlsByUserId } from '@/composables/riskControl/exitControl/useGetExitControlsByUserId';
-
-
+import { useGetControlDesignsByUserId } from '@/composables/riskControl/controlDesign/useGetControlDesignsByUserId';
 import { useGetAuditProgramsByUserId } from '@/composables/riskControl/auditProgram/useGetAuditProgramsByUserId';
 
 
@@ -146,14 +149,15 @@ const isLoading = ref(false);
 const errorMessage = ref(null);
 
 // Selected IDs
-const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId"));
-const selectedAuditProcessId = ref(localStorage.getItem("riskControlSelectedAuditProcessId"));
-const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId"));
-const selectedRiskControlMatrixId = ref(localStorage.getItem("riskControlSelectedRiskControlMatrixId"));
-const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId"));
-const selectedRiskId = ref(localStorage.getItem("riskControlSelectedRiskId"));
-const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || ''); // Initialize with empty string if null
-const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId"));
+const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || '');
+const selectedAuditProcessId = ref(localStorage.getItem("riskControlSelectedAuditProcessId") || '');
+const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId") || '');
+const selectedRiskControlMatrixId = ref(localStorage.getItem("riskControlSelectedRiskControlMatrixId") || '');
+const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId") || '');
+const selectedRiskId = ref(localStorage.getItem("riskControlSelectedRiskId") || '');
+const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || '');
+const selectedControlDesignId = ref(localStorage.getItem("riskControlSelectedControlDesignId") || '');
+const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId") || '');
 
 
 // Composables
@@ -205,9 +209,11 @@ const setActiveTab = async (tabId) => {
       case 'exitcontrols':
         await getRisksByUserId();
         break;
+      case 'controldesigns':
+        await getExitControlsByUserId();
+        break;
       case 'auditprograms':
-        await getExitControlsByUserId(); // This fetches exit controls
-        // The logic for selectedExitControlId validation will be handled inside AuditProgramVue
+        await getExitControlsByUserId(); 
         break;
     }
   } catch (err) {
@@ -247,10 +253,15 @@ const handleRiskSelected = (id) => {
 const handleExitControlSelected = (exitControl) => { 
   selectedExitControlId.value = exitControl.id;
   if (exitControl.inadequate) { 
-    setActiveTab('auditprograms');
-  } else {
     setActiveTab('controldesigns');
+  } else {
+    setActiveTab('auditprograms');
   }
+};
+
+const handleControlDesignSelected = (controlDesign) => {
+  selectedControlDesignId.value = controlDesign.id;
+  setActiveTab('auditprograms');
 };
 
 const handleAuditProgramSelected = (id) => {
@@ -258,7 +269,7 @@ const handleAuditProgramSelected = (id) => {
   setActiveTab('observations');
 };
 
-// Init -> load processes tab
+// // Init -> load processes tab
 onMounted(async () => {
   await setActiveTab('processes');
 });

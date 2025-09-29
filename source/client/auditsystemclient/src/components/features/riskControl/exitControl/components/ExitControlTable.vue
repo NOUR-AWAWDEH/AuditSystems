@@ -251,17 +251,14 @@ const noDataMessage = computed(() => {
 });
 
 const inadequateColorMap = {
-    'false': 'bg-red-100 text-red-800',
-    'true': 'bg-green-100 text-green-800',
-    'Unknown': 'bg-gray-100 text-gray-800'
+  true: 'bg-red-100 text-red-800',     // Bad → Inadequate
+  false: 'bg-green-100 text-green-800' // Good → Adequate
 };
 
 const inadequateLabelMap = {
   true: 'Inadequate',
-  false: 'Adequate',
-  Unknown: 'Unknown'
+  false: 'Adequate'
 };
-
 
 
 </script>

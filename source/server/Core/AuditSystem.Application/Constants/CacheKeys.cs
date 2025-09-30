@@ -30,6 +30,7 @@ public static class CacheKeys
     public const string ExitControl = "exitcontrol";
     public const string ControlDesign = "controldesign";
     public const string AuditProgram = "auditprogram";
+    public const string Observation = "observation";
 
     public const string SupportingDoc = "supportingdoc";
 }

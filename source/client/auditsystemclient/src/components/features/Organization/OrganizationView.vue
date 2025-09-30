@@ -164,7 +164,6 @@ const handleSubDepartmentSelected = async (id) => {
   setSelectedId('subDepartment', id);
 };
 
-
 // Tab navigation - always refresh list when switching
 const setActiveTab = async (tabId) => {
   activeTab.value = tabId;

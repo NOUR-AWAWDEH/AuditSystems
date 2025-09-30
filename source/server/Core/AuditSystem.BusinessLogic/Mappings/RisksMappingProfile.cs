@@ -6,6 +6,8 @@ using AuditSystem.Application.Features.Risks.Risk.Create;
 using AuditSystem.Application.Features.Risks.Risk.Update;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Domain.Entities.Risks;
+using AuditSystem.Contract.Models.Observation;
+using AuditSystem.Domain.Entities.Observations;
 using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Mappings;
@@ -28,5 +30,10 @@ public sealed class RisksMappingProfile : Profile
         CreateMap<ControlDesignModel, ControlDesign>().ReverseMap();
         CreateMap<CreateControlDesignCommand, ControlDesignModel>();
         CreateMap<UpdateControlDesignCommand, ControlDesignModel>();
+
+        //Observation
+        CreateMap<ObservationModel, Observation>().ReverseMap();
+       // CreateMap<CreateObservationCommand, ObservationModel>();
+       // CreateMap<UpdateObservationCommand, ObservationModel>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Common;
+using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.RiskControls;
@@ -40,6 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public required DbSet<ExitControl> ExitControls { get; set; }
     public required DbSet<ControlDesign> ControlDesigns { get; set; }
     public required DbSet<AuditProgram> AuditPrograms { get; set; }
+    public required DbSet<Observation> Observations { get; set; }
 
     // Supporting Docs
     public required DbSet<SupportingDoc> SupportingDocs { get; set; }

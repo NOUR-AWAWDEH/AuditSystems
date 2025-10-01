@@ -5,14 +5,9 @@ using AuditSystem.Domain.Entities.SupportingDocs;
 
 namespace AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
-public class SupportingDocValidationHelper : ISupportingDocValidation
+public class SupportingDocValidationHelper(IRepository<Guid, SupportingDoc> repository) : ISupportingDocValidation
 {
-    private readonly IRepository<Guid, SupportingDoc> _repository;
-
-    public SupportingDocValidationHelper(IRepository<Guid, SupportingDoc> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, SupportingDoc> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId)
     {

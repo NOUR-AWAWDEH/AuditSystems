@@ -9,6 +9,8 @@ using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Domain.Entities.Observations;
 using AutoMapper;
+using AuditSystem.Application.Features.Observation.Create;
+using AuditSystem.Application.Features.Observation.Update;
 
 namespace AuditSystem.BusinessLogic.Mappings;
 
@@ -33,7 +35,7 @@ public sealed class RisksMappingProfile : Profile
 
         //Observation
         CreateMap<ObservationModel, Observation>().ReverseMap();
-       // CreateMap<CreateObservationCommand, ObservationModel>();
-       // CreateMap<UpdateObservationCommand, ObservationModel>();
+        CreateMap<CreateObservationCommand, ObservationModel>();
+        CreateMap<UpdateObservationCommand, ObservationModel>();
     }
 }

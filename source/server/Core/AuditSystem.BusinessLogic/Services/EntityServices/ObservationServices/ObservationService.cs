@@ -1,22 +1,18 @@
 using AuditSystem.Application.Constants;
-using AuditSystem.Application.Constants.Audit.AuditProgramConst;
 using AuditSystem.Application.Constants.ObservationConst;
-using AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
+using AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
-using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Pagination;
-using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Observations;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
+namespace AuditSystem.BusinessLogic.Services.EntityServices.ObservationServices;
 
 internal sealed class ObservationService(
     IRepository<Guid, Observation> repository,
@@ -46,7 +42,7 @@ internal sealed class ObservationService(
 
         logger.LogInformation("Creating observation {ObservationName} for user {UserId}", observationModel.Description, userId);
 
-        await _validationHelper.ValidateExitControlOwnershipAsync(observationModel.ExitControlId, userId);
+        await _validationHelper.ValidateAuditProgramOwnershipAsync(observationModel.AuditProgramId, userId);
 
         var entity = mapper.Map<Observation>(observationModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -68,12 +64,12 @@ internal sealed class ObservationService(
         await _validationHelper.ValidateObservationOwnershipAsync(observationId, userId);
 
         var observation = await repository.GetByIdAsync(observationId);
-        var exitControlId = observation?.ExitControlId;
+        var auditProgramId = observation?.AuditProgramId;
 
         await repository.DeleteAsync(observationId);
         await ClearEntityCacheAsync(observationId);
         
-        await ClearUserRelatedCachesAsync(userId, ObservationConstants.EntityName, exitControlId);
+        await ClearUserRelatedCachesAsync(userId, ObservationConstants.EntityName, auditProgramId);
 
         logger.LogInformation("Successfully deleted observation {ObservationId}", observationId);
     }
@@ -87,8 +83,8 @@ internal sealed class ObservationService(
         var cashedResult = await TryGetFromCacheWithValidationAsync<ObservationModel>(
             id,
             userId,
-            entity => entity.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
-            ObservationConstants.UnauthorizedAccessMessage);
+            entity => entity.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            ObservationConstants.UnauthorizedAuditProgramAccessMessage);
 
         if (cashedResult != null) 
         {
@@ -113,7 +109,7 @@ internal sealed class ObservationService(
             .Include(s => s.AuditProgram)
             .Where(ap => ap.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(d => new ObservationModel
-            { 
+            {
                 Id = d.Id,
                 Description = d.Description,
                 Recommendation = d.Recommendation,
@@ -123,6 +119,7 @@ internal sealed class ObservationService(
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })
+            .OrderBy(o => o.CreatedAt)
             .ToListAsync();
     }
 

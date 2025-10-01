@@ -12,21 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 
-public class SupportingDocSearchHelper : ISupportingDocSearch
+public class SupportingDocSearchHelper(
+    IRepository<Guid, SupportingDoc> repository,
+    ILogger<SupportingDocSearchHelper> logger,
+    ICacheService cacheService) : ISupportingDocSearch
 {
-    private readonly IRepository<Guid, SupportingDoc> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<SupportingDocSearchHelper> _logger;
-
-    public SupportingDocSearchHelper(
-        IRepository<Guid, SupportingDoc> repository,
-        ILogger<SupportingDocSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, SupportingDoc> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<SupportingDocSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public static Expression<Func<SupportingDoc, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {

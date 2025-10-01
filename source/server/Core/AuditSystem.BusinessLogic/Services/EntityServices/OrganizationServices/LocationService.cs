@@ -177,6 +177,7 @@ internal sealed class LocationService(
                 Address = l.Address,
                 CompanyId = l.CompanyId,
             })
+            .OrderBy(l => l.CreatedAt)
             .ToListAsync();
     }
 }

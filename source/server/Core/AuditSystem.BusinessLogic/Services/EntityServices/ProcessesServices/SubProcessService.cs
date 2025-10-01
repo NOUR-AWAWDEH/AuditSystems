@@ -134,6 +134,7 @@ internal sealed class SubProcessService(
                 CreatedAt = sp.CreatedAt,
                 UpdatedAt = sp.UpdatedAt,
             })
+            .OrderBy(sp => sp.CreatedAt)
             .ToListAsync();
 
     }

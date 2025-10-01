@@ -6,6 +6,7 @@ using AuditSystem.DataAccess.Repositories;
 using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Common;
+using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.RiskControls;
@@ -116,6 +117,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Risk>()
         .AddRepository<Guid, ExitControl>()
         .AddRepository<Guid, ControlDesign>()
+        .AddRepository<Guid, Observation>()
 
         //SupportingDocs
         .AddRepository<Guid, SupportingDoc>()

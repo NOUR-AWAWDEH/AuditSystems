@@ -133,6 +133,7 @@ internal sealed class ExitControlService(
                 CreatedAt = ec.CreatedAt,
                 UpdatedAt = ec.UpdatedAt,
             })
+            .OrderBy(ec => ec.CreatedAt)
             .ToListAsync();
     }
 

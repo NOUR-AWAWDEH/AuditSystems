@@ -139,6 +139,7 @@ internal sealed class SubDepartmentService(
                 CreatedAt = s.CreatedAt,
                 UpdatedAt = s.UpdatedAt
             })
+            .OrderBy(sd => sd.CreatedAt)
             .ToListAsync();
     }
 

@@ -5,14 +5,9 @@ using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 
-public class SubLocationValidationHelper : ISubLocationValidation
+public class SubLocationValidationHelper(IRepository<Guid, SubLocation> repository) : ISubLocationValidation
 {
-    private readonly IRepository<Guid, SubLocation> _repository;
-
-    public SubLocationValidationHelper(IRepository<Guid, SubLocation> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, SubLocation> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId)
     {

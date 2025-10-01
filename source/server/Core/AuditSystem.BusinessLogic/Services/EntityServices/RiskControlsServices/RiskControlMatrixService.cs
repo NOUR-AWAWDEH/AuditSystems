@@ -131,6 +131,7 @@ internal sealed class RiskControlMatrixService(
                 CreatedAt = rcm.CreatedAt,
                 UpdatedAt = rcm.UpdatedAt,
             })
+            .OrderBy(rcm => rcm.CreatedAt)
             .ToListAsync();
     }
 

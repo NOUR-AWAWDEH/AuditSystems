@@ -7,13 +7,9 @@ using AuditSystem.Domain.Entities.Processes;
 
 namespace AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 
-public class SubProcessValidationHelper : ISubProcessValidation
+public class SubProcessValidationHelper(IRepository<Guid, SubProcess> repository) : ISubProcessValidation
 {
-    private readonly IRepository<Guid, SubProcess> _repository;
-    public SubProcessValidationHelper(IRepository<Guid, SubProcess> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, SubProcess> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId) 
     {

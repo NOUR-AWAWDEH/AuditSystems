@@ -132,6 +132,7 @@ internal sealed class AuditProcessService(
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })
+            .OrderBy(ap => ap.CreatedAt)
             .ToListAsync();
     }
 

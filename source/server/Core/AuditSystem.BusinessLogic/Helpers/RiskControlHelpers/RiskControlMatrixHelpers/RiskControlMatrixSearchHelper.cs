@@ -12,21 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 
-public class RiskControlMatrixSearchHelper : IRiskControlMatrixSearch
+public class RiskControlMatrixSearchHelper(
+    IRepository<Guid, RiskControlMatrix> repository,
+    ILogger<RiskControlMatrixSearchHelper> logger,
+    ICacheService cacheService) : IRiskControlMatrixSearch
 {
-    private readonly IRepository<Guid, RiskControlMatrix> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<RiskControlMatrixSearchHelper> _logger;
-
-    public RiskControlMatrixSearchHelper(
-        IRepository<Guid, RiskControlMatrix> repository,
-        ILogger<RiskControlMatrixSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, RiskControlMatrix> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<RiskControlMatrixSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<RiskControlMatrix, bool>> BuildUserSearchPredicate(
         Guid userId, string? searchTerm, Guid subProcessId)

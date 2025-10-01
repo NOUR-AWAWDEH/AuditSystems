@@ -7,13 +7,9 @@ using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 
-public class RiskControlMatrixValidationHelper : IRiskControlMatrixValidation
+public class RiskControlMatrixValidationHelper(IRepository<Guid, RiskControlMatrix> repository) : IRiskControlMatrixValidation
 {
-    private readonly IRepository<Guid, RiskControlMatrix> _repository;
-    public RiskControlMatrixValidationHelper(IRepository<Guid, RiskControlMatrix> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, RiskControlMatrix> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId) 
     {

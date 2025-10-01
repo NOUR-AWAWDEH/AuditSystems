@@ -117,6 +117,7 @@ internal sealed class ControlDesignService(
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })
+            .OrderBy(cd => cd.CreatedAt)
             .ToListAsync();
     }
 

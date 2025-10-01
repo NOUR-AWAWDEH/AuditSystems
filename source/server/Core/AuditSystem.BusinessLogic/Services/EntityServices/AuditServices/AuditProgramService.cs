@@ -109,7 +109,7 @@ internal sealed class AuditProgramService(
             .Include(s => s.ExitControl)
             .Where(r => r.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
             .Select(d => new AuditProgramModel
-            { 
+            {
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
@@ -117,6 +117,7 @@ internal sealed class AuditProgramService(
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })
+            .OrderBy(ap => ap.CreatedAt)
             .ToListAsync();
     }
 

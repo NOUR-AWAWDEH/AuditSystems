@@ -12,21 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 
-public class SubDepartmentSearchHelper : ISubDepartmentSearch
+public class SubDepartmentSearchHelper(
+    IRepository<Guid, SubDepartment> repository,
+    ILogger<SubDepartmentSearchHelper> logger,
+    ICacheService cacheService) : ISubDepartmentSearch
 {
-    private readonly IRepository<Guid, SubDepartment> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<SubDepartmentSearchHelper> _logger;
-
-    public SubDepartmentSearchHelper(
-        IRepository<Guid, SubDepartment> repository,
-        ILogger<SubDepartmentSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, SubDepartment> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<SubDepartmentSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<SubDepartment, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid departmentId)
     {

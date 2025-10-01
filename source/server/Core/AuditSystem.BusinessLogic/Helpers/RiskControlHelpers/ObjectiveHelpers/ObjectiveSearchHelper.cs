@@ -13,21 +13,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 
-public class ObjectiveSearchHelper : IObjectiveSearch
+public class ObjectiveSearchHelper(
+    IRepository<Guid, Objective> repository,
+    ILogger<ObjectiveSearchHelper> logger,
+    ICacheService cacheService) : IObjectiveSearch
 {
-    private readonly IRepository<Guid, Objective> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<ObjectiveSearchHelper> _logger;
-
-    public ObjectiveSearchHelper(
-        IRepository<Guid, Objective> repository,
-        ILogger<ObjectiveSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    }
+    private readonly IRepository<Guid, Objective> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<ObjectiveSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Objective, bool>> BuildUserSearchPredicate(
         Guid userId, string? searchTerm, Guid riskControlMatrixId)

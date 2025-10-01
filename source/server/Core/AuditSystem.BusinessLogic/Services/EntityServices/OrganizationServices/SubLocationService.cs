@@ -139,6 +139,7 @@ internal sealed class SubLocationService(
                 UpdatedAt = s.UpdatedAt,
                 Address = s.Address
             })
+            .OrderBy(sl => sl.CreatedAt)
             .ToListAsync();
     }
 

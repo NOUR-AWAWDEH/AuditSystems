@@ -107,6 +107,7 @@ public class ControlDesignSearchHelper(
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt
             })
+            .OrderBy(cd => cd.CreatedAt)
             .ToArrayAsync();
 
         var result = new PaginationResult<ControlDesignModel>

@@ -111,6 +111,7 @@ public class AuditProgramSearchHelper(
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt
             })
+            .OrderBy(ap => ap.CreatedAt)
             .ToArrayAsync();
 
         var result = new PaginationResult<AuditProgramModel>

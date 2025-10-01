@@ -135,6 +135,7 @@ internal class ObjectiveService(
                 CreatedAt = ob.CreatedAt,
                 UpdatedAt = ob.UpdatedAt,
             })
+            .OrderBy(o => o.CreatedAt)
             .ToListAsync();
     }
 

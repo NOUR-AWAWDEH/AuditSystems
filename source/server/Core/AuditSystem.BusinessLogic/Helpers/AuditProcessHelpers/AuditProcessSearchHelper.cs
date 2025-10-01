@@ -92,6 +92,7 @@ public class AuditProcessSearchHelper : IAuditProcessSearch
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })
+            .OrderBy(ap => ap.CreatedAt)
             .ToArrayAsync();
     
         var result = new PaginationResult<AuditProcessModel>

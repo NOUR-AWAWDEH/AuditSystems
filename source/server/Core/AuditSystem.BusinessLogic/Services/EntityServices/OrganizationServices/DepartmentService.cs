@@ -129,13 +129,14 @@ internal sealed class DepartmentService(
             .Include(s => s.SubLocation)
             .Where(r => r.SubLocation.Location.UserId == userId)
             .Select(d => new DepartmentModel
-            { 
+            {
                 Id = d.Id,
                 Name = d.Name,
                 SubLocationId = d.SubLocationId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })
+            .OrderBy(d => d.CreatedAt)
             .ToListAsync();
     }
 

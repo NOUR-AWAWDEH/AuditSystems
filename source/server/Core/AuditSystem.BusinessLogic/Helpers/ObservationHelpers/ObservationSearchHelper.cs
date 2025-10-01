@@ -4,11 +4,11 @@ using AuditSystem.Application.Constants.ObservationConst;
 using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
-using AuditSystem.Contract.Models.Observations;
 using AuditSystem.Domain.Entities.Observations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using AuditSystem.Contract.Models.Observation;
+using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 
 
 namespace AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
@@ -49,10 +49,10 @@ public class ObservationSearchHelper : IObservationSearch
         var auditProgramIdStr = auditProgramId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProgramIdStr, page.Number, page.Size);
+            CacheKeys.Observation, userId, normalizedSearchTerm, auditProgramIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProgramIdStr);
+            CacheKeys.Observation, userId, normalizedSearchTerm, auditProgramIdStr);
 
         return (cacheKey, countCacheKey);
     }
@@ -96,6 +96,7 @@ public class ObservationSearchHelper : IObservationSearch
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })
+            .OrderBy(o => o.CreatedAt)
             .ToArrayAsync();
     
         var result = new PaginationResult<ObservationModel>
@@ -114,13 +115,13 @@ public class ObservationSearchHelper : IObservationSearch
         return result;
     }
 
-    private async Task CacheSearchResultsAsync(string cacheKey, AuditProcessModel[] items)
+    private async Task CacheSearchResultsAsync(string cacheKey, ObservationModel[] items)
     {
-        await _cacheService.SetAsync(cacheKey, items, AuditProcessConstants.AuditProcessTags, CacheExpirations.MediumTerm);
+        await _cacheService.SetAsync(cacheKey, items, ObservationConstants.ObservationTags, CacheExpirations.MediumTerm);
     }
 
     private async Task CacheSearchCountAsync(string countCacheKey, int totalCount)
     {
-        await _cacheService.SetAsync(countCacheKey, totalCount, AuditProcessConstants.AuditProcessTags, CacheExpirations.MediumTerm);
+        await _cacheService.SetAsync(countCacheKey, totalCount, ObservationConstants.ObservationTags, CacheExpirations.MediumTerm);
     }
 }

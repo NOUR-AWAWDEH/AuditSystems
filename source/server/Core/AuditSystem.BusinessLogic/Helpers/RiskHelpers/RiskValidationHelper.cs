@@ -7,13 +7,9 @@ using AuditSystem.Domain.Entities.Risks;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 
-public class RiskValidationHelper : IRiskValidation
+public class RiskValidationHelper(IRepository<Guid, Risk> repository) : IRiskValidation
 {
-    private readonly IRepository<Guid, Risk> _repository;
-    public RiskValidationHelper(IRepository<Guid, Risk> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, Risk> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId) 
     {

@@ -134,6 +134,7 @@ internal sealed class RiskService(
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })
+            .OrderBy(r => r.CreatedAt)
             .ToListAsync();
     }
 

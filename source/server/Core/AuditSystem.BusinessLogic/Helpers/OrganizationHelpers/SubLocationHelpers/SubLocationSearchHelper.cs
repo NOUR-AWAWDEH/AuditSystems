@@ -12,21 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 
-public class SubLocationSearchHelper : ISubLocationSearch
+public class SubLocationSearchHelper(
+    IRepository<Guid, SubLocation> repository,
+    ILogger<SubLocationSearchHelper> logger,
+    ICacheService cacheService) : ISubLocationSearch
 {
-    private readonly IRepository<Guid, SubLocation> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<SubLocationSearchHelper> _logger;
-
-    public SubLocationSearchHelper(
-        IRepository<Guid, SubLocation> repository,
-        ILogger<SubLocationSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    }
+    private readonly IRepository<Guid, SubLocation> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<SubLocationSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<SubLocation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid locationId)
     {

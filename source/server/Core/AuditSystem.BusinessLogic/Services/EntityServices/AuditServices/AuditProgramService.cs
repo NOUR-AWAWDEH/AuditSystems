@@ -18,14 +18,14 @@ internal sealed class AuditProgramService(
     IRepository<Guid, AuditProgram> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<AuditProgramService> logger,
+    ILogger<AuditProgramService> _logger,
     IAuditProgramValidation validationHelper,
     IAuditProgramSearch searchHelper) : 
     UnifiedCacheService<Guid, AuditProgram, AuditProgramModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.AuditProgram,
         AuditProgramConstants.AuditProgramTags,
         AuditProgramConstants.ListTags
@@ -40,7 +40,7 @@ internal sealed class AuditProgramService(
         ArgumentNullException.ThrowIfNull(auditProgramModel, nameof(auditProgramModel));
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating audit program {AuditProgramName} for user {UserId}", auditProgramModel.Description, userId);
+        _logger.LogInformation("Creating audit program {AuditProgramName} for user {UserId}", auditProgramModel.Description, userId);
 
         await _validationHelper.ValidateExitControlOwnershipAsync(auditProgramModel.ExitControlId, userId);
 
@@ -50,7 +50,7 @@ internal sealed class AuditProgramService(
         await CacheEntityAsync(createdEntity); 
         await InvalidateEntityTagsCacheAsync();
 
-        logger.LogInformation("Successfully created audit program {AuditProgramId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogInformation("Successfully created audit program {AuditProgramId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -59,7 +59,7 @@ internal sealed class AuditProgramService(
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
             
-        logger.LogInformation("Deleting audit program {AuditProgramId} for user {UserId}", auditProgramId, userId);
+        _logger.LogInformation("Deleting audit program {AuditProgramId} for user {UserId}", auditProgramId, userId);
 
         await _validationHelper.ValidateAuditProgramOwnershipAsync(auditProgramId, userId);
 
@@ -71,18 +71,19 @@ internal sealed class AuditProgramService(
         
         await ClearUserRelatedCachesAsync(userId, AuditProgramConstants.EntityName, exitControlId);
 
-        logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
+        _logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
     }
 
     public async Task<AuditProgramModel> GetAuditProgramByIdAsync(Guid id, Guid userId)
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving audit program {AuditProgramId} for user {UserId}",id,userId);
+        _logger.LogDebug("Retrieving audit program {AuditProgramId} for user {UserId}",id,userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<AuditProgramModel>(
             id,
             userId,
+            //use the Const Selector later
             entity => entity.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
             AuditProgramConstants.UnauthorizedAccessMessage);
 
@@ -101,7 +102,7 @@ internal sealed class AuditProgramService(
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retriving all audit programs for user {UserId}", userId);
+        _logger.LogDebug("Retriving all audit programs for user {UserId}", userId);
 
 
         return await repository.GetAll()
@@ -125,14 +126,14 @@ internal sealed class AuditProgramService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searcing audit programs whith name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searcing audit programs whith name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<AuditProgramModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(AuditProgramConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(AuditProgramConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -144,7 +145,7 @@ internal sealed class AuditProgramService(
         AuditProgramValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching audit programs for user {UserId} with term: {SearchTerm} and exit control: {ExitControlId}",
+        _logger.LogDebug("Searching audit programs for user {UserId} with term: {SearchTerm} and exit control: {ExitControlId}",
             userId, searchTerm ?? "(none)", exitControlId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, exitControlId, page);
@@ -164,7 +165,7 @@ internal sealed class AuditProgramService(
         ArgumentNullException.ThrowIfNull(auditProgramModel, nameof(auditProgramModel));
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating audit program {AuditProgramId} for user {UserId}", auditProgramModel.Id, userId);
+        _logger.LogInformation("Updating audit program {AuditProgramId} for user {UserId}", auditProgramModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateAuditProgramOwnershipAsync(auditProgramModel.Id, userId);
         
@@ -176,6 +177,6 @@ internal sealed class AuditProgramService(
         await CacheEntityAsync(existingEntity);
         await InvalidateEntityTagsCacheAsync();
 
-        logger.LogInformation("Successfully updated audit program {AuditProgramId}", auditProgramModel.Id);
+        _logger.LogInformation("Successfully updated audit program {AuditProgramId}", auditProgramModel.Id);
     }
 }

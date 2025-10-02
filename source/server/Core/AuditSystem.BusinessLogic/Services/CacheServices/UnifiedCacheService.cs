@@ -1,14 +1,12 @@
-﻿using AuditSystem.Contract.Interfaces.Cache;
+﻿using System;
+using System.Threading.Tasks;
+using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Domain.Entities.Common;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using AuditSystem.BusinessLogic.Extensions;
-using Microsoft.EntityFrameworkCore;
-using AuditSystem.Application.Constants;
 using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
+using AuditSystem.Application.Constants;
 
 namespace AuditSystem.BusinessLogic.Services.CacheServices;
 
@@ -19,263 +17,71 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     ILogger<UnifiedCacheService<TId, TEntity, TModel>> logger,
     string cacheKeyPrefix,
     string[] entityTags,
-    string[] listTags)
-    : IUnifiedCacheService<TId, TEntity, TModel>
+    string[] listTags) :
+    EntityCacheHandler<TId, TEntity, TModel>(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags),
+    IUnifiedCacheService<TId, TEntity, TModel>
     where TEntity : Entity<TId>
     where TId : IComparable<TId>
 {
-    private readonly ICacheService _cacheService = cacheService;
-    private readonly ILogger<UnifiedCacheService<TId, TEntity, TModel>> _logger = logger;
-    private readonly string _cacheKeyPrefix = cacheKeyPrefix;
-    private readonly string[] _entityTags = entityTags;
-    private readonly string[] _listTags = listTags;
+    private readonly SearchCacheHandler<TId, TEntity, TModel> searchHandler = 
+        new(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags);
+    private readonly CacheInvalidationHandler<TId, TEntity, TModel> invalidationHandler = 
+        new(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags);
 
-    public async Task<PaginationResult<TTargetModel>?> GetFromCacheAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page)
-    {
-        var cachedEntities = await TryGetCachedSearchResults(cacheKey);
-        if (cachedEntities == null)
-        {
-            return null;
-        }
+    #region Entity Cache
 
-        var cachedCount = await TryGetCachedSearchCountAsync(countCacheKey);
-        if (!cachedCount.HasValue)
-        {
-            return null;
-        }
+    //Generic version (returns TTargetModel)
+    public Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
+        TId id,
+        Guid userId,
+        System.Linq.Expressions.Expression<Func<TEntity, Guid>> userIdSelector,
+        string unauthorizedMessage)
+        where TTargetModel : class
+        => base.TryGetFromCacheWithValidationAsync<TTargetModel>(id, userId, userIdSelector, unauthorizedMessage);
 
-        return new PaginationResult<TTargetModel>
-        {
-            Items = mapper.Map<List<TTargetModel>>(cachedEntities),
-            TotalCount = cachedCount.Value,
-            PageNumber = page.Number,
-            PageSize = page.Size
-        };
-    }
+    public new Task CacheEntityAsync(TEntity entity)
+        => base.CacheEntityAsync(entity);
 
-    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(
-            string cacheKey,
-            string countCacheKey,
-            Page page,
-            string? name)
-    {
-        var predicate = BuildSearchPredicate<TEntity>("Name", name);
+    public new Task ClearEntityCacheAsync(TId id)
+        => base.ClearEntityCacheAsync(id);
 
-        var query = repository.GetAll()
-            .AsNoTracking()
-            .Where(predicate)
-            .OrderBy(x => x.Id);
+    public new string GetCacheKey(TId id, string lang = "en")
+        => base.GetCacheKey(id, lang);
 
-        var modelQuery = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
-        var result = await modelQuery.PaginateAsync(page, repository);
+    #endregion
 
-        var entities = mapper.Map<List<TEntity>>(result.Items);
-        await CacheSearchResultsAsync(cacheKey, entities);
-        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
+    #region Search Cache
 
-        return new PaginationResult<TTargetModel>
-        {
-            Items = result.Items,
-            TotalCount = result.TotalCount,
-            PageNumber = page.Number,
-            PageSize = page.Size
-        };
-    }
+    // Non-generic version (returns TModel)
+    public Task<PaginationResult<TModel>?> GetFromCacheAsync(string cacheKey, string countCacheKey, Page page)
+        => searchHandler.GetFromCacheAsync(cacheKey, countCacheKey, page);
 
-    public static Expression<Func<T, bool>> BuildSearchPredicate<T>(string propertyName, string? searchTerm)
-    {
-        var parameter = Expression.Parameter(typeof(T), "entity");
-        var property = Expression.Property(parameter, propertyName);
+    // Generic version (returns TTargetModel)
+    public Task<PaginationResult<TTargetModel>?> GetFromCacheAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page)
+        where TTargetModel : class
+        => searchHandler.GetFromCacheAsync<TTargetModel>(cacheKey, countCacheKey, page);
 
-        if (property.Type != typeof(string))
-            throw new InvalidOperationException($"Property '{propertyName}' is not of type string.");
+    // Non-generic version (returns TModel)
+    public Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? name = null)
+        => searchHandler.GetFromRepositoryAsync(cacheKey, countCacheKey, page, name);
 
-        if (string.IsNullOrEmpty(searchTerm))
-            return Expression.Lambda<Func<T, bool>>(Expression.Constant(true), parameter);
-
-        var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
-        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), [typeof(string)])!;
-
-        var propertyToLower = Expression.Call(property, toLowerMethod);
-
-        var searchTermToLower = Expression.Constant(searchTerm.ToLower(), typeof(string));
-
-        var containsCall = Expression.Call(propertyToLower, containsMethod, searchTermToLower);
-
-        return Expression.Lambda<Func<T, bool>>(containsCall, parameter);
-    }
-
-    public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
-    {
-        var cacheKey = GetSearchCacheKey(searchTerm, page);
-        var countCacheKey = GetSearchCountCacheKey(searchTerm);
-        return (cacheKey, countCacheKey);
-    }
-
-    public string GetCacheKey(TId id, string lang = "en") =>
-        string.Format(CacheKeys.CacheKey, _cacheKeyPrefix, id, lang);
-
-    public async Task SetCacheAsync(string cacheKey, TEntity entity)
-    {
-        await _cacheService.SetAsync(
-            key: cacheKey,
-            value: entity,
-            tags: _entityTags,
-            expiration: CacheExpirations.MediumTerm);
-
-        await InvalidateListTagsCacheAsync();
-    }
-
-    public async Task ClearCacheAsync(string cacheKey)
-    {
-        await _cacheService.RemoveByPatternAsync(cacheKey);
-        await InvalidateListTagsCacheAsync(); 
-        await InvalidateEntityTagsCacheAsync(); 
-    }
-
-    public string GetSearchCountCacheKey(string? searchTerm) =>
-        string.Format(CacheKeys.SearchCountCacheKey,
-            _cacheKeyPrefix,
-            searchTerm?.Trim().ToLowerInvariant() ?? "all");
-
-    public string GetSearchCacheKey(string? searchTerm, Page page) =>
-        string.Format(CacheKeys.SearchCacheKey,
-            _cacheKeyPrefix,
-            searchTerm?.Trim().ToLowerInvariant() ?? "all",
-            page.Number,
-            page.Size);
-
-    public async Task<int?> TryGetCachedSearchCountAsync(string countCacheKey)
-    {
-        return await _cacheService.GetAsync<int?>(countCacheKey);
-    }
-
-    public async Task CacheSearchCountAsync(string countCacheKey, int count)
-    {
-        await _cacheService.SetAsync(
-            key: countCacheKey,
-            value: count,
-            tags: _listTags,
-            expiration: CacheExpirations.MediumTerm);
-    }
-
-    public async Task<List<TEntity>?> TryGetCachedSearchResults(string cacheKey)
-    {
-        var cachedResults = await _cacheService.GetAsync<List<TEntity>>(cacheKey);
-        if (cachedResults != null)
-            _logger.LogDebug("Retrieved {Count} {EntityType} from cache with key {CacheKey}",
-                cachedResults.Count, typeof(TEntity).Name, cacheKey);
-        
-        return cachedResults;
-    }
-
-    public async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TEntity> entities)
-    {
-        await _cacheService.SetAsync(
-            key: cacheKey,
-            value: entities.ToList(),
-            tags: _listTags,
-            expiration: CacheExpirations.MediumTerm);
-    }
-
-    public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(TId id, Guid userId, Expression<Func<TEntity, Guid>> userIdSelector, string unauthorizedMessage)
-    {
-        var cacheKey = GetCacheKey(id);
-        var cachedEntity = await _cacheService.GetAsync<TEntity>(cacheKey);
-
-        if (cachedEntity == null)
-        {
-            return default;
-        }
-
-        var compiledSelector = userIdSelector.Compile();
-        var entityUserId = compiledSelector(cachedEntity);
-
-        if (entityUserId != userId)
-        {
-            throw new UnauthorizedAccessException(
-                string.Format(unauthorizedMessage, userId, id));
-        }
-
-        return mapper.Map<TTargetModel>(cachedEntity);
-    }
-
-    public async Task CacheEntityAsync(TEntity entity)
-    {
-        var cacheKey = GetCacheKey(entity.Id);
-        await SetCacheAsync(cacheKey, entity);
-    }
-
-    public async Task ClearEntityCacheAsync(TId id)
-    {
-        var cacheKey = GetCacheKey(id);
-        await ClearCacheAsync(cacheKey);
-    }
+    // Generic version (returns TTargetModel)
+    public Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page, string? name = null)
+        where TTargetModel : class
+        => searchHandler.GetFromRepositoryAsync<TTargetModel>(cacheKey, countCacheKey, page, name);
     
-    public async Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName, Guid? relatedId = null)
-    {
-        if (string.IsNullOrWhiteSpace(entityTypeName))
-            throw new ArgumentException("Entity type name must be provided", nameof(entityTypeName));
+    public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
+        => searchHandler.GetSearchCacheKeys(searchTerm, page);
 
-        var normalizedEntity = entityTypeName.ToLowerInvariant();
+    #endregion
 
-        var searchPattern = $"{normalizedEntity}_search_user_{userId}_*";
-        await _cacheService.RemoveByPatternAsync(searchPattern);
+    #region Cache Invalidation
 
-        var countPattern = $"{normalizedEntity}_search_count_user_{userId}_*";
-        await _cacheService.RemoveByPatternAsync(countPattern); 
+    public Task InvalidateEntityTagsCacheAsync()
+        => invalidationHandler.InvalidateEntityTagsCacheAsync();
 
-        var listKey = $"{normalizedEntity}_list_user_{userId}";
-        await _cacheService.RemoveByPatternAsync(listKey); 
+    public Task ClearUserRelatedCachesAsync(Guid userId, string entityTypeName, Guid? relatedId = null)
+        => invalidationHandler.ClearUserRelatedCachesAsync(userId, entityTypeName, relatedId);
 
-        if (relatedId.HasValue)
-        {
-            var searchWithRelated = $"{normalizedEntity}_search_user_{userId}_*_{relatedId.Value}_*";
-            var countWithRelated = $"{normalizedEntity}_search_count_user_{userId}_*_{relatedId.Value}";
-            await _cacheService.RemoveByPatternAsync(searchWithRelated);
-            await _cacheService.RemoveByPatternAsync(countWithRelated); 
-        }
-
-        await InvalidateListTagsCacheAsync();
-
-        _logger.LogDebug("Cleared caches for {EntityType}, user {UserId}, relatedId {RelatedId}", 
-            entityTypeName, userId, relatedId);
-    }
-
-
-    public async Task InvalidateEntityTagsCacheAsync()
-    {
-        await _cacheService.RemoveCacheByTagAsync(_entityTags);
-    }
-
-    public async Task InvalidateListTagsCacheAsync()
-    {
-        await _cacheService.RemoveCacheByTagAsync(_listTags);
-    }
-
-    public async Task<PaginationResult<TTargetModel>> GetAllFromRepositoryAsync<TTargetModel>(
-    string cacheKey,
-    string countCacheKey,
-    Page page,
-    string? name = null)
-    {
-        var query = repository.GetAll()
-                              .OrderBy(x => x.Id);
-
-        var modelQuery = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
-        var result = await modelQuery.PaginateAsync(page, repository);
-
-        // Cache results
-        var entities = mapper.Map<List<TEntity>>(result.Items);
-        await CacheSearchResultsAsync(cacheKey, entities);
-        await CacheSearchCountAsync(countCacheKey, result.TotalCount);
-
-        return new PaginationResult<TTargetModel>
-        {
-            Items = result.Items,
-            TotalCount = result.TotalCount,
-            PageNumber = page.Number,
-            PageSize = page.Size
-        };
-    }
+    #endregion
 }

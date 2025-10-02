@@ -8,11 +8,9 @@ using AuditSystem.Domain.Entities.Organization;
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 
 public class SubLocationValidationHelper(
-    IRepository<Guid, SubLocation> subLocationRepository,
     IRepository<Guid, Location> locationRepository) 
     : ISubLocationValidation
 {
-    private readonly IRepository<Guid, SubLocation> _subLocationRepository = subLocationRepository ?? throw new ArgumentNullException(nameof(subLocationRepository));
     private readonly IRepository<Guid, Location> _locationRepository = locationRepository ?? throw new ArgumentNullException(nameof(locationRepository));
 
     public static void ValidateUserId(Guid userId)

@@ -9,31 +9,23 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
 
-internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, IRateService
+internal sealed class RateService(
+    IRepository<Guid, Rate> repository,
+    IMapper mapper,
+    ICacheService cacheService,
+    ILogger<RateService> logger
+    ) : UnifiedCacheService<Guid, Rate, RateModel>(repository, mapper, cacheService, logger, CacheKeys.Rate, RatingTags, ListTags), IRateService
 {
     private static readonly string[] RatingTags = ["ratings", "rating-list"];
     private static readonly string[] ListTags = ["rating-list"];
 
-    private readonly IRepository<Guid, Rate> _repository;
-    private readonly IMapper _mapper;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<RateService> _logger;
-
-    public RateService(
-        IRepository<Guid, Rate> repository,
-        IMapper mapper,
-        ICacheService cacheService,
-        ILogger<RateService> logger
-    ) : base(repository, mapper, cacheService, logger, CacheKeys.Rate, RatingTags, ListTags)
-    {
-        _repository = repository;
-        _mapper = mapper;
-        _cacheService = cacheService;
-        _logger = logger;
-    }
+    private readonly IRepository<Guid, Rate> _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<RateService> _logger = logger;
 
     public async Task<Guid> CreateRateAsync(RateModel rateModel)
     {
@@ -47,9 +39,10 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
             throw new InvalidOperationException($"Invalid rate level: {rateModel.Level}");
         }
 
-        // Check for duplicates
-        var exists = await _repository.CountAsync(r => r.Level == rateModel.Level);
-        if (exists > 0)
+        // Check for duplicates using EF Core directly
+        var exists = await _repository.GetAll()
+            .AnyAsync(r => r.Level == rateModel.Level);
+        if (exists)
         {
             _logger.LogWarning("Rate with level {Level} already exists.", rateModel.Level);
             throw new InvalidOperationException($"Rate with level '{rateModel.Level}' already exists.");
@@ -58,9 +51,7 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
         var entity = _mapper.Map<Rate>(rateModel);
         var createdEntity = await _repository.CreateAsync(entity);
 
-        var cacheKey = GetCacheKey(createdEntity.Id);
-        await SetCacheAsync(cacheKey, entity);
-
+        await CacheEntityAsync(entity);
         _logger.LogInformation("Rate created successfully with ID {Id}", createdEntity.Id);
         return createdEntity.Id;
     }
@@ -77,30 +68,36 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
             throw new InvalidOperationException($"Invalid rate level: {rateModel.Level}");
         }
 
-        // Check for duplicate level in other rows
-        var exists = await _repository.CountAsync(r => r.Level == rateModel.Level && r.Id != rateModel.Id);
-        if (exists > 0)
+        // Check for duplicate level in other rows using EF Core directly
+        var exists = await _repository.GetAll()
+            .AnyAsync(r => r.Level == rateModel.Level && r.Id != rateModel.Id);
+        if (exists)
         {
             _logger.LogWarning("Rate level {Level} already exists.", rateModel.Level);
             throw new InvalidOperationException($"Rate with level '{rateModel.Level}' already exists.");
         }
 
-        var entity = _mapper.Map<Rate>(rateModel);
-        await _repository.UpdateAsync(entity);
+        var existingEntity = await _repository.GetByIdAsync(rateModel.Id);
+        if (existingEntity is null)
+        {
+            _logger.LogWarning("Rate with ID {Id} not found for update", rateModel.Id);
+            throw new KeyNotFoundException($"Rate with ID {rateModel.Id} not found.");
+        }
 
-        var cacheKey = GetCacheKey(entity.Id);
-        await SetCacheAsync(cacheKey, entity);
+        _mapper.Map(rateModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
 
-        _logger.LogInformation("Rate with ID {Id} updated successfully", entity.Id);
+        await _repository.UpdateAsync(existingEntity);
+        await CacheEntityAsync(existingEntity);
+
+        _logger.LogInformation("Rate with ID {Id} updated successfully", rateModel.Id);
     }
 
     public async Task DeleteRateAsync(Guid rateId)
     {
         _logger.LogInformation("Deleting rate with ID {Id}", rateId);
 
-        var cacheKey = GetCacheKey(rateId);
         var entity = await _repository.GetByIdAsync(rateId);
-
         if (entity is null)
         {
             _logger.LogWarning("Rate with ID {Id} not found for deletion", rateId);
@@ -108,7 +105,8 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
         }
 
         await _repository.DeleteAsync(rateId);
-        await ClearCacheAsync(cacheKey);
+        await ClearEntityCacheAsync(rateId);
+        await InvalidateEntityTagsCacheAsync();
 
         _logger.LogInformation("Rate with ID {Id} deleted successfully", rateId);
     }
@@ -121,7 +119,7 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(null, page);
 
-        // Try getting from cache first
+        // Try getting from cache first using the base class method
         var cachedResult = await GetFromCacheAsync<RateModel>(cacheKey, countCacheKey, page);
         if (cachedResult is not null)
         {
@@ -129,11 +127,15 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
             return cachedResult;
         }
 
-        // Fetch all records from repository
-        var result = await GetAllFromRepositoryAsync<RateModel>(cacheKey, countCacheKey, page);
+        // Fetch from repository using EF Core directly
+        var query = _repository.GetAll()
+            .AsNoTracking()
+            .OrderBy(r => r.Level);
+
+        // Use the base class pagination method
+        var result = await GetFromRepositoryAsync<RateModel>(cacheKey, countCacheKey, page);
 
         _logger.LogInformation("Found {Count} rate levels from repository", result.Items.Count);
-
         return result;
     }
 
@@ -141,25 +143,44 @@ internal sealed class RateService : UnifiedCacheService<Guid, Rate, RateModel>, 
     {
         _logger.LogInformation("Fetching rate by ID {Id}", id);
 
-        var cacheKey = GetCacheKey(id);
-        var cachedEntity = await _cacheService.GetAsync<Rate>(cacheKey);
+        var cachedResult = await TryGetFromCacheWithValidationAsync<RateModel>(
+            id,
+            Guid.Empty,
+            entity => Guid.Empty,
+            "Unauthorized");
 
-        if (cachedEntity is not null)
+        if (cachedResult is not null)
         {
             _logger.LogInformation("Returning cached rate with ID {Id}", id);
-            return _mapper.Map<RateModel>(cachedEntity);
+            return cachedResult;
         }
 
-        var entity = await _repository.GetByIdAsync(id);
+        // Fetch from repository using EF Core directly
+        var entity = await _repository.GetAll()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id);
+
         if (entity is null)
         {
             _logger.LogWarning("Rate with ID {Id} not found", id);
             throw new KeyNotFoundException($"Rate with ID '{id}' not found.");
         }
 
-        await SetCacheAsync(cacheKey, entity);
+        await CacheEntityAsync(entity);
         _logger.LogInformation("Rate with ID {Id} retrieved from repository", id);
 
         return _mapper.Map<RateModel>(entity);
+    }
+
+    // Additional helper method to get all rates without pagination (if needed)
+    public async Task<IReadOnlyList<RateModel>> GetAllRatesAsync()
+    {
+        _logger.LogInformation("Retrieving all rate levels");
+
+        return await _repository.GetAll()
+            .AsNoTracking()
+            .OrderBy(r => r.Level)
+            .Select(r => _mapper.Map<RateModel>(r))
+            .ToListAsync();
     }
 }

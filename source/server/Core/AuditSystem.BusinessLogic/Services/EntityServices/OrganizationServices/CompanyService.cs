@@ -36,9 +36,7 @@ internal sealed class CompanyService(
 
         var entity = mapper.Map<Company>(companyModel);
         var createdEntity = await repository.CreateAsync(entity);
-
-        var cacheKey = GetCacheKey(createdEntity.Id);
-        await SetCacheAsync(cacheKey, createdEntity);
+       await CacheEntityAsync(entity);
 
         return createdEntity.Id;
     }
@@ -51,7 +49,7 @@ internal sealed class CompanyService(
             ?? throw new KeyNotFoundException($"Company with ID {companyId} not found.");
 
         await repository.DeleteAsync(companyId);
-        await ClearCacheAsync(cacheKey);
+       await CacheEntityAsync(entity);
     }
 
     public async Task<CompanyModel> GetCompanyByIdAsync(Guid id)
@@ -65,7 +63,7 @@ internal sealed class CompanyService(
         var entity = await repository.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Company with ID '{id}' not found.");
 
-        await SetCacheAsync(cacheKey, entity);
+       await CacheEntityAsync(entity);
         
         return mapper.Map<CompanyModel>(entity);
     }
@@ -91,6 +89,6 @@ internal sealed class CompanyService(
         await repository.UpdateAsync(entity);
         
         var cacheKey = GetCacheKey(entity.Id);
-        await SetCacheAsync(cacheKey, entity);
+        await CacheEntityAsync(entity);
     }
 }

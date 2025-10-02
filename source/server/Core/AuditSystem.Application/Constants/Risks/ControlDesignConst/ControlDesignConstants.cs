@@ -1,26 +1,16 @@
 using System.Linq.Expressions;
 using AuditSystem.Domain.Entities.Risks;
 
-
 namespace AuditSystem.Application.Constants.Risks.ControlDesignConst;
 
 public static class ControlDesignConstants
 {
     public static readonly string[] ControlDesignTags = ["control-designs", "control-design-list"];
     public static readonly string[] ListTags = ["control-design-list"];
-    public static readonly Expression<Func<ControlDesign, object?>>[] IncludeHierarchy =
-    [
-        cd => cd.ExitControl,
-        cd => cd.ExitControl.Risk,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
-        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.Company,
-    ];
+    
+    public static readonly Expression<Func<ControlDesign, Guid>> ControlDesignOwnerIdSelector = 
+        cd => cd.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess
+                .AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
 
     public const string EntityName = "ControlDesign";
 

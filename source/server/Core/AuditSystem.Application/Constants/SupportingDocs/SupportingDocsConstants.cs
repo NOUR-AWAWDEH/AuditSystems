@@ -8,7 +8,8 @@ public static class SupportingDocsConstants
 {
     public static readonly string[] SupportingDocTags = ["supporting-docs", "supporting-doc-list"];
     public static readonly string[] ListTags = ["supporting-doc-list"];
-    public static readonly Expression<Func<SupportingDocEntity, object?>>[] IncludeUser = [s => s.User];
+    public static readonly Expression<Func<SupportingDocEntity, Guid>> SupportingDocOwnerIdSelector = 
+        s => s.UserId;
     
     public const string EntityName = "SupportingDoc";
     public const string ServiceName = "SupportingDocs";

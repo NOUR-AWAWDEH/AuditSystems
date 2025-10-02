@@ -1,18 +1,15 @@
 using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
 using AuditSystem.Application.Constants.RiskControls.RiskControlMatrixConst;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 
-public class ObjectiveValidationHelper : IObjectiveValidation
+public class ObjectiveValidationHelper(IRepository<Guid, Objective> repository) : IObjectiveValidation
 {
-    private readonly IRepository<Guid, Objective> _repository;
-    public ObjectiveValidationHelper(IRepository<Guid, Objective> repository)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    }
+    private readonly IRepository<Guid, Objective> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
     public static void ValidateUserId(Guid userId) 
     {
@@ -22,23 +19,27 @@ public class ObjectiveValidationHelper : IObjectiveValidation
 
     public async Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId)
     {
-        var objective = await _repository.GetByIdAsync(objectiveId, ObjectiveConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(ObjectiveConstants.ObjectiveNotFoundMessage, objectiveId));
-        
-        if (objective.RiskControlMatrix?.SubProcess?.AuditProcess?.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId));
-
-        return objective;
+        return await OwnershipValidator.ValidateOwnershipAsync<Objective, Guid>(
+            _repository.Query(),
+            o => o.Id == objectiveId,
+            ObjectiveConstants.ObjectiveOwnerIdSelector,
+            userId,
+            string.Format(ObjectiveConstants.ObjectiveNotFoundMessage, objectiveId),
+            string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId)
+        );
     }
 
     public async Task<RiskControlMatrix> ValidateRiskControlMatrixOwnershipAsync(Guid riskControlMatrixId, Guid userId)
     {
-        var riskControlMatrix = await _repository.GetByIdAsync(riskControlMatrixId, RiskControlMatrixConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(RiskControlMatrixConstants.RiskControlMatrixNotFoundMessage, riskControlMatrixId));
+       var riskControlMatrixWithObjective = await OwnershipValidator.ValidateOwnershipAsync<Objective, Guid>(
+            _repository.Query(),
+            o => o.RiskControlMatrix.Id == riskControlMatrixId,
+           ObjectiveConstants.ObjectiveOwnerIdSelector,
+            userId,
+            string.Format(RiskControlMatrixConstants.RiskControlMatrixNotFoundMessage, riskControlMatrixId),
+            string.Format(RiskControlMatrixConstants.UnauthorizedAccessMessage, userId, riskControlMatrixId)
+        );
         
-        if (riskControlMatrix.SubProcess?.AuditProcess?.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(RiskControlMatrixConstants.UnauthorizedAccessMessage, userId, riskControlMatrixId));
-        
-        return riskControlMatrix;
+        return riskControlMatrixWithObjective.RiskControlMatrix;
     }
 }

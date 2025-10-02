@@ -7,7 +7,8 @@ public static class SubLocationConstants
 {
     public static readonly string[] SubLocationTags = ["sub-locations", "sub-location-list"];
     public static readonly string[] ListTags = ["sub-location-list"];
-    public static readonly Expression<Func<SubLocation, object?>>[] IncludeLocation = [sl => sl.Location];
+    public static readonly Expression<Func<SubLocation, Guid>> SubLocationOwnerIdSelector =
+        sl => sl.Location.UserId;
 
     public const string EntityName = "SubLocation";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access sublocation {1}.";

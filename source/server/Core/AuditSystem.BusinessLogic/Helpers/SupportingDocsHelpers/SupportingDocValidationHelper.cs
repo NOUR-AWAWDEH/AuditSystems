@@ -1,4 +1,5 @@
 using AuditSystem.Application.Constants.SupportingDocs;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.SupportingDocs;
@@ -23,15 +24,13 @@ public class SupportingDocValidationHelper(IRepository<Guid, SupportingDoc> repo
 
     public async Task<SupportingDoc> ValidateSupportingDocOwnershipAsync(Guid supportingDocId, Guid userId)
     {
-        var supportingDoc = await _repository.GetByIdAsync(supportingDocId)
-            ?? throw new KeyNotFoundException(string.Format(SupportingDocsConstants.SupportingDocNotFoundMessage, supportingDocId));
-        
-        if (supportingDoc.UserId != userId)
-        {
-            throw new UnauthorizedAccessException(
-                string.Format(SupportingDocsConstants.UnauthorizedAccessMessage, userId, supportingDocId));
-        }
-        
-        return supportingDoc;
+        return await OwnershipValidator.ValidateOwnershipAsync<SupportingDoc, Guid>(
+            _repository.Query(),
+            sd => sd.Id == supportingDocId,
+            SupportingDocsConstants.SupportingDocOwnerIdSelector,
+            userId,
+            string.Format(SupportingDocsConstants.SupportingDocNotFoundMessage, supportingDocId),
+            string.Format(SupportingDocsConstants.UnauthorizedAccessMessage, userId, supportingDocId)
+        );
     }
 }

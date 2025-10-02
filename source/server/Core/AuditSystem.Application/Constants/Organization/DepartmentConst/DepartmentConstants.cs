@@ -7,12 +7,8 @@ public static class DepartmentConstants
 {
     public static readonly string[] DepartmentTags = ["department", "department-list"];
     public static readonly string[] ListTags = ["department-list"];
-    public static readonly Expression<Func<Department, object?>>[] IncludeHierarchy =
-    [
-        d => d.SubLocation,
-        d => d.SubLocation.Location
-    ];
-
+    public static readonly Expression<Func<Department, Guid>> DepartmentOwnerIdSelector =
+        d => d.SubLocation.Location.UserId;
 
     public const string EntityName = "Department";
 

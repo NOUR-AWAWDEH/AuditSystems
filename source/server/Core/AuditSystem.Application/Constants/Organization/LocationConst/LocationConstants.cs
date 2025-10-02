@@ -8,9 +8,8 @@ public static class LocationConstants
 {
     public static readonly string[] LocationTags = ["locations", "location-list"];
     public static readonly string[] ListTags = ["location-list"];
-    public static readonly Expression<Func<Location, object?>>[] IncludeCompany = [l => l.Company];
-    public static readonly Expression<Func<Location, object?>>[] IncludeUser = [l => l.User];
-    public static readonly Expression<Func<Location, object?>>[] IncludeAll = [l => l.Company, l => l.User];
+    public static readonly Expression<Func<Location, Guid>> LocationOwnerIdSelector =
+        l => l.UserId;
     
     public const string EntityName = "Location";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access location {1}.";

@@ -7,13 +7,8 @@ public static class AuditProcessConstants
 {
     public static readonly string[] AuditProcessTags = ["audit-process", "audit-process-list"];
     public static readonly string[] ListTags = ["audit-process-list"];
-    public static readonly Expression<Func<AuditProcess, object?>>[] IncludeHierarchy =
-    [
-        d => d.SubDepartment,
-        d => d.SubDepartment.Department,
-        d => d.SubDepartment.Department.SubLocation,
-        d => d.SubDepartment.Department.SubLocation.Location
-    ];
+    public static readonly Expression<Func<AuditProcess, Guid>> AuditProcessOwnerIdSelector =
+        ap => ap.SubDepartment.Department.SubLocation.Location.UserId;
 
     public const string EntityName = "AuditProcess";
 

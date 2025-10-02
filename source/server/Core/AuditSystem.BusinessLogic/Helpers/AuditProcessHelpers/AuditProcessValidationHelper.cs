@@ -1,9 +1,11 @@
 using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
 using AuditSystem.Application.Constants.Processes.AuditProcessConst;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 
@@ -24,23 +26,26 @@ public class AuditProcessValidationHelper : IAuditProcessValidation
 
     public async Task<AuditProcess> ValidateAuditProcessOwnerShipAsync(Guid auditProcessId, Guid userId)
     {
-        var auditProcess = await _repository.GetByIdAsync(auditProcessId, AuditProcessConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(AuditProcessConstants.AuditProcessNotFoundMessage, auditProcessId));
-        
-        if (auditProcess.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(AuditProcessConstants.UnauthorizedAccessMessage, userId, auditProcessId));
-        
-        return auditProcess;
+       return await OwnershipValidator.ValidateOwnershipAsync<AuditProcess, Guid>(
+            _repository.Query(),
+            cd =>  cd.Id == auditProcessId,
+            AuditProcessConstants.AuditProcessOwnerIdSelector,
+            userId,
+            string.Format(AuditProcessConstants.AuditProcessNotFoundMessage, auditProcessId),
+            string.Format(AuditProcessConstants.UnauthorizedAccessMessage, userId, auditProcessId)
+       );
     }
 
     public async Task<SubDepartment> ValidateSubDepartmentOwnerShipAsync(Guid subDepartmentId, Guid userId)
     {
-        var subDepartment = await _repository.GetByIdAsync(subDepartmentId, SubDepartmentConstants.IncludeDepartmentWithLocation)
-            ?? throw new KeyNotFoundException(string.Format(SubDepartmentConstants.SubDepartmentNotFoundMessage, subDepartmentId));
-
-        if (subDepartment.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(SubDepartmentConstants.UnauthorizedAccessMessage, userId, subDepartmentId));
-        
-        return subDepartment;
+        var subDepartmentWithAuditProcess = await OwnershipValidator.ValidateOwnershipAsync<AuditProcess, Guid>(
+            _repository.Query(),
+            ap => ap.SubDepartment.Id == subDepartmentId,
+            AuditProcessConstants.AuditProcessOwnerIdSelector,
+            userId,
+            string.Format(SubDepartmentConstants.SubDepartmentNotFoundMessage, subDepartmentId),
+            string.Format(SubDepartmentConstants.UnauthorizedAccessMessage, userId, subDepartmentId)
+       );
+        return subDepartmentWithAuditProcess.SubDepartment;
     }
 }

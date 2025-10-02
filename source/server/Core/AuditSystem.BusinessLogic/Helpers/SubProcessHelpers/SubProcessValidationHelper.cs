@@ -1,6 +1,7 @@
 using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using AuditSystem.Application.Constants.Processes.SubProcessConst;
 using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Processes;
@@ -19,24 +20,27 @@ public class SubProcessValidationHelper(IRepository<Guid, SubProcess> repository
 
     public async Task<SubProcess> ValidateSubProcessOwnershipAsync(Guid subProcessId, Guid userId)
     {
-        var subProcess = await _repository.GetByIdAsync(subProcessId, SubProcessConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(SubProcessConstants.SubProcessNotFoundMessage, subProcessId));
-        
-        if (subProcess.AuditProcess?.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(SubProcessConstants.UnauthorizedAccessMessage, userId, subProcessId));
-
-        return subProcess;
+        return await OwnershipValidator.ValidateOwnershipAsync<SubProcess, Guid>(
+            _repository.Query(),
+            sp => sp.Id == subProcessId,
+            SubProcessConstants.SubProcessOwnerIdSelector,
+            userId,
+            string.Format(SubProcessConstants.SubProcessNotFoundMessage, subProcessId),
+            string.Format(SubProcessConstants.UnauthorizedAccessMessage, userId, subProcessId)
+        );
     }
 
     public async Task<AuditProcess> ValidateAuditProcessOwnershipAsync(Guid auditProcessId, Guid userId)
     {
-        var auditProcess = await _repository.GetByIdAsync(auditProcessId, AuditProcessConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(AuditProcessConstants.AuditProcessNotFoundMessage, auditProcessId));
+        var auditProcessWithSubProcess = await OwnershipValidator.ValidateOwnershipAsync<SubProcess, Guid>(
+            _repository.Query(),
+            sp => sp.AuditProcess.Id == auditProcessId,
+            SubProcessConstants.SubProcessOwnerIdSelector,
+            userId,
+            string.Format(SubProcessConstants.AuditProcessNotFoundMessage, auditProcessId),
+            string.Format(SubProcessConstants.UnauthorizedAccessMessage, userId, auditProcessId)
+        );
         
-        if (auditProcess.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(AuditProcessConstants.UnauthorizedAccessMessage, userId, auditProcessId));
-        
-        return auditProcess;
+        return auditProcessWithSubProcess.AuditProcess;
     }
-
 }

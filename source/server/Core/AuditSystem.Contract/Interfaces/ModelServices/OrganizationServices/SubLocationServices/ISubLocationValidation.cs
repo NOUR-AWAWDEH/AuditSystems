@@ -4,6 +4,6 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Sub
 
 public interface ISubLocationValidation
 {
-    Task<SubLocation> ValidateSubLocationOwnershipAsync(Guid subLocationId, Guid userId);
     Task<Location> ValidateLocationOwnershipAsync(Guid locationId, Guid userId);
+    Task<SubLocation> ValidateSubLocationOwnershipAsync(SubLocation subLocation, Guid userId);
 }

@@ -1,5 +1,6 @@
 using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
 using AuditSystem.Application.Constants.Risks.RiskConst;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.RiskControls;
@@ -19,23 +20,27 @@ public class RiskValidationHelper(IRepository<Guid, Risk> repository) : IRiskVal
 
     public async Task<Risk> ValidateRiskOwnershipAsync(Guid riskId, Guid userId)
     {
-        var risk = await _repository.GetByIdAsync(riskId, RiskConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(RiskConstants.RiskNotFoundMessage, riskId));
-        
-        if (risk.Objective?.RiskControlMatrix?.SubProcess?.AuditProcess?.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(RiskConstants.UnauthorizedAccessMessage, userId, riskId));
-
-        return risk;
+        return await OwnershipValidator.ValidateOwnershipAsync<Risk, Guid>(
+            _repository.Query(),
+            r => r.Id == riskId,
+            RiskConstants.RiskOwnerIdSelector,
+            userId,
+            string.Format(RiskConstants.RiskNotFoundMessage, riskId),
+            string.Format(RiskConstants.UnauthorizedAccessMessage, userId, riskId)
+        );
     }
 
     public async Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId)
     {
-        var objective = await _repository.GetByIdAsync(objectiveId, ObjectiveConstants.IncludeHierarchy)
-            ?? throw new KeyNotFoundException(string.Format(ObjectiveConstants.ObjectiveNotFoundMessage, objectiveId));
+        var objectiveWithRisk = await OwnershipValidator.ValidateOwnershipAsync<Risk, Guid>(
+            _repository.Query(),
+            rcm => rcm.Objective.Id == objectiveId,
+            RiskConstants.RiskOwnerIdSelector,
+            userId,
+            string.Format(ObjectiveConstants.ObjectiveNotFoundMessage, objectiveId),
+            string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId)
+        );
         
-        if (objective.RiskControlMatrix?.SubProcess?.AuditProcess?.SubDepartment?.Department?.SubLocation?.Location?.UserId != userId)
-            throw new ArgumentException(string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId));
-        
-        return objective;
+        return objectiveWithRisk.Objective;
     }
 }

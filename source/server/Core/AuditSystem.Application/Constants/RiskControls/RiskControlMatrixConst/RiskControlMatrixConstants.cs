@@ -7,16 +7,10 @@ public static class RiskControlMatrixConstants
 {   
     public static readonly string[] RiskControlMatrixTags = ["risk-control-matrices", "risk-control-matrix-list"];
     public static readonly string[] ListTags = ["risk-control-matrix-list"];
-    public static readonly Expression<Func<RiskControlMatrix, object?>>[] IncludeHierarchy =
-    [
-        sp => sp.SubProcess,
-        sp => sp.SubProcess.AuditProcess,
-        sp => sp.SubProcess.AuditProcess.SubDepartment,
-        sp => sp.SubProcess.AuditProcess.SubDepartment.Department,
-        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
-        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
-    ];
-
+    
+    public static readonly Expression<Func<RiskControlMatrix, Guid>> RiskControlMatrixOwnerIdSelector =
+        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+    
     public const string EntityName = "RiskControlMatrix";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access risk control matrix {1}.";

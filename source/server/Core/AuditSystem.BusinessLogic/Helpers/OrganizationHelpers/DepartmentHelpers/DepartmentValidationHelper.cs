@@ -1,5 +1,6 @@
 using AuditSystem.Application.Constants.Organization.DepartmentConst;
 using AuditSystem.Application.Constants.Organization.SublocationConst;
+using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
@@ -20,30 +21,27 @@ public class DepartmentValidationHelper(
 
     public async Task<Department> ValidateDepartmentOwnershipAsync(Guid departmentId, Guid userId)
     {
-        var department = await _repository.GetByIdAsync(departmentId, DepartmentConstants.IncludeHierarchy) 
-            ?? throw new KeyNotFoundException(string.Format(DepartmentConstants.DepartmentNotFoundMessage, departmentId ));
-
-        if (department.SubLocation?.Location?.UserId != userId)
-            throw new UnauthorizedAccessException( string.Format(DepartmentConstants.UnauthorizedDepartmentAccessMessage, userId, departmentId));
-
-        return department;
+       return await OwnershipValidator.ValidateOwnershipAsync<Department, Guid>(
+            _repository.Query(),
+            d => d.Id == departmentId,
+            DepartmentConstants.DepartmentOwnerIdSelector,
+            userId,
+            string.Format(DepartmentConstants.DepartmentNotFoundMessage, departmentId),
+            string.Format(DepartmentConstants.UnauthorizedDepartmentAccessMessage, userId, departmentId)
+        );
     }
 
     public async Task<SubLocation> ValidateSubLocationOwnershipAsync(Guid subLocationId, Guid userId)
     {
-        var subLocation = await _repository.GetByIdAsync(subLocationId, SubLocationConstants.IncludeLocation)
-                ?? throw new KeyNotFoundException(string.Format(
-                    DepartmentConstants.SubLocationNotFoundMessage,
-                    subLocationId
-                ));
+        var subLocationWithDepartment = await OwnershipValidator.ValidateOwnershipAsync<Department, Guid>(
+            _repository.Query(),
+            sl => sl.SubLocation.Id == subLocationId,
+            DepartmentConstants.DepartmentOwnerIdSelector,
+            userId,
+            string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationId),
+            string.Format(SubLocationConstants.UnauthorizedAccessMessage, userId, subLocationId)
+        );
 
-        // Add null check for safety
-        if (subLocation.Location?.UserId != userId) 
-            throw new UnauthorizedAccessException( string.Format(
-                DepartmentConstants.UnauthorizedSubLocationAccessMessage,
-                userId, subLocationId
-            ));
-
-        return subLocation;
+        return subLocationWithDepartment.SubLocation;
     }
 }

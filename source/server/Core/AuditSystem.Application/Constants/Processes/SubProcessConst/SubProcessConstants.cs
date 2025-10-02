@@ -7,14 +7,9 @@ public static class SubProcessConstants
 {   
     public static readonly string[] SubProcessTags = ["sub-processes", "sub-process-list"];
     public static readonly string[] ListTags = ["sub-process-list"];
-    public static readonly Expression<Func<SubProcess, object?>>[] IncludeHierarchy =
-    [
-        sp => sp.AuditProcess,
-        sp => sp.AuditProcess.SubDepartment,
-        sp => sp.AuditProcess.SubDepartment.Department,
-        sp => sp.AuditProcess.SubDepartment.Department.SubLocation,
-        sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location,
-    ];
+    
+    public static readonly Expression<Func<SubProcess, Guid>> SubProcessOwnerIdSelector =
+        sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
 
     public const string EntityName = "SubProcess";
 

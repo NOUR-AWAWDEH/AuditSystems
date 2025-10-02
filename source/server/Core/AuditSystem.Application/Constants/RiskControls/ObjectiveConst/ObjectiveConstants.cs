@@ -7,17 +7,10 @@ public static class ObjectiveConstants
 {   
     public static readonly string[] ObjectiveTags = ["objectives", "objective-list"];
     public static readonly string[] ListTags = ["objective-list"];
-    public static readonly Expression<Func<Objective, object?>>[] IncludeHierarchy =
-    [
-        sp => sp.RiskControlMatrix,
-        sp => sp.RiskControlMatrix.SubProcess,
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess,
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment,
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department,
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
-    ];
-
+    
+    public static readonly Expression<Func<Objective, Guid>> ObjectiveOwnerIdSelector =
+        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+ 
     public const string EntityName = "Objective";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access objective {1}.";

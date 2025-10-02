@@ -9,21 +9,10 @@ public static class ObservationConstants
     public static readonly string[] ObservationTags = ["observation", "observation-list"];
     public static readonly string[] ListTags = ["observation-list"];
 
-    public static readonly Expression<Func<Observation, object?>>[] IncludeHierarchy =
-    [
-        o => o.AuditProgram,
-        o => o.AuditProgram.ExitControl,
-        o => o.AuditProgram.ExitControl.Risk,
-        o => o.AuditProgram.ExitControl.Risk.Objective,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
-    ];
-
+    public static readonly Expression<Func<Observation, Guid>> ObservationOwnerIdSelector =
+        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.
+            AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+    
     public const string EntityName = "Observation";
     
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access observation {1}.";

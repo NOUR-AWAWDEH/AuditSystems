@@ -35,70 +35,62 @@ internal sealed class SubLocationService(
     private readonly ISubLocationValidation _validationHelper = validationHelper;
     private readonly ISubLocationSearch _searchHelper = searchHelper;
 
-    public async Task<Guid> CreateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
+    // CREATE
+    public async Task<Guid> CreateSubLocationAsync(SubLocationModel model, Guid userId)
     {
-        ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
+        ArgumentNullException.ThrowIfNull(model);
         SubLocationValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating sublocation {SublocationName} for user {UserId}",subLocationModel.Name, userId);
+        logger.LogInformation("Creating sublocation {SublocationName} for user {UserId}", model.Name, userId);
 
-        await _validationHelper.ValidateLocationOwnershipAsync(subLocationModel.LocationId, userId);
+        await _validationHelper.ValidateLocationOwnershipAsync(model.LocationId, userId);
 
-        var entity = mapper.Map<SubLocation>(subLocationModel);
+        var entity = mapper.Map<SubLocation>(model);
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created sublocation {SubLocationId} for user {UserId}",
-            createdEntity.Id, userId);
-
+        logger.LogInformation("Successfully created sublocation {SubLocationId} for user {UserId}", createdEntity.Id, userId);
         return createdEntity.Id;
     }
 
-    public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid id, Guid userId)
+    // GET BY ID
+    public async Task<SubLocationModel> GetSubLocationByIdAsync(Guid subLocationId, Guid userId)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving sublocation {SubLocationId} for user {UserId}", id, userId);
+        logger.LogDebug("Retrieving sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
 
+        // Try cache first
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubLocationModel>(
-            id,
+            subLocationId,
             userId,
             entity => entity.Location.UserId,
             SubLocationConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved sublocation {SubLocationId} from cache", id);
+            logger.LogDebug("Retrieved sublocation {SubLocationId} from cache", subLocationId);
             return cachedResult;
         }
 
-        var entity = await _validationHelper.ValidateSubLocationOwnershipAsync(id, userId);
+        // Fetch sublocation + location in a single query
+        var entity = await repository.Query()
+            .Include(sl => sl.Location)
+            .FirstOrDefaultAsync(sl => sl.Id == subLocationId);
 
+        if (entity == null)
+            throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationId));
+
+        // Validate ownership using preloaded entity
+        await _validationHelper.ValidateSubLocationOwnershipAsync(entity, userId);
+
+        // Cache & return
         await CacheEntityAsync(entity);
-
         return mapper.Map<SubLocationModel>(entity);
     }
 
-    public async Task DeleteSubLocationAsync(Guid subLocationId, Guid userId)
-    {
-        SubLocationValidationHelper.ValidateUserId(userId);
-
-        logger.LogInformation("Deleting sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
-
-        await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationId, userId);
-
-        // Get the sublocation first to retrieve the LocationId before deletion
-        var subLocation = await repository.GetByIdAsync(subLocationId);
-        Guid? locationId = subLocation?.LocationId;
-
-        await repository.DeleteAsync(subLocationId);
-        await ClearEntityCacheAsync(subLocationId);
-        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName, locationId);
-
-        logger.LogInformation("Successfully deleted sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
-    }
-
+    // UPDATE
     public async Task UpdateSubLocationAsync(SubLocationModel subLocationModel, Guid userId)
     {
         ArgumentNullException.ThrowIfNull(subLocationModel, nameof(subLocationModel));
@@ -107,77 +99,116 @@ internal sealed class SubLocationService(
         logger.LogInformation("Updating sublocation {SubLocationId} for user {UserId}",
             subLocationModel.Id, userId);
 
-        var existingEntity = await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
+        // Fetch sublocation + location in a single query
+        var existingEntity = await repository.Query()
+            .Include(sl => sl.Location)
+            .FirstOrDefaultAsync(sl => sl.Id == subLocationModel.Id);
 
+        if (existingEntity == null)
+            throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationModel.Id));
+
+        // Validate ownership using preloaded entity
+        await _validationHelper.ValidateSubLocationOwnershipAsync(existingEntity, userId);
+
+        // Map changes and update timestamp
         mapper.Map(subLocationModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
 
+        // Update DB & cache
         await repository.UpdateAsync(existingEntity);
-
         await CacheEntityAsync(existingEntity);
 
         logger.LogInformation("Successfully updated sublocation {SubLocationId}", subLocationModel.Id);
     }
 
+
+    // DELETE
+    public async Task DeleteSubLocationAsync(Guid subLocationId, Guid userId)
+    {
+        SubLocationValidationHelper.ValidateUserId(userId);
+
+        logger.LogInformation("Deleting sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
+
+        // Fetch sublocation + location in a single query
+        var subLocation = await repository.Query()
+            .Include(sl => sl.Location)
+            .FirstOrDefaultAsync(sl => sl.Id == subLocationId);
+
+        if (subLocation == null)
+            throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationId));
+
+        // Validate ownership using preloaded entity
+        await _validationHelper.ValidateSubLocationOwnershipAsync(subLocation, userId);
+
+        // Delete from DB
+        await repository.DeleteAsync(subLocationId);
+
+        // Clear cache
+        await ClearEntityCacheAsync(subLocationId);
+        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName, subLocation.Location.Id);
+
+        logger.LogInformation("Successfully deleted sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
+    }
+
+    // GET ALL BY USER
     public async Task<IReadOnlyList<SubLocationModel>> GetSubLocationsByUserIdAsync(Guid userId)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
 
         logger.LogDebug("Retrieving all sublocations for user {UserId}", userId);
 
-        // Create the LINQ query equivalent to your SQL
-        return await repository.GetAll()
+        // Generate cache key
+        var cacheKey = string.Format(CacheKeys.UserListCacheKey, CacheKeys.SubLocation, userId);
+
+        // Try to get from cache
+        var cachedList = await GetFromCacheAsync<SubLocationModel>(cacheKey);
+        if (cachedList != null)
+        {
+            logger.LogDebug("Retrieved sublocations for user {UserId} from cache", userId);
+            return cachedList;
+        }
+
+        // Fetch from database
+        var subLocations = await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.Location)
-            .Where(s => s.Location.UserId == userId)
-            .Select(s => new SubLocationModel
+            .Include(sl => sl.Location)
+            .Where(sl => sl.Location.UserId == userId)
+            .Select(sl => new SubLocationModel
             {
-                Id = s.Id,
-                Name = s.Name,
-                LocationId = s.LocationId,
-                CreatedAt = s.CreatedAt,
-                UpdatedAt = s.UpdatedAt,
-                Address = s.Address
+                Id = sl.Id,
+                Name = sl.Name,
+                LocationId = sl.LocationId,
+                CreatedAt = sl.CreatedAt,
+                UpdatedAt = sl.UpdatedAt,
+                Address = sl.Address
             })
             .OrderBy(sl => sl.CreatedAt)
             .ToListAsync();
+
+        // Cache the result for future calls
+        await SetCacheAsync(cacheKey, subLocations);
+
+        return subLocations;
     }
 
+
+
+    // SEARCH (User-specific)
     public async Task<PaginationResult<SubLocationModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page)
     {
         SubLocationValidationHelper.ValidateUserId(userId);
-        ArgumentNullException.ThrowIfNull(page, nameof(page));
-
-        logger.LogDebug("Searching sublocations for user {UserId} with term: {SearchTerm} and locationId: {LocationId}",
-            userId, searchTerm ?? "(none)", locationId.ToString() ?? "(none)");
+        ArgumentNullException.ThrowIfNull(page);
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, locationId, page);
 
-        var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
-        if (cachedResult != null)
-        {
-            logger.LogDebug(SubLocationConstants.RetrievedUserSearchResultsFromCacheMessage);
-            return cachedResult;
-        }
+        var cached = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
+        if (cached != null)
+            return cached;
 
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, locationId, page, cacheKey, countCacheKey);
+        var result = await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, locationId, page, cacheKey, countCacheKey);
+
+        return result;
     }
 
-    public async Task<PaginationResult<SubLocationModel>> SearchAsync(string? name, Page? page)
-    {
-        ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching sublocations with name filter: {Name}", name ?? "(none)");
-
-        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
-
-        var cachedResult = await GetFromCacheAsync<SubLocationModel>(cacheKey, countCacheKey, page);
-        if (cachedResult != null)
-        {
-            logger.LogDebug(SubLocationConstants.RetrievedSearchResultsFromCacheMessage);
-            return cachedResult;
-        }
-
-        return await GetFromRepositoryAsync<SubLocationModel>(cacheKey, countCacheKey, page, name);
-    }
 }

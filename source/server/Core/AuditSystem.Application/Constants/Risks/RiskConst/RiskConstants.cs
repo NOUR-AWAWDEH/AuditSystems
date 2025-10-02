@@ -8,17 +8,10 @@ public static class RiskConstants
 {   
     public static readonly string[] RiskTags = ["risks", "risk-list"];
     public static readonly string[] ListTags = ["risk-list"];
-    public static readonly Expression<Func<Risk, object?>>[] IncludeHierarchy =
-    [
-        r => r.Objective,
-        r => r.Objective.RiskControlMatrix,
-        r => r.Objective.RiskControlMatrix.SubProcess,
-        r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess,
-        r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment,
-        r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department,
-        r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation,
-        r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location,
-    ];
+    
+    public static readonly Expression<Func<Risk, Guid>> RiskOwnerIdSelector = 
+        r => r.Objective.RiskControlMatrix.SubProcess   
+                .AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
 
     public const string EntityName = "Risk";
 

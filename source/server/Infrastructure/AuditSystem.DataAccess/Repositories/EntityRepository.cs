@@ -16,6 +16,11 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     private readonly DbSet<TEntity> _entities = context.Set<TEntity>();
     private readonly IMapper _mapper = mapper;
 
+    public IQueryable<TEntity> Query()
+    {
+        return _entities.AsQueryable();
+    }
+    
     public async Task<TEntity> CreateAsync(TEntity entity)
     {
         var result = await _entities.AddAsync(entity);

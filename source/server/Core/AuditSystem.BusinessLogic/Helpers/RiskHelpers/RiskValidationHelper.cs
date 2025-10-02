@@ -5,12 +5,17 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 
-public class RiskValidationHelper(IRepository<Guid, Risk> repository) : IRiskValidation
+public class RiskValidationHelper(
+    IRepository<Guid, Risk> repository,
+    IRepository<Guid, Objective> objectiveRepository) 
+    : IRiskValidation
 {
     private readonly IRepository<Guid, Risk> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IRepository<Guid, Objective> _objectiveRepository = objectiveRepository ?? throw new ArgumentNullException(nameof(objectiveRepository));
 
     public static void ValidateUserId(Guid userId) 
     {
@@ -32,15 +37,22 @@ public class RiskValidationHelper(IRepository<Guid, Risk> repository) : IRiskVal
 
     public async Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId)
     {
-        var objectiveWithRisk = await OwnershipValidator.ValidateOwnershipAsync<Risk, Guid>(
-            _repository.Query(),
-            rcm => rcm.Objective.Id == objectiveId,
-            RiskConstants.RiskOwnerIdSelector,
-            userId,
-            string.Format(ObjectiveConstants.ObjectiveNotFoundMessage, objectiveId),
-            string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId)
-        );
+        var objective = await _objectiveRepository.GetByIdAsync(objectiveId)
+            ?? throw new ArgumentException(
+                ObjectiveConstants.ObjectiveNotFoundMessage, nameof(objectiveId)
+            );
         
-        return objectiveWithRisk.Objective;
+        var ownerId = await _objectiveRepository.Query()
+            .AsNoTracking()
+            .Where(o => o.Id == objectiveId)
+            .Select(ObjectiveConstants.ObjectiveOwnerIdSelector)
+            .FirstOrDefaultAsync();
+        
+        if (ownerId == Guid.Empty || ownerId != userId)
+            throw new ArgumentException(
+                string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId)
+            );
+        
+        return objective;
     }
 }

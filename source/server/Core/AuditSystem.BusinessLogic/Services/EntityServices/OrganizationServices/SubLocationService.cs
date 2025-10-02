@@ -65,7 +65,7 @@ internal sealed class SubLocationService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubLocationModel>(
             subLocationId,
             userId,
-            entity => entity.Location.UserId,
+            SubLocationConstants.SubLocationOwnerIdSelector,
             SubLocationConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -80,7 +80,7 @@ internal sealed class SubLocationService(
             .FirstOrDefaultAsync(sl => sl.Id == subLocationId) ?? throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationId));
 
         // Validate ownership using preloaded entity
-        await _validationHelper.ValidateSubLocationOwnershipAsync(entity, userId);
+        await _validationHelper.ValidateSubLocationOwnershipAsync(entity.Id, userId);
 
         // Cache & return
         await CacheEntityAsync(entity);
@@ -96,14 +96,8 @@ internal sealed class SubLocationService(
         _logger.LogInformation("Updating sublocation {SubLocationId} for user {UserId}",
             subLocationModel.Id, userId);
 
-        // Fetch sublocation + location in a single query
-        var existingEntity = await repository.Query()
-            .Include(sl => sl.Location)
-            .FirstOrDefaultAsync(sl => sl.Id == subLocationModel.Id) ?? throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationModel.Id));
-
-        // Validate ownership using preloaded entity
-        await _validationHelper.ValidateSubLocationOwnershipAsync(existingEntity, userId);
-
+        var existingEntity = await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationModel.Id, userId);
+        
         // Map changes and update timestamp
         mapper.Map(subLocationModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -115,7 +109,6 @@ internal sealed class SubLocationService(
         _logger.LogInformation("Successfully updated sublocation {SubLocationId}", subLocationModel.Id);
     }
 
-
     // DELETE
     public async Task DeleteSubLocationAsync(Guid subLocationId, Guid userId)
     {
@@ -123,25 +116,28 @@ internal sealed class SubLocationService(
 
         _logger.LogInformation("Deleting sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
 
-        // Fetch sublocation + location in a single query
-        var subLocation = await repository.Query()
-            .Include(sl => sl.Location)
-            .FirstOrDefaultAsync(sl => sl.Id == subLocationId);
-
-        if (subLocation == null)
-            throw new KeyNotFoundException(string.Format(SubLocationConstants.SubLocationNotFoundMessage, subLocationId));
-
         // Validate ownership using preloaded entity
-        await _validationHelper.ValidateSubLocationOwnershipAsync(subLocation, userId);
+        var existingEntity = await _validationHelper.ValidateSubLocationOwnershipAsync(subLocationId, userId);
 
         // Delete from DB
         await repository.DeleteAsync(subLocationId);
 
-        // Clear cache
+        // Clear cache - safely handle null Location
         await ClearEntityCacheAsync(subLocationId);
-        await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName, subLocation.Location.Id);
+        
+        var locationId = existingEntity.Location?.Id;
+        if (locationId.HasValue)
+        {
+            await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName, locationId.Value);
+        }
+        else
+        {
+            _logger.LogWarning("Location was null for sublocation {SubLocationId} during cache cleanup", subLocationId);
+            // Optionally clear caches without locationId
+            await ClearUserRelatedCachesAsync(userId, SubLocationConstants.EntityName);
+        }
 
-        logger.LogInformation("Successfully deleted sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
+        _logger.LogInformation("Successfully deleted sublocation {SubLocationId} for user {UserId}", subLocationId, userId);
     }
 
     // GET ALL BY USER
@@ -159,10 +155,10 @@ internal sealed class SubLocationService(
             {
                 Id = sl.Id,
                 Name = sl.Name,
+                Address = sl.Address,
                 LocationId = sl.LocationId,
                 CreatedAt = sl.CreatedAt,
                 UpdatedAt = sl.UpdatedAt,
-                Address = sl.Address
             })
             .OrderBy(sl => sl.CreatedAt)
             .ToListAsync();

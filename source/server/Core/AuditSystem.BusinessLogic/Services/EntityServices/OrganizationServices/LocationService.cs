@@ -17,7 +17,7 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices
 internal sealed class LocationService(
     IRepository<Guid, Location> repository,
     ICacheService cacheService,
-    ILogger<LocationService> logger,
+    ILogger<LocationService> _logger,
     ILocationValidation validationHelper,
     ILocationSearch searchHelper,
     IMapper mapper) : 
@@ -25,7 +25,7 @@ internal sealed class LocationService(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Location,
         LocationConstants.LocationTags,
         LocationConstants.ListTags
@@ -40,7 +40,7 @@ internal sealed class LocationService(
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));
         LocationValidationHelper.ValidateUserId(userId);
         
-        logger.LogInformation("Creating location for user {UserId}", userId);
+        _logger.LogInformation("Creating location for user {UserId}", userId);
 
         var entity = mapper.Map<Location>(locationModel);
         entity.UserId = userId;
@@ -48,7 +48,7 @@ internal sealed class LocationService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created location {LocationId} for user {UserId}", 
+        _logger.LogInformation("Successfully created location {LocationId} for user {UserId}", 
             createdEntity.Id, userId);
         
         return createdEntity.Id;
@@ -58,7 +58,7 @@ internal sealed class LocationService(
     {
         LocationValidationHelper.ValidateUserId(userId);
         
-        logger.LogDebug("Retrieving location {LocationId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving location {LocationId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<LocationModel>(
             id, 
@@ -68,7 +68,7 @@ internal sealed class LocationService(
             
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved location {LocationId} from cache", id);
+            _logger.LogDebug("Retrieved location {LocationId} from cache", id);
             return cachedResult;
         }
 
@@ -83,7 +83,7 @@ internal sealed class LocationService(
     {
         LocationValidationHelper.ValidateUserId(userId);
         
-        logger.LogInformation("Deleting location {LocationId} for user {UserId}", locationId, userId);
+        _logger.LogInformation("Deleting location {LocationId} for user {UserId}", locationId, userId);
 
         await _validationHelper.ValidateLocationOwnershipAsync(locationId, userId);
         
@@ -95,7 +95,7 @@ internal sealed class LocationService(
         await ClearEntityCacheAsync(locationId);
         await ClearUserRelatedCachesAsync(userId, LocationConstants.EntityName, companyId);
         
-        logger.LogInformation("Successfully deleted location {LocationId} for user {UserId}", locationId, userId);
+        _logger.LogInformation("Successfully deleted location {LocationId} for user {UserId}", locationId, userId);
     }
 
     public async Task UpdateLocationAsync(LocationModel locationModel, Guid userId)
@@ -103,7 +103,7 @@ internal sealed class LocationService(
         ArgumentNullException.ThrowIfNull(locationModel, nameof(locationModel));
         LocationValidationHelper.ValidateUserId(userId);
         
-        logger.LogInformation("Updating location {LocationId} for user {UserId}", 
+        _logger.LogInformation("Updating location {LocationId} for user {UserId}", 
             locationModel.Id, userId);
 
         // Get the tracked entity from validation
@@ -117,21 +117,21 @@ internal sealed class LocationService(
     
         await CacheEntityAsync(existingEntity);
         
-        logger.LogInformation("Successfully updated location {LocationId}", locationModel.Id);
+        _logger.LogInformation("Successfully updated location {LocationId}", locationModel.Id);
     }
 
     public async Task<PaginationResult<LocationModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         
-        logger.LogDebug("Searching locations with name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searching locations with name filter: {Name}", name ?? "(none)");
         
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<LocationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(LocationConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(LocationConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -143,7 +143,7 @@ internal sealed class LocationService(
         LocationValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
         
-        logger.LogDebug("Searching locations for user {UserId} with term: {SearchTerm}", 
+        _logger.LogDebug("Searching locations for user {UserId} with term: {SearchTerm}", 
             userId, searchTerm ?? "(none)");
         
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, page);
@@ -151,7 +151,7 @@ internal sealed class LocationService(
         var cachedResult = await GetFromCacheAsync<LocationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved user search results from cache");
+            _logger.LogDebug("Retrieved user search results from cache");
             return cachedResult;
         }
     
@@ -162,7 +162,7 @@ internal sealed class LocationService(
     {
         LocationValidationHelper.ValidateUserId(userId);
         
-        logger.LogDebug("Retrieving all locations for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all locations for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()

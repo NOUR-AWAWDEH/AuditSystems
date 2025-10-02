@@ -5,16 +5,20 @@ using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramSe
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Risks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
 public class AuditProgramValidationHelper(
-    IRepository<Guid, AuditProgram> repository)
+    IRepository<Guid, AuditProgram> repository,
+    IRepository<Guid, ExitControl> exitControlRepository)
     : IAuditProgramValidation
 {
     private readonly IRepository<Guid, AuditProgram> _repository = repository
         ?? throw new ArgumentNullException(nameof(repository));
-
+    private readonly IRepository<Guid, ExitControl> _exitControlRepository = exitControlRepository
+        ?? throw new ArgumentNullException(nameof(exitControlRepository));
+    
     public static void ValidateUserId(Guid userId)
     {
         if (userId == Guid.Empty)
@@ -36,15 +40,20 @@ public class AuditProgramValidationHelper(
 
     public async Task<ExitControl> ValidateExitControlOwnershipAsync(Guid exitControlId, Guid userId)
     {
-       var exitControlWithRisk = await OwnershipValidator.ValidateOwnershipAsync<AuditProgram, Guid>(
-            _repository.Query(),
-            ap => ap.ExitControl.Id == exitControlId,
-            AuditProgramConstants.AuditProgramOwnerIdSelector,
-            userId,
-            string.Format(ExitControlConstants.ExitControlNotFoundMessage, exitControlId),
-            string.Format(ExitControlConstants.UnauthorizedAccessMessage, userId, exitControlId)
-        );
+        var exitControl = await _exitControlRepository.GetByIdAsync(exitControlId)
+            ?? throw new ArgumentException(string.Format(ExitControlConstants.ExitControlNotFoundMessage, nameof(exitControlId)));
+        
+        var ownerId = await _exitControlRepository.Query()
+            .AsNoTracking()
+            .Where(ec => ec.Id == exitControlId)
+            .Select(ExitControlConstants.ExitControlOwnerIdSelector)
+            .FirstOrDefaultAsync();
 
-        return exitControlWithRisk.ExitControl;
+        if (ownerId == Guid.Empty || ownerId != userId)
+            throw new ArgumentException(
+                string.Format(ExitControlConstants.UnauthorizedAccessMessage, userId, exitControlId)
+            );
+            
+        return exitControl;
     }
 }

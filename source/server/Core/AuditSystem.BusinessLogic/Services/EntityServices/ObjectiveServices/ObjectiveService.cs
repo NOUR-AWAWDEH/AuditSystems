@@ -18,14 +18,14 @@ internal class ObjectiveService(
     IRepository<Guid, Objective> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<ObjectiveService> logger,
+    ILogger<ObjectiveService> _logger,
     IObjectiveValidation validationHelper,
     IObjectiveSearch searchHelper) :
     UnifiedCacheService<Guid, Objective, ObjectiveModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Objective,
         ObjectiveConstants.ObjectiveTags,
         ObjectiveConstants.ListTags
@@ -49,7 +49,7 @@ internal class ObjectiveService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogDebug("Successfully created objective {ObjectiveId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogDebug("Successfully created objective {ObjectiveId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -58,7 +58,7 @@ internal class ObjectiveService(
     {
         ObjectiveValidationHelper.ValidateUserId(userId);
         
-        logger.LogDebug("Retrieveing objective {ObjectiveId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieveing objective {ObjectiveId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<ObjectiveModel>(
             id,
@@ -80,7 +80,7 @@ internal class ObjectiveService(
     public async Task DeleteObjectiveAsync(Guid objectiveId, Guid userId)
     {
         ObjectiveValidationHelper.ValidateUserId(userId);
-        logger.LogDebug("Deleting objective {ObjectiveId} for user {UserId}", objectiveId, userId);
+        _logger.LogDebug("Deleting objective {ObjectiveId} for user {UserId}", objectiveId, userId);
         
         await _validationHelper.ValidateObjectiveOwnershipAsync(objectiveId, userId);
         
@@ -96,7 +96,7 @@ internal class ObjectiveService(
             riskControlMatrixId
         );
         
-        logger.LogInformation("Successfully deleted objective {ObjectiveId} for user {UserId}", objectiveId, userId);
+        _logger.LogInformation("Successfully deleted objective {ObjectiveId} for user {UserId}", objectiveId, userId);
     }
 
     public async Task UpdateObjectiveAsync(ObjectiveModel objectiveModel, Guid userId)
@@ -104,7 +104,7 @@ internal class ObjectiveService(
         ArgumentNullException.ThrowIfNull(objectiveModel, nameof(objectiveModel));
         ObjectiveValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Updating objective {ObjectiveId} for user {UserId}", objectiveModel.Id, userId);
+        _logger.LogDebug("Updating objective {ObjectiveId} for user {UserId}", objectiveModel.Id, userId);
         
         var existingEntity = await _validationHelper.ValidateObjectiveOwnershipAsync(objectiveModel.Id, userId);
         await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(objectiveModel.RiskControlMatrixId, userId);
@@ -115,14 +115,14 @@ internal class ObjectiveService(
         await repository.UpdateAsync(existingEntity);
         await CacheEntityAsync(existingEntity);
 
-        logger.LogInformation("Successfully updated objective {ObjectiveId} for user {UserId}", existingEntity.Id, userId);
+        _logger.LogInformation("Successfully updated objective {ObjectiveId} for user {UserId}", existingEntity.Id, userId);
     }
 
     public async Task<IReadOnlyList<ObjectiveModel>> GetObjectivesByUserIdAsync(Guid userId)
     {
         ObjectiveValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all objectives for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all objectives for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()
@@ -144,7 +144,7 @@ internal class ObjectiveService(
         ObjectiveValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching objectives for user {UserId} with term: {SearchTerm} and risk control matrix: {RiskControlMatrixId}",
+        _logger.LogDebug("Searching objectives for user {UserId} with term: {SearchTerm} and risk control matrix: {RiskControlMatrixId}",
                 userId, searchTerm ?? "(none)", riskControlMatrixId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, riskControlMatrixId, page);

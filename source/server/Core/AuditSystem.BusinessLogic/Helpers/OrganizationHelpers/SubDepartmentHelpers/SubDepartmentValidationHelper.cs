@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using AuditSystem.Application.Constants.Organization.DepartmentConst;
 using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
 using AuditSystem.Application.Constants.Organization.SublocationConst;
@@ -6,12 +5,17 @@ using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Organization;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 
-public class SubDepartmentValidationHelper(IRepository<Guid, SubDepartment> repository ) : ISubDepartmentValidation
+public class SubDepartmentValidationHelper(
+    IRepository<Guid, SubDepartment> repository,
+    IRepository<Guid, Department> departmentRepository) 
+    : ISubDepartmentValidation
 {
     private readonly IRepository<Guid, SubDepartment> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IRepository<Guid, Department> _departmentRepository = departmentRepository ?? throw new ArgumentNullException(nameof(departmentRepository));
     
     public static void ValidateUserId(Guid userId)
     {
@@ -33,15 +37,19 @@ public class SubDepartmentValidationHelper(IRepository<Guid, SubDepartment> repo
     
     public async Task<Department> ValidateDepartmentOwnershipAsync(Guid departmentId, Guid userId)
     {
-        var departmentWithSubDepartment = await OwnershipValidator.ValidateOwnershipAsync<SubDepartment, Guid>(
-            _repository.Query(),
-            s => s.Department.Id == departmentId,
-            SubDepartmentConstants.SubDepartmentOwnerIdSelector,
-            userId,
-            string.Format(SubDepartmentConstants.SubDepartmentNotFoundMessage, departmentId),
-            string.Format(SubDepartmentConstants.UnauthorizedAccessMessage, userId, departmentId)
-        );
-        
-        return departmentWithSubDepartment.Department;
+       var department = await _departmentRepository.GetByIdAsync(departmentId) ?? throw new ArgumentException(SubDepartmentConstants.DepartmentNotFoundMessage, nameof(departmentId));
+       
+       var ownerId = await _departmentRepository.Query()
+            .AsNoTracking()
+            .Where(d => d.Id == departmentId)
+            .Select(DepartmentConstants.DepartmentOwnerIdSelector)
+            .FirstOrDefaultAsync();
+ 
+       if (ownerId == Guid.Empty || ownerId != userId)
+            throw new UnauthorizedAccessException(
+                string.Format(SubDepartmentConstants.UnauthorizedAccessMessage, userId, departmentId)
+            );
+ 
+       return department;
     }
 }

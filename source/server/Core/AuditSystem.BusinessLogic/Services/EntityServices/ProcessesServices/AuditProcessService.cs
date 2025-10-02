@@ -18,14 +18,14 @@ internal sealed class AuditProcessService(
     IRepository<Guid, AuditProcess> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<AuditProcessService> logger,
+    ILogger<AuditProcessService> _logger,
     IAuditProcessValidation validationHelper,
     IAuditProcessSearch searchHelper) : 
     UnifiedCacheService<Guid, AuditProcess, AuditProcessModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.AuditProcess,
         AuditProcessConstants.AuditProcessTags,
         AuditProcessConstants.ListTags
@@ -42,7 +42,7 @@ internal sealed class AuditProcessService(
 
         logger.LogInformation("Creating audit process {ProcessName} for user {UserId}", processModel.ProcessName, userId);
 
-        await _validationHelper.ValidateSubDepartmentOwnerShipAsync(processModel.SubDepartmentId, userId);
+        await _validationHelper.ValidateSubDepartmentOwnershipAsync(processModel.SubDepartmentId, userId);
 
         var entity = mapper.Map<AuditProcess>(processModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -63,7 +63,7 @@ internal sealed class AuditProcessService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<AuditProcessModel>(
             id,
             userId,
-            entity => entity.SubDepartment.Department.SubLocation.Location.UserId,
+            AuditProcessConstants.AuditProcessOwnerIdSelector,
             AuditProcessConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -72,7 +72,7 @@ internal sealed class AuditProcessService(
             return cachedResult;
         }
 
-        var entity = await _validationHelper.ValidateAuditProcessOwnerShipAsync(id, userId);
+        var entity = await _validationHelper.ValidateAuditProcessOwnershipAsync(id, userId);
         await CacheEntityAsync(entity);
         return mapper.Map<AuditProcessModel>(entity);
     }
@@ -81,9 +81,9 @@ internal sealed class AuditProcessService(
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
         
-        logger.LogDebug("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
+        _logger.LogDebug("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
 
-        await _validationHelper.ValidateAuditProcessOwnerShipAsync(processId, userId);
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(processId, userId);
     
         var auditProcess = await repository.GetByIdAsync(processId);
         Guid? subDepartmentId = auditProcess?.SubDepartmentId;
@@ -92,7 +92,7 @@ internal sealed class AuditProcessService(
         await ClearEntityCacheAsync(processId);
         await ClearUserRelatedCachesAsync(userId, AuditProcessConstants.EntityName, subDepartmentId);
 
-        logger.LogInformation("Successfully deleted audit process {ProcessId} for user {UserId}", processId, userId);
+        _logger.LogInformation("Successfully deleted audit process {ProcessId} for user {UserId}", processId, userId);
     }
     
     public async Task UpdateAuditProcessAsync(AuditProcessModel processModel, Guid userId)
@@ -102,9 +102,9 @@ internal sealed class AuditProcessService(
     
         logger.LogInformation("Updating audit process {ProcessId} for user {UserId}", processModel.Id, userId);
     
-        var existingEntity = await _validationHelper.ValidateAuditProcessOwnerShipAsync(processModel.Id, userId);
+        var existingEntity = await _validationHelper.ValidateAuditProcessOwnershipAsync(processModel.Id, userId);
         
-        await _validationHelper.ValidateSubDepartmentOwnerShipAsync(processModel.SubDepartmentId, userId);
+        await _validationHelper.ValidateSubDepartmentOwnershipAsync(existingEntity.SubDepartmentId, userId);
         
         mapper.Map(processModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -112,14 +112,14 @@ internal sealed class AuditProcessService(
     
         await CacheEntityAsync(existingEntity);
     
-        logger.LogInformation("Successfully updated audit process {ProcessId}", processModel.Id);
+        _logger.LogInformation("Successfully updated audit process {ProcessId}", processModel.Id);
     }
     
     public async Task<IReadOnlyList<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId)
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all audit processes for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all audit processes for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()

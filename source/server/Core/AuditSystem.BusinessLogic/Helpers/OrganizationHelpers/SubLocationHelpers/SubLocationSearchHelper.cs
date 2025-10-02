@@ -75,6 +75,7 @@ public class SubLocationSearchHelper(
             {
                 Id = sl.Id,
                 Name = sl.Name,
+                Address = sl.Address,
                 LocationId = sl.LocationId,
                 CreatedAt = sl.CreatedAt,
                 UpdatedAt = sl.UpdatedAt

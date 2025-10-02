@@ -15,12 +15,12 @@ internal sealed class CompanyService(
     IRepository<Guid, Company> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<CompanyService> logger) : 
+    ILogger<CompanyService> _logger) : 
     UnifiedCacheService<Guid, Company, CompanyModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Company,
         CompanyTags,
         ListTags
@@ -42,9 +42,7 @@ internal sealed class CompanyService(
     }
 
     public async Task DeleteCompanyAsync(Guid companyId)
-    {
-        var cacheKey = GetCacheKey(companyId);
-        
+    {        
         var entity = await repository.GetByIdAsync(companyId)
             ?? throw new KeyNotFoundException($"Company with ID {companyId} not found.");
 
@@ -88,7 +86,6 @@ internal sealed class CompanyService(
         var entity = mapper.Map<Company>(companyModel);
         await repository.UpdateAsync(entity);
         
-        var cacheKey = GetCacheKey(entity.Id);
         await CacheEntityAsync(entity);
     }
 }

@@ -7,6 +7,7 @@ public static class AuditProcessConstants
 {
     public static readonly string[] AuditProcessTags = ["audit-process", "audit-process-list"];
     public static readonly string[] ListTags = ["audit-process-list"];
+    
     public static readonly Expression<Func<AuditProcess, Guid>> AuditProcessOwnerIdSelector =
         ap => ap.SubDepartment.Department.SubLocation.Location.UserId;
 

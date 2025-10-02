@@ -18,14 +18,14 @@ internal sealed class ObservationService(
     IRepository<Guid, Observation> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<ObservationService> logger,
+    ILogger<ObservationService> _logger,
     IObservationValidation validationHelper,
     IObservationSearch searchHelper) : 
     UnifiedCacheService<Guid, Observation, ObservationModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Observation,
         ObservationConstants.ObservationTags,
         ObservationConstants.ListTags
@@ -40,7 +40,7 @@ internal sealed class ObservationService(
         ArgumentNullException.ThrowIfNull(observationModel, nameof(observationModel));
         ObservationValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating observation {ObservationName} for user {UserId}", observationModel.Description, userId);
+        _logger.LogInformation("Creating observation {ObservationName} for user {UserId}", observationModel.Description, userId);
 
         await _validationHelper.ValidateAuditProgramOwnershipAsync(observationModel.AuditProgramId, userId);
 
@@ -78,7 +78,7 @@ internal sealed class ObservationService(
     {
         ObservationValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving observation {ObservationId} for user {UserId}",id,userId);
+        _logger.LogDebug("Retrieving observation {ObservationId} for user {UserId}",id,userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<ObservationModel>(
             id,
@@ -101,7 +101,7 @@ internal sealed class ObservationService(
     {
         ObservationValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retriving all observations for user {UserId}", userId);
+        _logger.LogDebug("Retriving all observations for user {UserId}", userId);
 
 
         return await repository.GetAll()
@@ -127,14 +127,14 @@ internal sealed class ObservationService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searcing observations whith name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searcing observations whith name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<ObservationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(ObservationConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(ObservationConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -146,7 +146,7 @@ internal sealed class ObservationService(
         ObservationValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching observations for user {UserId} with term: {SearchTerm} and audit program: {AuditProgramId}",
+        _logger.LogDebug("Searching observations for user {UserId} with term: {SearchTerm} and audit program: {AuditProgramId}",
             userId, searchTerm ?? "(none)", auditProgramId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, auditProgramId, page);
@@ -154,7 +154,7 @@ internal sealed class ObservationService(
         var cachedResult = await GetFromCacheAsync<ObservationModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(ObservationConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(ObservationConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
         var result = await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, auditProgramId, page, cacheKey, countCacheKey);
@@ -166,7 +166,7 @@ internal sealed class ObservationService(
         ArgumentNullException.ThrowIfNull(observationModel, nameof(observationModel));
         ObservationValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating observation {ObservationId} for user {UserId}", observationModel.Id, userId);
+        _logger.LogInformation("Updating observation {ObservationId} for user {UserId}", observationModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateObservationOwnershipAsync(observationModel.Id, userId);
         
@@ -178,6 +178,6 @@ internal sealed class ObservationService(
         await CacheEntityAsync(existingEntity);
         await InvalidateEntityTagsCacheAsync();
 
-        logger.LogInformation("Successfully updated observation {ObservationId}", observationModel.Id);
+        _logger.LogInformation("Successfully updated observation {ObservationId}", observationModel.Id);
     }
 }

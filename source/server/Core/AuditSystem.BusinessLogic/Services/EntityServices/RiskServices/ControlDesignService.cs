@@ -19,14 +19,14 @@ internal sealed class ControlDesignService(
     IRepository<Guid, ControlDesign> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<ControlDesignService> logger,
+    ILogger<ControlDesignService> _logger,
     IControlDesignValidation validationHelper,
     IControlDesignSearch searchHelper) :
     UnifiedCacheService<Guid, ControlDesign, ControlDesignModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.ControlDesign,
         ControlDesignConstants.ControlDesignTags,
         ControlDesignConstants.ListTags
@@ -41,7 +41,7 @@ internal sealed class ControlDesignService(
         ArgumentNullException.ThrowIfNull(controlDesignModel, nameof(controlDesignModel));
         ControlDesignValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating  control design {ControlDesignDescription} for user {UserId}", controlDesignModel.Description, userId);
+        _logger.LogInformation("Creating  control design {ControlDesignDescription} for user {UserId}", controlDesignModel.Description, userId);
 
         await _validationHelper.ValidateExitControlOwnershipAsync(controlDesignModel.ExitControlId, userId);
 
@@ -51,7 +51,7 @@ internal sealed class ControlDesignService(
         await CacheEntityAsync(createdEntity);
         await InvalidateEntityTagsCacheAsync();
 
-        logger.LogInformation("Successfully created  control design {ControlDesignId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogInformation("Successfully created  control design {ControlDesignId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -60,7 +60,7 @@ internal sealed class ControlDesignService(
     {
         ControlDesignValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Deleting  control design {ControlDesignId} for user {UserId}", controlDesignId, userId);
+        _logger.LogInformation("Deleting  control design {ControlDesignId} for user {UserId}", controlDesignId, userId);
 
         await _validationHelper.ValidateControlDesignOwnershipAsync(controlDesignId, userId);
 
@@ -72,14 +72,14 @@ internal sealed class ControlDesignService(
 
         await ClearUserRelatedCachesAsync(userId, ControlDesignConstants.EntityName, exitControlId);
 
-        logger.LogInformation("Successfully deleted  control design {ControlDesignId}", controlDesignId);
+        _logger.LogInformation("Successfully deleted  control design {ControlDesignId}", controlDesignId);
     }
 
     public async Task<ControlDesignModel> GetControlDesignByIdAsync(Guid id, Guid userId)
     {
         ControlDesignValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving  control design {ControlDesignId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving  control design {ControlDesignId} for user {UserId}", id, userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<ControlDesignModel>(
             id,
@@ -102,7 +102,7 @@ internal sealed class ControlDesignService(
     {
         ControlDesignValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retriving all  control designs for user {UserId}", userId);
+        _logger.LogDebug("Retriving all  control designs for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()
@@ -125,14 +125,14 @@ internal sealed class ControlDesignService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searcing control design whith name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searcing control design whith name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<ControlDesignModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(ControlDesignConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(ControlDesignConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -144,7 +144,7 @@ internal sealed class ControlDesignService(
         ControlDesignValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching  control designs for user {UserId} with term: {SearchTerm} and exit control: {ExitControlId}",
+        _logger.LogDebug("Searching  control designs for user {UserId} with term: {SearchTerm} and exit control: {ExitControlId}",
             userId, searchTerm ?? "(none)", exitControlId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, exitControlId, page);
@@ -164,7 +164,7 @@ internal sealed class ControlDesignService(
         ArgumentNullException.ThrowIfNull(ControlDesignModel, nameof(ControlDesignModel));
         ControlDesignValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating  control design {ControlDesignId} for user {UserId}", ControlDesignModel.Id, userId);
+        _logger.LogInformation("Updating  control design {ControlDesignId} for user {UserId}", ControlDesignModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateControlDesignOwnershipAsync(ControlDesignModel.Id, userId);
 
@@ -176,6 +176,6 @@ internal sealed class ControlDesignService(
         await CacheEntityAsync(existingEntity);
         await InvalidateEntityTagsCacheAsync();
 
-        logger.LogInformation("Successfully updated  control design {ControlDesignId}", ControlDesignModel.Id);
+        _logger.LogInformation("Successfully updated  control design {ControlDesignId}", ControlDesignModel.Id);
     }
 }

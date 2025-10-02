@@ -18,7 +18,7 @@ internal sealed class RiskService(
     IRepository<Guid, Risk> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<RiskService> logger,
+    ILogger<RiskService> _logger,
     IRiskValidation validationHelper,
     IRiskSearch searchHelper) : 
 
@@ -26,7 +26,7 @@ internal sealed class RiskService(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Risk,
         RiskConstants.RiskTags,
         RiskConstants.ListTags
@@ -41,7 +41,7 @@ internal sealed class RiskService(
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
         RiskValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating risk {RiskName} for user {UserId}", riskModel.RiskName, userId);
+        _logger.LogInformation("Creating risk {RiskName} for user {UserId}", riskModel.RiskName, userId);
 
         await _validationHelper.ValidateObjectiveOwnershipAsync(riskModel.ObjectiveId, userId);
 
@@ -50,7 +50,7 @@ internal sealed class RiskService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created risk {RiskId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogInformation("Successfully created risk {RiskId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -59,7 +59,7 @@ internal sealed class RiskService(
     {
         RiskValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving risk {RiskId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving risk {RiskId} for user {UserId}", id, userId);
         
         var cachedResult = await TryGetFromCacheWithValidationAsync<RiskModel>(
             id,
@@ -69,7 +69,7 @@ internal sealed class RiskService(
 
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved risk {RiskId} from cache", id);
+            _logger.LogDebug("Retrieved risk {RiskId} from cache", id);
             return cachedResult;
         }
 
@@ -82,7 +82,7 @@ internal sealed class RiskService(
     {
         RiskValidationHelper.ValidateUserId(userId);
         
-        logger.LogDebug("Deleting risk {RiskId} for user {UserId}", riskId, userId);
+        _logger.LogDebug("Deleting risk {RiskId} for user {UserId}", riskId, userId);
 
         await _validationHelper.ValidateRiskOwnershipAsync(riskId, userId);
     
@@ -93,7 +93,7 @@ internal sealed class RiskService(
         await ClearEntityCacheAsync(riskId);
         await ClearUserRelatedCachesAsync(userId, RiskConstants.EntityName, objectiveId);
 
-        logger.LogInformation("Successfully deleted risk {RiskId} for user {UserId}", riskId, userId);
+        _logger.LogInformation("Successfully deleted risk {RiskId} for user {UserId}", riskId, userId);
     }
     
     public async Task UpdateRiskAsync(RiskModel riskModel, Guid userId)
@@ -101,7 +101,7 @@ internal sealed class RiskService(
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
         RiskValidationHelper.ValidateUserId(userId);
     
-        logger.LogInformation("Updating risk {RiskId} for user {UserId}", riskModel.Id, userId);
+        _logger.LogInformation("Updating risk {RiskId} for user {UserId}", riskModel.Id, userId);
     
         var existingEntity = await _validationHelper.ValidateRiskOwnershipAsync(riskModel.Id, userId);
         
@@ -113,14 +113,14 @@ internal sealed class RiskService(
     
         await CacheEntityAsync(existingEntity);
     
-        logger.LogInformation("Successfully updated risk {RiskId}", riskModel.Id);
+        _logger.LogInformation("Successfully updated risk {RiskId}", riskModel.Id);
     }
     
     public async Task<IReadOnlyList<RiskModel>> GetRisksByUserIdAsync(Guid userId)
     {
         RiskValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all risks for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all risks for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()
@@ -143,7 +143,7 @@ internal sealed class RiskService(
         RiskValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching risks for user {UserId} with term: {SearchTerm} and objective: {ObjectiveId}",
+        _logger.LogDebug("Searching risks for user {UserId} with term: {SearchTerm} and objective: {ObjectiveId}",
             userId, searchTerm ?? "(none)", objectiveId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, objectiveId, page);
@@ -151,7 +151,7 @@ internal sealed class RiskService(
         var cachedResult = await GetFromCacheAsync<RiskModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(RiskConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(RiskConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, objectiveId, page, cacheKey, countCacheKey);
@@ -161,7 +161,7 @@ internal sealed class RiskService(
     { 
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching risks with name filter: {RiskName}", name ?? "(none)");
+        _logger.LogDebug("Searching risks with name filter: {RiskName}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 

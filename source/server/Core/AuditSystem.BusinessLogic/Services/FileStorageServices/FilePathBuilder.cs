@@ -27,7 +27,7 @@ public class FilePathBuilder : IFilePathBuilder
         return Path.GetFullPath(fullPath);
     } 
 
-    private string GetRelativePath(Guid userId,  string serviceName, string fileName)
+    private static string GetRelativePath(Guid userId,  string serviceName, string fileName)
     {
         return Path.Combine(userId.ToString(), serviceName, fileName);
     }

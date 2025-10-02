@@ -19,14 +19,14 @@ internal sealed class DepartmentService(
     IRepository<Guid, Department> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<DepartmentService> logger,
+    ILogger<DepartmentService> _logger,
     IDepartmentValidation validationHelper,
     IDepartmentSearch searchHelper) : 
     UnifiedCacheService<Guid, Department, DepartmentModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.Department,
         DepartmentConstants.DepartmentTags,
         DepartmentConstants.ListTags
@@ -42,7 +42,7 @@ internal sealed class DepartmentService(
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating department {DepartmentName} for user {UserId}", departmentModel.Name, userId);
+        _logger.LogInformation("Creating department {DepartmentName} for user {UserId}", departmentModel.Name, userId);
 
         await _validationHelper.ValidateSubLocationOwnershipAsync(departmentModel.SubLocationId, userId);
 
@@ -51,7 +51,7 @@ internal sealed class DepartmentService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created department {DepartmentId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogInformation("Successfully created department {DepartmentId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -60,7 +60,7 @@ internal sealed class DepartmentService(
     {
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving department {DepartmentId} for user {UserId}",id,userId);
+        _logger.LogDebug("Retrieving department {DepartmentId} for user {UserId}",id,userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<DepartmentModel>(
             id,
@@ -70,7 +70,7 @@ internal sealed class DepartmentService(
 
         if (cashedResult != null) 
         {
-            logger.LogDebug("Retrieved department {DepartmentId} from cache", id);
+            _logger.LogDebug("Retrieved department {DepartmentId} from cache", id);
             return cashedResult;
         }
 
@@ -83,7 +83,7 @@ internal sealed class DepartmentService(
     {
         DepartmentValidationHelper.ValidateUserId(userId);
         
-        logger.LogInformation("Deleting department {DepartmentId} for user {UserId}", departmentId, userId);
+        _logger.LogInformation("Deleting department {DepartmentId} for user {UserId}", departmentId, userId);
 
         await _validationHelper.ValidateDepartmentOwnershipAsync(departmentId, userId);
         
@@ -95,7 +95,7 @@ internal sealed class DepartmentService(
         
         await ClearUserRelatedCachesAsync(userId, DepartmentConstants.EntityName, subLocationId);
 
-        logger.LogInformation("Successfully deleted department {DepartmentId} for user {UserId}", departmentId, userId);
+        _logger.LogInformation("Successfully deleted department {DepartmentId} for user {UserId}", departmentId, userId);
     }
     
     public async Task UpdateDepartmentAsync(DepartmentModel departmentModel, Guid userId)
@@ -103,7 +103,7 @@ internal sealed class DepartmentService(
         ArgumentNullException.ThrowIfNull(departmentModel, nameof(departmentModel));
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating department {DepartmentId} for user {UserId}", departmentModel.Id, userId);
+        _logger.LogInformation("Updating department {DepartmentId} for user {UserId}", departmentModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateDepartmentOwnershipAsync(departmentModel.Id, userId);
         
@@ -114,14 +114,14 @@ internal sealed class DepartmentService(
 
         await CacheEntityAsync(existingEntity);
 
-        logger.LogInformation("Successfully updated department {DepartmentId}", departmentModel.Id);
+        _logger.LogInformation("Successfully updated department {DepartmentId}", departmentModel.Id);
     }
     
     public async Task<IReadOnlyList<DepartmentModel>> GetDepartmentsByUserIdAsync(Guid userId)
     {
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retriving all departments for user {UserId}", userId);
+        _logger.LogDebug("Retriving all departments for user {UserId}", userId);
 
 
         return await repository.GetAll()
@@ -145,7 +145,7 @@ internal sealed class DepartmentService(
         DepartmentValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and sublocation: {SubLocationId}",
+        _logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and sublocation: {SubLocationId}",
             userId, searchTerm ?? "(none)", subLocationId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subLocationId, page);
@@ -153,7 +153,7 @@ internal sealed class DepartmentService(
         var cachedResult = await GetFromCacheAsync<DepartmentModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(DepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(DepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subLocationId, page, cacheKey, countCacheKey);
@@ -163,14 +163,14 @@ internal sealed class DepartmentService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching departments with name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searching departments with name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<DepartmentModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(DepartmentConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(DepartmentConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 

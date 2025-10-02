@@ -4,12 +4,17 @@ using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.RiskControls;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 
-public class ObjectiveValidationHelper(IRepository<Guid, Objective> repository) : IObjectiveValidation
+public class ObjectiveValidationHelper(
+    IRepository<Guid, Objective> repository,
+    IRepository<Guid, RiskControlMatrix> riskControlMatrixRepository) 
+    : IObjectiveValidation
 {
     private readonly IRepository<Guid, Objective> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly IRepository<Guid, RiskControlMatrix> _riskControlMatrixRepository = riskControlMatrixRepository ?? throw new ArgumentNullException(nameof(riskControlMatrixRepository));
 
     public static void ValidateUserId(Guid userId) 
     {
@@ -31,15 +36,20 @@ public class ObjectiveValidationHelper(IRepository<Guid, Objective> repository) 
 
     public async Task<RiskControlMatrix> ValidateRiskControlMatrixOwnershipAsync(Guid riskControlMatrixId, Guid userId)
     {
-       var riskControlMatrixWithObjective = await OwnershipValidator.ValidateOwnershipAsync<Objective, Guid>(
-            _repository.Query(),
-            o => o.RiskControlMatrix.Id == riskControlMatrixId,
-           ObjectiveConstants.ObjectiveOwnerIdSelector,
-            userId,
-            string.Format(RiskControlMatrixConstants.RiskControlMatrixNotFoundMessage, riskControlMatrixId),
-            string.Format(RiskControlMatrixConstants.UnauthorizedAccessMessage, userId, riskControlMatrixId)
-        );
+       var riskControlMatrix = await _riskControlMatrixRepository.GetByIdAsync(riskControlMatrixId)
+            ?? throw new ArgumentException(RiskControlMatrixConstants.RiskControlMatrixNotFoundMessage, nameof(riskControlMatrixId));
+           
+       var ownerId = await _riskControlMatrixRepository.Query()
+            .AsNoTracking()
+            .Where(rcm => rcm.Id == riskControlMatrixId)
+            .Select(RiskControlMatrixConstants.RiskControlMatrixOwnerIdSelector)
+            .FirstOrDefaultAsync();
+            
+       if (ownerId == Guid.Empty || ownerId != userId)
+            throw new UnauthorizedAccessException(
+                string.Format(RiskControlMatrixConstants.UnauthorizedAccessMessage, userId, riskControlMatrixId)
+            );
         
-        return riskControlMatrixWithObjective.RiskControlMatrix;
+       return riskControlMatrix;
     }
 }

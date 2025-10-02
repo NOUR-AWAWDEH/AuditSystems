@@ -19,14 +19,14 @@ internal sealed class SubProcessService(
     IRepository<Guid, SubProcess> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<SubProcessService> logger,
+    ILogger<SubProcessService> _logger,
     ISubProcessValidation validationHelper,
     ISubProcessSearch searchHelper ) :
     UnifiedCacheService<Guid, SubProcess, SubProcessModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.SubProcess,
         SubProcessConstants.SubProcessTags,
         SubProcessConstants.ListTags
@@ -42,7 +42,7 @@ internal sealed class SubProcessService(
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
         AuditProcessValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Creating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
+        _logger.LogDebug("Creating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
         
         await _validationHelper.ValidateAuditProcessOwnershipAsync(subProcessModel.AuditProcessId, userId);
 
@@ -51,7 +51,7 @@ internal sealed class SubProcessService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created sub process {SubProcessId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogInformation("Successfully created sub process {SubProcessId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -60,7 +60,7 @@ internal sealed class SubProcessService(
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving sub process {SubProcessId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving sub process {SubProcessId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubProcessModel>(
             id,
@@ -70,7 +70,7 @@ internal sealed class SubProcessService(
         
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved sub process {SubProcessId} from cache for user {UserId}", id, userId);
+            _logger.LogDebug("Retrieved sub process {SubProcessId} from cache for user {UserId}", id, userId);
             return cachedResult;
         }
 
@@ -83,7 +83,7 @@ internal sealed class SubProcessService(
     {
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Deleting sub process {SubProcessId} for user {UserId}", subProcessId, userId);
+        _logger.LogDebug("Deleting sub process {SubProcessId} for user {UserId}", subProcessId, userId);
 
         await _validationHelper.ValidateSubProcessOwnershipAsync(subProcessId, userId);
         
@@ -94,7 +94,7 @@ internal sealed class SubProcessService(
         await ClearEntityCacheAsync(subProcessId);
         await ClearUserRelatedCachesAsync(userId, SubProcessConstants.EntityName, auditProcessId);
 
-        logger.LogInformation("Successfully deleted sub process {SubProcessId} for user {UserId}", subProcessId, userId);
+        _logger.LogInformation("Successfully deleted sub process {SubProcessId} for user {UserId}", subProcessId, userId);
     }
     
     public async Task UpdateSubProcessAsync(SubProcessModel subProcessModel, Guid userId)
@@ -102,7 +102,7 @@ internal sealed class SubProcessService(
         ArgumentNullException.ThrowIfNull(subProcessModel, nameof(subProcessModel));
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
+        _logger.LogInformation("Updating sub process {SubProcessId} for user {UserId}", subProcessModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateSubProcessOwnershipAsync(subProcessModel.Id, userId);
         await _validationHelper.ValidateAuditProcessOwnershipAsync(existingEntity.AuditProcessId, userId);
@@ -114,14 +114,14 @@ internal sealed class SubProcessService(
 
         await CacheEntityAsync(existingEntity);
 
-        logger.LogInformation("Successfully updated sub process {SubProcessId} for user {UserId}", existingEntity.Id, userId);
+        _logger.LogInformation("Successfully updated sub process {SubProcessId} for user {UserId}", existingEntity.Id, userId);
     }
 
     public async Task<IReadOnlyList<SubProcessModel>> GetSubProcessesByUserIdAsync(Guid userId)
     {
         AuditProcessValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all sub processes for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all sub processes for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()
@@ -144,7 +144,7 @@ internal sealed class SubProcessService(
         SubDepartmentValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching sub processes for user {UserId} with term: {SearchTerm} and audit process: {AuditProcessId}",
+        _logger.LogDebug("Searching sub processes for user {UserId} with term: {SearchTerm} and audit process: {AuditProcessId}",
                 userId, searchTerm ?? "(none)", auditProcessId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, auditProcessId, page);
@@ -152,7 +152,7 @@ internal sealed class SubProcessService(
         var cachedResult = await GetFromCacheAsync<SubProcessModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(SubProcessConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(SubProcessConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, auditProcessId, page, cacheKey, countCacheKey);
@@ -162,14 +162,14 @@ internal sealed class SubProcessService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching sub processes  with name filter: {Particular}", name?? "(none)");
+        _logger.LogDebug("Searching sub processes  with name filter: {Particular}", name?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<SubProcessModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(SubProcessConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(SubProcessConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 

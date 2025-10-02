@@ -18,14 +18,14 @@ internal sealed class RiskControlMatrixService(
     IRepository<Guid, RiskControlMatrix> repository,
     IMapper mapper,
     ICacheService cacheService,
-    ILogger<RiskControlMatrixService> logger,
+    ILogger<RiskControlMatrixService> _logger,
     IRiskControlMatrixValidation validationHelper,
     IRiskControlMatrixSearch searchHelper) : 
     UnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.RiskControlMatrix,
         RiskControlMatrixConstants.RiskControlMatrixTags,
         RiskControlMatrixConstants.ListTags
@@ -40,7 +40,7 @@ internal sealed class RiskControlMatrixService(
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Creating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
+        _logger.LogDebug("Creating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
 
         await _validationHelper.ValidateSubProcessOwnershipAsync(riskControlMatrixModel.SubProcessId, userId);
 
@@ -49,7 +49,7 @@ internal sealed class RiskControlMatrixService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogDebug("Successfully created risk control matrix {RiskControlMatrixId} for user {UserId}", createdEntity.Id, userId);
+        _logger.LogDebug("Successfully created risk control matrix {RiskControlMatrixId} for user {UserId}", createdEntity.Id, userId);
 
         return createdEntity.Id;
     }
@@ -58,7 +58,7 @@ internal sealed class RiskControlMatrixService(
     {
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving risk control matrix {RiskControlMatrixId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving risk control matrix {RiskControlMatrixId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<RiskControlMatrixModel>(
             id,
@@ -68,7 +68,7 @@ internal sealed class RiskControlMatrixService(
 
         if (cachedResult != null) 
         {
-            logger.LogDebug("Retrieved risk control matrix {RiskControlMatrixId} from cache for user {UserId}", id, userId);
+            _logger.LogDebug("Retrieved risk control matrix {RiskControlMatrixId} from cache for user {UserId}", id, userId);
             return cachedResult;
         }
 
@@ -80,7 +80,7 @@ internal sealed class RiskControlMatrixService(
     public async Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId, Guid userId)
     {
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
-        logger.LogDebug("Deleting risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
+        _logger.LogDebug("Deleting risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
         
         await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(riskControlMatrixId, userId);
         
@@ -92,7 +92,7 @@ internal sealed class RiskControlMatrixService(
         await ClearEntityCacheAsync(riskControlMatrixId);
         await ClearUserRelatedCachesAsync(userId, RiskControlMatrixConstants.EntityName, subProcessId);
 
-        logger.LogInformation("Successfully deleted risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
+        _logger.LogInformation("Successfully deleted risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
     }
 
     public async Task UpdateRiskControlMatrixAsync(RiskControlMatrixModel riskControlMatrixModel, Guid userId)
@@ -100,7 +100,7 @@ internal sealed class RiskControlMatrixService(
         ArgumentNullException.ThrowIfNull(riskControlMatrixModel, nameof(riskControlMatrixModel));
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Updating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
+        _logger.LogDebug("Updating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(riskControlMatrixModel.Id, userId);
         await _validationHelper.ValidateSubProcessOwnershipAsync(riskControlMatrixModel.SubProcessId, userId);
@@ -111,14 +111,14 @@ internal sealed class RiskControlMatrixService(
         await repository.UpdateAsync(existingEntity);
         await CacheEntityAsync(existingEntity);
 
-        logger.LogInformation("Successfully updated risk control matrix {RiskControlMatrixId} for user {UserId}", existingEntity.Id, userId);
+        _logger.LogInformation("Successfully updated risk control matrix {RiskControlMatrixId} for user {UserId}", existingEntity.Id, userId);
     }
 
     public async Task<IReadOnlyList<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId)
     {
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all risk control matrices for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all risk control matrices for user {UserId}", userId);
 
         return await repository.GetAll()
             .AsNoTracking()
@@ -140,7 +140,7 @@ internal sealed class RiskControlMatrixService(
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching risk control matrices for user {UserId} with term: {SearchTerm} and sub process: {SubProcessId}",
+        _logger.LogDebug("Searching risk control matrices for user {UserId} with term: {SearchTerm} and sub process: {SubProcessId}",
                 userId, searchTerm ?? "(none)", subProcessId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subProcessId, page);
@@ -148,7 +148,7 @@ internal sealed class RiskControlMatrixService(
         var cachedResult = await GetFromCacheAsync<RiskControlMatrixModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(RiskControlMatrixConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(RiskControlMatrixConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -159,14 +159,14 @@ internal sealed class RiskControlMatrixService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching risk control matrices with Description filter: {Description}", description?? "(none)");
+        _logger.LogDebug("Searching risk control matrices with Description filter: {Description}", description?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(description, page);
 
         var cachedResult = await GetFromCacheAsync<RiskControlMatrixModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         { 
-            logger.LogDebug(RiskControlMatrixConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(RiskControlMatrixConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 

@@ -21,12 +21,12 @@ internal sealed class SubDepartmentService(
     ICacheService cacheService,
     ISubDepartmentValidation validationHelper,
     ISubDepartmentSearch searchHelper,
-    ILogger<SubDepartmentService> logger) : 
+    ILogger<SubDepartmentService> _logger) : 
     UnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>(
         repository,
         mapper,
         cacheService,
-        logger,
+        _logger,
         CacheKeys.SubDepartment,
         SubDepartmentConstants.SubDepartmentTags,
         SubDepartmentConstants.ListTags
@@ -41,7 +41,7 @@ internal sealed class SubDepartmentService(
         ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Creating subdepartment {SubDepartmentName} for user {UserId}",subDepartmentModel.Name, userId);
+        _logger.LogInformation("Creating subdepartment {SubDepartmentName} for user {UserId}",subDepartmentModel.Name, userId);
 
         await _validationHelper.ValidateDepartmentOwnershipAsync(subDepartmentModel.DepartmentId, userId);
 
@@ -50,7 +50,7 @@ internal sealed class SubDepartmentService(
 
         await CacheEntityAsync(createdEntity);
 
-        logger.LogInformation("Successfully created subdepartment {SubDepartmentId} for user {UserId}",
+        _logger.LogInformation("Successfully created subdepartment {SubDepartmentId} for user {UserId}",
             createdEntity.Id, userId);
 
         return createdEntity.Id;
@@ -60,7 +60,7 @@ internal sealed class SubDepartmentService(
     {
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving subdepartment {SubDepartmentId} for user {UserId}", id, userId);
+        _logger.LogDebug("Retrieving subdepartment {SubDepartmentId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubDepartmentModel>(
             id,
@@ -70,7 +70,7 @@ internal sealed class SubDepartmentService(
 
         if (cachedResult != null)
         {
-            logger.LogDebug("Retrieved subdepartment {SubDepartmentId} from cache", id);
+            _logger.LogDebug("Retrieved subdepartment {SubDepartmentId} from cache", id);
 
             return cachedResult;
         }
@@ -86,7 +86,7 @@ internal sealed class SubDepartmentService(
     {
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Deleting subdepartment {SubDepartmentId} for user {UserId}", subDepartmentId, userId);
+        _logger.LogInformation("Deleting subdepartment {SubDepartmentId} for user {UserId}", subDepartmentId, userId);
 
         await _validationHelper.ValidateSubDepartmentOwnershipAsync(subDepartmentId, userId);
 
@@ -97,7 +97,7 @@ internal sealed class SubDepartmentService(
         await ClearEntityCacheAsync(subDepartmentId);
         await ClearUserRelatedCachesAsync(userId, SubDepartmentConstants.EntityName, departmentId);
 
-        logger.LogInformation("Successfully deleted subdepartment {SubDepartmentId} for user {UserId}", subDepartmentId, userId);
+        _logger.LogInformation("Successfully deleted subdepartment {SubDepartmentId} for user {UserId}", subDepartmentId, userId);
     }
 
     public async Task UpdateSubDepartmentAsync(SubDepartmentModel subDepartmentModel, Guid userId)
@@ -105,7 +105,7 @@ internal sealed class SubDepartmentService(
         ArgumentNullException.ThrowIfNull(subDepartmentModel, nameof(subDepartmentModel));
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogInformation("Updating subdepartment {SubDepartmentId} for user {UserId}",
+        _logger.LogInformation("Updating subdepartment {SubDepartmentId} for user {UserId}",
             subDepartmentModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateSubDepartmentOwnershipAsync(subDepartmentModel.Id, userId);
@@ -124,7 +124,7 @@ internal sealed class SubDepartmentService(
     {
         SubDepartmentValidationHelper.ValidateUserId(userId);
 
-        logger.LogDebug("Retrieving all subdepartments for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all subdepartments for user {UserId}", userId);
 
         // Create the LINQ query equivalent to your SQL
         return await repository.GetAll()
@@ -148,7 +148,7 @@ internal sealed class SubDepartmentService(
         SubDepartmentValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching subdepartments for user {UserId} with term: {SearchTerm} and departmentId: {DepartmentId}",
+        _logger.LogDebug("Searching subdepartments for user {UserId} with term: {SearchTerm} and departmentId: {DepartmentId}",
             userId, searchTerm ?? "(none)", departmentId.ToString() ?? "(none)");
 
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, departmentId, page);
@@ -156,7 +156,7 @@ internal sealed class SubDepartmentService(
         var cachedResult = await GetFromCacheAsync<SubDepartmentModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(SubDepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(SubDepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
 
@@ -167,14 +167,14 @@ internal sealed class SubDepartmentService(
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        logger.LogDebug("Searching subdepartments with name filter: {Name}", name ?? "(none)");
+        _logger.LogDebug("Searching subdepartments with name filter: {Name}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<SubDepartmentModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
-            logger.LogDebug(SubDepartmentConstants.RetrievedSearchResultsFromCacheMessage);
+            _logger.LogDebug(SubDepartmentConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
         }
 

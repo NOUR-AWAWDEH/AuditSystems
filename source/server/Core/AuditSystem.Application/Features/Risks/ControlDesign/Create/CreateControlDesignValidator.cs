@@ -19,7 +19,9 @@ public sealed class CreateControlDesignValidator : AbstractValidator<CreateContr
 
         RuleFor(x => x.Inadequate)
             .NotNull()
-            .WithMessage("Inadequate is required.");
+            .WithMessage("Inadequate is required.")
+            .Must(x => x is false)
+            .WithMessage("Inadequate must be false.");
 
         RuleFor(x => x.UserId)
             .NotEmpty()

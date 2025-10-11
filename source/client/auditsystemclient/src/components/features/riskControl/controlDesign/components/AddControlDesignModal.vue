@@ -34,25 +34,6 @@
                                 <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
                             </div>
 
-                            <!-- Control Design Inadequate -->
-                            <div>
-                                <label for="control-design-inadequate" class="block text-sm font-medium text-gray-700">
-                                    Control Design Inadequate *
-                                </label>
-                                <select
-                                    id="control-design-inadequate"
-                                    v-model="formData.inadequate"
-                                    class="w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2"
-                                    :class="errors.inadequate ? 'border-error focus:ring-error' : 'border-gray-tint focus:ring-primary-base'"
-                                >
-                                    <option disabled value="">-- Select an option --</option>
-                                    <option :value="true">Inadequate</option>
-                                    <option :value="false">Adequate</option>
-                                </select>
-                                <p v-if="errors.inadequate" class="text-error text-sm mt-1">{{ errors.inadequate }}</p>
-                            </div>
-
-
                             <!--Error Display -->
                             <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                                 <p class="text-error text-sm">{{ error }}</p>
@@ -107,13 +88,11 @@ const { showNotification } = useNotification();
 const { isCreating, error, createControlDesign, resetState } = useCreateControlDesign();
 
 const formData = ref({
-    description: '',
-    inadequate: null
+    description: ''
 });
 
 const errors = ref({
-    description: '',
-    inadequate: null
+    description: ''
 });
 
 watch(() => props.isVisible, (newValue) => {
@@ -124,12 +103,10 @@ watch(() => props.isVisible, (newValue) => {
 
 const resetForm = () => {
     formData.value = {
-        description: '',
-        inadequate: null
+        description: ''
     };
     errors.value = {
-        description: '',
-        inadequate: null
+        description: ''
     };
 
     resetState();
@@ -148,7 +125,7 @@ const handleSubmit = async () => {
     try {
         const ControlDesignData = {
             description: formData.value.description.trim(),
-            inadequate: formData.value.inadequate,
+            inadequate: false,
             exitControlId: props.exitControlId
         };
 
@@ -175,8 +152,7 @@ const handleSubmit = async () => {
 
 const validateForm = () => {
     errors.value = {
-        description: '',
-        inadequate: null
+        description: ''
     };
 
     let isValid = true;
@@ -185,11 +161,6 @@ const validateForm = () => {
         errors.value.description = 'Control Design description is required';
         isValid = false;
     }
-
-    if (formData.value.inadequate === '') {
-        errors.value.inadequate = 'Control Design inadequate is required';
-    }
-
 
     return isValid;
 };

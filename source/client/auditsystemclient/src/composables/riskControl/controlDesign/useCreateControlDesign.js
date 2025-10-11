@@ -36,6 +36,7 @@ export function useCreateControlDesign() {
             isCreating.value = true;
             error.value = null;
             createdControlDesign.value = null;
+            controlDesignData.Inadequate = false;
 
             const response = await createControlDesignRepository.createControlDesign(controlDesignData);
 

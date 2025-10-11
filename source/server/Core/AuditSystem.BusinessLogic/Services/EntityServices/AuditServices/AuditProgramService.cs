@@ -69,8 +69,10 @@ internal sealed class AuditProgramService(
         await repository.DeleteAsync(auditProgramId);
         await ClearEntityCacheAsync(auditProgramId);
         
+        // Clear all related caches
         await ClearUserRelatedCachesAsync(userId, AuditProgramConstants.EntityName, exitControlId);
-
+        await InvalidateEntityTagsCacheAsync();
+        
         _logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
     }
 
@@ -78,18 +80,17 @@ internal sealed class AuditProgramService(
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        _logger.LogDebug("Retrieving audit program {AuditProgramId} for user {UserId}",id,userId);
+        _logger.LogDebug("Retrieving audit program {AuditProgramId} for user {UserId}", id, userId);
 
         var cashedResult = await TryGetFromCacheWithValidationAsync<AuditProgramModel>(
             id,
             userId,
-            //use the Const Selector later
-            entity => entity.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            AuditProgramConstants.AuditProgramOwnerIdSelector,
             AuditProgramConstants.UnauthorizedAccessMessage);
 
         if (cashedResult != null) 
         {
-            logger.LogDebug("Retrieved audit program {AuditProgramId} from cache", id);
+            _logger.LogDebug("Retrieved audit program {AuditProgramId} from cache", id);
             return cashedResult;
         }
 
@@ -153,7 +154,7 @@ internal sealed class AuditProgramService(
         var cachedResult = await GetFromCacheAsync<AuditProgramModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
         {
-            logger.LogDebug(AuditProgramConstants.RetrievedUserSearchResultsFromCacheMessage);
+            _logger.LogDebug(AuditProgramConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
         var result = await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, exitControlId, page, cacheKey, countCacheKey);

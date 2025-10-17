@@ -54,6 +54,7 @@ export const deleteDepartmentByIdRepository = {
             // Handle other server errors
             const responseData = error.response?.data;
             const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting department.';
+            
             return ApiResponseT.serverError(
                 [{ message: serverMessage }],
                 'Server error'

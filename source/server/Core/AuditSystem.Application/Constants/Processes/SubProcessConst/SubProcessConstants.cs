@@ -9,8 +9,11 @@ public static class SubProcessConstants
     public static readonly string[] ListTags = ["sub-process-list"];
     
     public static readonly Expression<Func<SubProcess, Guid>> SubProcessOwnerIdSelector =
-        sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
-
+        sp => sp.AuditProcess.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<SubProcess, bool>> SubProcessOwnerPredicate(Guid userId) =>
+        sp => sp.AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        
     public const string EntityName = "SubProcess";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access sub process {1}.";

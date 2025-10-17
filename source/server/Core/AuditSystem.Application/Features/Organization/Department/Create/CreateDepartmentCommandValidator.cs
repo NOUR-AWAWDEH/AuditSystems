@@ -20,11 +20,11 @@ public sealed class CreateDepartmentCommandValidator : AbstractValidator<CreateD
             .MaximumLength(200)
             .WithMessage("Department Name must not exceed 200 characters.");
 
-        RuleFor(x => x.SubLocationId)
+        RuleFor(x => x.LocationId)
             .NotEmpty()
-            .WithMessage("Sublocation Id is required.")
+            .WithMessage("Location Id is required.")
             .Must(x => x != Guid.Empty)
-            .WithMessage("Sublocation Id must be a valid GUID.");
+            .WithMessage("Location Id must be a valid GUID.");
 
     }
 }

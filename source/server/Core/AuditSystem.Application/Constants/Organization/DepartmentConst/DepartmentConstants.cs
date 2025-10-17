@@ -8,8 +8,11 @@ public static class DepartmentConstants
     public static readonly string[] DepartmentTags = ["department", "department-list"];
     public static readonly string[] ListTags = ["department-list"];
     public static readonly Expression<Func<Department, Guid>> DepartmentOwnerIdSelector =
-        d => d.SubLocation.Location.UserId;
-
+        d => d.Location.UserId;
+    
+    public static Expression<Func<Department, bool>> DepartmentOwnerPredicate(Guid userId) =>
+        d => d.Location.UserId == userId;
+        
     public const string EntityName = "Department";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access department {1}.";

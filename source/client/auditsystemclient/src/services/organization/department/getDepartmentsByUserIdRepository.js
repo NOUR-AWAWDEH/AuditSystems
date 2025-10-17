@@ -19,7 +19,6 @@ export const getDepartmentByUserIdRepository = {
                 }
             });
 
-            // Fix: Access data through response.data
             if (response.data?.success && response.data?.result) {
                 return ApiResponseT.ok(response.data.result, response.data.successMessage || 'Department retrieved successfully.');
             }

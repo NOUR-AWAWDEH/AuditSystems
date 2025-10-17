@@ -3,22 +3,22 @@
         <!-- Add Department Modal -->
         <AddDepartmentModal
             :is-visible="showAddDepartmentModal"
-            :sub-location-id="internalSelectedSubLocationId"
+            :location-id="internalSelectedLocationId"
             @close="handleCloseAddDepartmentModal"
             @department-added="handleDepartmentAdded"
         />
 
         <!-- Department Management -->
         <DepartmentTable
-            :sub-locations="props.subLocations"
+            :locations="props.locations"
             :departments="departments"
             :is-loading="isLoading"
-            :selected-sub-location-id="internalSelectedSubLocationId"
-            :selected-sub-location="selectedSubLocation"
-            :current-sub-location="currentSubLocation"
-            :is-sub-location-loading="isSubLocationLoading"
+            :selected-location-id="internalSelectedLocationId"
+            :selected-location="selectedLocation"
+            :current-location="currentLocation"
+            :is-location-loading="isLocationLoading"
             :search-query="searchQuery"
-            :handle-sub-location-change="handleDepartmentChange"
+            :handle-location-change="handleDepartmentChange"
             :handle-search="handleSearch"
             @add-department="handleAddDepartment"
             @edit-department="handleEditDepartment"
@@ -59,11 +59,11 @@ import { watch } from 'vue';
 import { useDepartmentModals } from './composables/useDepartmentModals';
 
 const props = defineProps({
-    subLocations: {
+    locations: {
         type: Array,
         default: () => []
     },
-    selectedSubLocationId: {
+    selectedLocationId: {
         type: [String, Number],
         default: null
     }
@@ -81,20 +81,20 @@ const emit = defineEmits([
 const {
     departments,
     isLoading,
-    selectedSubLocationId: internalSelectedSubLocationId,
-    selectedSubLocation,
-    currentSubLocation,
-    isSubLocationLoading,
+    selectedLocationId: internalSelectedLocationId,
+    selectedLocation,
+    currentLocation,
+    isLocationLoading,
     searchQuery,
     handleDepartmentChange,
     handleSearch,
     resetToDefaultView,
-} = useDepartmentTable(props.subLocations);
+} = useDepartmentTable(props.locations);
 
 // Watch for prop changes and update internal state
-watch(() => props.selectedSubLocationId, (newSubLocationId) => {
-    if (newSubLocationId !== internalSelectedSubLocationId.value) {
-        handleDepartmentChange(newSubLocationId);
+watch(() => props.selectedLocationId, (newLocationId) => {
+    if (newLocationId !== internalSelectedLocationId.value) {
+        handleDepartmentChange(newLocationId);
     }
 }, { immediate: true });
 
@@ -124,7 +124,7 @@ const handleDepartmentSelected = (departmentId) => {
 
 defineExpose({
     departments,
-    selectedSubLocationId: internalSelectedSubLocationId,
+    selectedLocationId: internalSelectedLocationId,
     resetToDefaultView
 });
 </script>

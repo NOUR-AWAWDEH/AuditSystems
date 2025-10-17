@@ -14,9 +14,9 @@ public class SearchDepartmentQueryValidator : PaginationRequestValidator<Departm
             .Must(BeAValidGuid)
             .WithMessage("User ID must be a valid GUID.");
 
-        RuleFor(x => x.SubLocationId)
+        RuleFor(x => x.LocationId)
             .Must(BeAValidGuid)
-            .WithMessage("SubLocation ID must be a valid GUID");
+            .WithMessage("Location ID must be a valid GUID");
 
         RuleFor(x => x.SearchTerm)
             .MaximumLength(200)

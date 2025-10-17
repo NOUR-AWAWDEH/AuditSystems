@@ -13,5 +13,5 @@ public class Location : Entity<Guid>
     // Navigation properties
     public virtual Company Company { get; set; } = null!;
     public virtual User User { get; set; } = null!;
-    public virtual ICollection<SubLocation> SubLocations { get; set; } = new HashSet<SubLocation>();
+    public virtual ICollection<Department> Departments { get; set; } = new HashSet<Department>();
 }

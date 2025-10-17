@@ -13,22 +13,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 
-public class LocationSearchHelper : ILocationSearch
+public class LocationSearchHelper(
+    IRepository<Guid, Location> repository,
+    ILogger<LocationSearchHelper> logger,
+    ICacheService cacheService
+        ) : ILocationSearch
 {
-    private readonly IRepository<Guid, Location> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<LocationSearchHelper> _logger;
-
-    public LocationSearchHelper(
-        IRepository<Guid, Location> repository,
-        ILogger<LocationSearchHelper> logger,
-        ICacheService cacheService
-        )
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IRepository<Guid, Location> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<LocationSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {

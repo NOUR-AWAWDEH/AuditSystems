@@ -9,8 +9,11 @@ public static class AuditProcessConstants
     public static readonly string[] ListTags = ["audit-process-list"];
     
     public static readonly Expression<Func<AuditProcess, Guid>> AuditProcessOwnerIdSelector =
-        ap => ap.SubDepartment.Department.SubLocation.Location.UserId;
-
+        ap => ap.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<AuditProcess, bool>> AuditProcessOwnerPredicate(Guid userId) =>
+        ap => ap.SubDepartment.Department.Location.UserId == userId;
+        
     public const string EntityName = "AuditProcess";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access audit process {1}.";

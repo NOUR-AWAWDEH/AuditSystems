@@ -101,7 +101,6 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Rate>()
 
         //Organization
-        .AddRepository<Guid, SubLocation>()
         .AddRepository<Guid, SubDepartment>()
         .AddRepository<Guid, Location>()
         .AddRepository<Guid, Department>()

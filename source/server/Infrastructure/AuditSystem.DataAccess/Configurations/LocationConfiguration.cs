@@ -37,7 +37,7 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(l => l.SubLocations)
+        builder.HasMany(l => l.Departments)
             .WithOne(sl => sl.Location)
             .HasForeignKey(sl => sl.LocationId)
             .OnDelete(DeleteBehavior.Restrict);

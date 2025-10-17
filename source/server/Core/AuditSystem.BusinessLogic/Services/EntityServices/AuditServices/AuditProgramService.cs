@@ -108,8 +108,7 @@ internal sealed class AuditProgramService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.ExitControl)
-            .Where(r => r.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(AuditProgramConstants.AuditProgramOwnerPredicate(userId))
             .Select(d => new AuditProgramModel
             {
                 Id = d.Id,

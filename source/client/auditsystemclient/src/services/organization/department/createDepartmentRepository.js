@@ -12,9 +12,9 @@ export const createDepartmentRepository = {
 
             const payload = {
                 name: departmentData.name,
-                subLocationId: typeof departmentData.subLocationId === 'object'
-                    ? departmentData.subLocationId.value || departmentData.subLocationId.id
-                    : departmentData.subLocationId
+                locationId: typeof departmentData.locationId === 'object'
+                    ? departmentData.locationId.value || departmentData.locationId.id
+                    : departmentData.locationId
             };
 
             const response = await api.post(

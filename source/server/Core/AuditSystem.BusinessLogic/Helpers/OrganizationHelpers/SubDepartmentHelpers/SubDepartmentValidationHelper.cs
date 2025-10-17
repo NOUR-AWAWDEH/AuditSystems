@@ -1,6 +1,5 @@
 using AuditSystem.Application.Constants.Organization.DepartmentConst;
 using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
-using AuditSystem.Application.Constants.Organization.SublocationConst;
 using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -20,7 +19,7 @@ public class SubDepartmentValidationHelper(
     public static void ValidateUserId(Guid userId)
     {
         if (userId == Guid.Empty)
-            throw new ArgumentException(SubLocationConstants.UserIdEmptyMessage, nameof(userId));
+            throw new ArgumentException(SubDepartmentConstants.UserIdEmptyMessage, nameof(userId));
     }
 
     public async Task<SubDepartment> ValidateSubDepartmentOwnershipAsync(Guid subDepartmentId, Guid userId)

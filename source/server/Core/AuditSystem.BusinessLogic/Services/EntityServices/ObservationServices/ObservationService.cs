@@ -83,11 +83,11 @@ internal sealed class ObservationService(
         var cashedResult = await TryGetFromCacheWithValidationAsync<ObservationModel>(
             id,
             userId,
-            entity => entity.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            ObservationConstants.ObservationOwnerIdSelector,
             ObservationConstants.UnauthorizedAuditProgramAccessMessage);
 
         if (cashedResult != null) 
-        {
+        {   
             logger.LogDebug("Retrieved observation {ObservationId} from cache", id);
             return cashedResult;
         }
@@ -106,8 +106,7 @@ internal sealed class ObservationService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.AuditProgram)
-            .Where(ap => ap.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(ObservationConstants.ObservationOwnerPredicate(userId))
             .Select(d => new ObservationModel
             {
                 Id = d.Id,

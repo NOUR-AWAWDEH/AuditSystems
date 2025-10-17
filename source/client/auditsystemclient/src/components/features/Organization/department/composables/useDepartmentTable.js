@@ -1,39 +1,39 @@
 import { useDepartmentData } from './useDepartmentData';
-import { useSubLocationManagement } from './useSubLocationManagement';
+import { useLocationManagement } from './useLocationManagement';
 import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 import { useDepartmentActions } from './useDepartmentActions';
 import { useDepartmentWatchers } from './useDepartmentWatchers';
 import { useDepartmentLifecycle } from './useDepartmentLifecycle';
 import { useDepartmentComputed } from './useDepartmentComputed';
 
-export function useDepartmentTable(subLocations) {
+export function useDepartmentTable(locations) {
   const dataComposable = useDepartmentData();
-  const subLocationComposable = useSubLocationManagement(subLocations);
+  const locationComposable = useLocationManagement(locations);
   const searchComposable = useSearchAndPagination();
 
   const actionsComposable = useDepartmentActions({
     ...dataComposable,
-    ...subLocationComposable,
+    ...locationComposable,
     ...searchComposable
   });
 
   const lifecycleComposable = useDepartmentLifecycle({
     ...dataComposable,
-    ...subLocationComposable,
+    ...locationComposable,
     ...searchComposable,
     ...actionsComposable,
   });
 
   const computedComposable = useDepartmentComputed({
     ...dataComposable,
-    ...subLocationComposable,
+    ...locationComposable,
     ...searchComposable,
     ...lifecycleComposable
   });
 
   useDepartmentWatchers({
     ...dataComposable,
-    ...subLocationComposable,
+    ...locationComposable,
     ...searchComposable,
     ...actionsComposable,
     ...lifecycleComposable
@@ -42,10 +42,10 @@ export function useDepartmentTable(subLocations) {
   return {
     departments: computedComposable.departments,
     isLoading: computedComposable.isLoading,
-    selectedSubLocationId: subLocationComposable.selectedSubLocationId,
-    selectedSubLocation: subLocationComposable.selectedSubLocation,
-    currentSubLocation: subLocationComposable.currentSubLocation,
-    isSubLocationLoading: subLocationComposable.isSubLocationLoading,
+    selectedLocationId: locationComposable.selectedLocationId,
+    selectedLocation: locationComposable.selectedLocation,
+    currentLocation: locationComposable.currentLocation,
+    isLocationLoading: locationComposable.isLocationLoading,
     searchQuery: searchComposable.searchQuery,
     currentPage: searchComposable.currentPage,
     pageSize: searchComposable.pageSize,

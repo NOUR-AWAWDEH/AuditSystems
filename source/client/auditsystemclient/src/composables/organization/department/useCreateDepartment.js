@@ -16,7 +16,7 @@ export function useCreateDepartment() {
 
     const handleCreateFailure = (response, defaultErrorMessage = 'Failed to create department.') => {
         const errorMessage = response?.errors?.length
-            ? response.errors[0].message  // Fixed: was response.error[0].message
+            ? response.errors[0].message
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
@@ -33,8 +33,8 @@ export function useCreateDepartment() {
         if (!departmentData.name?.trim()) {
             return 'Department name is required.';
         }
-        if (!departmentData.subLocationId) {
-            return 'Sub-location is required.';
+        if (!departmentData.locationId) {
+            return 'Location is required.';
         }
         return null;
     };

@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.Organization.Department.Create;
 
 public sealed record CreateDepartmentCommand(
     string Name,
-    Guid SubLocationId
+    Guid LocationId
 ) : UserAwareCommand<Result<CreateDepartmentCommandResponse>>;

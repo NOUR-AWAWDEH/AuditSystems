@@ -12,7 +12,6 @@ using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 
 internal sealed class SubDepartmentService(
@@ -65,7 +64,7 @@ internal sealed class SubDepartmentService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubDepartmentModel>(
             id,
             userId,
-            entity => entity.Department.SubLocation.Location.UserId,
+            SubDepartmentConstants.SubDepartmentOwnerIdSelector,
             SubDepartmentConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -129,8 +128,7 @@ internal sealed class SubDepartmentService(
         // Create the LINQ query equivalent to your SQL
         return await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.Department) // Include the Department navigation property
-            .Where(s => s.Department.SubLocation.Location.UserId == userId)
+            .Where(SubDepartmentConstants.SubDepartmentOwnerPredicate(userId))
             .Select(s => new SubDepartmentModel
             {
                 Id = s.Id,

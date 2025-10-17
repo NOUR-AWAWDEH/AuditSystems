@@ -17,9 +17,9 @@ export const updateDepartmentByIdRepository = {
             const payload = {
                 id: departmentData.id,
                 name: departmentData.name,
-                subLocationId: typeof departmentData.subLocationId === 'object' 
-                    ? departmentData.subLocationId.value || departmentData.subLocationId.id || departmentData.subLocationId
-                    : departmentData.subLocationId
+                locationId: typeof departmentData.locationId === 'object' 
+                    ? departmentData.locationId.value || departmentData.locationId.id || departmentData.locationId
+                    : departmentData.locationId
             };
 
             const response = await api.put(

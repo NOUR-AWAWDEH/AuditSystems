@@ -1,9 +1,9 @@
 import { watch, nextTick } from 'vue';
 
 export function useDepartmentWatchers({
-  subLocationsRef = null,
-  selectedSubLocation,
-  selectedSubLocationId,
+  locationsRef = null,
+  selectedLocation,
+  selectedLocationId,
   searchQuery,
   currentPage,
   pageSize,
@@ -13,21 +13,21 @@ export function useDepartmentWatchers({
   clearSearch,
   getDepartmentsByUserId,
   allDepartments,
-  clearSubLocation,
-  getSubLocationById,
+  clearLocation,
+  getLocationById,
   initializeData,
   resetToDefaultView
 }) {
-  // Watch SubLocations
-  if (subLocationsRef) {
-    watch(subLocationsRef, async (newSubLocations) => {
+  // Watch locations
+  if (locationsRef) {
+    watch(locationsRef, async (newLocations) => {
 
-      if (!newSubLocations?.length || !selectedSubLocation.value || isInitialized.value || isInitializing.value) {
+      if (!newLocations?.length || !selectedLocation.value || isInitialized.value || isInitializing.value) {
         return;
       }
 
-      const subLocationExists = newSubLocations.some(sub => sub.id === selectedSubLocationId.value);
-      if (subLocationExists) {
+      const locationExists = newLocations.some(loc => loc.id === selectedLocationId.value);
+      if (locationExists) {
         await nextTick();
         await initializeData?.();
       } else {
@@ -43,7 +43,7 @@ export function useDepartmentWatchers({
       if (searchDepartments) {
         await searchDepartments({
           searchTerm: search,
-          subLocationId: selectedSubLocationId.value,
+          locationId: selectedLocationId.value,
           page: currentPage.value,
           pageSize: pageSize.value,
         });
@@ -51,11 +51,11 @@ export function useDepartmentWatchers({
     } else {
       clearSearch?.();
 
-      if (selectedSubLocationId.value) {
+      if (selectedLocationId.value) {
         if (searchDepartments) {
           await searchDepartments({
             searchTerm: '',
-            subLocationId: selectedSubLocationId.value,
+            locationId: selectedLocationId.value,
             page: currentPage.value,
             pageSize: pageSize.value,
           });
@@ -67,7 +67,7 @@ export function useDepartmentWatchers({
   });
 
   // Watch selected sub department
-  watch(selectedSubLocationId, async (newSubLocationId) => {
+  watch(selectedLocationId, async (newLocationId) => {
 
     clearSearch?.();
 
@@ -75,8 +75,8 @@ export function useDepartmentWatchers({
       allDepartments.value = [];
     }
 
-    if (!newSubLocationId) {
-      clearSubLocation?.();
+    if (!newLocationId) {
+      clearLocation?.();
       if (!searchQuery.value.trim()) {
         await getDepartmentsByUserId?.();
       }
@@ -84,14 +84,14 @@ export function useDepartmentWatchers({
     }
 
     try {
-      await getSubLocationById?.(newSubLocationId);
+      await getLocationById?.(newLocationId);
     } catch (error) {
-      console.error('[Process] Error fetching SubLocation:', error);
+      console.error('[Process] Error fetching location:', error);
     }
 
     await searchDepartments?.({
       searchTerm: searchQuery.value || '',
-      subLocationId: newSubLocationId,
+      locationId: newLocationId,
       page: currentPage.value,
       pageSize: pageSize.value,
     });

@@ -26,7 +26,6 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     // Organization
     public required DbSet<Company> Companies { get; set; }
     public required DbSet<Location> Locations { get; set; }
-    public required DbSet<SubLocation> SubLocations { get; set; }
     public required DbSet<Department> Departments { get; set; }
     public required DbSet<SubDepartment> SubDepartments { get; set; }
 

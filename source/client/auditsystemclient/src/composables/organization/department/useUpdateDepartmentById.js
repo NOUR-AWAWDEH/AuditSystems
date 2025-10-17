@@ -39,8 +39,8 @@ export function useUpdateDepartmentById() {
             return 'Department name is required';
         }
 
-        if (!departmentData.subLocationId) {
-            return 'SubLocation is required';
+        if (!departmentData.locationId) {
+            return 'Location is required';
         }
 
         return null;

@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 export function useDepartmentComputed({
     searchQuery,
-    selectedSubLocationId,
+    selectedLocationId,
     searchResults,
     allDepartments,
     isSearching,
@@ -17,7 +17,7 @@ export function useDepartmentComputed({
                 : [];
         }
         
-        if (selectedSubLocationId?.value) {
+        if (selectedLocationId?.value) {
             return (searchResults && searchResults.value)
                 ? searchResults.value
                 : [];

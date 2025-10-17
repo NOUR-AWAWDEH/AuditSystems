@@ -3,17 +3,17 @@
         <!-- Department Header -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
             <div class="p-3 sm:p-4 md:p-6">
-                <!-- Header with SubLocation Selection and Filters -->
+                <!-- Header with Location Selection and Filters -->
                 <div class="flex flex-col gap-4 mb-6">
                     <DepartmentHeader />
 
-                    <!-- SubLocationSelector and Filters - Stack on mobile -->
+                    <!-- LocationSelector and Filters - Stack on mobile -->
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
                         <div class="w-full sm:min-w-64 sm:max-w-xs">
-                            <SubLocationSelector
-                                :sub-locations="subLocations"
-                                :selected-sub-location-id="selectedSubLocationId"
-                                @sub-location-changed="handleSubLocationChange"
+                            <LocationSelector
+                                :locations="locations"
+                                :selected-location-id="selectedLocationId"
+                                @location-changed="handleLocationChange"
                             />
                         </div>
                         <div class="w-full sm:w-auto">
@@ -28,8 +28,8 @@
                     </div>
                 </div>
 
-                <!-- Selected SubLocation Info - Show when SubLocation is Selected -->
-                <div v-if="selectedSubLocationId"
+                <!-- Selected Location Info - Show when Location is Selected -->
+                <div v-if="selectedLocationId"
                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -38,8 +38,8 @@
                             <p class="text-sm text-gray-700">
                                 Showing departments for: &nbsp;&nbsp;
                                 <span class="font-semibold text-blue-800">
-                                    <span v-if="isSubLocationLoading">Loading subLocation...</span>
-                                    <span v-else>{{ currentSubLocation?.name || 'Loading...' }}</span>
+                                    <span v-if="isLocationLoading">Loading location...</span>
+                                    <span v-else>{{ currentLocation?.name || 'Loading...' }}</span>
                                 </span>
                                 <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                             </p>
@@ -52,8 +52,8 @@
                     </div>
                 </div>
 
-                <!-- Table Container - Show when SubLocation is Selected -->
-                <div v-if="selectedSubLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <!-- Table Container - Show when Location is Selected -->
+                <div v-if="selectedLocationId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
                         :items="departments"
                         :columns="enhancedColumns"
@@ -102,11 +102,11 @@
 
                     <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a subLocation to view
                         departments</h3>
-                    <p class="text-gray-500 mb-6">Choose a subLocation from the dropdown above to get started</p>
+                    <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
 
-                    <!-- No SubLocations Available -->
-                    <div v-if="!subLocations || subLocations.length === 0" class="text-center">
-                        <p class="text-sm text-gray-400">Please add a subLocation first to manage departments</p>
+                    <!-- No Locations Available -->
+                    <div v-if="!locations || locations.length === 0" class="text-center">
+                        <p class="text-sm text-gray-400">Please add a location first to manage departments</p>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@
 import { computed, ref, watch} from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
-import SubLocationSelector from '@/components/features/Organization/sublocation/components/SubLocationSelector.vue';
+import LocationSelector from '@/components/features/Organization/location/components/LocationSelector.vue';
 import DepartmentHeader from './DepartmentHeader.vue';
 import LocationIcon from '@/components/common/icons/LocationIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
@@ -129,15 +129,15 @@ import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 
 const props = defineProps({
-    subLocations: Array,
+    locations: Array,
     departments: Array,
     isLoading: Boolean,
-    selectedSubLocationId: String,
-    selectedSubLocation: Object,
-    currentSubLocation: Object,
-    isSubLocationLoading: Boolean,
+    selectedLocationId: String,
+    selectedLocation: Object,
+    currentLocation: Object,
+    isLocationLoading: Boolean,
     searchQuery: String,
-    handleSubLocationChange: Function,
+    handleLocationChange: Function,
     handleSearch: Function,
 });
 
@@ -148,14 +148,14 @@ const emit = defineEmits([
     'department-selected'
 ]);
 
-const internalSelectedSubLocationId = ref(props.selectedSubLocationId);
+const internalSelectedLocationId = ref(props.selectedLocationId);
 
-watch(() => props.selectedSubLocationId, (newVal) => {
-  internalSelectedSubLocationId.value = newVal;
+watch(() => props.selectedLocationId, (newVal) => {
+  internalSelectedLocationId.value = newVal;
 });
 
-watch(internalSelectedSubLocationId, (newVal) => {
-  props.handleSubLocationChange(newVal);
+watch(internalSelectedLocationId, (newVal) => {
+  props.handleLocationChange(newVal);
 }, { immediate: true });
 
 // Department selection state

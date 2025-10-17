@@ -84,7 +84,7 @@ internal sealed class ControlDesignService(
         var cashedResult = await TryGetFromCacheWithValidationAsync<ControlDesignModel>(
             id,
             userId,
-            entity => entity.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            ControlDesignConstants.ControlDesignOwnerIdSelector,
             ControlDesignConstants.UnauthorizedAccessMessage);
 
         if (cashedResult != null)
@@ -106,8 +106,7 @@ internal sealed class ControlDesignService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.ExitControl)
-            .Where(r => r.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(ControlDesignConstants.ControlDesignOwnerPredicate(userId))
             .Select(d => new ControlDesignModel
             {
                 Id = d.Id,

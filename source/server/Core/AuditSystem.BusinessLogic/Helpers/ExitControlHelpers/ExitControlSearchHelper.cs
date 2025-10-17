@@ -24,7 +24,7 @@ public class ExitControlSearchHelper(
     public Expression<Func<ExitControl, bool>> BuildUserSearchPredicate(    
         Guid userId, string? searchTerm, Guid riskId)
     {
-        return r => r.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId &&
+        return r => r.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
                 (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
                 r.RiskId == riskId;
     }

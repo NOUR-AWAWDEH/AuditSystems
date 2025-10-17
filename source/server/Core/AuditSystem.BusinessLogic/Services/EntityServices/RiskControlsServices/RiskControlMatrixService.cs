@@ -63,7 +63,7 @@ internal sealed class RiskControlMatrixService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<RiskControlMatrixModel>(
             id,
             userId,
-            entity => entity.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            RiskControlMatrixConstants.RiskControlMatrixOwnerIdSelector,
             RiskControlMatrixConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null) 
@@ -122,7 +122,7 @@ internal sealed class RiskControlMatrixService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(rcm => rcm.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(RiskControlMatrixConstants.RiskControlMatrixOwnerPredicate(userId))
             .Select(rcm => new RiskControlMatrixModel
             {
                 Id = rcm.Id,

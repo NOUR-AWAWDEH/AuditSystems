@@ -11,6 +11,9 @@ public static class LocationConstants
     public static readonly Expression<Func<Location, Guid>> LocationOwnerIdSelector =
         l => l.UserId;
     
+    public static Expression<Func<Location, bool>> LocationOwnerPredicate(Guid userId) =>
+        l => l.UserId == userId;
+        
     public const string EntityName = "Location";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access location {1}.";
     public const string LocationNotFoundMessage = "Location with ID {0} not found.";

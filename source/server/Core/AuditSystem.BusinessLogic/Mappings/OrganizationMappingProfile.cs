@@ -6,8 +6,6 @@ using AuditSystem.Application.Features.Organization.Location.Create;
 using AuditSystem.Application.Features.Organization.Location.Update;
 using AuditSystem.Application.Features.Organization.SubDepartment.Create;
 using AuditSystem.Application.Features.Organization.SubDepartment.Update;
-using AuditSystem.Application.Features.Organization.SubLocation.Create;
-using AuditSystem.Application.Features.Organization.SubLocation.Update;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
@@ -28,11 +26,6 @@ public sealed class OrganizationMappingProfile : Profile
         CreateMap<LocationModel, Location>().ReverseMap();
         CreateMap<CreateLocationCommand, LocationModel>();
         CreateMap<UpdateLocationCommand, LocationModel>();
-        
-        //SubLocation
-        CreateMap<SubLocationModel, SubLocation>().ReverseMap();
-        CreateMap<CreateSubLocationCommand, SubLocationModel>();
-        CreateMap<UpdateSubLocationCommand, SubLocationModel>();
 
         //Department
         CreateMap<DepartmentModel, Department>().ReverseMap();

@@ -123,7 +123,7 @@ internal sealed class AuditProcessService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(ap => ap.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(AuditProcessConstants.AuditProcessOwnerPredicate(userId))
             .Select(ap => new AuditProcessModel
             {
                 Id = ap.Id,

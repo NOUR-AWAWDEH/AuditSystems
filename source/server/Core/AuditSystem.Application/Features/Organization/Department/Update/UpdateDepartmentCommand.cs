@@ -6,5 +6,5 @@ namespace AuditSystem.Application.Features.Organization.Department.Update;
 public sealed record UpdateDepartmentCommand(
     Guid Id,
     string Name,
-    Guid SublocationId
+    Guid LocationId
 ) : UserAwareCommand<Result>;

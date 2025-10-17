@@ -11,8 +11,12 @@ public static class ExitControlConstants
     // Ownership path expressions
     public static readonly Expression<Func<ExitControl, Guid>> ExitControlOwnerIdSelector = 
         ec => ec.Risk.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
-                
+                .AuditProcess.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<ExitControl, bool>> ExitControlOwnerPredicate(Guid userId) =>
+        ec => ec.Risk.Objective.RiskControlMatrix.SubProcess
+                .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        
     public const string EntityName = "ExitControl";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access exit control {1}.";

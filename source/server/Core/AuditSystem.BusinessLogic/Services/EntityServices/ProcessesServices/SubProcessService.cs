@@ -65,7 +65,7 @@ internal sealed class SubProcessService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<SubProcessModel>(
             id,
             userId,
-            entity => entity.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            SubProcessConstants.SubProcessOwnerIdSelector,
             SubProcessConstants.UnauthorizedAccessMessage);
         
         if (cachedResult != null)
@@ -125,7 +125,7 @@ internal sealed class SubProcessService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(sp => sp.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(SubProcessConstants.SubProcessOwnerPredicate(userId))
             .Select(sp => new SubProcessModel
             {
                 Id = sp.Id,

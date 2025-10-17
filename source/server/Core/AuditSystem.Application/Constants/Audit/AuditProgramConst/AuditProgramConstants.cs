@@ -10,7 +10,12 @@ public static class AuditProgramConstants
 
     public static readonly Expression<Func<AuditProgram, Guid>> AuditProgramOwnerIdSelector =
         a => a.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess
-            .AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+            .AuditProcess.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<AuditProgram, bool>> AuditProgramOwnerPredicate(Guid userId) =>
+        ap => ap.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess
+            .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+
 
     public const string EntityName = "AuditProgram";    
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access audit program {1}.";

@@ -10,7 +10,7 @@ export function useSearchDepartmentsByUserId() {
     const currentPage = ref(1);
     const pageSize = ref(10);
     const searchTerm = ref('');
-    const subLocationId = ref(null);
+    const locationId = ref(null);
     const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
@@ -47,13 +47,13 @@ export function useSearchDepartmentsByUserId() {
 
             const params = {
                 searchTerm: searchParams.searchTerm || searchTerm.value,
-                subLocationId: searchParams.subLocationId || subLocationId.value,
+                locationId: searchParams.locationId || locationId.value,
                 page: searchParams.page || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
             }
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
-            if (searchParams.subLocationId !== undefined) subLocationId.value = searchParams.subLocationId;
+            if (searchParams.locationId !== undefined) locationId.value = searchParams.locationId;
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
@@ -75,7 +75,7 @@ export function useSearchDepartmentsByUserId() {
     const clearSearch = () => {
         searchResults.value = [];
         searchTerm.value = '';
-        subLocationId.value = null;
+        locationId.value = null;
         currentPage.value = 1;
         error.value = null;
         totalCount.value = 0;
@@ -89,7 +89,7 @@ export function useSearchDepartmentsByUserId() {
         totalCount.value = 0;
         currentPage.value = 1;
         searchTerm.value = '';
-        subLocationId.value = null;
+        locationId.value = null;
     };
 
     return {

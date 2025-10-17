@@ -33,7 +33,6 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
     {
         await _entities.AddRangeAsync(entities);
         await context.SaveChangesAsync();
-        entities.ToList().ForEach(e => context.Entry(e).State = EntityState.Detached);
     }
 
     public async Task<TEntity?> GetByIdAsync(TId id)

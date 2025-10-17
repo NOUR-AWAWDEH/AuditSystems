@@ -19,17 +19,17 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired(true)
             .HasMaxLength(200);
 
-        builder.Property(d => d.SubLocationId)
+        builder.Property(d => d.LocationId)
             .IsRequired(true);
 
         // Relationships
-        builder.HasOne(d => d.SubLocation)
-            .WithMany(sl => sl.Departments)
-            .HasForeignKey(d => d.SubLocationId)
+        builder.HasOne(d => d.Location)
+            .WithMany(l => l.Departments)
+            .HasForeignKey(d => d.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes for performance
-        builder.HasIndex(d => d.SubLocationId);
+        builder.HasIndex(d => d.LocationId);
         builder.HasIndex(d => d.Name);
     }
 }

@@ -11,6 +11,9 @@ public static class SupportingDocsConstants
     public static readonly Expression<Func<SupportingDocEntity, Guid>> SupportingDocOwnerIdSelector = 
         s => s.UserId;
     
+    public static Expression<Func<SupportingDocEntity, bool>> SupportingDocOwnerPredicate(Guid userId) =>
+        s => s.UserId == userId;
+        
     public const string EntityName = "SupportingDoc";
     public const string ServiceName = "SupportingDocs";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access supporting document {1}.";

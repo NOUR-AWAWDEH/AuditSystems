@@ -64,7 +64,7 @@ internal sealed class RiskService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<RiskModel>(
             id,
             userId,
-            entity => entity.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            RiskConstants.RiskOwnerIdSelector,
             RiskConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -124,7 +124,7 @@ internal sealed class RiskService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(RiskConstants.RiskOwnerPredicate(userId))
             .Select(ap => new RiskModel
             {
                 Id = ap.Id,

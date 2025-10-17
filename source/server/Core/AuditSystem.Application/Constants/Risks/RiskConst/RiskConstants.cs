@@ -11,8 +11,12 @@ public static class RiskConstants
     
     public static readonly Expression<Func<Risk, Guid>> RiskOwnerIdSelector = 
         r => r.Objective.RiskControlMatrix.SubProcess   
-                .AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
-
+                .AuditProcess.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<Risk, bool>> RiskOwnerPredicate(Guid userId) =>
+        r => r.Objective.RiskControlMatrix.SubProcess
+                .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        
     public const string EntityName = "Risk";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access risk {1}.";

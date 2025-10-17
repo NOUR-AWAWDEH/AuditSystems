@@ -30,7 +30,7 @@ public class AuditProcessSearchHelper : IAuditProcessSearch
 
     public Expression<Func<AuditProcess, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subDepartmentId)
     {
-        return ap => ap.SubDepartment.Department.SubLocation.Location.UserId == userId &&  
+        return ap => ap.SubDepartment.Department.Location.UserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || ap.ProcessName.Contains(searchTerm)) &&
                 ap.SubDepartmentId == subDepartmentId;
     }

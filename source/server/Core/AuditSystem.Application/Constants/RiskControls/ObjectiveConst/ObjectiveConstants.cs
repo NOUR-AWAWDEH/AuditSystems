@@ -9,7 +9,10 @@ public static class ObjectiveConstants
     public static readonly string[] ListTags = ["objective-list"];
     
     public static readonly Expression<Func<Objective, Guid>> ObjectiveOwnerIdSelector =
-        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+        sp => sp.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId;
+    
+    public static Expression<Func<Objective, bool>> ObjectiveOwnerPredicate(Guid userId) =>
+        o => o.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId;
  
     public const string EntityName = "Objective";
 

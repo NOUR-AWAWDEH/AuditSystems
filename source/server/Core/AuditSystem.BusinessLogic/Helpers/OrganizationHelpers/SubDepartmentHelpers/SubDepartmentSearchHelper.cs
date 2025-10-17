@@ -23,7 +23,7 @@ public class SubDepartmentSearchHelper(
 
     public Expression<Func<SubDepartment, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid departmentId)
     {
-        return sl => sl.Department.SubLocation.Location.UserId == userId && 
+        return sl => sl.Department.Location.UserId == userId && 
                     (string.IsNullOrEmpty(searchTerm) || sl.Name.Contains(searchTerm)) &&
                     sl.DepartmentId == departmentId;
     }

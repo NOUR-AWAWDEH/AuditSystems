@@ -63,7 +63,7 @@ internal class ObjectiveService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<ObjectiveModel>(
             id,
             userId,
-            entity => entity.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            ObjectiveConstants.ObjectiveOwnerIdSelector,
             ObjectiveConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null) 
@@ -126,7 +126,7 @@ internal class ObjectiveService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(ob => ob.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(ObjectiveConstants.ObjectiveOwnerPredicate(userId))
             .Select(ob => new ObjectiveModel
             {
                 Id = ob.Id,

@@ -144,7 +144,7 @@ const handleSubmit = async () => {
     const departmentData = {
       id: props.department.id,
       name: formData.value.name.trim(),
-      subLocationId: props.department.subLocationId
+      locationId: props.department.locationId
     };
 
     const result = await updateDepartment(departmentData);

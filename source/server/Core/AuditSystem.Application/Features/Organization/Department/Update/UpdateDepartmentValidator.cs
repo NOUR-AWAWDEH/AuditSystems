@@ -24,11 +24,11 @@ public sealed class UpdateDepartmentValidator : AbstractValidator<UpdateDepartme
             .MaximumLength(100)
             .WithMessage("Name must not exceed 100 characters.");
 
-        RuleFor(x => x.SublocationId)
+        RuleFor(x => x.LocationId)
             .NotEmpty()
             .WithMessage("Id is required.")
             .Must(BeAValidGuid)
-            .WithMessage("SubLocation Id must not be empty.");
+            .WithMessage("Location Id must not be empty.");
     }
     private bool BeAValidGuid(Guid id)
     {

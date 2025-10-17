@@ -21,8 +21,8 @@ export const searchDepartmentsByUserIdRepository = {
                 queryParams.append('searchTerm', searchParams.searchTerm);
             }
 
-            if (searchParams.subLocationId) {
-                queryParams.append('subLocationId', searchParams.subLocationId);
+            if (searchParams.locationId) {
+                queryParams.append('locationId', searchParams.locationId);
             }
 
             if (searchParams.page) {

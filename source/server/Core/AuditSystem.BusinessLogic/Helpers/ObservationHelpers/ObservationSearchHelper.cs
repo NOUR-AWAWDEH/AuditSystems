@@ -13,26 +13,19 @@ using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 
 namespace AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 
-public class ObservationSearchHelper : IObservationSearch
+public class ObservationSearchHelper(
+    IRepository<Guid, Observation> repository,
+    ILogger<ObservationSearchHelper> logger,
+    ICacheService cacheService) : IObservationSearch
 {
-    private readonly IRepository<Guid, Observation> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<ObservationSearchHelper> _logger;
-
-    public ObservationSearchHelper(
-        IRepository<Guid, Observation> repository,
-        ILogger<ObservationSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    }
+    private readonly IRepository<Guid, Observation> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ILogger<ObservationSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Observation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProgramId)
     {
         return ap => ap.AuditProgramId == auditProgramId &&
-                ap.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId == userId &&  
+                ap.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm));
     }
 

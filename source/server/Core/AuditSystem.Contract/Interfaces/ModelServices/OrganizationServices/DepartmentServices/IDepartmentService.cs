@@ -10,7 +10,7 @@ public interface IDepartmentService
     Task UpdateDepartmentAsync(DepartmentModel departmentModel, Guid userId);
     Task DeleteDepartmentAsync(Guid departmentId, Guid userId); 
     Task<DepartmentModel> GetDepartmentByIdAsync(Guid id, Guid userId);
-    Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subLocationId, Page? page);
+    Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page);
     Task<IReadOnlyList<DepartmentModel>> GetDepartmentsByUserIdAsync(Guid userId);
     
     // The existing SearchAsync for admin/system use if needed

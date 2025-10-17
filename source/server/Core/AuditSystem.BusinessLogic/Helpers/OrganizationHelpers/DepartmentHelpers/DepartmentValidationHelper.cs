@@ -1,5 +1,5 @@
 using AuditSystem.Application.Constants.Organization.DepartmentConst;
-using AuditSystem.Application.Constants.Organization.SublocationConst;
+using AuditSystem.Application.Constants.Organization.LocationConst;
 using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.Repositories;
@@ -10,13 +10,13 @@ namespace AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelper
 
 public class DepartmentValidationHelper(
     IRepository<Guid, Department> repository,
-    IRepository<Guid, SubLocation> subLocationRepository)
+    IRepository<Guid, Location> locationRepository)
     : IDepartmentValidation
 {
     private readonly IRepository<Guid, Department> _repository = repository
         ?? throw new ArgumentNullException(nameof(repository));
-    private readonly IRepository<Guid, SubLocation> _subLocationRepository = subLocationRepository
-        ?? throw new ArgumentNullException(nameof(subLocationRepository));
+    private readonly IRepository<Guid, Location> _locationRepository = locationRepository
+        ?? throw new ArgumentNullException(nameof(locationRepository));
 
     public static void ValidateUserId(Guid userId)
     {
@@ -35,22 +35,22 @@ public class DepartmentValidationHelper(
         );
     }
 
-    public async Task<SubLocation> ValidateSubLocationOwnershipAsync(Guid subLocationId, Guid userId)
+    public async Task<Location> ValidateLocationOwnershipAsync(Guid locationId, Guid userId)
     {
-         var subLocation = await _subLocationRepository.GetByIdAsync(subLocationId) 
-            ?? throw new ArgumentException(SubLocationConstants.SubLocationNotFoundMessage, nameof(subLocationId));
+         var location = await _locationRepository.GetByIdAsync(locationId) 
+            ?? throw new ArgumentException(LocationConstants.LocationNotFoundMessage, nameof(locationId));
         
-        var ownerId = await _subLocationRepository.Query()
+        var ownerId = await _locationRepository.Query()
             .AsNoTracking()
-            .Where(sl => sl.Id == subLocationId)
-            .Select(SubLocationConstants.SubLocationOwnerIdSelector)
+            .Where(l => l.Id == locationId)
+            .Select(LocationConstants.LocationOwnerIdSelector)
             .FirstOrDefaultAsync();
 
         if (ownerId == Guid.Empty || ownerId != userId)
             throw new UnauthorizedAccessException(
-                string.Format(SubLocationConstants.UnauthorizedAccessMessage, userId, subLocationId)
+                string.Format(LocationConstants.UnauthorizedAccessMessage, userId, locationId)
             );
         
-        return subLocation;
+        return location;
     }
 }

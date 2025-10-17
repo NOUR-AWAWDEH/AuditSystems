@@ -10,8 +10,11 @@ public static class SubDepartmentConstants
     public static readonly Expression<Func<SubDepartment, object?>>[] IncludeDepartment = [sl => sl.Department];
     
     public static readonly Expression<Func<SubDepartment, Guid>> SubDepartmentOwnerIdSelector =
-        s => s.Department.SubLocation.Location.UserId;
+        s => s.Department.Location.UserId;
     
+    public static Expression<Func<SubDepartment, bool>> SubDepartmentOwnerPredicate(Guid userId) =>
+        s => s.Department.Location.UserId == userId;
+        
     public const string EntityName = "SubDepartment";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access subdepartment {1}.";
     public const string DepartmentNotFoundMessage = "Department with ID {0} not found.";

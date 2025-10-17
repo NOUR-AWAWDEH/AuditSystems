@@ -44,7 +44,7 @@ internal sealed class DepartmentService(
 
         _logger.LogInformation("Creating department {DepartmentName} for user {UserId}", departmentModel.Name, userId);
 
-        await _validationHelper.ValidateSubLocationOwnershipAsync(departmentModel.SubLocationId, userId);
+        await _validationHelper.ValidateLocationOwnershipAsync(departmentModel.LocationId, userId);
 
         var entity = mapper.Map<Department>(departmentModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -65,7 +65,7 @@ internal sealed class DepartmentService(
         var cashedResult = await TryGetFromCacheWithValidationAsync<DepartmentModel>(
             id,
             userId,
-            entity => entity.SubLocation.Location.UserId,
+            DepartmentConstants.DepartmentOwnerIdSelector,
             DepartmentConstants.UnauthorizedAccessMessage);
 
         if (cashedResult != null) 
@@ -88,12 +88,12 @@ internal sealed class DepartmentService(
         await _validationHelper.ValidateDepartmentOwnershipAsync(departmentId, userId);
         
         var department = await repository.GetByIdAsync(departmentId);
-        Guid? subLocationId = department?.SubLocationId;
+        Guid? locationId = department?.LocationId;
         
         await repository.DeleteAsync(departmentId);
         await ClearEntityCacheAsync(departmentId);
         
-        await ClearUserRelatedCachesAsync(userId, DepartmentConstants.EntityName, subLocationId);
+        await ClearUserRelatedCachesAsync(userId, DepartmentConstants.EntityName, locationId);
 
         _logger.LogInformation("Successfully deleted department {DepartmentId} for user {UserId}", departmentId, userId);
     }
@@ -126,13 +126,12 @@ internal sealed class DepartmentService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Include(s => s.SubLocation)
-            .Where(r => r.SubLocation.Location.UserId == userId)
+            .Where(DepartmentConstants.DepartmentOwnerPredicate(userId))
             .Select(d => new DepartmentModel
             {
                 Id = d.Id,
                 Name = d.Name,
-                SubLocationId = d.SubLocationId,
+                LocationId = d.LocationId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })
@@ -140,15 +139,15 @@ internal sealed class DepartmentService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subLocationId, Page? page)
+    public async Task<PaginationResult<DepartmentModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid locationId, Page? page)
     {
         DepartmentValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        _logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and sublocation: {SubLocationId}",
-            userId, searchTerm ?? "(none)", subLocationId.ToString() ?? "(none)");
+        _logger.LogDebug("Searching departments for user {UserId} with term: {SearchTerm} and location: {LocationId}",
+            userId, searchTerm ?? "(none)", locationId.ToString() ?? "(none)");
 
-        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subLocationId, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, locationId, page);
 
         var cachedResult = await GetFromCacheAsync<DepartmentModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null) 
@@ -156,7 +155,7 @@ internal sealed class DepartmentService(
             _logger.LogDebug(DepartmentConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subLocationId, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, locationId, page, cacheKey, countCacheKey);
     }
     
     public async Task<PaginationResult<DepartmentModel>> SearchAsync(string? name, Page page)

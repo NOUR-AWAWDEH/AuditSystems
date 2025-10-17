@@ -76,7 +76,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    subLocationId: {
+    locationId: {
         type: [String, Number],
         default: null
     }
@@ -113,8 +113,8 @@ const resetForm = () => {
 };
 
 const handleSubmit = async () => {
-    if (!props.subLocationId) {
-        showNotification('sub location is required ', 'error');
+    if (!props.locationId) {
+        showNotification('location is required ', 'error');
         return;
     }
 
@@ -125,7 +125,7 @@ const handleSubmit = async () => {
     try {
         const departmentData = {
             name: formData.value.name.trim(),
-            subLocationId: props.subLocationId
+            locationId: props.locationId
         };
 
         const result = await createDepartment(departmentData);

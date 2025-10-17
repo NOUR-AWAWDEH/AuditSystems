@@ -5,17 +5,17 @@ export function useDepartmentActions({
     clearSubLocation,
     allDepartments,
     searchQuery,
-    selectedSubLocationId,
+    selectedLocationId,
     currentPage,
     pageSize
 }) {
     const refreshData = async () => {
-        const hasSearchOrFilter = searchQuery.value.trim() || selectedSubLocationId.value;
+        const hasSearchOrFilter = searchQuery.value.trim() || selectedLocationId.value;
         if (hasSearchOrFilter) {
             if (searchDepartments) {
                 await searchDepartments({
                     searchTerm: searchQuery.value || '',
-                    subLocationId: selectedSubLocationId.value,
+                    locationId: selectedLocationId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });
@@ -27,14 +27,14 @@ export function useDepartmentActions({
         }
     };
 
-    const handleDepartmentChange = async (newSubLocationId) => {
+    const handleDepartmentChange = async (newLocationId) => {
         if (clearSearch) clearSearch();
         if (allDepartments?.value !== undefined) allDepartments.value = [];
-        selectedSubLocationId.value = newSubLocationId;
+        selectedLocationId.value = newLocationId;
     };
 
     const resetToDefaultView = () => {
-        selectedSubLocationId.value = null;
+        selectedLocationId.value = null;
         searchQuery.value = '';
         currentPage.value = 1;
         if (clearSearch) clearSearch();

@@ -9,8 +9,11 @@ public static class RiskControlMatrixConstants
     public static readonly string[] ListTags = ["risk-control-matrix-list"];
     
     public static readonly Expression<Func<RiskControlMatrix, Guid>> RiskControlMatrixOwnerIdSelector =
-        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId;
+        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId;
     
+    public static Expression<Func<RiskControlMatrix, bool>> RiskControlMatrixOwnerPredicate(Guid userId) =>
+        sp => sp.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        
     public const string EntityName = "RiskControlMatrix";
 
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access risk control matrix {1}.";

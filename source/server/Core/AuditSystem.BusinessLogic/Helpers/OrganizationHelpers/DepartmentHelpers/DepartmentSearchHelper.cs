@@ -21,24 +21,24 @@ public class DepartmentSearchHelper(
     private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     private readonly ILogger<DepartmentSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-    public Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subLocationId)
+    public Expression<Func<Department, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid locationId)
     {
-        return d => d.SubLocation.Location.UserId == userId && 
+        return d => d.Location.UserId == userId && 
                 (string.IsNullOrEmpty(searchTerm) || d.Name.Contains(searchTerm)) &&
-                d.SubLocationId == subLocationId;
+                d.LocationId == locationId;
     }
 
-    // Method with required Guid subLocationId (not nullable) - matches interface
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid subLocationId, Page page)
+    // Method with required Guid locationId (not nullable) - matches interface
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid locationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subLocationIdStr = subLocationId.ToString();
+        var locationIdStr = locationId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr, page.Number, page.Size);
+            CacheKeys.Department, userId, normalizedSearchTerm, locationIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr);
+            CacheKeys.Department, userId, normalizedSearchTerm, locationIdStr);
 
         return (cacheKey, countCacheKey);
     }
@@ -49,29 +49,29 @@ public class DepartmentSearchHelper(
         return GetUserSearchCacheKeys(userId, searchTerm, null, page);
     }
 
-    // Updated method with nullable subLocationId support (for internal use)
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subLocationId, Page page)
+    // Updated method with nullable locationId support (for internal use)
+    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? locationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subLocationIdStr = subLocationId.ToString() ?? "all";
+        var locationIdStr = locationId.ToString() ?? "all";
         
         var cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey, 
             CacheKeys.Department, 
-            userId, normalizedSearchTerm, subLocationIdStr,
+            userId, normalizedSearchTerm, locationIdStr,
             page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Department, userId, normalizedSearchTerm, subLocationIdStr);
+            CacheKeys.Department, userId, normalizedSearchTerm, locationIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
     // Add the missing method required by interface
     public async Task<PaginationResult<DepartmentModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid subLocationId, Page page, string cacheKey, string countCacheKey)
+        Guid userId, string? searchTerm, Guid locationId, Page page, string cacheKey, string countCacheKey)
     {
-        var predicate = BuildUserSearchPredicate(userId, searchTerm, subLocationId);
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, locationId);
 
         var query = _repository.GetAll()
             .Where(predicate)
@@ -87,7 +87,7 @@ public class DepartmentSearchHelper(
             {
                 Id = d.Id,
                 Name = d.Name,
-                SubLocationId = d.SubLocationId,
+                LocationId = d.LocationId,
             })
             .ToArrayAsync();
     

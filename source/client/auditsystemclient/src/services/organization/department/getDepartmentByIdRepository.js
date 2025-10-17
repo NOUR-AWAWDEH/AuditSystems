@@ -37,7 +37,6 @@ export const getDepartmentByIdRepository = {
         } catch (error) {
             console.error('Error fetching department:', error);
             
-            // Fix: Define responseData from error.response?.data
             const responseData = error.response?.data;
 
             if (error.response?.status === 401) {

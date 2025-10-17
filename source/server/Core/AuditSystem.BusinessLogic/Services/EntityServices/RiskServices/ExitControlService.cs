@@ -64,7 +64,7 @@ internal sealed class ExitControlService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<ExitControlModel>(
             id,
             userId,
-            entity => entity.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.SubLocation.Location.UserId,
+            ExitControlConstants.ExitControlOwnerIdSelector,
             ExitControlConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -122,8 +122,7 @@ internal sealed class ExitControlService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(r => r.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess
-                .SubDepartment.Department.SubLocation.Location.UserId == userId)
+            .Where(ExitControlConstants.ExitControlOwnerPredicate(userId))
             .Select(ec => new ExitControlModel
             {
                 Id = ec.Id,

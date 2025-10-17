@@ -1,11 +1,11 @@
 import { ref, onMounted, nextTick } from 'vue';
 
 export function useDepartmentLifecycle({
-    selectedSubLocationId,
+    selectedLocationId,
     currentPage,
     pageSize,
     searchDepartments,
-    subLocationsRef,
+    locationsRef,
     searchQuery,
     getDepartmentsByUserId,
     resetToDefaultView
@@ -14,7 +14,7 @@ export function useDepartmentLifecycle({
     const isInitializing = ref(false);
 
     const initializeData = async () => {
-        if (!selectedSubLocationId.value || isInitialized.value || isInitializing.value) {
+        if (!selectedLocationId.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
@@ -22,7 +22,7 @@ export function useDepartmentLifecycle({
             isInitializing.value = true;
             if (searchDepartments) {
                 await searchDepartments({
-                    subLocationId: selectedSubLocationId.value,
+                    locationId: selectedLocationId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });
@@ -38,17 +38,17 @@ export function useDepartmentLifecycle({
     onMounted(async () => {
         await nextTick();
 
-        if (selectedSubLocationId.value && !isInitialized.value && !isInitializing.value) {
-            if (subLocationsRef.value?.length > 0) {
-                const subLocationExists = subLocationsRef.value.some(
-                    sub => sub.id === selectedSubLocationId.value);
-                if (subLocationExists) {
+        if (selectedLocationId.value && !isInitialized.value && !isInitializing.value) {
+            if (locationsRef.value?.length > 0) {
+                const locationExists = locationsRef.value.some(
+                    loc => loc.id === selectedLocationId.value);
+                if (locationExists) {
                     await initializeData();
                 } else {
                     resetToDefaultView();
                 }
             }
-        } else if (!selectedSubLocationId.value 
+        } else if (!selectedLocationId.value 
             && !searchQuery.value.trim() 
             && getDepartmentsByUserId) {
                 await getDepartmentsByUserId();

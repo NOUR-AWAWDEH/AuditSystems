@@ -6,7 +6,6 @@ using AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
-using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubLocationHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
@@ -36,7 +35,6 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
-using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubLocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
@@ -125,12 +123,6 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, SubDepartment, SubDepartmentModel>, SubDepartmentService>()
             .AddScoped<ISubDepartmentValidation, SubDepartmentValidationHelper>()
             .AddScoped<ISubDepartmentSearch, SubDepartmentSearchHelper>()
-
-            // SubLocation
-            .AddScoped<ISubLocationService, SubLocationService>()
-            .AddScoped<IUnifiedCacheService<Guid, SubLocation, SubLocationModel>, SubLocationService>()
-            .AddScoped<ISubLocationValidation, SubLocationValidationHelper>()
-            .AddScoped<ISubLocationSearch, SubLocationSearchHelper>()
 
             // Audit Process
             .AddScoped<IAuditProcessService, AuditProcessService>()

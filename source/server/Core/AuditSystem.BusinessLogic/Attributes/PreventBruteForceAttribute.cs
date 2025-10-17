@@ -10,17 +10,12 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.BusinessLogic.Attributes;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-public sealed class PreventBruteForceAttribute : Attribute, IAsyncActionFilter
+public sealed class PreventBruteForceAttribute(int requestLimit = PreventBruteForceAttribute.DefaultRequestLimit) : Attribute, IAsyncActionFilter
 {
     private const int DefaultRequestLimit = 20;
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
-    private readonly int _requestLimit;
-
-    public PreventBruteForceAttribute(int requestLimit = DefaultRequestLimit)
-    {
-        _requestLimit = requestLimit > 0 ? requestLimit : DefaultRequestLimit;
-    }
+    private readonly int _requestLimit = requestLimit > 0 ? requestLimit : DefaultRequestLimit;
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {

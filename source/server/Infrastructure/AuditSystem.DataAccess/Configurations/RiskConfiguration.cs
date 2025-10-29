@@ -26,13 +26,6 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                 builder.Property(r => r.ObjectiveId)
                         .IsRequired(true);
 
-
-                // Relationship with Objective
-                builder.HasOne(r => r.Objective)
-                        .WithMany(r => r.Risks)
-                        .HasForeignKey(r => r.ObjectiveId)
-                        .OnDelete(DeleteBehavior.Restrict);
-
                 // Relationship with Rate
                 builder.HasOne(r => r.Rate)
                         .WithMany(r => r.Risks)

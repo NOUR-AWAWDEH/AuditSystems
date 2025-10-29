@@ -10,7 +10,7 @@ export function useSearchExitControlsByUserId() {
     const currentPage = ref(1);
     const pageSize = ref(10);
     const searchTerm = ref('');
-    const riskId = ref(null);
+    const objectiveId = ref(null);
     const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
@@ -47,14 +47,14 @@ export function useSearchExitControlsByUserId() {
 
             const params = {
                 searchTerm: searchParams.searchTerm || searchTerm.value,
-                riskId: searchParams.riskId || riskId.value,
+                objectiveId: searchParams.objectiveId || objectiveId.value,
                 pageNumber: searchParams.pageNumber || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
             }
 
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
-            if (searchParams.riskId !== undefined) riskId.value = searchParams.riskId;
+            if (searchParams.objectiveId !== undefined) objectiveId.value = searchParams.objectiveId;
             if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
@@ -62,7 +62,7 @@ export function useSearchExitControlsByUserId() {
                 params.searchTerm,
                 params.pageNumber,
                 params.pageSize,
-                params.riskId
+                params.objectiveId
             );
 
             if (response?.success) {
@@ -82,7 +82,7 @@ export function useSearchExitControlsByUserId() {
     const clearSearch = () => {
         searchResults.value = [];
         searchTerm.value = '';
-        riskId.value = null;
+        objectiveId.value = null;
         currentPage.value = 1;
         error.value = null;
         totalCount.value = 0;
@@ -96,7 +96,7 @@ export function useSearchExitControlsByUserId() {
         totalCount.value = 0;
         currentPage.value = 1;
         searchTerm.value = '';
-        riskId.value = null;
+        objectiveId.value = null;
     };
 
     return {
@@ -107,7 +107,7 @@ export function useSearchExitControlsByUserId() {
         currentPage,
         pageSize,
         searchTerm,
-        riskId,
+        objectiveId,
         searchExitControls,
         clearSearch,
         resetState

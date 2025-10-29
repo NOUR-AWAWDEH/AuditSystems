@@ -13,5 +13,4 @@ public class Risk : Entity<Guid>
     // Navigation properties
     public virtual Rate Rate { get; set; } = null!;
     public virtual Objective Objective { get; set; } = null!;
-    public virtual ICollection<ExitControl> ExitControls { get; set; } = new HashSet<ExitControl>();
 }

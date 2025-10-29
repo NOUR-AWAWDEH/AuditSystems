@@ -15,17 +15,15 @@ namespace AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 
 public class ObservationSearchHelper(
     IRepository<Guid, Observation> repository,
-    ILogger<ObservationSearchHelper> logger,
     ICacheService cacheService) : IObservationSearch
 {
     private readonly IRepository<Guid, Observation> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    private readonly ILogger<ObservationSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Observation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProgramId)
     {
         return ap => ap.AuditProgramId == auditProgramId &&
-                ap.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&  
+                ap.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm));
     }
 

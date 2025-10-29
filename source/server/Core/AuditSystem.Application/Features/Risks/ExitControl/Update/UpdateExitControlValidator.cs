@@ -12,11 +12,11 @@ public sealed class UpdateExitControlValidator : AbstractValidator<UpdateExitCon
             .Must(BeAValidGuid)
             .WithMessage("Id must not be empty.");
         
-        RuleFor(x => x.RiskId)
+        RuleFor(x => x.ObjectiveId)
             .NotEmpty()
-            .WithMessage("Risk Id is required.")
+            .WithMessage("Objective Id is required.")
             .Must(BeAValidGuid)
-            .WithMessage("Risk Id must not be empty.");
+            .WithMessage("Objective Id must not be empty.");
         
         RuleFor(x => x.Description)
             .NotEmpty()

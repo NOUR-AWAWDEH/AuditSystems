@@ -10,5 +10,6 @@ public class Objective : Entity<Guid>
 
     // Navigation properties
     public virtual RiskControlMatrix RiskControlMatrix { get; set; } = null!;
+    public virtual ICollection<ExitControl> ExitControls { get; set; } = null!;
     public virtual ICollection<Risk> Risks { get; set; } = null!;
 }

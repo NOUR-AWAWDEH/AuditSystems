@@ -7,11 +7,11 @@
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
                         <ExitControlHeader/>
-                        <RiskSelector
-                            :risks="risks"
-                            :selected-risk-id="internalSelectedRiskId"
-                            @update:selected-risk="(id) => internalSelectedRiskId = id"
-                            @risk-changed="(id) => internalSelectedRiskId = id"
+                        <ObjectiveSelector
+                            :objectives="objectives"
+                            :selected-objective-id="internalSelectedObjectiveId"
+                            @update:selected-objective="(id) => internalSelectedObjectiveId = id"
+                            @objective-changed="(id) => internalSelectedObjectiveId = id"
                         />
                     </div>
 
@@ -27,18 +27,18 @@
                     </div>
                 </div>
 
-                <!-- Keep only this Selected risk Info section -->
-                <div v-if="selectedRiskId"
+                <!-- Keep only this Selected objective Info section -->
+                <div v-if="selectedObjectiveId"
                      class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                      <div class="flex items-center justify-between">
                          <div class="flex items-center">
-                             <RiskIcon size="xxl" custom-class="text-blue-600 mr-2" />
+                             <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
 
                              <p class="text-sm text-gray-700">
                                  Showing Exit Controls for: &nbsp;&nbsp;
                                  <span class="font-semibold text-blue-800">
-                                     <span v-if="isRiskLoading">Loading risk...</span>
-                                     <span v-else>{{ currentRisk?.description || 'Loading...' }}</span>
+                                     <span v-if="isObjectiveLoading">Loading objective...</span>
+                                     <span v-else>{{ currentObjective?.description || 'Loading...' }}</span>
                                  </span>
                                  <span v-if="searchQuery" class="ml-2 text-blue-600">| Search: "{{ searchQuery }}"</span>
                              </p>
@@ -51,8 +51,8 @@
                      </div>
                  </div>
 
-                <!-- Table Container - Show when risk is Selected -->
-                <div v-if="selectedRiskId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                 <!-- Table Container - Show when objective is Selected -->
+                <div v-if="selectedObjectiveId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
                     <ReusableTable
                         :items="exitControls"
                         :columns="enhancedColumns"
@@ -118,30 +118,30 @@
                 <!-- No Risk  Selected - Show when no risk is selected -->
 
                 <div v-else class="text-center py-20">
-                    <!-- When risks are available but none selected -->
-                    <div v-if="risks && risks.length > 0" class="max-w-md mx-auto">
+                    <!-- When objectives are available but none selected -->
+                    <div v-if="objectives && objectives.length > 0" class="max-w-md mx-auto">
                         <div class="bg-gradient-to-br from-blue-50 to-indigo-100
                             rounded-full w-32 h-32 mx-auto mb-8 flex items-center
                             justify-center shadow-lg">
                             <RiskIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Risk</h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">Choose a risk from the dropdown above to view and manage exit controls</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Select an Objective</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Choose an objective from the dropdown above to view and manage exit controls</p>
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <p class="text-sm text-blue-700">
-                                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a risk and start managing exit controls
+                                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select an objective and start managing exit controls
                             </p>
                         </div>
                     </div>
 
-                    <!-- When no risks are available -->
+                    <!-- When no objectives are available -->
                     <div v-else class="max-w-lg mx-auto">
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32
                              mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
-                            <RiskIcon size="xxxl" custom-class="text-gray-400" />
+                            <ObjectiveIcon size="xxxl" custom-class="text-gray-400" />
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Risks Available</h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">You need to create risks first before you can manage exit controls</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">No Objectives Available</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">You need to create objectives first before you can manage exit controls</p>
                     </div>
                 </div>
             </div>
@@ -153,8 +153,8 @@
 import { computed, ref, watch } from 'vue';
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import SearchFilter from '@/components/common/SearchFilter.vue';
-import RiskSelector from '@/components/features/riskControl/risk/components/RiskSelector.vue';
-import RiskIcon from '@/components/common/icons/RiskIcon.vue';
+import ObjectiveSelector from '@/components/features/riskControl/objective/components/ObjectiveSelector.vue';
+import ObjectiveIcon from '@/components/common/icons/ObjectiveIcon.vue';
 import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
@@ -164,7 +164,7 @@ import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 import ExitControlHeader from './ExitControlHeader.vue';
 
 const props = defineProps({
-    risks: {
+    objectives: {
         type: Array,
         default: () => []
     },
@@ -176,19 +176,19 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    selectedRiskId: {
+    selectedObjectiveId: {
         type: [String, Number],
         default: null
     },
-    selectedRisk: {
+    selectedObjective: {
         type: Object,
         default: () => null
     },
-    currentRisk: {
+    currentObjective: {
         type: Object,
         default: () => null
     },
-    isRiskLoading: {
+    isObjectiveLoading: {
         type: Boolean,
         default: false
     },
@@ -196,7 +196,7 @@ const props = defineProps({
         type: String,
         default: ''
     },
-    handleRiskChange: {
+    handleObjectiveChange: {
         type: Function,
         default: () => {}
     },
@@ -206,14 +206,14 @@ const props = defineProps({
     }
 });
 
-const internalSelectedRiskId = ref(props.selectedRiskId);
+const internalSelectedObjectiveId = ref(props.selectedObjectiveId);
 
-watch(() => props.selectedRiskId, (newVal) => {
-    internalSelectedRiskId.value = newVal;
+watch(() => props.selectedObjectiveId, (newVal) => {
+    internalSelectedObjectiveId.value = newVal;
 });
 
-watch(internalSelectedRiskId, (newVal) => {
-    props.handleRiskChange(newVal);
+watch(internalSelectedObjectiveId, (newVal) => {
+    props.handleObjectiveChange(newVal);
 });
 
 const emit = defineEmits([
@@ -247,7 +247,7 @@ const noDataMessage = computed(() => {
     if (props.searchQuery) {
         return `No Exit Controls found for "${props.searchQuery}".`;
     }
-    return 'No Exit Controls found for this Risk.';
+    return 'No Exit Controls found for this Objective.';
 });
 
 const inadequateColorMap = {

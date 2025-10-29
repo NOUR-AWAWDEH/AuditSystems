@@ -95,7 +95,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    riskId: {
+    objectiveId: {
         type: [String, Number],
         default: null
     }
@@ -137,8 +137,8 @@ const resetForm = () => {
 };
 
 const handleSubmit = async () => {
-    if (!props.riskId) {
-        showNotification('risk is required', 'error');
+    if (!props.objectiveId) {
+        showNotification('objective is required', 'error');
         return;
     }
 
@@ -150,7 +150,7 @@ const handleSubmit = async () => {
         const exitControlData = {
             description: formData.value.description.trim(),
             inadequate: formData.value.inadequate,
-            riskId: props.riskId
+            objectiveId: props.objectiveId
         };
 
         const result = await createExitControl(exitControlData);

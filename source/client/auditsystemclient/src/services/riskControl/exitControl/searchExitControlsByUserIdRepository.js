@@ -6,13 +6,13 @@ const EXIT_CONTROL_BASE_ENDPOINT = '/api/ExitControl';
 const SEARCH_EXIT_CONTROLS_BY_USER_ID_ENDPOINT = '/search-exit-controls-by-user-id';
 
 export const searchExitControlsByUserIdRepository = {
-    async searchExitControlsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, riskId = '') {
+    async searchExitControlsByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, objectiveId = '') {
         try {
             const token = authService.getLocalToken();
 
             const params = {
                 searchTerm: searchTerm,
-                riskId: riskId,
+                objectiveId: objectiveId,
                 page: pageNumber,
                 pageSize: pageSize
             };

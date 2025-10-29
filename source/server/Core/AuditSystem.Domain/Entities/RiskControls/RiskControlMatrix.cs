@@ -1,6 +1,5 @@
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Processes;
-using AuditSystem.Domain.Entities.Audit;
 
 namespace AuditSystem.Domain.Entities.RiskControls;
 

@@ -4,17 +4,18 @@ using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 using Microsoft.EntityFrameworkCore;
-using AuditSystem.Application.Constants.Risks.RiskConst;
+using AuditSystem.Domain.Entities.RiskControls;
+using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
 
 namespace AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 
 public class ExitControlValidationHelper(
     IRepository<Guid, ExitControl> repository, 
-    IRepository<Guid, Risk> riskRepository) 
+    IRepository<Guid, Objective> objectiveRepository) 
     : IExitControlValidation
 {
     private readonly IRepository<Guid, ExitControl> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    private readonly IRepository<Guid, Risk> _riskRepository = riskRepository ?? throw new ArgumentNullException(nameof(riskRepository));
+    private readonly IRepository<Guid, Objective> _objectiveRepository = objectiveRepository ?? throw new ArgumentNullException(nameof(objectiveRepository));
 
     public static void ValidateUserId(Guid userId)
     {
@@ -35,21 +36,21 @@ public class ExitControlValidationHelper(
         );
     }
 
-    public async Task<Risk> ValidateRiskOwnershipAsync(Guid riskId, Guid userId)
+    public async Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId)
     {
-        var risk = await _riskRepository.GetByIdAsync(riskId) ?? throw new ArgumentException(ExitControlConstants.RiskNotFoundMessage, nameof(riskId));
+        var objective = await _objectiveRepository.GetByIdAsync(objectiveId) ?? throw new ArgumentException(ExitControlConstants.ObjectiveNotFoundMessage, nameof(objectiveId));
         
-        var ownerId = await _riskRepository.Query()
+        var ownerId = await _objectiveRepository.Query()
             .AsNoTracking()
-            .Where(r => r.Id == riskId)
-            .Select(RiskConstants.RiskOwnerIdSelector)
+            .Where(r => r.Id == objectiveId)
+            .Select(ObjectiveConstants.ObjectiveOwnerIdSelector)
             .FirstOrDefaultAsync();
 
         if (ownerId == Guid.Empty || ownerId != userId)
             throw new UnauthorizedAccessException(
-                string.Format(ExitControlConstants.UnauthorizedAccessMessage, userId, riskId)
+                string.Format(ExitControlConstants.UnauthorizedAccessMessage, userId, objectiveId)
             );
 
-        return risk;
+        return objective;
     }
 }

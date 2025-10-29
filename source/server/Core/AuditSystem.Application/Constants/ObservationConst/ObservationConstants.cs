@@ -10,11 +10,11 @@ public static class ObservationConstants
     public static readonly string[] ListTags = ["observation-list"];
 
     public static readonly Expression<Func<Observation, Guid>> ObservationOwnerIdSelector =
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.
+        o => o.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.
             AuditProcess.SubDepartment.Department.Location.UserId;
     
     public static Expression<Func<Observation, bool>> ObservationOwnerPredicate(Guid userId) =>
-        o => o.AuditProgram.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess.
+        o => o.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.
             AuditProcess.SubDepartment.Department.Location.UserId == userId;
     
     public const string EntityName = "Observation";

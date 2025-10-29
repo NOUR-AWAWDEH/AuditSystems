@@ -23,7 +23,7 @@ internal sealed class SearchExitControlQueryHandler(
         var searchResult = await exitControlService.SearchByUserIdAsync(
             request.UserId, 
             request.SearchTerm, 
-            request.RiskId, 
+            request.ObjectiveId, 
             page);
 
         logger.LogInformation(

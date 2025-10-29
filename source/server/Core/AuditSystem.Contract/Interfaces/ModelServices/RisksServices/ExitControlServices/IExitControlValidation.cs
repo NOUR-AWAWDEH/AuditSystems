@@ -1,3 +1,4 @@
+using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
@@ -5,5 +6,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitContro
 public interface IExitControlValidation
 {
     Task<ExitControl> ValidateExitControlOwnershipAsync(Guid exitControlId, Guid userId);
-    Task<Risk> ValidateRiskOwnershipAsync(Guid riskId, Guid userId);
+    Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId);
 }

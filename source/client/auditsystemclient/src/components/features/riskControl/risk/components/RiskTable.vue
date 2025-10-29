@@ -33,7 +33,7 @@
                             <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
 
                             <p class="text-sm text-gray-700">
-                                Showing Objectives for: &nbsp;&nbsp;
+                                Showing Risks for objective : &nbsp;&nbsp;
                                 <span class="font-semibold text-blue-800">
                                     <span v-if="isObjectiveLoading">Loading objective...</span>
                                     <span v-else>{{ currentObjective?.description || 'Loading...' }}</span>
@@ -66,13 +66,7 @@
 
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                <button @click.stop="handleSelectRisk(item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                                    :class="{ 'bg-green-200': selectedRiskId === item.id }">
-                                    <CheckIcon v-if="selectedRiskId === item.id" size="sm" custom-class="mr-1" />
-                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
-                                    {{ selectedRiskId === item.id ? 'Selected' : 'Select' }}
-                                </button>
+                                
                                 <button @click.stop="$emit('edit-risk', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
@@ -132,8 +126,6 @@ import PlusIcon from '@/components/common/icons/PlusIcon.vue';
 import EditIcon from '@/components/common/icons/EditIcon.vue';
 import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import CheckIcon from '@/components/common/icons/CheckIcon.vue';
-import SelectIcon from '@/components/common/icons/SelectIcon.vue';
 import RiskHeader from './RiskHeader.vue';
 import ObjectiveSelector from '../../objective/components/ObjectiveSelector.vue';
 import ObjectiveIcon from '@/components/common/icons/ObjectiveIcon.vue';
@@ -199,17 +191,7 @@ const emit = defineEmits([
     'add-risk',
     'edit-risk',
     'delete-risk',
-    'risk-selected'
 ]);
-
-// Risk selection state
-const selectedRiskId = ref(null);
-
-// Handle risk selection from table row or button
-const handleSelectRisk = (risk) => {
-    selectedRiskId.value = risk.id;
-    emit('risk-selected', risk.id);
-};
 
 
 const riskColumns = [

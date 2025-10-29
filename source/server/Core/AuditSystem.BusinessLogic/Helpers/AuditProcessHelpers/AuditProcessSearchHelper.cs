@@ -12,21 +12,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
 
-public class AuditProcessSearchHelper : IAuditProcessSearch
+public class AuditProcessSearchHelper(
+    IRepository<Guid, AuditProcess> repository,
+    ICacheService cacheService) : IAuditProcessSearch
 {
-    private readonly IRepository<Guid, AuditProcess> _repository;
-    private readonly ICacheService _cacheService;
-    private readonly ILogger<AuditProcessSearchHelper> _logger;
-
-    public AuditProcessSearchHelper(
-        IRepository<Guid, AuditProcess> repository,
-        ILogger<AuditProcessSearchHelper> logger,
-        ICacheService cacheService)
-    {
-        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    }
+    private readonly IRepository<Guid, AuditProcess> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
 
     public Expression<Func<AuditProcess, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subDepartmentId)
     {

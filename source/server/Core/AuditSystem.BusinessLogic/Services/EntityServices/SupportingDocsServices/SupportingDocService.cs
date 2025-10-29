@@ -214,7 +214,7 @@ internal sealed class SupportingDocService(
         if (entities is not { Count: > 0 })
         {
             _logger.LogDebug("No supporting documents found for user {UserId}", userId);
-            return new List<SupportingDocModel>();
+            return [];
         }
 
         await cacheService.SetAsync(cacheKey, entities, tags: SupportingDocsConstants.ListTags);

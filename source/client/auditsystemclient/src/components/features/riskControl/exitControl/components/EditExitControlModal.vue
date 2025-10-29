@@ -168,7 +168,7 @@ const handleSubmit = async () => {
   try {
     const exitControlData = {
         id: props.exitControl?.id,
-        riskId: props.exitControl?.riskId,
+        objectiveId: props.exitControl?.objectiveId,
         description: formData.value.description.trim(),
         inadequate: formData.value.inadequate
       };

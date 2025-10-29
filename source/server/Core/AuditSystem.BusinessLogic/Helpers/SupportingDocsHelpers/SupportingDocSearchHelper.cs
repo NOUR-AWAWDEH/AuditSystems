@@ -30,15 +30,17 @@ public class SupportingDocSearchHelper(
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        
-        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
+
+        var cacheKey = string.Format(CacheKeys.UserSearchCacheKey,
             CacheKeys.SupportingDoc, userId, normalizedSearchTerm, page.Number, page.Size);
-        
-        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
+
+        var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey,
             CacheKeys.SupportingDoc, userId, normalizedSearchTerm);
-        
+
         return (cacheKey, countCacheKey);
     }
+
+
 
     public async Task<PaginationResult<SupportingDocModel>> GetUserSearchFromRepositoryAsync(
         Guid userId, string? searchTerm, Page page, string cacheKey, string countCacheKey)

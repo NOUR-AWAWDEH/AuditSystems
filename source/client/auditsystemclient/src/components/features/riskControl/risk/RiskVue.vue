@@ -25,7 +25,6 @@
             @add-risk="handleAddRisk"
             @edit-risk="handleEditRisk"
             @delete-risk="handleDeleteRisk"
-            @risk-selected="handleRiskSelected"
         />
 
         <!-- Show big Objective icon when no Objective  exist -->
@@ -102,7 +101,6 @@ const props = defineProps({
 
 // Define emit first
 const emit = defineEmits([
-    'risk-selected',
     'risk-added',
     'risk-updated',
     'risk-deleted'
@@ -150,12 +148,6 @@ const {
     confirmDelete,
     cancelDelete
 } = useRiskModals(risks, emit);
-
-
-// Handle risk selection and forward to parent
-const handleRiskSelected = (riskId) => {
-    emit('risk-selected', riskId);
-};
 
 defineExpose({
     risks,

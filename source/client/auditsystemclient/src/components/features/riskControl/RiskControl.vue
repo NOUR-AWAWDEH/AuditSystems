@@ -71,23 +71,23 @@
             :risk-control-matrices="riskControlMatrices"
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
             @objective-selected="handleObjectiveSelected"
+            @add-risks="handleAddRisks"
           />
         </div>
 
-        <!-- Risks -->
         <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6">
           <RiskVue
+            v-if="showAddRiskForm"
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
-            @risk-selected="handleRiskSelected"
           />
         </div>
 
         <!-- Exit Controls -->
         <div v-if="activeTab === 'exitcontrols'" class="p-3 sm:p-4 md:p-6">
           <ExitControlVue 
-            :risks="risks"
-            :selected-risk-id="selectedRiskId"
+            :objectives="objectives"
+            :selected-objective-id="selectedObjectiveId"
             @exit-control-selected="handleExitControlSelected"
           />
         </div>
@@ -147,6 +147,7 @@ import { useGetAuditProgramsByUserId } from '@/composables/riskControl/auditProg
 const activeTab = ref('processes');
 const isLoading = ref(false);
 const errorMessage = ref(null);
+const showAddRiskForm = ref(false);
 
 // Selected IDs
 const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || '');
@@ -154,7 +155,6 @@ const selectedAuditProcessId = ref(localStorage.getItem("riskControlSelectedAudi
 const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId") || '');
 const selectedRiskControlMatrixId = ref(localStorage.getItem("riskControlSelectedRiskControlMatrixId") || '');
 const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId") || '');
-const selectedRiskId = ref(localStorage.getItem("riskControlSelectedRiskId") || '');
 const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || '');
 const selectedControlDesignId = ref(localStorage.getItem("riskControlSelectedControlDesignId") || '');
 const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId") || '');
@@ -166,7 +166,6 @@ const { getAuditProcessesByUserId, auditProcesses } = useGetAuditProcessesByUser
 const { getSubProcessesByUserId, subProcesses } = useGetSubProcessesByUserId();
 const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskControlMatricesByUserId();
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
-const { getRisksByUserId, risks } = useGetRisksByUserId();
 const { getExitControlsByUserId, exitControls } = useGetExitControlsByUserId();
 const { getAuditProgramsByUserId, auditPrograms } = useGetAuditProgramsByUserId();
 
@@ -207,7 +206,7 @@ const setActiveTab = async (tabId) => {
         await getObjectivesByUserId();
         break;
       case 'exitcontrols':
-        await getRisksByUserId();
+        await getObjectivesByUserId();
         break;
       case 'controldesigns':
         await getExitControlsByUserId();
@@ -242,11 +241,6 @@ const handleRiskControlMatrixSelected = (id) => {
 
 const handleObjectiveSelected = (id) => {
   selectedObjectiveId.value = id;
-  setActiveTab('risks');
-};
-
-const handleRiskSelected = (id) => {
-  selectedRiskId.value = id;
   setActiveTab('exitcontrols');
 };
 
@@ -267,6 +261,12 @@ const handleControlDesignSelected = (controlDesign) => {
 const handleAuditProgramSelected = (id) => {
   selectedAuditProgramId.value = id;
   setActiveTab('observations');
+};
+
+const handleAddRisks = (objectiveId) => {
+  selectedObjectiveId.value = objectiveId;
+  activeTab.value = 'risks';
+  showAddRiskForm.value = true;
 };
 
 // // Init -> load processes tab

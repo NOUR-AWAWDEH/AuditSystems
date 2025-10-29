@@ -35,6 +35,11 @@ public sealed class PreventBruteForceAttribute(int requestLimit = PreventBruteFo
                 cache.Set(cacheKey, entry, CacheOptionsFactory.CreateBruteForceProtectionOptions());
             }
 
+            if(entry is null || logger is null)
+            {
+                return;
+            }
+
             if (RateLimitHelper.IsBlocked(entry, logger, ip))
             {
                 context.Result = ResponseFactory.CreateBlockedResponse(entry.BlockedUntil);

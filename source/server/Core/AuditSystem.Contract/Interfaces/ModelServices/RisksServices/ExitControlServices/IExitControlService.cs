@@ -11,6 +11,6 @@ public interface IExitControlService
     Task<ExitControlModel> GetExitControlByIdAsync(Guid id, Guid userId);
 
     Task<IReadOnlyList<ExitControlModel>> GetExitControlsByUserIdAsync(Guid userId);
-    Task<PaginationResult<ExitControlModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid riskId, Page? page);
+    Task<PaginationResult<ExitControlModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid observationId, Page? page);
     Task<PaginationResult<ExitControlModel>> SearchAsync(string? name, Page page);
 }

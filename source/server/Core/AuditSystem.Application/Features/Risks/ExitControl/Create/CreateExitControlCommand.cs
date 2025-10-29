@@ -5,6 +5,6 @@ namespace AuditSystem.Application.Features.Risks.ExitControl.Create;
 
 public sealed record class CreateExitControlCommand(
     string Description,
-    Guid RiskId,
+    Guid ObjectiveId,
     bool Inadequate
 ) : UserAwareCommand<Result<CreateExitControlCommandResponse>>;

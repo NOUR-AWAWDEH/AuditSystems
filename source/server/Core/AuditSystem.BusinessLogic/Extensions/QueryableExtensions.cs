@@ -18,10 +18,10 @@ public static class QueryableExtensions
         ArgumentNullException.ThrowIfNull(repository);
 
         if (page.Size <= 0)
-            throw new ArgumentOutOfRangeException(nameof(page.Size), "Page size must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(page), "Page size must be greater than zero.");
 
         if (page.Number < 1)
-            throw new ArgumentOutOfRangeException(nameof(page.Number), "Page number must be greater than or equal to one.");
+            throw new ArgumentOutOfRangeException(nameof(page), "Page number must be greater than or equal to one.");
 
         var totalCount = query.Count();
 
@@ -29,7 +29,7 @@ public static class QueryableExtensions
         {
             return new PaginationResult<TModel>
             {
-                Items = Array.Empty<TModel>(),
+                Items = [],
                 TotalCount = 0,
                 PageNumber = page.Number,
                 PageSize = page.Size

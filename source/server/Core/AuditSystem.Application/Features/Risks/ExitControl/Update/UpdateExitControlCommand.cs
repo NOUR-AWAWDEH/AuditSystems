@@ -6,6 +6,6 @@ namespace AuditSystem.Application.Features.Risks.ExitControl.Update;
 public sealed record class UpdateExitControlCommand(
     Guid Id,
     string Description,
-    Guid RiskId,
+    Guid ObjectiveId,
     bool Inadequate
 ) : UserAwareCommand<Result>;

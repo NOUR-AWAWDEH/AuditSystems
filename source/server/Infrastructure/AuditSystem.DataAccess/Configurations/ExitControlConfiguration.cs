@@ -22,14 +22,14 @@ public class ExitControlConfiguration : IEntityTypeConfiguration<ExitControl>
         builder.Property(ec => ec.Inadequate)
             .IsRequired(true);
 
-        // Relationship with Risk (Restrict delete to prevent cascade path)
-        builder.HasOne(ec => ec.Risk)
-            .WithMany(r => r.ExitControls)
-            .HasForeignKey(ec => ec.RiskId)
+        // Relationship with Objective (Restrict delete to prevent cascade path)
+        builder.HasOne(ec => ec.Objective)
+            .WithMany(o => o.ExitControls)
+            .HasForeignKey(ec => ec.ObjectiveId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
-        builder.HasIndex(ec => ec.RiskId);
+        builder.HasIndex(ec => ec.ObjectiveId);
         builder.HasIndex(ec => ec.Inadequate);
     }
 }

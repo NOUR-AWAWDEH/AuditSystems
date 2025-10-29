@@ -12,7 +12,7 @@ export const createExitControlRepository = {
             const token = authService.getLocalToken();
             const payload = {
                 description: exitControlData.description,
-                riskId: exitControlData.riskId,
+                objectiveId: exitControlData.objectiveId,
                 inadequate: exitControlData.inadequate,
             }
 

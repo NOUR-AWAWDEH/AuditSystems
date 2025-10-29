@@ -14,11 +14,11 @@ public class SearchExitControlQueryValidator : PaginationRequestValidator<ExitCo
             .Must(BeAValidGuid)
             .WithMessage("User ID must be a valid GUID.");
         
-        RuleFor(x => x.RiskId)
+        RuleFor(x => x.ObjectiveId)
             .NotEmpty()
-            .WithMessage("Risk ID is required.")
+            .WithMessage("Objective ID is required.")
             .Must(BeAValidGuid)
-            .WithMessage("Risk ID must be a valid GUID.");
+            .WithMessage("Objective ID must be a valid GUID.");
 
     }
     

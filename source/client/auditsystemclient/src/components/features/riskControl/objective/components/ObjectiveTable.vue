@@ -74,6 +74,7 @@
                                     <SelectIcon v-else size="sm" custom-class="mr-1" />
                                     {{ selectedObjectiveId === item.id ? 'Selected' : 'Select' }}
                                 </button>
+
                                 <button @click.stop="$emit('edit-objective', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium
                                       text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2
@@ -85,6 +86,14 @@
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
                                     <DeleteIcon size="sm" custom-class="mr-1" />
                                     Delete
+                                </button>
+
+                                <button @click.stop="$emit('add-risks', item)"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium
+                                      text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2
+                                      focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
+                                    <AddIcon size="sm" custom-class="mr-1" />
+                                    Add Risks
                                 </button>
                             </div>
                         </template>
@@ -144,6 +153,7 @@ import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import CheckIcon from '@/components/common/icons/CheckIcon.vue';
 import SelectIcon from '@/components/common/icons/SelectIcon.vue';
+import AddIcon from '@/components/common/icons/AddIcon.vue';    
 import ObjectiveHeader from './ObjectiveHeader.vue';
 
 const props = defineProps({
@@ -203,9 +213,15 @@ const emit = defineEmits([
     'add-objective',
     'edit-objective',
     'delete-objective',
-    'objective-selected'
+    'objective-selected',
+    'go-to-risks-tab'
 ]);
 
+const handleAddRisks = (objective) => {
+    selectedObjectiveId.value = objective.id;
+    emit('objective-selected', objective.id);
+    emit('go-to-risks-tab');
+};
 // Objective selection state
 const selectedObjectiveId = ref(null);
 
@@ -214,7 +230,6 @@ const handleSelectObjective = (objective) => {
     selectedObjectiveId.value = objective.id;
     emit('objective-selected', objective.id);
 };
-
 
 const objectiveColumns = [
     { key: 'description', label: 'Description' },

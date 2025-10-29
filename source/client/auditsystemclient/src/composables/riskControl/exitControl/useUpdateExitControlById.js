@@ -39,8 +39,8 @@ export function useUpdateExitControlById() {
             return 'Exit Control description is required';
         }
 
-        if (!exitControlData.riskId) {
-            return 'Risk ID is required';
+        if (!exitControlData.objectiveId) {
+            return 'Objective ID is required';
         }
 
         return null;

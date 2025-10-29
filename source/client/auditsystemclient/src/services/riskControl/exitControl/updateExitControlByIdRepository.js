@@ -14,7 +14,7 @@ export const updateExitControlByIdRepository = {
             const payload = {
                 id: exitControlData.id,
                 description: exitControlData.description,
-                riskId: exitControlData.riskId,
+                objectiveId: exitControlData.objectiveId,
                 inadequate: exitControlData.inadequate,
             };
 

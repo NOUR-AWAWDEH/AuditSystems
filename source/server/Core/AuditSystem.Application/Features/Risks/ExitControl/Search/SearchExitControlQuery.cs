@@ -6,7 +6,7 @@ namespace AuditSystem.Application.Features.Risks.ExitControl.Search;
 
 public sealed record class SearchExitControlQuery(
     string? SearchTerm,
-    Guid RiskId
+    Guid ObjectiveId
 ) : PaginationRequest<ExitControlModel>, IUserAwareRequest
 { 
     public Guid UserId { get; set; } = Guid.Empty;

@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 export function useExitControlComputed({
     searchQuery,
-    selectedRiskId,
+    selectedObjectiveId,
     searchResults,
     allExitControls,
     isSearching,
@@ -16,7 +16,7 @@ export function useExitControlComputed({
                 : [];
         }
         
-        if (selectedRiskId?.value) {
+        if (selectedObjectiveId?.value) {
             return (searchResults && searchResults.value)
                 ? searchResults.value
                 : [];

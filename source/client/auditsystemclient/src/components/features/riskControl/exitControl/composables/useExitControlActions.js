@@ -2,23 +2,23 @@ export function useExitControlActions({
     searchExitControls,
     getExitControlsByUserId,
     clearSearch,
-    clearRisk,
+    clearObjective,
     allExitControls,
     searchQuery,
-    selectedRiskId,
+    selectedObjectiveId,
     currentPage,
     pageSize
 }) {
 
     const refreshData = async () => {
         try {
-            const hasSearchOrFilter = searchQuery.value.trim() || selectedRiskId.value;
+            const hasSearchOrFilter = searchQuery.value.trim() || selectedObjectiveId.value;
 
             if (hasSearchOrFilter) {
                 if (searchExitControls) {
                     await searchExitControls({
                         searchTerm: searchQuery.value || '',
-                        riskId: selectedRiskId.value,
+                        objectiveId: selectedObjectiveId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -60,7 +60,7 @@ export function useExitControlActions({
 
     const resetToDefaultView = () => {
         try {
-            selectedRiskId.value = null;
+            selectedObjectiveId.value = null;
             searchQuery.value = '';
             currentPage.value = 1;
 
@@ -72,8 +72,8 @@ export function useExitControlActions({
                 allExitControls.value = [];
             }
 
-            if (clearRisk) {
-                clearRisk();
+            if (clearObjective) {
+                clearObjective();
             }
         } catch (error) {
             console.error('Error resetting to default view:', error);

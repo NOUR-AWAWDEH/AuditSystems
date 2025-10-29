@@ -7,8 +7,8 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitContro
 
 public interface IExitControlSearch
 {
-    Expression<Func<ExitControl, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid riskId);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid riskId, Page page);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? riskId, Page page);
-    Task<PaginationResult<ExitControlModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid riskId, Page page, string cacheKey, string countCacheKey);
+    Expression<Func<ExitControl, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid objectiveId);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid objectiveId, Page page);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? objectiveId, Page page);
+    Task<PaginationResult<ExitControlModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid objectiveId, Page page, string cacheKey, string countCacheKey);
 }

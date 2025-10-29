@@ -122,7 +122,7 @@ internal sealed class AuditProgramService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<AuditProgramModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<AuditProgramModel>> SearchAsync(string? name, Page? page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 

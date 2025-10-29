@@ -1,9 +1,9 @@
 import { watch, nextTick } from 'vue';
 
 export function useExitControlWatchers({
-    risksRef,
-    selectedRisk,
-    selectedRiskId,
+    objectivesRef,
+    selectedObjective,
+    selectedObjectiveId,
     searchQuery,
     currentPage,
     pageSize,
@@ -13,22 +13,22 @@ export function useExitControlWatchers({
     clearSearch,
     getExitControlsByUserId,
     allExitControls,
-    clearRisk,
-    getRiskById,
+    clearObjective,
+    getObjectiveById,
     initializeData,
     resetToDefaultView
 }) {
    
-    // Watch Risk
-    watch(risksRef, async (newRisks) => {
-        if (!newRisks?.length || !selectedRisk.value || isInitialized.value || isInitializing.value) {
+    // Watch Objective
+    watch(objectivesRef, async (newObjectives) => {
+        if (!newObjectives?.length || !selectedObjective.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
-        const riskExists = newRisks.some(
-            risk => risk.id === selectedRiskId.value
+        const objectiveExists = newObjectives.some(
+            objective => objective.id === selectedObjectiveId.value
         );
-        if (riskExists) {
+        if (objectiveExists) {
             await nextTick();
             await initializeData();
         } else {
@@ -43,7 +43,7 @@ export function useExitControlWatchers({
                 if (searchExitControls) {
                     await searchExitControls({
                         searchTerm: search,
-                        riskId: selectedRiskId.value,
+                        objectiveId: selectedObjectiveId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -54,19 +54,19 @@ export function useExitControlWatchers({
                     clearSearch();
                 }
                 
-                // Reload risk based on current state
-                if (selectedRiskId.value) {
-                    // If a risk is selected, reload risk for that risk
+                // Reload objective based on current state
+                if (selectedObjectiveId.value) {
+                    // If a objective is selected, reload objective for that objective
                     if (searchExitControls) {
                         await searchExitControls({
                             searchTerm: '',
-                            riskId: selectedRiskId.value,
+                            objectiveId: selectedObjectiveId.value,
                             page: currentPage.value,
                             pageSize: pageSize.value,
                         });
                     }
                 } else {
-                    // If no risk is selected, load all risks
+                    // If no objective is selected, load all objectives
                     if (getExitControlsByUserId) {
                         await getExitControlsByUserId();
                     }
@@ -74,8 +74,8 @@ export function useExitControlWatchers({
             }
     });
 
-    // Watch selected risk
-    watch(selectedRiskId, async (newRiskId) => {
+    // Watch selected objective
+    watch(selectedObjectiveId, async (newObjectiveId) => {
         if (clearSearch) {
             clearSearch();
         }
@@ -84,31 +84,31 @@ export function useExitControlWatchers({
             allExitControls.value = [];
         }
 
-        if (!newRiskId) {
-            if (clearRisk) {
-                clearRisk();
+        if (!newObjectiveId) {
+            if (clearObjective) {
+                clearObjective();
             }
         }
         
-        if (!newRiskId) {
+        if (!newObjectiveId) {
             try {
-                await getRiskById(newRiskId);
+                await getObjectiveById(newObjectiveId);
             } catch (error) {
-                console.error('[Risk] Error fetching risk:', error);
+                console.error('[Objective] Error fetching objective:', error);
             }
         }
 
-        if (!newRiskId) {
+        if (!newObjectiveId) {
             if (!searchQuery.value.trim() && getExitControlsByUserId) {
                 getExitControlsByUserId();
             }
             return;
         }
 
-        if (newRiskId) {
+        if (newObjectiveId) {
             await searchExitControls({
                 searchTerm: searchQuery.value || '',
-                riskId: newRiskId,
+                objectiveId: newObjectiveId,
                 page: currentPage.value,
                 pageSize: pageSize.value,
             });

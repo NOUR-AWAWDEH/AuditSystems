@@ -22,11 +22,11 @@ public class ExitControlSearchHelper(
     private readonly ILogger<ExitControlSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<ExitControl, bool>> BuildUserSearchPredicate(    
-        Guid userId, string? searchTerm, Guid riskId)
+        Guid userId, string? searchTerm, Guid objectiveId)
     {
-        return r => r.Risk.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
+        return r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
                 (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
-                r.RiskId == riskId;
+                r.ObjectiveId == objectiveId;
     }
 
     // Original method for backward compatibility
@@ -38,40 +38,40 @@ public class ExitControlSearchHelper(
 
     // Method with required Guid riskId - matches interface
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid riskId, Page page)
+        Guid userId, string? searchTerm, Guid objectiveId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var riskIdStr = riskId.ToString();
+        var objectiveIdStr = objectiveId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.ExitControl, userId, normalizedSearchTerm, riskIdStr, page.Number, page.Size);
+            CacheKeys.ExitControl, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.ExitControl, userId, normalizedSearchTerm, riskIdStr);
+            CacheKeys.ExitControl, userId, normalizedSearchTerm, objectiveIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
     // Updated method with nullable riskId support (for internal use)
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid? riskId, Page page)
+        Guid userId, string? searchTerm, Guid? objectiveId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var riskIdStr = riskId?.ToString() ?? "all";
+        var objectiveIdStr = objectiveId?.ToString() ?? "all";
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.ExitControl, userId, normalizedSearchTerm, riskIdStr, page.Number, page.Size);
+            CacheKeys.ExitControl, userId, normalizedSearchTerm, objectiveIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.ExitControl, userId, normalizedSearchTerm, riskIdStr);
+            CacheKeys.ExitControl, userId, normalizedSearchTerm, objectiveIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<ExitControlModel>> GetUserSearchFromRepositoryAsync(
-    Guid userId, string? searchTerm, Guid riskId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid objectiveId, Page page, string cacheKey, string countCacheKey)
     {
-        var predicate = BuildUserSearchPredicate(userId, searchTerm, riskId);
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, objectiveId);
 
         var query = _repository.GetAll()
             .Where(predicate)
@@ -88,7 +88,7 @@ public class ExitControlSearchHelper(
                 Id = ec.Id,
                 Description = ec.Description,
                 Inadequate = ec.Inadequate,
-                RiskId = ec.RiskId,
+                ObjectiveId = ec.ObjectiveId,
                 CreatedAt = ec.CreatedAt,
                 UpdatedAt = ec.UpdatedAt
             })

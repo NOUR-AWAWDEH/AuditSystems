@@ -9,11 +9,11 @@ public static class AuditProgramConstants
     public static readonly string[] ListTags = ["audit-list"];
 
     public static readonly Expression<Func<AuditProgram, Guid>> AuditProgramOwnerIdSelector =
-        a => a.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess
+        a => a.ExitControl.Objective.RiskControlMatrix.SubProcess
             .AuditProcess.SubDepartment.Department.Location.UserId;
     
     public static Expression<Func<AuditProgram, bool>> AuditProgramOwnerPredicate(Guid userId) =>
-        ap => ap.ExitControl.Risk.Objective.RiskControlMatrix.SubProcess
+        ap => ap.ExitControl.Objective.RiskControlMatrix.SubProcess
             .AuditProcess.SubDepartment.Department.Location.UserId == userId;
 
 

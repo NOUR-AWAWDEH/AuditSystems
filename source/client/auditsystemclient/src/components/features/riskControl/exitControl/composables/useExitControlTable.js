@@ -1,40 +1,40 @@
 import { useExitControlData } from './useExitControlData';
-import { useRiskManagement } from './useRiskManagement';
+import { useObjectiveManagement } from './useObjectiveManagement';
 import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
 import { useExitControlActions } from './useExitControlActions';
 import { useExitControlWatchers } from './useExitControlWatchers';
 import { useExitControlLifecycle } from './useExitControlLifecycle';
 import { useExitControlComputed } from './useExitControlComputed';
 
-export function useExitControlTable(risks) {
+export function useExitControlTable(objectives) {
 
     const dataComposable = useExitControlData();
-    const riskComposable = useRiskManagement(risks);
+    const objectiveComposable = useObjectiveManagement(objectives);
     const searchComposable = useSearchAndPagination();
 
     const actionsComposable = useExitControlActions({
         ...dataComposable,
-        ...riskComposable,
+        ...objectiveComposable,
         ...searchComposable
     });
 
     const lifecycleComposable = useExitControlLifecycle({
         ...dataComposable,
-        ...riskComposable,
+        ...objectiveComposable,
         ...searchComposable,
         ...actionsComposable
     });
 
     const computedComposable = useExitControlComputed({
         ...dataComposable,
-        ...riskComposable,
+        ...objectiveComposable,
         ...searchComposable,
         ...lifecycleComposable
     });
 
     useExitControlWatchers({
         ...dataComposable,
-        ...riskComposable,
+        ...objectiveComposable,
         ...searchComposable,
         ...actionsComposable,
         ...lifecycleComposable
@@ -44,10 +44,10 @@ export function useExitControlTable(risks) {
         exitControls: computedComposable.exitControls,
         isLoading: computedComposable.isLoading,
         
-        selectedRiskId: riskComposable.selectedRiskId,
-        selectedRisk: riskComposable.selectedRisk,
-        currentRisk: riskComposable.currentRisk,
-        isRiskLoading: riskComposable.isRiskLoading,
+        selectedObjectiveId: objectiveComposable.selectedObjectiveId,
+        selectedObjective: objectiveComposable.selectedObjective,
+        currentObjective: objectiveComposable.currentObjective,
+        isObjectiveLoading: objectiveComposable.isObjectiveLoading,
         
         searchQuery: searchComposable.searchQuery,
         currentPage: searchComposable.currentPage,

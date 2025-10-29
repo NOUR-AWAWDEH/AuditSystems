@@ -26,6 +26,7 @@
             @edit-objective="handleEditObjective"
             @delete-objective="handleDeleteObjective"
             @objective-selected="handleObjectiveSelected"
+            @add-risks="handleAddRisks"
         />
 
         <!-- Show big RiskControlMatrix icon when no Risk Control Matrix  exist -->
@@ -104,7 +105,8 @@ const emit = defineEmits([
     'objective-selected',
     'objective-added',
     'objective-updated',
-    'objective-deleted'
+    'objective-deleted',
+    'add-risks',
 ]);
 
 // Use composables - now with integrated backend search
@@ -156,6 +158,10 @@ const handleObjectiveSelected = (objectiveId) => {
     emit('objective-selected', objectiveId);
 };
 
+const handleAddRisks = (objective) => {
+  emit('objective-selected', objective.id);
+  emit('add-risks', objective.id);
+};
 
 defineExpose({
     objectives,

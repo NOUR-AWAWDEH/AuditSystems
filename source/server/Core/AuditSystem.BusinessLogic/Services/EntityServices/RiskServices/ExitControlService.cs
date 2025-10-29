@@ -43,7 +43,7 @@ internal sealed class ExitControlService(
 
         _logger.LogInformation("Creating exit Control {Description} for user {UserId}", exitControlModel.Description, userId);
 
-        await _validationHelper.ValidateRiskOwnershipAsync(exitControlModel.RiskId, userId);
+        await _validationHelper.ValidateObjectiveOwnershipAsync(exitControlModel.ObjectiveId, userId);
 
         var entity = mapper.Map<ExitControl>(exitControlModel);
         var createdEntity = await repository.CreateAsync(entity);
@@ -87,11 +87,11 @@ internal sealed class ExitControlService(
         await _validationHelper.ValidateExitControlOwnershipAsync(exitControlId, userId);
         
         var exitControl = await repository.GetByIdAsync(exitControlId);
-        Guid? riskId = exitControl?.RiskId;
+        Guid? objectiveId = exitControl?.ObjectiveId;
 
         await repository.DeleteAsync(exitControlId);
         await ClearEntityCacheAsync(exitControlId);
-        await ClearUserRelatedCachesAsync(userId, ExitControlConstants.EntityName, riskId);
+        await ClearUserRelatedCachesAsync(userId, ExitControlConstants.EntityName, objectiveId);
 
         _logger.LogInformation("Successfully deleted exit Control {ExitControlId} for user {UserId}", exitControlId, userId);
     }
@@ -105,7 +105,7 @@ internal sealed class ExitControlService(
     
         var existingEntity = await _validationHelper.ValidateExitControlOwnershipAsync(exitControlModel.Id, userId);
         
-        await _validationHelper.ValidateRiskOwnershipAsync(exitControlModel.RiskId, userId);
+        await _validationHelper.ValidateObjectiveOwnershipAsync(exitControlModel.ObjectiveId, userId);
         
         mapper.Map(exitControlModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -128,7 +128,7 @@ internal sealed class ExitControlService(
                 Id = ec.Id,
                 Description = ec.Description,
                 Inadequate = ec.Inadequate,
-                RiskId = ec.RiskId,
+                ObjectiveId = ec.ObjectiveId,
                 CreatedAt = ec.CreatedAt,
                 UpdatedAt = ec.UpdatedAt,
             })
@@ -136,15 +136,15 @@ internal sealed class ExitControlService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<ExitControlModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid riskId, Page? page)
+    public async Task<PaginationResult<ExitControlModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid observationId, Page? page)
     {
         ExitControlValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        _logger.LogDebug("Searching exit controls for user {UserId} with term: {SearchTerm} and risk: {RiskId}",
-            userId, searchTerm ?? "(none)", riskId.ToString() ?? "(none)");
+        _logger.LogDebug("Searching exit controls for user {UserId} with term: {SearchTerm} and observation: {ObservationId}",
+            userId, searchTerm ?? "(none)", observationId.ToString() ?? "(none)");
 
-        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, riskId, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, observationId, page);
 
         var cachedResult = await GetFromCacheAsync<ExitControlModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
@@ -152,7 +152,7 @@ internal sealed class ExitControlService(
             logger.LogDebug(ExitControlConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, riskId, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, observationId, page, cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<ExitControlModel>> SearchAsync(string? name, Page page) 

@@ -120,7 +120,7 @@ internal sealed class ControlDesignService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<ControlDesignModel>> SearchAsync(string? name, Page page)
+    public async Task<PaginationResult<ControlDesignModel>> SearchAsync(string? name, Page? page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 

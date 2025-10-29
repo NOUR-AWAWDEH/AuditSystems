@@ -10,11 +10,11 @@ public sealed class CreateExitControlValidator : AbstractValidator<CreateExitCon
         RuleFor(x => x.Description)
             .ValidateRequiredString(2, 500, "Description");
 
-        RuleFor(x => x.RiskId)
+        RuleFor(x => x.ObjectiveId)
            .NotEmpty()
-           .WithMessage("Rate is required.")
+           .WithMessage("Objective ID is required.")
            .Must(x => x != Guid.Empty)
-           .WithMessage("Rate is required.");
+           .WithMessage("Objective ID is required.");
 
         RuleFor(x => x.Description)
             .MaximumLength(500)

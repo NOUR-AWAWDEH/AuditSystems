@@ -4,23 +4,23 @@
         <!-- Add Exit Control Modal -->
         <AddExitControlModal
             :is-visible="showAddExitControlModal"
-            :risk-id="internalSelectedRiskId"
+            :objective-id="internalSelectedObjectiveId"
             @close="handleCloseAddExitControlModal"
             @exit-control-added="handleExitControlAdded"
         />
 
-        <!-- Show Exit Control Table only when risks exist -->
+        <!-- Show Exit Control Table only when objectives exist -->
         <ExitControlTable
-            v-if="props.risks && props.risks.length > 0"
-            :risks="props.risks"
+            v-if="props.objectives && props.objectives.length > 0"
+            :objectives="props.objectives"
             :exit-controls="exitControls"
             :is-loading="isLoading"
-            :selected-risk-id="internalSelectedRiskId"
-            :selected-risk="selectedRisk"
-            :current-risk="currentRisk"
-            :is-risk-loading="isRiskLoading"
+            :selected-objective-id="internalSelectedObjectiveId"
+            :selected-objective="selectedObjective"
+            :current-objective="currentObjective"
+            :is-objective-loading="isObjectiveLoading"
             :search-query="searchQuery"
-            :handle-risk-change="handleExitControlChange"
+            :handle-objective-change="handleExitControlChange"
             :handle-search="handleSearch"
             @add-ExitControl="handleAddExitControl"
             @edit-ExitControl="handleEditExitControl"
@@ -28,15 +28,15 @@
             @exit-control-selected="handleExitControlSelected"
         />
 
-        <!-- Show big Risk icon when no Risk exist -->
+        <!-- Show big Objective icon when no Objective exist -->
         <div v-else class="text-center py-20">
             <div class="max-w-lg mx-auto">
                 <div class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32
                     mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base">
-                    <RiskIcon size="xxxl" custom-class="text-primary-shade" />
+                    <ObjectiveIcon size="xxxl" custom-class="text-primary-shade" />
                 </div>
-                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Risks Available</h3>
-                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create risks first before you can manage Exit Controls</p>
+                <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Objectives Available</h3>
+                <p class="text-gray-base mb-6 text-sm leading-relaxed">You need to create objectives first before you can manage Exit Controls</p>
                 <div class="bg-white border border-tertiary-shade rounded-lg p-6">
                     <div class="flex items-start space-x-3">
                         <div class="flex-shrink-0">
@@ -50,10 +50,10 @@
                             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
                             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
                                 <li>Navigate to the Risk Control section</li>
-                                <li>Create or select a risk </li>
+                                <li>Create or select an objective </li>
                                 <li>Return here to manage Exit Controls</li>
                             </ol>
-                        </div>
+                        </div>  
                     </div>
                 </div>
             </div>
@@ -82,21 +82,21 @@
 </template>
 
 <script setup>
-import { onMounted, watch} from 'vue';
+import { watch} from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import ExitControlTable from './components/ExitControlTable.vue';
 import AddExitControlModal from './components/AddExitControlModal.vue';
 import EditExitControlModal from './components/EditExitControlModal.vue';
 import { useExitControlTable } from './composables/useExitControlTable';
 import { useExitControlModals } from './composables/useExitControlModals';
-import RiskIcon from '@/components/common/icons/RiskIcon.vue';
+import ObjectiveIcon from '@/components/common/icons/ObjectiveIcon.vue';
 
 const props = defineProps({
-    risks: {
+    objectives: {
         type: Array,
         default: () => [],
     },
-    selectedRiskId: {
+    selectedObjectiveId: {
         type: [String, Number],
         default: null
     }
@@ -114,20 +114,20 @@ const emit = defineEmits([
 const {
     exitControls,
     isLoading,
-    selectedRiskId : internalSelectedRiskId,
-    selectedRisk,
-    currentRisk,
-    isRiskLoading,
+    selectedObjectiveId : internalSelectedObjectiveId,
+    selectedObjective,
+    currentObjective,
+    isObjectiveLoading,
     searchQuery,
     handleExitControlChange,
     handleSearch,
     resetToDefaultView,
-} = useExitControlTable(props.risks);
+} = useExitControlTable(props.objectives);
 
 // Watch for prop changes and update internal state
-watch( () => props.selectedRiskId, (newRiskId) => {
-        if (newRiskId !== internalSelectedRiskId.value) {
-             handleExitControlChange(newRiskId);
+watch( () => props.selectedObjectiveId, (newObjectiveId) => {
+        if (newObjectiveId !== internalSelectedObjectiveId.value) {
+             handleExitControlChange(newObjectiveId);
         }
     },
     { immediate: true }
@@ -162,7 +162,7 @@ const handleExitControlSelected = (exitControl) => {
 
 defineExpose({
     exitControls,
-    selectedRiskId: internalSelectedRiskId,
+    selectedObjectiveId: internalSelectedObjectiveId,
     resetToDefaultView
 });
 </script>

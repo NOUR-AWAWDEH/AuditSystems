@@ -1,4 +1,5 @@
 <template>
+    <!-- ObjectiveTable.vue -->
     <div class="space-y-6">
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
@@ -66,13 +67,11 @@
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
                                 <button @click.stop="handleSelectObjective(item)"
-                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700
-                                      bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500
-                                      focus:ring-offset-1 transition-all duration-200"
-                                    :class="{ 'bg-green-200': selectedObjectiveId === item.id }">
-                                    <CheckIcon v-if="selectedObjectiveId === item.id" size="sm" custom-class="mr-1" />
-                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
-                                    {{ selectedObjectiveId === item.id ? 'Selected' : 'Select' }}
+                                        class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                                        :class="{ 'bg-green-200': selectedObjectiveId === item.id }">
+                                <CheckIcon v-if="selectedObjectiveId === item.id" size="sm" custom-class="mr-1"/>
+                                <SelectIcon v-else size="sm" custom-class="mr-1"/>
+                                {{ selectedObjectiveId === item.id ? 'Selected' : 'Select' }}
                                 </button>
 
                                 <button @click.stop="$emit('edit-objective', item)"
@@ -193,11 +192,16 @@ const props = defineProps({
         type: Function,
         default: () => {}
     },
+    selectedObjectiveId: { 
+        type: [String, Number],
+        default: null 
+    },
     handleSearch: {
         type: Function,
         default: () => {}
     }
 });
+const selectedObjectiveId = ref(props.selectedObjectiveId);
 
 const internalSelectedRiskControlMatrixId = ref(props.selectedRiskControlMatrixId);
 
@@ -209,21 +213,19 @@ watch(internalSelectedRiskControlMatrixId, (newVal) => {
     props.handleRiskControlMatrixChange(newVal);
 });
 
+// Also watch for selectedObjectiveId prop changes
+watch(() => props.selectedObjectiveId, (newVal) => {
+    selectedObjectiveId.value = newVal;
+});
+
 const emit = defineEmits([
     'add-objective',
     'edit-objective',
     'delete-objective',
     'objective-selected',
-    'go-to-risks-tab'
+    'add-risks'
 ]);
 
-const handleAddRisks = (objective) => {
-    selectedObjectiveId.value = objective.id;
-    emit('objective-selected', objective.id);
-    emit('go-to-risks-tab');
-};
-// Objective selection state
-const selectedObjectiveId = ref(null);
 
 // Handle objective selection from table row or button
 const handleSelectObjective = (objective) => {

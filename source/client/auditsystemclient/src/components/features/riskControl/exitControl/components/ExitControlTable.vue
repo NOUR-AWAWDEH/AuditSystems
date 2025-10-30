@@ -3,7 +3,7 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-6">
 
-                <!-- Risk and Filters - Stack on mobile -->
+                <!-- Objective and Filters - Stack on mobile -->
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div class="flex-1 max-w-md">
                         <ExitControlHeader/>
@@ -115,7 +115,7 @@
                     </div>
                 </div>
 
-                <!-- No Risk  Selected - Show when no risk is selected -->
+                <!-- No Objective Selected - Show when no objective is selected -->
 
                 <div v-else class="text-center py-20">
                     <!-- When objectives are available but none selected -->
@@ -123,7 +123,7 @@
                         <div class="bg-gradient-to-br from-blue-50 to-indigo-100
                             rounded-full w-32 h-32 mx-auto mb-8 flex items-center
                             justify-center shadow-lg">
-                            <RiskIcon size="xxxl" custom-class="text-blue-600" />
+                            <ObjectiveIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">Select an Objective</h3>
                         <p class="text-gray-600 mb-6 leading-relaxed">Choose an objective from the dropdown above to view and manage exit controls</p>

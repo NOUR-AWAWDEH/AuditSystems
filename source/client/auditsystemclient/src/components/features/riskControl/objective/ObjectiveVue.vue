@@ -1,3 +1,4 @@
+
 <template>
   <!-- Objective.vue -->
     <div class="space-y-6">
@@ -80,7 +81,7 @@
 </template>
 
 <script setup>
-import { watch} from 'vue';
+import { watch, computed } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import ObjectiveTable from './components/ObjectiveTable.vue';
 import AddObjectiveModal from './components/AddObjectiveModal.vue';
@@ -97,7 +98,12 @@ const props = defineProps({
     selectedRiskControlMatrixId: {
         type: [String, Number],
         default: null
+    },
+    selectedObjectiveId: {
+        type: [String, Number],
+        default: null 
     }
+
 });
 
 // Define emit first
@@ -107,7 +113,15 @@ const emit = defineEmits([
     'objective-updated',
     'objective-deleted',
     'add-risks',
+    'update:selectedObjectiveId'
 ]);
+
+// ✅ Add internal selected objective ID for v-model
+const internalSelectedObjectiveId = computed({
+    get: () => props.selectedObjectiveId,
+    set: (value) => emit('update:selectedObjectiveId', value)
+});
+
 
 // Use composables - now with integrated backend search
 const {
@@ -153,14 +167,23 @@ const {
 } = useObjectiveModals(objectives, emit);
 
 
-// Handle objective selection and forward to parent
+// ✅ FIXED: Handle objective selection from ObjectiveTable
 const handleObjectiveSelected = (objectiveId) => {
+    // Update the v-model
+    internalSelectedObjectiveId.value = objectiveId;
+    
+    // Emit to parent (RiskControl.vue)
     emit('objective-selected', objectiveId);
 };
 
+// ✅ FIXED: Handle add risks
 const handleAddRisks = (objective) => {
-  emit('objective-selected', objective.id);
-  emit('add-risks', objective.id);
+    // Update the selected objective ID
+    internalSelectedObjectiveId.value = objective.id;
+    
+    // Emit both events
+    emit('objective-selected', objective.id);
+    emit('add-risks', objective.id);
 };
 
 defineExpose({

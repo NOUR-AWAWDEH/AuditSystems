@@ -1,5 +1,5 @@
-// RiskControl.vue
 <template>
+  <!-- RiskControl.vue -->
   <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-2 sm:p-4 md:p-6">
     <!-- Header Section -->
     <div class="mb-4 sm:mb-6 md:mb-8">
@@ -70,6 +70,7 @@
           <Objective
             :risk-control-matrices="riskControlMatrices"
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
+            v-model:selectedObjectiveId="selectedObjectiveId"
             @objective-selected="handleObjectiveSelected"
             @add-risks="handleAddRisks"
           />

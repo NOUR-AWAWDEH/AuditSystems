@@ -7,7 +7,9 @@
       @update:modelValue="$emit('update:modelValue', $event)"
       :placeholder="props.placeholder"
       :disabled="props.disabled"
-      :inputClass="inputClasses" class="pr-10 transition-all duration-200"
+      :inputClass="inputClasses"
+      autocomplete="current-password"
+      class="pr-10 transition-all duration-200"
     />
     <button
       type="button"

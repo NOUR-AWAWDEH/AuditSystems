@@ -42,7 +42,7 @@ export function useExitControlActions({
         }
     };
 
-    const handleExitControlChange = async (newRiskId) => {
+    const handleExitControlChange = async (newObjectiveId) => {
         try {
             if (clearSearch) {
                 clearSearch();
@@ -52,7 +52,7 @@ export function useExitControlActions({
                 allExitControls.value = [];
             }
 
-            selectedRiskId.value = newRiskId;
+            selectedObjectiveId.value = newObjectiveId;
         } catch (error) {
             console.error('Error handling Exit Control change:', error);
         }

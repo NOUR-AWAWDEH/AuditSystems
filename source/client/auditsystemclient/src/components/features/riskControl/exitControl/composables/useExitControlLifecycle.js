@@ -38,7 +38,7 @@ export function useExitControlLifecycle({
     onMounted(async () => {
         await nextTick();
 
-        if (selectedRiskId.value && !isInitialized.value && !isInitializing.value) {
+        if (selectedObjectiveId.value && !isInitialized.value && !isInitializing.value) {
             if (objectivesRef.value?.length > 0) {
                 const objectiveExists = objectivesRef.value.some(
                     objective => objective.id === selectedObjectiveId.value);

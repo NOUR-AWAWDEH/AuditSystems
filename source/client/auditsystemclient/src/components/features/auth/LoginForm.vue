@@ -1,3 +1,67 @@
+<template>
+  <!-- Login Form -->
+  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg">
+    <div class="flex justify-center mb-6 w-full">
+      <Logo />
+    </div>
+    <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
+    
+    <!-- ✅ Fixed form - removed redundant event handlers -->
+    <form @submit.prevent="handleLogin">
+      <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
+
+      <transition name="fade">
+        <div
+          v-if="errorMassage && isErrorVisible"
+          class="mb-4 p-3 bg-soft-error text-error rounded-md"
+        >
+          {{ errorMassage }}
+        </div>
+      </transition>
+      
+      <div class="mb-4">
+        <label for="username" class="block mb-2 font-medium text-left">User Name</label>
+        <BaseInput
+          id="username"
+          type="text"
+          v-model="username"
+          placeholder="Enter your username"
+          :disabled="isLoading"
+          autocomplete="username"
+          autofocus
+        />
+      </div>
+
+      <div class="mb-6">
+        <label for="password" class="block mb-2 font-medium text-left">Password</label>
+        <PasswordInput
+          id="password"
+          v-model="password"
+          placeholder="Enter your password"
+          :disabled="isLoading"
+        />
+      </div>
+
+      <!-- ✅ Fixed button - added type="submit" and removed @click -->
+      <BaseButton 
+        type="submit" 
+        :disabled="isLoading" 
+        class="w-full py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base"
+      >
+        <template #loading>Logging in...</template>
+        <span v-if="!isLoading">Login</span> 
+        <span v-else>Is logging in...</span>
+      </BaseButton>
+    </form>
+    
+    <div class="text-center mt-4">
+      <BaseLink @click="clearLocalStorage" to="/forgot-password">
+        Forgot Password?
+      </BaseLink>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, watch } from 'vue';
 import { validateUsername } from '@/services/validations/userValidation';
@@ -62,7 +126,6 @@ const validateForm = () => {
 };
 
 const handleLogin = async () => {
-  
   if (!validateForm()) {
     return;
   }
@@ -91,60 +154,6 @@ const clearLocalStorage = () => {
   localStorage.clear();
 };
 </script>
-
-<template>
-  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg">
-    <div class="flex justify-center mb-6 w-full">
-      <Logo />
-    </div>
-    <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
-
-    <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
-
-    <transition name="fade">
-      <div
-        v-if="errorMassage && isErrorVisible"
-        class="mb-4 p-3 bg-soft-error text-error rounded-md"
-      >
-        {{ errorMassage }}
-      </div>
-    </transition>
-    <div class="mb-4">
-      <label for="username" class="block mb-2 font-medium text-left">User Name</label>
-      <BaseInput
-        id="username"
-        type="text"
-        v-model="username"
-        placeholder="Enter your username"
-        :disabled="isLoading"
-        autofocus
-        @keydown.enter="handleLogin"
-      />
-    </div>
-
-    <div class="mb-6">
-      <label for="password" class="block mb-2 font-medium text-left">Password</label>
-      <PasswordInput
-        id="password"
-        v-model="password"
-        placeholder="Enter your password"
-        :disabled="isLoading"
-        @login="handleLogin"
-        @keydown.enter="handleLogin"/>
-    </div>
-
-    <BaseButton @click="handleLogin" :disabled="isLoading" class="w-full py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base">
-      <template #loading>Logging in...</template>
-      <span v-if="!isLoading">Login</span> <span v-else>Is logging in...</span>
-    </BaseButton>
-
-    <div class="text-center mt-4">
-      <BaseLink @click="clearLocalStorage" to="/forgot-password">
-        Forgot Password?
-      </BaseLink>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .fade-enter-active,

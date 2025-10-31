@@ -103,7 +103,6 @@ public class ControlDesignSearchHelper(
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
-                Inadequate = ap.Inadequate,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt
             })

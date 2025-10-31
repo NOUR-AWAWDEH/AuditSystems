@@ -111,8 +111,7 @@ const resetForm = () => {
 const populateForm = () => {
   if (props.controlDesign) {
     formData.value = {
-      description: props.controlDesign.description || '',
-      inadequate: true
+      description: props.controlDesign.description || ''
     };
   }
 };
@@ -147,8 +146,7 @@ const handleSubmit = async () => {
     const controlDesignData = {
         id: props.controlDesign?.id,
         exitControlId: props.controlDesign?.exitControlId,
-        description: formData.value.description.trim(),
-        inadequate: false
+        description: formData.value.description.trim()
       };
 
 

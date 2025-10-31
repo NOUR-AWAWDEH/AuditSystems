@@ -125,7 +125,6 @@ const handleSubmit = async () => {
     try {
         const ControlDesignData = {
             description: formData.value.description.trim(),
-            inadequate: false,
             exitControlId: props.exitControlId
         };
 

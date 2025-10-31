@@ -6,6 +6,5 @@ namespace AuditSystem.Application.Features.Risks.ControlDesign.Update;
 public sealed record class UpdateControlDesignCommand(
     Guid Id,
     string Description,
-    Guid ExitControlId,
-    bool Inadequate
+    Guid ExitControlId
 ) : UserAwareCommand<Result>;

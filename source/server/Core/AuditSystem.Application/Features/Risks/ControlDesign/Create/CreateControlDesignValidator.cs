@@ -16,13 +16,6 @@ public sealed class CreateControlDesignValidator : AbstractValidator<CreateContr
            .Must(x => x != Guid.Empty)
            .WithMessage("Exit Control ID is required.");
 
-
-        RuleFor(x => x.Inadequate)
-            .NotNull()
-            .WithMessage("Inadequate is required.")
-            .Must(x => x is false)
-            .WithMessage("Inadequate must be false.");
-
         RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("User ID is required.")

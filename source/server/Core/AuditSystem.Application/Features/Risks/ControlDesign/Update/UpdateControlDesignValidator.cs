@@ -25,10 +25,6 @@ public sealed class UpdateControlDesignValidator : AbstractValidator<UpdateContr
             .WithMessage("Description must be at least 2 characters long.")
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
-        
-        RuleFor(x => x.Inadequate)
-            .NotNull()
-            .WithMessage("Inadequate is required.");
     }
 
     private static bool BeAValidGuid(Guid id)

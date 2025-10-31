@@ -62,13 +62,6 @@
                         :no-data-message="noDataMessage"
                         class="exit-control-table"
                         >
-                        <template #cell-inadequate="{ item }">
-                            <span 
-                                :class="inadequateColorMap[item.inadequate]" 
-                                class="px-2 py-1 rounded-full text-xs font-semibold">
-                                {{ inadequateLabelMap[item.inadequate] }}
-                            </span>
-                        </template>
 
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
@@ -236,7 +229,6 @@ const handleSelectControlDesign = (controlDesign) => {
 
 const controlDesignColumns = [
     { key: 'description', label: 'Description' },
-    { key: 'inadequate', label: 'Inadequate' },
     { key: 'createdAt', label: 'Created Date', type: 'date' }
 ];
 
@@ -250,17 +242,6 @@ const noDataMessage = computed(() => {
     }
     return 'No Control Designs found for this Risk.';
 });
-
-const inadequateColorMap = {
-  true: 'bg-red-100 text-red-800',     // Bad → Inadequate
-  false: 'bg-green-100 text-green-800' // Good → Adequate
-};
-
-const inadequateLabelMap = {
-  true: 'Inadequate',
-  false: 'Adequate'
-};
-
 
 </script>
 

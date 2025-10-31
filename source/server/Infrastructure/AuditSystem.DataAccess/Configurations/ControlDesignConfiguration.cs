@@ -15,9 +15,6 @@ public class ControlDesignConfiguration : IEntityTypeConfiguration<ControlDesign
         builder.Property(controlDesign => controlDesign.Description)
             .IsRequired(true)
             .HasMaxLength(500);
-        
-        builder.Property(controlDesign => controlDesign.Inadequate)
-            .IsRequired(true);
 
         builder.HasOne(cd => cd.ExitControl)
             .WithMany(ec => ec.ControlDesigns)

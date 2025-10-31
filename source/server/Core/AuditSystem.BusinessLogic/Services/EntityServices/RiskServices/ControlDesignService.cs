@@ -112,7 +112,6 @@ internal sealed class ControlDesignService(
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
-                Inadequate = d.Inadequate,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })

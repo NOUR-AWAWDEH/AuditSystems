@@ -14,8 +14,7 @@ export const updateControlDesignByIdRepository = {
             const payload = {
                 id: controlDesignData.id,
                 description: controlDesignData.description,
-                exitControlId: controlDesignData.exitControlId,
-                inadequate: controlDesignData.inadequate,
+                exitControlId: controlDesignData.exitControlId
             };
 
             const response = await api.put(

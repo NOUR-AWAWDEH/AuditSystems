@@ -5,6 +5,5 @@ namespace AuditSystem.Application.Features.Risks.ControlDesign.Create;
 
 public sealed record class CreateControlDesignCommand(
     string Description,
-    Guid ExitControlId,
-    bool Inadequate
+    Guid ExitControlId
 ) : UserAwareCommand<Result<CreateControlDesignCommandResponse>>;

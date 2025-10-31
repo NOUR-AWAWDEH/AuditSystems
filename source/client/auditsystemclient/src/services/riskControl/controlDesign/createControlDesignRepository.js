@@ -12,8 +12,7 @@ export const createControlDesignRepository = {
             const token = authService.getLocalToken();
             const payload = {
                 description: controlDesignData.description,
-                exitControlId: controlDesignData.exitControlId,
-                inadequate: controlDesignData.inadequate,
+                exitControlId: controlDesignData.exitControlId
             }
 
             const response = await api.post(

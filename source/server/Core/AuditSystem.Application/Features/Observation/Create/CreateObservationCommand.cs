@@ -5,8 +5,10 @@ namespace AuditSystem.Application.Features.Observation.Create;
 
 public sealed record CreateObservationCommand(
     string Description,
-    string? Recommendation,
+    string ActionOwner,
+    string Background,
     string ActionPlan,
     DateTime ActionDate,
+    string? Note,
     Guid AuditProgramId
 ) : UserAwareCommand<Result<CreateObservationCommandResponse>>;

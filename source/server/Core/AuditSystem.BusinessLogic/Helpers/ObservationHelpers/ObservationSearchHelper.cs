@@ -80,9 +80,11 @@ public class ObservationSearchHelper(
             {
                 Id = ap.Id,
                 Description = ap.Description,
-                Recommendation = ap.Recommendation,
+                ActionOwner = ap.ActionOwner,
+                Background = ap.Background,
                 ActionPlan = ap.ActionPlan,
                 ActionDate = ap.ActionDate,
+                Note = ap.Note,
                 AuditProgramId = ap.AuditProgramId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,

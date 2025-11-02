@@ -16,15 +16,25 @@ public class ObservationConfiguration : IEntityTypeConfiguration<Observation>
             .IsRequired(true)
             .HasMaxLength(500);
         
-        builder.Property(x => x.Recommendation)
+        builder.Property(x => x.ActionOwner)
+            .IsRequired(true)
             .HasMaxLength(500);
-
+            
+        builder.Property(x => x.Background)
+            .IsRequired(true)
+            .HasMaxLength(500);
+            
         builder.Property(x => x.ActionPlan)
             .IsRequired(true)
             .HasMaxLength(500);
             
-        builder.Property(x => x.ActionDate);
+        builder.Property(x => x.ActionDate)
+            .IsRequired(true);
 
+        builder.Property(x => x.Note)
+            .HasMaxLength(500)
+            .IsRequired(false);
+        
         builder.HasOne(x => x.AuditProgram)
             .WithMany(x => x.Observations)
             .HasForeignKey(x => x.AuditProgramId)

@@ -24,9 +24,21 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
 
-        RuleFor(x => x.Recommendation)
+        RuleFor(x => x.ActionOwner)
+            .NotEmpty()
+            .WithMessage("Action Owner is required.")
+            .MinimumLength(2)
+            .WithMessage("Action Owner must be at least 2 characters long.")
             .MaximumLength(500)
-            .WithMessage("Recommendation must not exceed 500 characters.");
+            .WithMessage("Action Owner must not exceed 500 characters.");
+            
+        RuleFor(x => x.Background)
+            .NotEmpty()
+            .WithMessage("Background is required.")
+            .MinimumLength(2)
+            .WithMessage("Background must be at least 2 characters long.")
+            .MaximumLength(500)
+            .WithMessage("Background must not exceed 500 characters.");
             
         RuleFor(x => x.ActionPlan)
             .NotEmpty()
@@ -38,12 +50,17 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .NotEmpty()
             .WithMessage("Action Date is required.");
             
+        RuleFor(x => x.Note)
+            .MaximumLength(500)
+            .WithMessage("Note must not exceed 500 characters.");
+            
         RuleFor(x => x.AuditProgramId)
             .NotEmpty()
             .WithMessage("Audit Program Id is required.")
             .Must(BeAValidGuid)
             .WithMessage("Audit Program Id must not be empty.");
     }
+    
     private static bool BeAValidGuid(Guid id)
     {
         return id != Guid.Empty;

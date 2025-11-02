@@ -111,10 +111,12 @@ internal sealed class ObservationService(
             {
                 Id = d.Id,
                 Description = d.Description,
-                Recommendation = d.Recommendation,
-                AuditProgramId = d.AuditProgramId,
+                ActionOwner = d.ActionOwner,
+                Background = d.Background,
                 ActionPlan = d.ActionPlan,
                 ActionDate = d.ActionDate,
+                Note = d.Note,
+                AuditProgramId = d.AuditProgramId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
             })

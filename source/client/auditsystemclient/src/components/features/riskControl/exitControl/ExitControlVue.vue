@@ -1,5 +1,5 @@
 <template>
-  <!-- ExitControl.vue -->
+    <!--ExitControlVue.vue-->
     <div class="space-y-6">
         <!-- Add Exit Control Modal -->
         <AddExitControlModal

@@ -1,4 +1,5 @@
 <template>
+  <!--RateSelector.vue-->
   <div>
      <div v-if="props.rates.length > 0">
       <CustomSelect

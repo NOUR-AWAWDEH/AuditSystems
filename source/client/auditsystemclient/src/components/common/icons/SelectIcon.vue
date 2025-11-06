@@ -1,4 +1,5 @@
 <template>
+  <!--SelectIcon.vue-->
   <svg 
     :class="[sizeClass, customClass]" 
     fill="none" 

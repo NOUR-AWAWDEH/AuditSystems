@@ -1,5 +1,5 @@
-// RiskControlMatrix.vue
 <template>
+    <!--RiskControlMatrix.vue-->
     <div class="space-y-6">
         <!-- Add RiskControlMatrix Modal -->
         <AddRiskControlMatrixModal

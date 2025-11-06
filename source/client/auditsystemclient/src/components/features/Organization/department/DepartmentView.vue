@@ -1,4 +1,5 @@
 <template>
+    <!--DepartmentView.vue-->
     <div class="space-y-6">
         <!-- Add Department Modal -->
         <AddDepartmentModal

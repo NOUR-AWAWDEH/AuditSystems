@@ -1,4 +1,5 @@
 <template>
+  <!--SidebarToggle.vue-->
   <BaseButton
     class="h-9 w-7 rounded-r-2xl mt-3.25"
     @click="toggleSidebar"

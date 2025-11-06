@@ -1,4 +1,5 @@
 <template>
+  <!--SideBar.vue-->
   <div class="relative flex min-h-screen">
     <!-- Mobile Overlay Background -->
     <div 

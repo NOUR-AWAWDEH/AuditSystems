@@ -1,4 +1,5 @@
 <template>
+    <!--EditLocationModal.vue-->
   <div v-if="isVisible" class="fixed inset-0 bg-gray-base bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
       <h2 class="text-xl font-semibold mb-4 text-secondary-shade">Edit Location</h2>

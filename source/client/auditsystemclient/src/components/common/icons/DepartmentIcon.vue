@@ -1,4 +1,5 @@
 <template>
+  <!--DepartmentIcon.vue-->
   <svg 
     :class="[sizeClass, customClass]" 
     fill="none" 

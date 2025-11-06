@@ -1,4 +1,5 @@
 <template>
+  <!--BaseLink.vue-->
   <router-link :to="to" :class="linkClasses">
     <slot />
   </router-link>

@@ -1,6 +1,5 @@
-// AuditProcess.vue
-
 <template>
+    <!--AuditProcess.vue-->
     <div class="space-y-6">
         <!-- Add Audit Process Modal -->
         <AddAuditProcessModal

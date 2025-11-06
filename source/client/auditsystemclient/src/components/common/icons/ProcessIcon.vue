@@ -1,4 +1,5 @@
 <template>
+  <!--ProcessIcon.vue-->
   <svg 
     :class="[sizeClass, customClass]" 
     fill="none" 

@@ -1,3 +1,12 @@
+<template>
+  <!--AuditLogo.vue-->
+  <img
+    :src="logoSrc"
+    :class="[width, height]"
+    alt="Audit System Logo"
+  />
+</template>
+
 <script setup>
 import { computed } from 'vue';
 
@@ -24,11 +33,3 @@ const logoSrc = computed(() => {
   return new URL('@/assets/icons/AuditSystem.svg', import.meta.url).href;
 });
 </script>
-
-<template>
-  <img
-    :src="logoSrc"
-    :class="[width, height]"
-    alt="Audit System Logo"
-  />
-</template>

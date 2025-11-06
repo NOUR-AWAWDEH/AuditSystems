@@ -1,6 +1,5 @@
-// LocationView.vue
-
 <template>
+    <!--LocationView.vue-->
     <div class="space-y-6">
         <!-- Add Location Modal -->
         <AddLocationForm

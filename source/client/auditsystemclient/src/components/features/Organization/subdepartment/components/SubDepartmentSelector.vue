@@ -1,4 +1,5 @@
 <template>
+    <!--SubDepartmentSelector.vue-->
   <CustomSelect
     :model-value="selectedSubDepartmentId"
     :options="subDepartments"

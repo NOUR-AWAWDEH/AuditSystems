@@ -1,4 +1,5 @@
 <template>
+    <!--LocationHeader.vue-->
     <div class="flex items-center"> 
         <div>
             <h2 class="text-xl sm:text-2xl font-bold text-secondary-base">

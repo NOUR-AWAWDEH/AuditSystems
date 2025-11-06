@@ -1,4 +1,5 @@
 <template>
+    <!--SubDepartmentTable.vue-->
     <div>
         <!-- SubDepartment Table -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">

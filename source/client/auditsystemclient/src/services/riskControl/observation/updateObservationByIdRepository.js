@@ -3,7 +3,7 @@ import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
 const OBSERVATION_API_ENDPOINT = '/api/Observation';
-const OBSERVATION_API_ENDPOINT_ID = '/update-observation';
+const OBSERVATION_API_ENDPOINT_ID = '/update-observation-by-id';
 
 export const updateObservationByIdRepository = {
     async updateObservationById(observationData) {

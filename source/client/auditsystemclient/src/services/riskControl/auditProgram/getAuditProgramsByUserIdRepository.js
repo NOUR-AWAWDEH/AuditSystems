@@ -20,11 +20,10 @@ export const getAuditProgramsByUserIdRepository = {
                 }
             );
 
-
             const { data, status } = response;
             responseData = data;
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result?.auditProgramModels, data?.successMessage || 'Audit Programs retrieved successfully');
+                return ApiResponseT.ok(data?.result?.auditPrograms, data?.successMessage || 'Audit Programs retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

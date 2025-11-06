@@ -1,5 +1,5 @@
 <template>
-  <!-- Login Form -->
+  <!--LoginForm.vue-->
   <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg">
     <div class="flex justify-center mb-6 w-full">
       <Logo />

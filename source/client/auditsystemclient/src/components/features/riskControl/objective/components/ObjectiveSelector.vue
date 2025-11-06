@@ -1,4 +1,5 @@
 <template>
+    <!--ObjectiveSelector.vue-->
   <CustomSelect
     :model-value="selectedObjectiveId"
     :options="objectives"

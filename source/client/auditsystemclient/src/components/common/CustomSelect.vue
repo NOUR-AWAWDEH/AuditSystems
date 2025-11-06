@@ -1,4 +1,5 @@
 <template>
+  <!--CustomSelect.vue-->
   <div class="custom-select" :class="{ 'is-open': isOpen }">
     <label v-if="label" :for="id" class="block text-sm font-semibold text-secondary-base mb-2">
       <svg class="inline w-4 h-4 mr-1 text-secondary-base" fill="none" stroke="currentColor" viewBox="0 0 24 24">

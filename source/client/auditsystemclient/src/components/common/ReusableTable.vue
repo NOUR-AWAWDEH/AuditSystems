@@ -1,4 +1,5 @@
 <template>
+  <!--ReusableTable.vue-->
   <div>
     <!-- Mobile Card View -->
     <div class="block md:hidden">
@@ -173,12 +174,15 @@ defineEmits(['edit-item', 'delete-item', 'view-item', 'download-item']);
 
 function formatDate(dateString) {
   if (!dateString) return 'N/A';
-  try {
-    return new Date(dateString).toLocaleDateString();
-  } catch {
-    return 'Invalid Date';
-  }
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Date';
+  return date.toLocaleDateString('en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit'
+  });
 }
+
 </script>
 
 <style scoped>

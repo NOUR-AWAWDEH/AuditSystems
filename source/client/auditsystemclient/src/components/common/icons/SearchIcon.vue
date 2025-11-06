@@ -1,4 +1,5 @@
 <template>
+    <!--SearchIcon.vue-->
     <svg 
         ref="svgRef"
         :class="iconClass" 

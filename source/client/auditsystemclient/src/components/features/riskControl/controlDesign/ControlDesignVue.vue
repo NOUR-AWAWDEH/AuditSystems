@@ -1,4 +1,5 @@
 <template>
+    <!--ControlDesignVue.vue-->
   <div class="space-y-6">
     <!-- Add Control Design Modal -->
     <AddControlDesignModal

@@ -1,5 +1,5 @@
-// OrganizationView.vue
 <template>
+    <!--OrganizationView.vue-->
   <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-2 sm:p-4 md:p-6">
     <!-- Header Section -->
     <div class="mb-4 sm:mb-6 md:mb-8">

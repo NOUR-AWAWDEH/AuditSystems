@@ -1,3 +1,44 @@
+<template>
+    <!--DocumentsTable.vue-->
+  <div class="w-full">
+    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-secondary-base px-1">Uploaded Documents</h3>
+    <div class="w-full overflow-hidden">
+      <ReusableTable
+        :columns="documentTableColumns"
+        :items="documents"
+        item-key="id"
+        :is-loading="isDownloadLoading"
+        no-data-message="No documents uploaded yet."
+        :actions="documentTableActions"
+        @delete-item="handleDeleteDocument"
+        @download-item="handleDownloadDocument"
+        class="w-full"
+      >
+        <template #cell-fileName="{ item }">
+          <div class="max-w-xs md:max-w-none">
+            <span class="block truncate md:inline" :title="getCleanFileName(item.fileName)">
+              {{ getCleanFileName(item.fileName) }}
+            </span>
+          </div>
+        </template>
+        
+        <template #cell-fileType="{ item }">
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {{ getFileType(item.fileName) }}
+          </span>
+        </template>
+        
+        <template #cell-createdAt="{ value }">
+          <span class="text-sm text-gray-600">
+            {{ formatDate(value) }}
+          </span>
+        </template>
+      </ReusableTable>
+    </div>
+  </div>
+</template>
+
+
 <script setup>
 import ReusableTable from '@/components/common/ReusableTable.vue';
 import { useNotification } from "@/composables/notification/useNotification";
@@ -51,48 +92,7 @@ async function handleDownloadDocument(document) {
     showNotification('Download failed', 'error');
   }
 }
-</script>
 
-<template>
-  <div class="w-full">
-    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-secondary-base px-1">Uploaded Documents</h3>
-    <div class="w-full overflow-hidden">
-      <ReusableTable
-        :columns="documentTableColumns"
-        :items="documents"
-        item-key="id"
-        :is-loading="isDownloadLoading"
-        no-data-message="No documents uploaded yet."
-        :actions="documentTableActions"
-        @delete-item="handleDeleteDocument"
-        @download-item="handleDownloadDocument"
-        class="w-full"
-      >
-        <template #cell-fileName="{ item }">
-          <div class="max-w-xs md:max-w-none">
-            <span class="block truncate md:inline" :title="getCleanFileName(item.fileName)">
-              {{ getCleanFileName(item.fileName) }}
-            </span>
-          </div>
-        </template>
-        
-        <template #cell-fileType="{ item }">
-          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            {{ getFileType(item.fileName) }}
-          </span>
-        </template>
-        
-        <template #cell-createdAt="{ value }">
-          <span class="text-sm text-gray-600">
-            {{ formatDate(value) }}
-          </span>
-        </template>
-      </ReusableTable>
-    </div>
-  </div>
-</template>
-
-<script>
 function getCleanFileName(fileName) {
   if (!fileName) return 'Unknown';
   

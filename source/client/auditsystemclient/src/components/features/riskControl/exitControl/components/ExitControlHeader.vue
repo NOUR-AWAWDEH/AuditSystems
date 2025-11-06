@@ -1,4 +1,5 @@
 <template>
+    <!--ExitControlHeader.vue-->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
         <div class="flex items-center">
             <div>

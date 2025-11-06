@@ -1,4 +1,5 @@
 <template>
+  <!--FileUploadDialog.vue-->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
             <h2 class="text-lg font-semibold text-secondary-base mb-2 sm:mb-0">

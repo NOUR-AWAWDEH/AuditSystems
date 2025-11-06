@@ -1,4 +1,5 @@
 <template>
+  <!--BaseButton.vue-->
   <button
     @click="$emit('click')"
     class=" text-white font-medium   transition-colors duration-300 cursor-pointer"

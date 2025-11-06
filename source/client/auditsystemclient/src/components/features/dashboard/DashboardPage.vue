@@ -1,111 +1,5 @@
-<script setup>
-import { ref, computed } from 'vue';
-
-const currentDate = computed(() => {
-  return new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-});
-
-const currentTime = ref(new Date().toLocaleTimeString());
-
-// Update time every second
-setInterval(() => {
-  currentTime.value = new Date().toLocaleTimeString();
-}, 1000);
-
-// Sample dashboard data
-const dashboardStats = ref([
-  {
-    title: 'Total Audits',
-    value: '24',
-    change: '+12%',
-    changeType: 'positive',
-    icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-  },
-  {
-    title: 'Pending Reviews',
-    value: '8',
-    change: '-3%',
-    changeType: 'negative',
-    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
-  },
-  {
-    title: 'Completed',
-    value: '16',
-    change: '+8%',
-    changeType: 'positive',
-    icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-  },
-  {
-    title: 'Documents',
-    value: '142',
-    change: '+25%',
-    changeType: 'positive',
-    icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
-  }
-]);
-
-const recentActivities = ref([
-  {
-    id: 1,
-    action: 'New audit created',
-    description: 'Financial Audit Q4 2024',
-    time: '2 hours ago',
-    type: 'create'
-  },
-  {
-    id: 2,
-    action: 'Document uploaded',
-    description: 'Balance Sheet.pdf',
-    time: '4 hours ago',
-    type: 'upload'
-  },
-  {
-    id: 3,
-    action: 'Audit completed',
-    description: 'Compliance Review',
-    time: '1 day ago',
-    type: 'complete'
-  },
-  {
-    id: 4,
-    action: 'Review assigned',
-    description: 'Internal Controls Assessment',
-    time: '2 days ago',
-    type: 'assign'
-  }
-]);
-
-const quickActions = ref([
-  {
-    title: 'New Audit',
-    description: 'Start a new audit process',
-    icon: 'M12 4v16m8-8H4',
-    color: 'bg-primary-base',
-    route: '/audits/new'
-  },
-  {
-    title: 'Upload Documents',
-    description: 'Add supporting documents',
-    icon: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10',
-    color: 'bg-secondary-base',
-    route: '/supporting-docs'
-  },
-  {
-    title: 'View Reports',
-    description: 'Access audit reports',
-    icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-    color: 'bg-tertiary-base',
-    route: '/reports'
-  }
-]);
-</script>
-
 <template>
+  <!--DashboardPage.vue-->
   <div class="min-h-[calc(100vh-4rem)] bg-gray-50 p-4 md:p-6">
     <!-- Header Section -->
     <div class="mb-8">
@@ -301,6 +195,113 @@ const quickActions = ref([
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const currentDate = computed(() => {
+  return new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+});
+
+const currentTime = ref(new Date().toLocaleTimeString());
+
+// Update time every second
+setInterval(() => {
+  currentTime.value = new Date().toLocaleTimeString();
+}, 1000);
+
+// Sample dashboard data
+const dashboardStats = ref([
+  {
+    title: 'Total Audits',
+    value: '24',
+    change: '+12%',
+    changeType: 'positive',
+    icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+  },
+  {
+    title: 'Pending Reviews',
+    value: '8',
+    change: '-3%',
+    changeType: 'negative',
+    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+  },
+  {
+    title: 'Completed',
+    value: '16',
+    change: '+8%',
+    changeType: 'positive',
+    icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+  },
+  {
+    title: 'Documents',
+    value: '142',
+    change: '+25%',
+    changeType: 'positive',
+    icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
+  }
+]);
+
+const recentActivities = ref([
+  {
+    id: 1,
+    action: 'New audit created',
+    description: 'Financial Audit Q4 2024',
+    time: '2 hours ago',
+    type: 'create'
+  },
+  {
+    id: 2,
+    action: 'Document uploaded',
+    description: 'Balance Sheet.pdf',
+    time: '4 hours ago',
+    type: 'upload'
+  },
+  {
+    id: 3,
+    action: 'Audit completed',
+    description: 'Compliance Review',
+    time: '1 day ago',
+    type: 'complete'
+  },
+  {
+    id: 4,
+    action: 'Review assigned',
+    description: 'Internal Controls Assessment',
+    time: '2 days ago',
+    type: 'assign'
+  }
+]);
+
+const quickActions = ref([
+  {
+    title: 'New Audit',
+    description: 'Start a new audit process',
+    icon: 'M12 4v16m8-8H4',
+    color: 'bg-primary-base',
+    route: '/audits/new'
+  },
+  {
+    title: 'Upload Documents',
+    description: 'Add supporting documents',
+    icon: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10',
+    color: 'bg-secondary-base',
+    route: '/supporting-docs'
+  },
+  {
+    title: 'View Reports',
+    description: 'Access audit reports',
+    icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+    color: 'bg-tertiary-base',
+    route: '/reports'
+  }
+]);
+</script>
 
 <style scoped>
 /* Custom animations */

@@ -1,4 +1,5 @@
 <template>
+  <!--DepartmentSelector.vue-->
   <CustomSelect
     :model-value="selectedDepartmentId"
     :options="departments"

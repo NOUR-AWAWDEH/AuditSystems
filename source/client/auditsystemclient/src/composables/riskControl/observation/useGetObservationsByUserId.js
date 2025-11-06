@@ -57,6 +57,6 @@ export function useGetObservationsByUserId() {
         observations,
         isLoading,
         error,
-        getObservationsByUserId,
+        getObservationsByUserId
     };
 }

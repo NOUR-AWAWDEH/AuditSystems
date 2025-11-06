@@ -1,4 +1,5 @@
 <template>
+  <!--UserMenu.vue-->
   <div class="relative" ref="menuRef">
     <!-- Icon (non-interactive) -->
     <div

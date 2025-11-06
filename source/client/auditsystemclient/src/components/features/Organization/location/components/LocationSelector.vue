@@ -1,4 +1,5 @@
 <template>
+    <!--LocationSelector.vue-->
   <CustomSelect
     :model-value="selectedLocationId"
     :options="locations"

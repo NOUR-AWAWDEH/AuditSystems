@@ -38,23 +38,73 @@ public class EntityCacheHandler<TId, TEntity, TModel>(
     }
 
     // Generic version (returns TTargetModel)
+
     public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
-        TId id,
-        Guid userId,
-        Expression<Func<TEntity, Guid>> userIdSelector,
-        string unauthorizedMessage)
-        where TTargetModel : class
+    TId id,
+    Guid userId,
+    Expression<Func<TEntity, Guid>> userIdSelector,
+    string unauthorizedMessage)
+    where TTargetModel : class
     {
-        var cacheKey = GetCacheKey(id);
-        var cached = await cacheService.GetAsync<TEntity>(cacheKey);
-        if (cached == null) return default;
+        try
+        {
+            var cacheKey = GetCacheKey(id);
+            var cached = await cacheService.GetAsync<TEntity>(cacheKey);
+            if (cached == null)
+            {
+                logger.LogDebug("Cache miss for entity {EntityId}", id);
+                return default;
+            }
 
-        var compiled = userIdSelector.Compile();
-        if (compiled(cached) != userId)
-            throw new UnauthorizedAccessException(string.Format(unauthorizedMessage, userId, id));
+            // Safe execution of the selector
+            Guid cachedUserId;
+            try
+            {
+                var compiledSelector = userIdSelector.Compile();
+                cachedUserId = compiledSelector(cached);
+            }
+            catch (NullReferenceException ex)
+            {
+                logger.LogWarning(ex, "Null reference in cached entity {EntityId} - relationships not properly cached", id);
+                return default;
+            }
 
-        return mapper.Map<TTargetModel>(cached);
+            if (cachedUserId == Guid.Empty || cachedUserId != userId)
+            {
+                logger.LogWarning("User {UserId} not authorized to access cached entity {EntityId} owned by {CachedUserId}",
+                    userId, id, cachedUserId);
+                throw new UnauthorizedAccessException(string.Format(unauthorizedMessage, userId, id));
+            }
+
+            logger.LogDebug("Cache hit for entity {EntityId}", id);
+            return mapper.Map<TTargetModel>(cached);
+        }
+        catch (Exception ex) when (ex is not UnauthorizedAccessException)
+        {
+            logger.LogWarning(ex, "Error during cache validation for entity {EntityId}", id);
+            return default;
+        }
     }
+
+
+
+    // public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
+    //     TId id,
+    //     Guid userId,
+    //     Expression<Func<TEntity, Guid>> userIdSelector,
+    //     string unauthorizedMessage)
+    //     where TTargetModel : class
+    // {
+    //     var cacheKey = GetCacheKey(id);
+    //     var cached = await cacheService.GetAsync<TEntity>(cacheKey);
+    //     if (cached == null) return default;
+
+    //     var compiled = userIdSelector.Compile();
+    //     if (compiled(cached) != userId)
+    //         throw new UnauthorizedAccessException(string.Format(unauthorizedMessage, userId, id));
+
+    //     return mapper.Map<TTargetModel>(cached);
+    // }
 
     public async Task ClearEntityCacheAsync(TId id)
     {

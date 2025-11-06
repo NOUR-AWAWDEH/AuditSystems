@@ -1,4 +1,5 @@
 <template>
+  <!--ResetPassword.vue-->
   <div class="flex flex-col items-center justify-center max-w-xs sm:max-w-sm md:max-w-md mt-1 sm:my-2 mx-auto py-8">
     <AuditLogo />
     <H2Heading class="mt-5">Reset Password</H2Heading>

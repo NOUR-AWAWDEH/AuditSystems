@@ -1,4 +1,5 @@
 <template>
+  <!--SidebarHeader.vue-->
   <a href="#" class="flex justify-center">
     <img 
       src="@/assets/icons/AuditSystem_White.svg" 

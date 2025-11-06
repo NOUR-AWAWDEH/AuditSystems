@@ -1,3 +1,14 @@
+<template>
+  <!--DocumentUploadSection.vue-->
+  <FileUploadDialog
+    v-if="uploadDialogOpen"
+    :is-uploading="isUploading"
+    :upload-progress="uploadProgress"
+    @close="closeUploadDialog"
+    @upload="handleFileUpload"
+  />
+</template>
+
 <script setup>
 import { ref } from "vue";
 import { useUploadSupportingDoc } from "@/composables/supportingDoc/useUploadSupportingDoc";
@@ -50,15 +61,3 @@ async function handleFileUpload({ file, fileName }) {
   }
 }
 </script>
-
-<template>
-  <!-- Removed the upload button div -->
-  
-  <FileUploadDialog
-    v-if="uploadDialogOpen"
-    :is-uploading="isUploading"
-    :upload-progress="uploadProgress"
-    @close="closeUploadDialog"
-    @upload="handleFileUpload"
-  />
-</template>

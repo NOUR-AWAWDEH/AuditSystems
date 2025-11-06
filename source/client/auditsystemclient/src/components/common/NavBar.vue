@@ -1,21 +1,5 @@
-<script setup>
-import { useLogout } from '@/composables/auth/useLogout';
-import { ref } from 'vue';
-import BaseLink from '@/components/base/BaseLink.vue';
-import Logo from './AuditLogo.vue';
-import UserMenu from './UserMenu.vue';
-
-const { isAuthenticated } = useLogout();
-const userMenuRef = ref(null);
-
-const handleUserMenuClick = () => {
-  if (userMenuRef.value && userMenuRef.value.toggleDropdown) {
-    userMenuRef.value.toggleDropdown();
-  }
-};
-</script>
-
 <template>
+  <!--NavBar.vue-->
   <nav class="bg-secondary-base w-full fixed text-white text-xl border-b border-secondary-base">
     <div class="container flex justify-between items-center">
 
@@ -43,6 +27,23 @@ const handleUserMenuClick = () => {
     </div>
   </nav>
 </template>
+
+<script setup>
+import { useLogout } from '@/composables/auth/useLogout';
+import { ref } from 'vue';
+import BaseLink from '@/components/base/BaseLink.vue';
+import Logo from './AuditLogo.vue';
+import UserMenu from './UserMenu.vue';
+
+const { isAuthenticated } = useLogout();
+const userMenuRef = ref(null);
+
+const handleUserMenuClick = () => {
+  if (userMenuRef.value && userMenuRef.value.toggleDropdown) {
+    userMenuRef.value.toggleDropdown();
+  }
+};
+</script>
 
 <style scoped>
 nav {

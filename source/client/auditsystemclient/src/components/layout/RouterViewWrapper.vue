@@ -1,4 +1,5 @@
 <template>
+  <!--RouterViewWrapper.vue-->
   <router-view v-slot="{ Component }">
     <transition :name="transitionName">
       <component :is="Component" />

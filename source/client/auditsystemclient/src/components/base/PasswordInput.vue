@@ -1,4 +1,5 @@
 <template>
+  <!--PasswordInput.vue-->
   <div class="relative">
     <BaseInput
       :id="props.id"

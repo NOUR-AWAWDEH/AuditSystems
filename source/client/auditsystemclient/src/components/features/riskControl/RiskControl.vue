@@ -112,9 +112,20 @@
         </div>
 
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6">
-         <h2>Observations Comming Soon</h2>
+          <Observation
+            :audit-programs="auditPrograms"
+            :selected-audit-program-id="selectedAuditProgramId"
+            @observation-selected="handleObservationSelected"
+          />
         </div>
-
+        <!-- Recommendations -->
+        <div v-if="activeTab === 'recommendations'" class="p-3 sm:p-4 md:p-6">
+         <h2 class="text-lg font-bold text-gray-800 mb-4">Recommendations Comming Soon</h2>
+          <!-- <Recommendation
+            :observations="observations"
+            :selected-observation-id="selectedObservationId"
+          /> -->
+        </div>
       </div>
     </div>
   </div>
@@ -132,17 +143,16 @@ import RiskVue from './risk/RiskVue.vue';
 import ExitControlVue from './exitControl/ExitControlVue.vue';
 import AuditProgramVue from './auditProgram/AuditProgramVue.vue';
 import ControlDesignVue from './controlDesign/ControlDesignVue.vue';
+import Observation from './observation/Observation.vue';
 
 import { useGetSubDepartmentsByUserId } from '@/composables/organization/subdepartment/useGetSubDepartmentsByUserId';
 import { useGetAuditProcessesByUserId } from '@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId';
 import { useGetSubProcessesByUserId } from '@/composables/riskControl/subProcess/useGetSubProcessesByUserId';
 import { useGetRiskControlMatricesByUserId } from '@/composables/riskControl/riskControlMatrix/useGetRiskControlMatricesByUserId';
 import { useGetObjectivesByUserId } from '@/composables/riskControl/objective/useGetObjectivesByUserId';
-import { useGetRisksByUserId } from '@/composables/riskControl/risk/useGetRisksByUserId';
 import { useGetExitControlsByUserId } from '@/composables/riskControl/exitControl/useGetExitControlsByUserId';
-import { useGetControlDesignsByUserId } from '@/composables/riskControl/controlDesign/useGetControlDesignsByUserId';
 import { useGetAuditProgramsByUserId } from '@/composables/riskControl/auditProgram/useGetAuditProgramsByUserId';
-
+import { useGetObservationsByUserId } from '@/composables/riskControl/observation/useGetObservationsByUserId';
 
 // State
 const activeTab = ref('processes');
@@ -159,6 +169,7 @@ const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjecti
 const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || '');
 const selectedControlDesignId = ref(localStorage.getItem("riskControlSelectedControlDesignId") || '');
 const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId") || '');
+const selectedObservationId = ref(localStorage.getItem("riskControlSelectedObservationId") || '');
 
 
 // Composables
@@ -169,6 +180,7 @@ const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskContro
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getExitControlsByUserId, exitControls } = useGetExitControlsByUserId();
 const { getAuditProgramsByUserId, auditPrograms } = useGetAuditProgramsByUserId();
+const { getObservationsByUserId, observations } = useGetObservationsByUserId();
 
 // Tabs
 const tabs = ref([
@@ -180,7 +192,8 @@ const tabs = ref([
   { id: 'exitcontrols', name: 'Exit Controls' },
   { id: 'controldesigns', name: 'Control Design' },
   { id: 'auditprograms', name: 'Audit Programs' },
-  { id: 'observations', name: 'Observations' }
+  { id: 'observations', name: 'Observations' },
+  { id: 'recommendations', name: 'Recommendations' }
 ]);
 
 // Set active tab & always refresh its data
@@ -215,7 +228,14 @@ const setActiveTab = async (tabId) => {
       case 'auditprograms':
         await getExitControlsByUserId(); 
         break;
+      case 'observations':
+        await getAuditProgramsByUserId();
+        break;
+      case 'recommendations':
+        await getObservationsByUserId();
+        break;
     }
+
   } catch (err) {
     console.error('Error fetching data:', err);
     errorMessage.value = 'Failed to load data';
@@ -264,6 +284,11 @@ const handleAuditProgramSelected = (id) => {
   setActiveTab('observations');
 };
 
+const handleObservationSelected = (id) => {
+  selectedObservationId.value = id;
+  setActiveTab('recommendations');
+};
+
 const handleAddRisks = (objectiveId) => {
   selectedObjectiveId.value = objectiveId;
   activeTab.value = 'risks';
@@ -271,7 +296,8 @@ const handleAddRisks = (objectiveId) => {
 };
 
 // // Init -> load processes tab
-onMounted(async () => {
-  await setActiveTab('processes');
+onMounted(() => {
+  setActiveTab('processes');
 });
+
 </script>

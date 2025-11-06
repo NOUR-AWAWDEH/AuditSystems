@@ -1,4 +1,5 @@
 <template>
+  <!--CloseIcon.vue-->
   <svg 
     :class="[sizeClass, customClass]" 
     fill="none" 

@@ -1,4 +1,5 @@
 <template>
+  <!--ObjectiveIcon.vue-->
 <svg
   :class="[sizeClass, customClass]"
   fill="none"

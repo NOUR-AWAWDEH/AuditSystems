@@ -1,4 +1,5 @@
 <template>
+    <!--LocationTable.vue-->
     <div>
         <!-- Location Table -->
         <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">

@@ -1,4 +1,5 @@
 <template>
+  <!--ConfirmDialog.vue-->
   <Teleport to="body" :disabled="!isMounted">
     <Transition name="modal">
       <div v-if="isVisible && isMounted" class="fixed inset-0 z-50 flex items-center justify-center p-4">

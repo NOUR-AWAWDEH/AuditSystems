@@ -1,4 +1,5 @@
 <template>
+    <!--SearchFilter.vue-->
     <div class="flex flex-col sm:flex-row sm:items-end gap-3">
         <!-- Search Input -->
         <div class="flex-1 min-w-0">

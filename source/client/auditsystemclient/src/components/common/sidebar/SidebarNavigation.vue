@@ -1,4 +1,5 @@
 <template>
+  <!--SidebarNavigation.vue-->
   <nav class="space-y-1 w-full">
     <NavigationItem
       v-for="item in visibleItems"

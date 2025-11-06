@@ -1,4 +1,5 @@
 <template>
+  <!--MainLayout.vue-->
   <div class="flex flex-col min-h-screen font-poppins">
     <!-- Main layout with SideBar and content -->
     <div v-if="shouldShowSideBar" class="flex flex-1" :class="{ 'pt-16': shouldShowNavBar }">

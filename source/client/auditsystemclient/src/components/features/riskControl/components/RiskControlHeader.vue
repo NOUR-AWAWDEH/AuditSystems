@@ -1,4 +1,5 @@
 <template>
+    <!--RiskControlHeader.vue-->
   <div>
     <h1 class="text-3xl md:text-4xl font-bold text-secondary-base mb-2">
       Risk & Control Management

@@ -1,4 +1,5 @@
 <template>
+    <!--DepartmentTable.vue-->
     <div>
         <!-- Department Header -->
         <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">

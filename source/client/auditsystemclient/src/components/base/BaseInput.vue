@@ -1,4 +1,5 @@
 <template>
+  <!--BaseInput.vue-->
   <input
     :id="id"
     :type="type"

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-// Load environment variables
+// Load environment variables from .env
 DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -20,6 +20,8 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 var services = builder.Services;
 var environment = builder.Environment;
 var configuration = builder.Configuration;
+
+// Health checks
 var healthChecksBuilder = services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
@@ -27,7 +29,32 @@ var healthChecksBuilder = services.AddHealthChecks()
 services.AddHostServices();
 services.AddAuthDependencies();
 
-// Configure Swagger, controllers, JSON, CORS are done in HostDependencies
+// --- CORS Configuration ---
+services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        // Get origins from .env / configuration
+        var envOrigins = (Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGIN") ?? "")
+                         .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                         .Select(o => o.Trim()).ToArray();
+
+        // // Add default dev origins
+        // string[] devOrigins = new[]
+        // {
+        //     "http://localhost",
+        //     "http://localhost:3000",
+        //     "http://localhost:10000"
+        // };
+
+        policy.WithOrigins(envOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// --- Application Core Services ---
 services.AddApplication();
 services.AddBusinessLogic();
 services.AddAuthentication();
@@ -37,19 +64,20 @@ services.AddDataAccess(
     isProduction: environment.IsProduction()
 );
 
-
 services.ConfigureApiCookie();
 
-// Data protection & file upload settings
+// --- Data Protection ---
 services.AddDataProtection()
         .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(environment.ContentRootPath, "keys")))
         .SetApplicationName("AuditSystem");
 
+// --- File Upload Limit ---
 services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 1_000_000_000; // 1 GB
 });
 
+// --- Kestrel Limits ---
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 1_000_000_000; // 1 GB
@@ -57,29 +85,32 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database
-//app.MigrateDatabase();
-
-// Swagger UI
+// --- Swagger ---
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
-    c.RoutePrefix = "swagger";
-    c.DocumentTitle = "Audit System API";
-    c.EnableDeepLinking();
-    c.DisplayRequestDuration();
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
+    options.RoutePrefix = "swagger";
+    options.DocumentTitle = "Audit System API";
+    options.EnableDeepLinking();
+    options.DisplayRequestDuration();
 });
 
-// Middleware pipeline
+// --- Middleware Pipeline ---
+app.UseCors("AllowSpecificOrigin");
 app.UseCustomMiddlewarePipeline();
-app.UseCors();
-if (!environment.IsProduction()) app.UseHttpsRedirection();
+
+// Only redirect to HTTPS in production
+if (environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
 
-// Health checks
+// --- Health Checks ---
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -97,14 +128,15 @@ app.MapHealthChecks("/health", new HealthCheckOptions
             }),
             timestamp = DateTime.UtcNow
         };
+
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
     }
 });
 
-// Controllers
+// --- Controllers ---
 app.MapControllers();
 
-// Root redirect to Swagger
+// --- Root Redirect to Swagger ---
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/swagger", permanent: false);

@@ -3,26 +3,47 @@ services:
     image: nourawawdeh/auditsystem:latest
     build:
       context: .
-      dockerfile: .\source\server\Infrastructure\AuditSystem.Host\Dockerfile
+      dockerfile: ./source/server/Infrastructure/AuditSystem.Host/Dockerfile
     ports:
       - "80:80"
-      - "443:443"
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - DB_CONNECTION_STRING=${DB_CONNECTION_STRING}
-      - JWT_KEY=${JWT_KEY}
-      - JWT_ISSUER=${JWT_ISSUER}
-      - JWT_AUDIENCE=${JWT_AUDIENCE}
-      - JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES}
-      - APP_DOMAIN=${APP_DOMAIN}
-      - APP_LOGGING_PATH=${APP_LOGGING_PATH}
-      - APP_EMAIL_CONFIRMATION=confirm-email?uid={0}&token={1}
-      - SMTP_SENDER_ADDRESS=${SMTP_SENDER_ADDRESS}
-      - SMTP_SENDER_NAME=${SMTP_SENDER_NAME}
-      - SMTP_USERNAME=${SMTP_USERNAME}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_ENABLE_SSL=${SMTP_ENABLE_SSL}
-      - FILE_STORAGE_BASE_URL=${FILE_STORAGE_BASE_URL}
-      - FILESTORAGE_UPLOADPATH=${FILESTORAGE_UPLOADPATH}
+      APP_DOMAIN: http://localhost
+      APP_EMAIL_CONFIRMATION: confirm-email?uid={0}&token={1}
+      APP_LOGGING_PATH: /logs/AuditSystem
+      ASPNETCORE_ENVIRONMENT: Development
+
+      DB_CONNECTION_STRING: Host=host.docker.internal;Port=5432;Database=auditsystemdb;Username=postgres;Password=Havana123!
+
+      FILE_STORAGE_BASE_URL: http://localhost/
+      FILESTORAGE_UPLOADPATH: ../../uploads
+
+      JWT_AUDIENCE: http://localhost
+      JWT_EXPIRATION_MINUTES: 60
+      JWT_ISSUER: http://localhost
+      JWT_KEY: AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765e
+
+      SIGNED_URL_SECRET_KEY: Q1WrW0CJ7GcbASej53hjPj1agkasd9870754s
+
+      SMTP_ENABLE_SSL: "true"
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PASSWORD: hqus qaaq dipe cqbm
+      SMTP_PORT: 587
+      SMTP_SENDER_ADDRESS: auditsstm@gmail.com
+      SMTP_SENDER_NAME: Audit System Team
+      SMTP_USERNAME: auditsstm@gmail.com
+
+      CORS_ALLOWED_ORIGIN: http://localhost:3000
+
+  auditsystem.client:
+    image: nourawawdeh/auditsystemclient:latest
+    build:
+      context: ./source/client/auditsystemclient
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost
+    ports:
+      - "3000:10000"
+    environment:
+      VITE_API_URL: http://localhost
+    depends_on:
+      - auditsystem.host

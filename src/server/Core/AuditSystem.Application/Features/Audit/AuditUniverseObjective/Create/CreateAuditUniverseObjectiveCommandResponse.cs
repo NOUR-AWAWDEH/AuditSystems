@@ -1,3 +1,0 @@
-﻿namespace AuditSystem.Application.Features.Audit.AuditUniverseObjective.Create;
-
-public sealed record class CreateAuditUniverseObjectiveCommandResponse(Guid AuditUniverseObjectiveId);

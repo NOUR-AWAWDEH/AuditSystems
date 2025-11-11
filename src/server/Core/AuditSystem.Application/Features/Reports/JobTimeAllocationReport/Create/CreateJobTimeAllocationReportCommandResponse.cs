@@ -1,3 +1,0 @@
-﻿namespace AuditSystem.Application.Features.Reports.JobTimeAllocationReport.Create;
-
-public sealed record class CreateJobTimeAllocationReportCommandResponse(Guid JobTimeAllocationReportId);

@@ -1,5 +1,0 @@
-using AuditSystem.Contract.Models.Reports;
-
-namespace AuditSystem.Application.Features.Reports.InternalAuditConsolidationReport.Get;
-
-public sealed record class GetInternalAuditConsolidationReportByIdQueryResponse(InternalAuditConsolidationReportModel InternalAuditConsolidationReportModel);

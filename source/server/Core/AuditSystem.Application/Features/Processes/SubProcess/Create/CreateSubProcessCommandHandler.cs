@@ -1,0 +1,24 @@
+﻿using Ardalis.Result;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
+using AuditSystem.Contract.Models.Processes;
+using AutoMapper;
+using MediatR;
+using Microsoft.Extensions.Logging;
+
+namespace AuditSystem.Application.Features.Processes.SubProcess.Create;
+
+internal sealed class CreateSubProcessCommandHandler(
+    ISubProcessService subProcessService,
+    IMapper mapper,
+    ILogger<CreateSubProcessCommandHandler> logger)
+    : IRequestHandler<CreateSubProcessCommand, Result<CreateSubProcessCommandResponse>>
+{
+    public async Task<Result<CreateSubProcessCommandResponse>> Handle(CreateSubProcessCommand request, CancellationToken cancellationToken)
+    {
+        var subProcessModel = mapper.Map<SubProcessModel>(request);
+        var subProcessId = await subProcessService.CreateSubProcessAsync(subProcessModel, request.UserId);
+
+        logger.LogInformation("SubProcess with  Particular {SubProcessParticular} has been created by User id: {UserId}", request.Particular, request.UserId);
+        return Result<CreateSubProcessCommandResponse>.Created(new CreateSubProcessCommandResponse(subProcessId), "SubProcess created.");
+    }
+}

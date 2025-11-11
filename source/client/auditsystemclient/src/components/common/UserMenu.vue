@@ -1,0 +1,131 @@
+<template>
+  <!--UserMenu.vue-->
+  <div class="relative" ref="menuRef">
+    <!-- Icon (non-interactive) -->
+    <div
+      class="p-1 sm:p-2 rounded-full text-white focus:outline-none duration-200 pointer-events-none"
+      :class="{ 'bg-gray-200': isDropdownOpen }"
+      aria-label="User menu"
+      title="User menu"
+    >
+      <UserMenuIcon />
+    </div>
+
+    <!-- Dropdown -->
+    <div
+      v-if="isDropdownOpen"
+      class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+    >
+      <button
+        @click="goToProfile"
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+      >
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+          Profile
+        </div>
+      </button>
+
+      <div class="border-t border-gray-100 my-1"></div>
+
+      <button
+        @click="handleLogout"
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        :disabled="isLoggingOut"
+      >
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+          </svg>
+          <span v-if="isLoggingOut">Logging out...</span>
+          <span v-else>Logout</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useLogout } from '@/composables/auth/useLogout';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import UserMenuIcon from '@/components/common/icons/UserMenuIcon.vue';
+
+const { logout } = useLogout();
+const router = useRouter();
+
+const isLoggingOut = ref(false);
+const isDropdownOpen = ref(false);
+const menuRef = ref(null);
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const handleClickOutside = (event) => {
+  if (menuRef.value && !menuRef.value.contains(event.target)) {
+    isDropdownOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+const handleLogout = async () => {
+  isLoggingOut.value = true;
+  isDropdownOpen.value = false;
+  try {
+    const response = await logout();
+    if (response.success) {
+      router.push('/login');
+    } else {
+      console.error('Logout failed:', response.successMessage);
+    }
+  } catch (err) {
+    console.error('Logout error:', err);
+  } finally {
+    isLoggingOut.value = false;
+  }
+};
+
+const goToProfile = () => {
+  isDropdownOpen.value = false;
+  router.push('/profile');
+};
+
+defineExpose({ toggleDropdown });
+</script>
+
+<style scoped>
+button {
+  transition: all 0.2s ease;
+}
+.relative {
+  position: relative;
+}
+.absolute {
+  animation: dropdown 0.2s ease-in-out;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+@keyframes dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

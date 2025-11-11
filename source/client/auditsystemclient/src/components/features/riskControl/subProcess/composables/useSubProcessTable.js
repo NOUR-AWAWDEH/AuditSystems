@@ -1,0 +1,59 @@
+import { useSubProcessData } from './useSubProcessData';
+import { useAuditProcessManagement } from './useAuditProcessManagement';
+import { useSearchAndPagination } from '@/composables/common/pagination/useSearchAndPagination';
+import { useSubProcessActions } from './useSubProcessActions';
+import { useSubProcessWatchers } from './useSubProcessWatchers';
+import { useSubProcessLifecycle } from './useSubProcessLifecycle';
+import { useSubProcessComputed } from './useSubProcessComputed';
+
+export function useSubProcessTable(auditProcesses) {
+
+    const dataComposable = useSubProcessData();
+    const auditProcessComposable = useAuditProcessManagement(auditProcesses);
+    const searchComposable = useSearchAndPagination();
+
+    const actionsComposable = useSubProcessActions({
+        ...dataComposable,
+        ...auditProcessComposable,
+        ...searchComposable
+    });
+
+    const lifecycleComposable = useSubProcessLifecycle({
+        ...dataComposable,
+        ...auditProcessComposable,
+        ...searchComposable,
+        ...actionsComposable
+    });
+
+    const computedComposable = useSubProcessComputed({
+        ...dataComposable,
+        ...auditProcessComposable,
+        ...searchComposable,
+        ...lifecycleComposable
+    });
+
+    useSubProcessWatchers({
+        ...dataComposable,
+        ...auditProcessComposable,
+        ...searchComposable,
+        ...actionsComposable,
+        ...lifecycleComposable
+    });
+
+    return {
+        subProcesses: computedComposable.subProcesses,
+        isLoading: computedComposable.isLoading,
+        selectedAuditProcessId: auditProcessComposable.selectedAuditProcessId,
+        selectedAuditProcess: auditProcessComposable.selectedAuditProcess,
+        currentAuditProcess: auditProcessComposable.currentAuditProcess,
+        isAuditProcessLoading: auditProcessComposable.isAuditProcessLoading,
+        searchQuery: searchComposable.searchQuery,
+        currentPage: searchComposable.currentPage,
+        pageSize: searchComposable.pageSize,
+        totalCount: dataComposable.totalCount,
+        handleSubProcessAdded: actionsComposable.handleSubProcessAdded,
+        handleSubProcessChange: actionsComposable.handleSubProcessChange,
+        handleSearch: searchComposable.handleSearch,
+        resetToDefaultView: actionsComposable.resetToDefaultView,
+    };
+}

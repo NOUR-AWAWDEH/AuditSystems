@@ -1,0 +1,175 @@
+﻿using AuditSystem.Application.Constants;
+using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.Processes;
+using AuditSystem.Domain.Entities.Processes;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
+using AuditSystem.BusinessLogic.Services.CacheServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
+using AuditSystem.Application.Constants.Processes.AuditProcessConst;
+using Microsoft.EntityFrameworkCore;
+using AuditSystem.BusinessLogic.Helpers.AuditProcessHelpers;
+
+namespace AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
+
+internal sealed class AuditProcessService(
+    IRepository<Guid, AuditProcess> repository,
+    IMapper mapper,
+    ICacheService cacheService,
+    ILogger<AuditProcessService> _logger,
+    IAuditProcessValidation validationHelper,
+    IAuditProcessSearch searchHelper) : 
+    UnifiedCacheService<Guid, AuditProcess, AuditProcessModel>(
+        repository,
+        mapper,
+        cacheService,
+        _logger,
+        CacheKeys.AuditProcess,
+        AuditProcessConstants.AuditProcessTags,
+        AuditProcessConstants.ListTags
+    ),
+    IAuditProcessService
+{
+    private readonly IAuditProcessValidation _validationHelper = validationHelper;
+    private readonly IAuditProcessSearch _searchHelper = searchHelper;
+    
+    public async Task<Guid> CreateAuditProcessAsync(AuditProcessModel processModel, Guid userId)
+    {
+        ArgumentNullException.ThrowIfNull(processModel, nameof(processModel));
+        AuditProcessValidationHelper.ValidateUserId(userId);
+
+        logger.LogInformation("Creating audit process {ProcessName} for user {UserId}", processModel.ProcessName, userId);
+
+        await _validationHelper.ValidateSubDepartmentOwnershipAsync(processModel.SubDepartmentId, userId);
+
+        var entity = mapper.Map<AuditProcess>(processModel);
+        var createdEntity = await repository.CreateAsync(entity);
+
+        await CacheEntityAsync(createdEntity);
+
+        logger.LogInformation("Successfully created audit process {ProcessId} for user {UserId}", createdEntity.Id, userId);
+
+        return createdEntity.Id;
+    }
+
+    public async Task<AuditProcessModel> GetAuditProcessByIdAsync(Guid id, Guid userId)
+    {
+        AuditProcessValidationHelper.ValidateUserId(userId);
+
+        logger.LogDebug("Retrieving audit process {ProcessId} for user {UserId}", id, userId);
+        
+        var cachedResult = await TryGetFromCacheWithValidationAsync<AuditProcessModel>(
+            id,
+            userId,
+            AuditProcessConstants.AuditProcessOwnerIdSelector,
+            AuditProcessConstants.UnauthorizedAccessMessage);
+
+        if (cachedResult != null)
+        {
+            logger.LogDebug("Retrieved audit process {ProcessId} from cache", id);
+            return cachedResult;
+        }
+
+        var entity = await _validationHelper.ValidateAuditProcessOwnershipAsync(id, userId);
+        await CacheEntityAsync(entity);
+        return mapper.Map<AuditProcessModel>(entity);
+    }
+
+    public async Task DeleteAuditProcessAsync(Guid processId, Guid userId)
+    {
+        AuditProcessValidationHelper.ValidateUserId(userId);
+        
+        _logger.LogDebug("Deleting audit process {ProcessId} for user {UserId}", processId, userId);
+
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(processId, userId);
+    
+        var auditProcess = await repository.GetByIdAsync(processId);
+        Guid? subDepartmentId = auditProcess?.SubDepartmentId;
+
+        await repository.DeleteAsync(processId);
+        await ClearEntityCacheAsync(processId);
+        await ClearUserRelatedCachesAsync(userId, AuditProcessConstants.EntityName, subDepartmentId);
+
+        _logger.LogInformation("Successfully deleted audit process {ProcessId} for user {UserId}", processId, userId);
+    }
+    
+    public async Task UpdateAuditProcessAsync(AuditProcessModel processModel, Guid userId)
+    {
+        ArgumentNullException.ThrowIfNull(processModel, nameof(processModel));
+        AuditProcessValidationHelper.ValidateUserId(userId);
+    
+        logger.LogInformation("Updating audit process {ProcessId} for user {UserId}", processModel.Id, userId);
+    
+        var existingEntity = await _validationHelper.ValidateAuditProcessOwnershipAsync(processModel.Id, userId);
+        
+        await _validationHelper.ValidateSubDepartmentOwnershipAsync(existingEntity.SubDepartmentId, userId);
+        
+        mapper.Map(processModel, existingEntity);
+        existingEntity.UpdatedAt = DateTime.UtcNow;
+        await repository.UpdateAsync(existingEntity);
+    
+        await CacheEntityAsync(existingEntity);
+    
+        _logger.LogInformation("Successfully updated audit process {ProcessId}", processModel.Id);
+    }
+    
+    public async Task<IReadOnlyList<AuditProcessModel>> GetAuditProcessesByUserIdAsync(Guid userId)
+    {
+        AuditProcessValidationHelper.ValidateUserId(userId);
+
+        _logger.LogDebug("Retrieving all audit processes for user {UserId}", userId);
+
+        return await repository.GetAll()
+            .AsNoTracking()
+            .Where(AuditProcessConstants.AuditProcessOwnerPredicate(userId))
+            .Select(ap => new AuditProcessModel
+            {
+                Id = ap.Id,
+                ProcessName = ap.ProcessName,
+                SubDepartmentId = ap.SubDepartmentId,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt,
+            })
+            .OrderBy(ap => ap.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<PaginationResult<AuditProcessModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subDepartmentId, Page? page)
+    {
+        AuditProcessValidationHelper.ValidateUserId(userId);
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        logger.LogDebug("Searching audit processes for user {UserId} with term: {SearchTerm} and subdepartment: {SubDepartmentId}",
+            userId, searchTerm ?? "(none)", subDepartmentId.ToString() ?? "(none)");
+
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subDepartmentId, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditProcessModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+        {
+            logger.LogDebug(AuditProcessConstants.RetrievedUserSearchResultsFromCacheMessage);
+            return cachedResult;
+        }
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subDepartmentId, page, cacheKey, countCacheKey);
+    }
+    
+    public async Task<PaginationResult<AuditProcessModel>> SearchAsync(string? name, Page page)
+    {
+        ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        logger.LogDebug("Searching audit processes with name filter: {ProcessName}", name ?? "(none)");
+
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
+
+        var cachedResult = await GetFromCacheAsync<AuditProcessModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+        {
+            logger.LogDebug(AuditProcessConstants.RetrievedSearchResultsFromCacheMessage);
+            return cachedResult;
+        }
+
+        return await GetFromRepositoryAsync<AuditProcessModel>(cacheKey, countCacheKey, page, name);
+    }
+}

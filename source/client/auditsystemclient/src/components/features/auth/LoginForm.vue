@@ -58,6 +58,11 @@
         Forgot Password?
       </BaseLink>
     </div>
+    
+    <!-- Build Time Info (Development Only) -->
+    <div class="text-center mt-2 text-xs text-gray-400 font-mono">
+      Build: {{ buildTime }}
+    </div>
   </div>
 </template>
 
@@ -87,6 +92,9 @@ const isValidationErrorVisible = ref(false);
 
 const errorMessage = ref('')
 const isErrorVisible = ref(false);
+
+// Build time for development
+const buildTime = ref(import.meta.env.VITE_BUILD_TIME || new Date().toLocaleString());
 
 // Constants
 const ERROR_DISPLAY_DURATION = 5000; // 5 seconds

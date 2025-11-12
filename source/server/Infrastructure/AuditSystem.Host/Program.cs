@@ -25,7 +25,8 @@ var configuration = builder.Configuration;
 
 // --- Build Version Info ---
 var buildVersion = "v1.2.3";
-var buildDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+var jerusalemTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+var buildDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, jerusalemTimeZone).ToString("yyyy-MM-dd HH:mm:ss");
 
 // --- Health checks ---
 var healthChecksBuilder = services.AddHealthChecks()

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite",
+    "dev": "set VITE_BUILD_TIME=%date% %time% && vite",
     "lint": "eslint --ext .js,.vue src",
     "start": "vite preview --port 10000 --host",
     "test": "vitest",

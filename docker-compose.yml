@@ -1,6 +1,26 @@
+version: "3.9"
+
 services:
+  auditsystem.db:
+    image: postgres:16
+    container_name: auditsystem.db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Havana123!
+      POSTGRES_DB: auditsystemdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   auditsystem.host:
     image: nourawawdeh/auditsystem:latest
+    container_name: auditsystem.host
     build:
       context: .
       dockerfile: ./source/server/Infrastructure/AuditSystem.Host/Dockerfile
@@ -13,6 +33,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
 
       DB_CONNECTION_STRING: Host=auditsystem.db;Port=5432;Database=auditsystemdb;Username=postgres;Password=Havana123!
+      DB_PASSWORD: Havana123!
 
       FILE_STORAGE_BASE_URL: http://localhost/
       FILESTORAGE_UPLOADPATH: ../../uploads
@@ -38,28 +59,13 @@ services:
       ADMIN_INITIAL_PASSWORD: Havana123%100
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
-      
     depends_on:
-      - auditsystem.db
-
-  auditsystem.db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Havana123!
-      POSTGRES_DB: auditsystemdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      auditsystem.db:
+        condition: service_healthy
 
   auditsystem.client:
     image: nourawawdeh/auditsystemclient:latest
+    container_name: auditsystem.client
     build:
       context: ./source/client/auditsystemclient
       dockerfile: Dockerfile

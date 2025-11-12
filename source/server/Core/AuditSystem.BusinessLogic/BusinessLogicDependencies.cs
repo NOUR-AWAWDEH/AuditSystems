@@ -6,6 +6,7 @@ using AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
+using AuditSystem.BusinessLogic.Helpers.RecommendationHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
@@ -19,6 +20,7 @@ using AuditSystem.BusinessLogic.Services.EntityServices.ObjectiveServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ObservationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.RecommendationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
@@ -37,6 +39,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Locatio
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
+using AuditSystem.Contract.Interfaces.ModelServices.RecommendationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
@@ -49,6 +52,7 @@ using AuditSystem.Contract.Models.Common;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Processes;
+using AuditSystem.Contract.Models.Recommendation;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Contract.Models.SupportingDocs;
@@ -57,6 +61,7 @@ using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
+using AuditSystem.Domain.Entities.Recommendations;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
@@ -171,6 +176,12 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, Observation, ObservationModel>, ObservationService>()
             .AddScoped<IObservationValidation, ObservationValidationHelper>()
             .AddScoped<IObservationSearch, ObservationSearchHelper>()
+
+            // Recommendations
+            .AddScoped<IRecommendationService, RecommendationService>()
+            .AddScoped<IUnifiedCacheService<Guid, Recommendation, RecommendationModel>, RecommendationService>()
+            .AddScoped<IRecommendationValidation, RecommendationValidationHelper>()
+            .AddScoped<IRecommendationSearch, RecommendationSearchHelper>()
 
             // Supporting Docs
             .AddScoped<ISupportingDocService, SupportingDocService>()

@@ -13,6 +13,8 @@ using AuditSystem.Application.Features.Observation.Create;
 using AuditSystem.Application.Features.Observation.Update;
 using AuditSystem.Contract.Models.Recommendation;
 using AuditSystem.Domain.Entities.Recommendations;
+using AuditSystem.Application.Features.Recommendation.Create;
+using AuditSystem.Application.Features.Recommendation.Update;
 
 namespace AuditSystem.BusinessLogic.Mappings;
 
@@ -42,7 +44,7 @@ public sealed class RisksMappingProfile : Profile
 
         //Recommendation
         CreateMap<RecommendationModel, Recommendation>().ReverseMap();
-        //CreateMap<CreateRecommendationCommand, RecommendationModel>();
-        //CreateMap<UpdateRecommendationCommand, RecommendationModel>();
+        CreateMap<CreateRecommendationCommand, RecommendationModel>();
+        CreateMap<UpdateRecommendationCommand, RecommendationModel>();
     }
 }

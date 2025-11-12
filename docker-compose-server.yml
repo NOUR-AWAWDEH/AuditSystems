@@ -37,6 +37,7 @@ services:
   # ASP.NET Core Backend
   # ------------------------
   auditsystem.host:
+    image: nourawawdeh/auditsystem:latest
     build:
       context: .
       dockerfile: ./source/server/Infrastructure/AuditSystem.Host/Dockerfile
@@ -95,6 +96,7 @@ services:
   # Vue.js Client
   # ------------------------
   auditsystem.client:
+    image: nourawawdeh/auditsystemclient:latest
     build:
       context: ./source/client/auditsystemclient
       dockerfile: Dockerfile

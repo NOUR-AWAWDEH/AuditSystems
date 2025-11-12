@@ -126,7 +126,8 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
-// Seed admin AFTER app is built
+// Seed admin AFTER app is built and AFTER migrations are applied
+await app.MigrateDatabaseAsync();
 await app.SeedAdminAsync();
 
 // Run app

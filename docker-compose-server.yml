@@ -2,42 +2,18 @@ version: "3.9"
 
 networks:
   proxy:
+    name: proxy
     external: true
     driver_opts:
       com.docker.network.driver.mtu: 1400
+
   auditsystem-internal-network:
     external: false
     driver_opts:
       com.docker.network.driver.mtu: 1400
 
 services:
-  # ------------------------
-  # PostgreSQL Database
-  # ------------------------
-  auditsystem.db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 64pxEr075zbliN
-      POSTGRES_DB: auditsystemdb
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - "47693:5432"
-    networks:
-      - auditsystem-internal-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
-
-  # ------------------------
-  # ASP.NET Core Backend
-  # ------------------------
   auditsystem.host:
-    image: nourawawdeh/auditsystem:latest
     build:
       context: .
       dockerfile: ./source/server/Infrastructure/AuditSystem.Host/Dockerfile
@@ -46,18 +22,14 @@ services:
       APP_EMAIL_CONFIRMATION: confirm-email?uid={0}&token={1}
       APP_LOGGING_PATH: /logs/AuditSystem
       ASPNETCORE_ENVIRONMENT: Production
-
       DB_CONNECTION_STRING: Host=auditsystem.db;Port=5432;Database=auditsystemdb;Username=postgres;Password=64pxEr075zbliN
-
       FILE_STORAGE_BASE_URL: https://api.auditsystem.online/
       FILESTORAGE_UPLOADPATH: ../../uploads
-
       JWT_AUDIENCE: https://api.auditsystem.online
       JWT_EXPIRATION_MINUTES: 60
       JWT_ISSUER: https://api.auditsystem.online
       JWT_KEY: AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765e
       SIGNED_URL_SECRET_KEY: Q1WrW0CJ7GcbASej53hjPj1agkasd9870754s
-
       SMTP_ENABLE_SSL: "true"
       SMTP_HOST: smtp.gmail.com
       SMTP_PASSWORD: hqus qaaq dipe cqbm
@@ -65,16 +37,13 @@ services:
       SMTP_SENDER_ADDRESS: auditsstm@gmail.com
       SMTP_SENDER_NAME: Audit System Team
       SMTP_USERNAME: auditsstm@gmail.com
-
       ADMIN_INITIAL_EMAIL: admin@auditsystem.online
       ADMIN_INITIAL_PASSWORD: Havana123%100
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
-
       CORS_ALLOWED_ORIGIN: https://auditsystem.online,https://www.auditsystem.online
     depends_on:
-      auditsystem.db:
-        condition: service_healthy
+      - auditsystem.db
     networks:
       - proxy
       - auditsystem-internal-network
@@ -92,11 +61,26 @@ services:
       - "traefik.http.services.auditsystem-svc.loadbalancer.server.port=80"
     restart: unless-stopped
 
-  # ------------------------
-  # Vue.js Client
-  # ------------------------
+  auditsystem.db:
+    image: postgres:16
+    ports:
+      - "47693:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 64pxEr075zbliN
+      POSTGRES_DB: auditsystemdb
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - auditsystem-internal-network
+
   auditsystem.client:
-    image: nourawawdeh/auditsystemclient:latest
     build:
       context: ./source/client/auditsystemclient
       dockerfile: Dockerfile
@@ -112,7 +96,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      # main domain
       - "traefik.http.routers.auditsystem-client-http.entrypoints=http"
       - "traefik.http.routers.auditsystem-client-http.rule=Host(`auditsystem.online`)"
       - "traefik.http.routers.auditsystem-client-http.middlewares=https-redirect@docker"
@@ -121,8 +104,8 @@ services:
       - "traefik.http.routers.auditsystem-client-https.tls=true"
       - "traefik.http.routers.auditsystem-client-https.tls.certresolver=le"
       - "traefik.http.routers.auditsystem-client-https.service=auditsystem-client-svc"
-      - "traefik.http.services.auditsystem-client-svc.loadbalancer.server.port=80"
-      # www subdomain
+      - "traefik.http.services.auditsystem-client-svc.loadbalancer.server.port=10000"
+      # www subdomain routers
       - "traefik.http.routers.auditsystem-client-http-www.entrypoints=http"
       - "traefik.http.routers.auditsystem-client-http-www.rule=Host(`www.auditsystem.online`)"
       - "traefik.http.routers.auditsystem-client-http-www.middlewares=https-redirect@docker"

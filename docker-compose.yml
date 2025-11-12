@@ -1,6 +1,23 @@
 version: "3.9"
 
+networks:
+  proxy:
+    external: false
+    name: proxy
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
+  auditsystem-internal-network:
+    external: false
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
+
+volumes:
+  pgdata:
+
 services:
+  # ------------------------
+  # PostgreSQL Database
+  # ------------------------
   auditsystem.db:
     image: postgres:16
     container_name: auditsystem.db
@@ -9,41 +26,48 @@ services:
       POSTGRES_PASSWORD: Havana123!
       POSTGRES_DB: auditsystemdb
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auditsystemdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks:
+      - auditsystem-internal-network
+    restart: unless-stopped
 
+  # ------------------------
+  # ASP.NET Core Backend
+  # ------------------------
   auditsystem.host:
+    image: nourawawdeh/auditsystem:latest
     container_name: auditsystem.host
     build:
       context: .
       dockerfile: ./source/server/Infrastructure/AuditSystem.Host/Dockerfile
-    ports:
-      - "80:80"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       APP_DOMAIN: http://localhost
       APP_EMAIL_CONFIRMATION: confirm-email?uid={0}&token={1}
       APP_LOGGING_PATH: /logs/AuditSystem
-      ASPNETCORE_ENVIRONMENT: Development
 
-      DB_CONNECTION_STRING: Host=auditsystem.db;Port=5433;Database=auditsystemdb;Username=postgres;Password=Havana123!
-      DB_PASSWORD: Havana123!
+      # Database (internal connection)
+      DB_CONNECTION_STRING: Host=auditsystem.db;Port=5432;Database=auditsystemdb;Username=postgres;Password=Havana123!
 
-      FILE_STORAGE_BASE_URL: http://localhost/
+      # File storage
+      FILE_STORAGE_BASE_URL: http://localhost:80/
       FILESTORAGE_UPLOADPATH: ../../uploads
 
+      # JWT
       JWT_AUDIENCE: http://localhost
       JWT_EXPIRATION_MINUTES: 60
       JWT_ISSUER: http://localhost
       JWT_KEY: AAAAAzxAAAAAAAAAAASuperSecresasdwfasdadasfasftKeyForJdwtAuth123aaas4asd43645867ituykjhlyuk57434423r435y6768k6umntbvrr34567645e4567890765e
-
       SIGNED_URL_SECRET_KEY: Q1WrW0CJ7GcbASej53hjPj1agkasd9870754s
 
+      # SMTP
       SMTP_ENABLE_SSL: "true"
       SMTP_HOST: smtp.gmail.com
       SMTP_PASSWORD: hqus qaaq dipe cqbm
@@ -52,29 +76,48 @@ services:
       SMTP_SENDER_NAME: Audit System Team
       SMTP_USERNAME: auditsstm@gmail.com
 
-      CORS_ALLOWED_ORIGIN: http://localhost:3000
-
+      # Admin
       ADMIN_INITIAL_EMAIL: admin@auditsystem.online
       ADMIN_INITIAL_PASSWORD: Havana123%100
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
+
+      # CORS - Allow both local and production domains
+      CORS_ALLOWED_ORIGIN: http://localhost:3000,http://localhost:10000,https://auditsystem.online,https://www.auditsystem.online
     depends_on:
       auditsystem.db:
         condition: service_healthy
+    ports:
+      - "80:80"
+    networks:
+      - auditsystem-internal-network
+      - proxy
+    # Remove Traefik labels for local development or make them conditional
+    labels:
+      - "traefik.enable=false"
+    restart: unless-stopped
 
+  # ------------------------
+  # Vue.js Client
+  # ------------------------
   auditsystem.client:
+    image: nourawawdeh/auditsystemclient:latest
     container_name: auditsystem.client
     build:
       context: ./source/client/auditsystemclient
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://localhost
-    ports:
-      - "3000:10000"
+        VITE_API_URL: http://localhost:80
     environment:
-      VITE_API_URL: http://localhost
+      VITE_API_URL: http://localhost:80
     depends_on:
       - auditsystem.host
-
-volumes:
-  pgdata:
+    ports:
+      - "3000:10000"
+    networks:
+      - auditsystem-internal-network
+      - proxy
+    # Remove Traefik labels for local development or make them conditional
+    labels:
+      - "traefik.enable=false"
+    restart: unless-stopped

@@ -7,7 +7,7 @@ namespace AuditSystem.Host.Extensions;
 
 public static class HostDependencies
 {
-    public static IServiceCollection AddHostServices(this IServiceCollection services)
+    public static IServiceCollection AddHostServices(this IServiceCollection services, string buildVersion, string buildDate)
     {
         // Controllers with JSON string enum support
         services.AddControllers()
@@ -31,7 +31,7 @@ public static class HostDependencies
             {
                 Title = "Audit System API V1",
                 Version = "v1",
-                Description = "API for Audit System",
+                Description = $"API for Audit System. Last Build: {buildVersion} ({buildDate})",
                 Contact = new Microsoft.OpenApi.Models.OpenApiContact
                 {
                     Name = "Support Team",

@@ -1,7 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using AuditSystem.Contract.Interfaces.Cache;
+using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Host.Caching;
 using AuditSystem.Host.Seed.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.Host.Extensions;
 
@@ -116,6 +118,27 @@ public static class HostDependencies
                 return Task.CompletedTask;
             };
         });
+    }
+
+    /// <summary>
+    /// Applies pending database migrations
+    /// </summary>
+    public static async Task MigrateDatabaseAsync(this IHost host)
+    {
+        using var scope = host.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        try
+        {
+            Console.WriteLine("Applying database migrations...");
+            await dbContext.Database.MigrateAsync();
+            Console.WriteLine("Database migrations applied successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error applying database migrations: {ex.Message}");
+            throw;
+        }
     }
 
     /// <summary>

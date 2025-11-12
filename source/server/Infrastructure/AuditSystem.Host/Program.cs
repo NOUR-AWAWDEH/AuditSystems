@@ -75,7 +75,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
     c.RoutePrefix = "swagger";
     c.DocumentTitle = "Audit System API";
-    c.HeadContent = $"<style>.swagger-ui .topbar:after{{content:'Last Build: {buildVersion} ({buildDate})';display:block;font-size:12px;color:#555;margin-top:5px;}}</style>";
 });
 
 // CORS
@@ -126,9 +125,6 @@ app.MapGet("/", context =>
     context.Response.Redirect("/swagger", permanent: false);
     return Task.CompletedTask;
 });
-
-// Initialize database
-DatabaseInitializer.InitializeDatabase(app.Services, environment.IsProduction());
 
 // Seed admin AFTER app is built
 await app.SeedAdminAsync();

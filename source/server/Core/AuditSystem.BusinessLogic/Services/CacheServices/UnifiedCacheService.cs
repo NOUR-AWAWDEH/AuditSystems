@@ -1,12 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using AuditSystem.Contract.Interfaces.Cache;
+﻿using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Common;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using AuditSystem.Application.Constants;
+
 
 namespace AuditSystem.BusinessLogic.Services.CacheServices;
 

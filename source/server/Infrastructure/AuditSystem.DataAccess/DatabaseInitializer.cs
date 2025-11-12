@@ -11,11 +11,7 @@ public class DatabaseInitializer
         using (var scope = serviceProvider.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-            if (!isProduction)
-            {
-                context.Database.Migrate();
-            }
+            context.Database.Migrate();
         }
     }
 }

@@ -120,6 +120,8 @@ app.MapGet("/", context =>
     return Task.CompletedTask;
 });
 
+DatabaseInitializer.InitializeDatabase(app.Services, app.Environment.IsProduction());
+
 // Seed admin user AFTER app is built
 await app.SeedAdminAsync();
 

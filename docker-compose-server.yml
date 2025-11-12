@@ -6,7 +6,6 @@ networks:
     external: true
     driver_opts:
       com.docker.network.driver.mtu: 1400
-
   auditsystem-internal-network:
     external: false
     driver_opts:
@@ -37,10 +36,12 @@ services:
       SMTP_SENDER_ADDRESS: auditsstm@gmail.com
       SMTP_SENDER_NAME: Audit System Team
       SMTP_USERNAME: auditsstm@gmail.com
+      
       ADMIN_INITIAL_EMAIL: admin@auditsystem.online
       ADMIN_INITIAL_PASSWORD: Havana123%100
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
+
       CORS_ALLOWED_ORIGIN: https://auditsystem.online,https://www.auditsystem.online
     depends_on:
       - auditsystem.db
@@ -72,7 +73,7 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5

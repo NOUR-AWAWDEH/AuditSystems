@@ -3,11 +3,12 @@ using AuditSystem.Auth;
 using AuditSystem.BusinessLogic;
 using AuditSystem.DataAccess;
 using AuditSystem.Host.Extensions;
-using AuditSystem.Host.Seed.Exceptions; // This namespace contains AddAdminSeeding
+using AuditSystem.Host.Seed.Exceptions;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
 
 // Load environment variables from .env
 DotNetEnv.Env.Load();
@@ -22,24 +23,24 @@ var services = builder.Services;
 var environment = builder.Environment;
 var configuration = builder.Configuration;
 
-// Health checks
+// --- Build Version Info ---
+var buildVersion = "v1.2.3";
+var buildDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+// --- Health checks ---
 var healthChecksBuilder = services.AddHealthChecks()
     .AddCheck("Application", () => HealthCheckResult.Healthy("Application is running"));
 
-// Host-level services
-services.AddHostServices();
+// --- Host-level services ---
+services.AddHostServices(buildVersion, buildDate);
 services.AddAuthDependencies();
-services.AddAdminSeeding(); // Now this will work
+services.AddAdminSeeding(); // Seed admin user
 
 // --- Application Core Services ---
 services.AddApplication();
 services.AddBusinessLogic();
 services.AddAuthentication();
-services.AddDataAccess(
-    configuration,
-    healthChecksBuilder,
-    isProduction: environment.IsProduction()
-);
+services.AddDataAccess(configuration, healthChecksBuilder, isProduction: environment.IsProduction());
 
 services.ConfigureApiCookie();
 
@@ -60,24 +61,29 @@ builder.WebHost.ConfigureKestrel(options =>
     options.Limits.MaxRequestBodySize = 1_000_000_000; // 1 GB
 });
 
+
+
 var app = builder.Build();
 
-// --- Swagger ---
+// --- Middleware Pipeline ---
+
+// Swagger JSON + UI
 app.UseSwagger();
-app.UseSwaggerUI(options =>
+app.UseSwaggerUI(c =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
-    options.RoutePrefix = "swagger";
-    options.DocumentTitle = "Audit System API";
-    options.EnableDeepLinking();
-    options.DisplayRequestDuration();
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Audit System API V1");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "Audit System API";
+    c.HeadContent = $"<style>.swagger-ui .topbar:after{{content:'Last Build: {buildVersion} ({buildDate})';display:block;font-size:12px;color:#555;margin-top:5px;}}</style>";
 });
 
-// --- Middleware Pipeline ---
+// CORS
 app.UseCors("AllowSpecificOrigin");
+
+// Custom middleware pipeline
 app.UseCustomMiddlewarePipeline();
 
-// Only redirect to HTTPS in production
+// HTTPS redirection in production
 if (environment.IsProduction())
 {
     app.UseHttpsRedirection();
@@ -87,7 +93,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseOutputCache();
 
-// --- Health Checks ---
+// Health Checks
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = async (context, report) =>
@@ -110,19 +116,21 @@ app.MapHealthChecks("/health", new HealthCheckOptions
     }
 });
 
-// --- Controllers ---
+// Controllers
 app.MapControllers();
 
-// --- Root Redirect to Swagger ---
+// Root redirect to Swagger
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/swagger", permanent: false);
     return Task.CompletedTask;
 });
 
-DatabaseInitializer.InitializeDatabase(app.Services, app.Environment.IsProduction());
+// Initialize database
+DatabaseInitializer.InitializeDatabase(app.Services, environment.IsProduction());
 
-// Seed admin user AFTER app is built
+// Seed admin AFTER app is built
 await app.SeedAdminAsync();
 
+// Run app
 await app.RunAsync();

@@ -60,7 +60,7 @@
     </div>
     
     <!-- Build Time Info (Development Only) -->
-    <div class="text-center mt-2 text-xs text-gray-400 font-mono">
+    <div class="text-center mt-2 text-xs text-secondary-base font-mono">
       Build: {{ buildTime }}
     </div>
   </div>
@@ -94,7 +94,7 @@ const errorMessage = ref('')
 const isErrorVisible = ref(false);
 
 // Build time for development
-const buildTime = ref(import.meta.env.VITE_BUILD_TIME || new Date().toLocaleString());
+const buildTime = ref(__BUILD_TIME__);
 
 // Constants
 const ERROR_DISPLAY_DURATION = 5000; // 5 seconds

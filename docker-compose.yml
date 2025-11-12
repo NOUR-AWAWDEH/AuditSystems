@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: Havana123!
       POSTGRES_DB: auditsystemdb
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -19,7 +19,6 @@ services:
       retries: 10
 
   auditsystem.host:
-    image: nourawawdeh/auditsystem:latest
     container_name: auditsystem.host
     build:
       context: .
@@ -32,7 +31,7 @@ services:
       APP_LOGGING_PATH: /logs/AuditSystem
       ASPNETCORE_ENVIRONMENT: Development
 
-      DB_CONNECTION_STRING: Host=auditsystem.db;Port=5432;Database=auditsystemdb;Username=postgres;Password=Havana123!
+      DB_CONNECTION_STRING: Host=auditsystem.db;Port=5433;Database=auditsystemdb;Username=postgres;Password=Havana123!
       DB_PASSWORD: Havana123!
 
       FILE_STORAGE_BASE_URL: http://localhost/
@@ -64,7 +63,6 @@ services:
         condition: service_healthy
 
   auditsystem.client:
-    image: nourawawdeh/auditsystemclient:latest
     container_name: auditsystem.client
     build:
       context: ./source/client/auditsystemclient

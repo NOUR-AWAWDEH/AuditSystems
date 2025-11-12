@@ -102,3 +102,5 @@ coverage
 
 # ignore Uploads/ folder
 Uploads/
+
+pgdata

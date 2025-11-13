@@ -1,5 +1,5 @@
 # Build stage
-FROM node:lts-alpine as build-stage
+FROM node:lts-alpine AS build-stage
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -9,7 +9,7 @@ ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # Production stage
-FROM node:lts-alpine as production-stage
+FROM node:lts-alpine AS production-stage
 WORKDIR /app
 COPY --from=build-stage /app/dist ./dist
 COPY package*.json ./

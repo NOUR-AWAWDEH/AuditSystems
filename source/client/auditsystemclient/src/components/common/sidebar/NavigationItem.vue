@@ -1,19 +1,18 @@
 <template>
-  <!--NavigationItem.vue-->
-  <router-link 
-    :to="route" 
+  <router-link
+    :to="route"
     :class="[
       'flex items-center rounded transition-all duration-200 hover:bg-secondary-shade',
-      isCollapsed 
-        ? 'py-2 px-1 sm:px-2 justify-center' 
+      isCollapsed
+        ? 'py-2 px-1 sm:px-2 justify-center'
         : 'py-2 px-2 sm:px-3 md:px-4'
     ]"
   >
-    <component 
-      :is="icon" 
+    <component
+      :is="icon"
       class="flex-shrink-0 transition-all duration-200 w-5 h-5"
     />
-    <span 
+    <span
       :class="[
         'text-white transition-all duration-200 truncate',
         isCollapsed ? 'hidden' : 'block ml-2 sm:ml-3 text-sm sm:text-base'

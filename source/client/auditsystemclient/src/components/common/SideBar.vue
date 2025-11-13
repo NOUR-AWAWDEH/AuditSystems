@@ -29,7 +29,9 @@
     <div
       :class="[
         'flex-1 min-h-screen transition-all duration-300',
-        isCollapsed ? 'ml-16' : 'ml-64'
+        isCollapsed
+          ? 'ml-12 sm:ml-14 md:ml-16'
+          : 'ml-40 sm:ml-48 md:ml-56 lg:ml-64'
       ]"
     >
       <slot />
@@ -38,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useSidebar } from '@/composables/sideBar/useSidebar.js'
 import SidebarNavigation from './sidebar/SidebarNavigation.vue'
 import SidebarToggle from './sidebar/SidebarToggle.vue'
@@ -49,14 +51,28 @@ const { isCollapsed, toggleSidebar } = useSidebar()
 const windowWidth = ref(window.innerWidth)
 const isMobile = computed(() => windowWidth.value < 768)
 
+// Auto-collapse when entering mobile view
+watch(isMobile, (mobile) => {
+  if (mobile) {
+    isCollapsed.value = true
+  }
+})
+
 const handleResize = () => {
   windowWidth.value = window.innerWidth
-  // Auto-collapse on small screens
-  if (isMobile.value) isCollapsed.value = true
 }
 
-onMounted(() => window.addEventListener('resize', handleResize))
-onUnmounted(() => window.removeEventListener('resize', handleResize))
+onMounted(() => {
+  // Initial check
+  if (isMobile.value) {
+    isCollapsed.value = true
+  }
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
@@ -66,10 +82,4 @@ onUnmounted(() => window.removeEventListener('resize', handleResize))
   height: calc(100dvh - 4rem);
 }
 
-/* Prevent layout breaking on small screens */
-@media (max-width: 480px) {
-  aside {
-    width: 56px !important;
-  }
-}
 </style>

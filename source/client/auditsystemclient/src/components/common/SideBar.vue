@@ -34,7 +34,6 @@
           : 'ml-40 sm:ml-48 md:ml-56 lg:ml-64'
       ]"
     >
-      <slot />
     </div>
   </div>
 </template>

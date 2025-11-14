@@ -122,14 +122,14 @@
               :class="{ 'cursor-pointer': !!$attrs['onRow-click'] }"
               @click="$emit('row-click', item)"
             >
-              <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 text-gray-600">
+              <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 border-t  text-gray-600">
                 {{ index + 1 }}
               </td>
 
               <td
                 v-for="column in columns"
                 :key="column.key"
-                class="px-6 py-4 border-r border-gray-200 last:border-r-0 align-top"
+                class="px-6 py-4 border-r border-gray-200 border-t last:border-r-0 align-top"
               >
                 <slot
                   :name="`cell-${column.key}`"

@@ -18,8 +18,10 @@
           </div>
         </div>
 
+
+
         <!-- Table for md+ screens -->
-        <div class="hidden md:block bg-gray-50 rounded-lg border border-gray-200 overflow-x-auto">
+        <div class="hidden md:block rounded-lg border border-gray-200 overflow-x-auto">
           <ReusableTable
             :items="locations"
             :columns="enhancedColumns"
@@ -37,7 +39,9 @@
                 >
                   <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
                   <SelectIcon v-else size="sm" class="mr-1" />
-                  <span class="hidden lg:inline">{{ selectedLocationId === item.id ? 'Selected' : 'Select' }}</span>
+                  <span class="hidden lg:inline">{{
+                    selectedLocationId === item.id ? "Selected" : "Select"
+                  }}</span>
                 </button>
 
                 <button
@@ -56,113 +60,128 @@
                   <span class="hidden lg:inline">Delete</span>
                 </button>
               </div>
-
-
             </template>
           </ReusableTable>
         </div>
 
-        <!-- Card view for small screens -->
-        <div v-if="locations.length && !isLoading" class="md:hidden flex flex-col gap-4">
-          <div
-            v-for="loc in locations"
-            :key="loc.id"
-            class="bg-white rounded-lg shadow p-4 border border-gray-200"
-          >
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="font-semibold text-lg">{{ loc.name }}</h3>
-                <p class="text-gray-600">{{ loc.address }}</p>
-                <p class="text-gray-400 text-sm">{{ formatDate(loc.createdAt) }}</p>
-              </div>
-              <div class="flex flex-col gap-2">
-                <button
-                  @click="handleSelectLocation(loc)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                  :class="{ 'bg-green-200': selectedLocationId === loc.id }"
-                >
-                  <CheckIcon v-if="selectedLocationId === loc.id" size="sm" custom-class="mr-1" />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
-                  {{ selectedLocationId === loc.id ? 'Selected' : 'Select' }}
-                </button>
+       <!-- Mobile Card View -->
+        <ReusableMobileCardList
+          :items="locations"
+          :showNumber="true"
+          :isLoading="isLoading"
+          :noDataMessage="noDataMessage"
+          class="md:hidden"
+        >
+          <template #card-content="{ item }">
+  <div class="space-y-4">
+    <div class="border-b border-gray-100 pb-3">
+      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        {{ locationColumns[0].label }}
+      </div>
+      <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">{{ item.name }}</div>
+    </div>
 
-                <button
-                  @click="$emit('edit-location', loc)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <EditIcon size="sm" custom-class="mr-1" />
-                  Edit
-                </button>
+    <div class="border-b border-gray-100 pb-3">
+      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        {{ locationColumns[1].label }}
+      </div>
+      <div class="text-gray-600 text-sm leading-relaxed wrap-break-word">{{ item.address }}</div>
+    </div>
 
-                <button
-                  @click="$emit('delete-location', loc)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <DeleteIcon size="sm" custom-class="mr-1" />
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-          <!-- No data message -->
-          <div v-if="!locations.length" class="text-gray-500 text-center py-6">
-            {{ noDataMessage }}
-          </div>
+    <div>
+      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        {{ locationColumns[2].label }}
+      </div>
+      <div class="text-gray-400 text-xs font-medium">{{ formatDate(item.createdAt) }}</div>
+    </div>
+  </div>
+</template>
+
+          <template #card-actions="{ item }">
+            <button
+              @click.stop="handleSelectLocation(item)"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+              :class="{ 'bg-green-200': selectedLocationId === item.id }"
+            >
+              <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
+              <SelectIcon v-else size="sm" class="mr-1" />
+              {{ selectedLocationId === item.id ? "Selected" : "Select" }}
+            </button>
+
+            <button
+              @click.stop="$emit('edit-location', item)"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
+            >
+              <EditIcon size="sm" class="mr-1" />
+              Edit
+            </button>
+
+            <button
+              @click.stop="$emit('delete-location', item)"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
+            >
+              <DeleteIcon size="sm" class="mr-1" />
+              Delete
+            </button>
+          </template>
+        </ReusableMobileCardList>
+
+        <!-- No data message -->
+        <div v-if="!locations.length" class="text-gray-500 text-center py-6">
+          {{ noDataMessage }}
         </div>
+      </div>
 
-        <!-- Loading -->
-        <div v-if="isLoading" class="text-center py-8">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base"></div>
-          <p class="mt-2 text-gray-600 text-sm">Loading data...</p>
-        </div>
+      <!-- Loading -->
+      <div v-if="isLoading" class="text-center py-8">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base"
+        ></div>
+        <p class="mt-2 text-gray-600 text-sm">Loading data...</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import ReusableTable from '@/components/common/ReusableTable.vue';
-import SearchFilters from '@/components/common/SearchFilter.vue';
-import EditIcon from '@/components/common/icons/EditIcon.vue';
-import DeleteIcon from '@/components/common/icons/DeleteIcon.vue';
-import CheckIcon from '@/components/common/icons/CheckIcon.vue';
-import SelectIcon from '@/components/common/icons/SelectIcon.vue';
-import LocationHeader from './LocationHeader.vue';
+import { computed, ref, watch } from "vue";
+import ReusableTable from "@/components/common/ReusableTable.vue";
+import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
+import SearchFilters from "@/components/common/SearchFilter.vue";
+import EditIcon from "@/components/common/icons/EditIcon.vue";
+import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
+import CheckIcon from "@/components/common/icons/CheckIcon.vue";
+import SelectIcon from "@/components/common/icons/SelectIcon.vue";
+import LocationHeader from "./LocationHeader.vue";
 
 const props = defineProps({
   locations: Array,
   isLoading: Boolean,
   searchQuery: String,
-  handleSearch: Function
+  handleSearch: Function,
 });
 
-const emit = defineEmits([
-  'add-location',
-  'edit-location',
-  'delete-location',
-  'location-selected'
-]);
+const emit = defineEmits(["add-location", "edit-location", "delete-location", "location-selected"]);
 
 const selectedLocationId = ref(null);
 
 const handleSelectLocation = (location) => {
   selectedLocationId.value = location.id;
-  emit('location-selected', location.id);
+  emit("location-selected", location.id);
 };
 
 const locationColumns = [
-  { key: 'name', label: 'Name' },
-  { key: 'address', label: 'Address' },
-  { key: 'createdAt', label: 'Created Date', type: 'date' }
+  { key: "name", label: "Name" },
+  { key: "address", label: "Address" },
+  { key: "createdAt", label: "Created Date", type: "date" },
 ];
 
-const enhancedColumns = computed(() => [...locationColumns, { key: 'actions', label: 'Actions' }]);
+const enhancedColumns = computed(() => [...locationColumns, { key: "actions", label: "Actions" }]);
 
 const noDataMessage = computed(() =>
   props.searchQuery
     ? `No Locations found for "${props.searchQuery}".`
-    : 'No Locations found yet. Please add a location.'
+    : "No Locations found yet. Please add a location."
 );
 
 watch(
@@ -172,7 +191,7 @@ watch(
       const exists = newLocations.some((loc) => loc.id === selectedLocationId.value);
       if (!exists) {
         selectedLocationId.value = null;
-        emit('location-selected', null);
+        emit("location-selected", null);
       }
     }
   },

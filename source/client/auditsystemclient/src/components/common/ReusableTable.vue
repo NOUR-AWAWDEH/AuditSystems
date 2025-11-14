@@ -42,11 +42,11 @@
                 >
                   <span
                     v-if="column.type === 'date'"
-                    class="text-sm text-gray-900 font-medium break-words"
+                    class="text-sm text-gray-900 font-medium wrap-break-word"
                   >
                     {{ formatDate(item[column.key]) }}
                   </span>
-                  <span v-else class="text-sm text-gray-900 font-medium break-words">
+                  <span v-else class="text-sm text-gray-900 font-medium wrap-break-word">
                     {{ item[column.key] ?? '—' }}
                   </span>
                 </slot>
@@ -143,7 +143,7 @@
                   >
                     {{ formatDate(item[column.key]) }}
                   </span>
-                  <span v-else class="text-gray-900 font-medium break-words">
+                  <span v-else class="text-gray-900 font-medium wrap-break-word">
                     {{ item[column.key] ?? '—' }}
                   </span>
                 </slot>

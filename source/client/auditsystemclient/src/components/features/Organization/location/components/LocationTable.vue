@@ -18,10 +18,7 @@
           </div>
         </div>
 
-
-
-        <!-- Table for md+ screens -->
-        <div class="hidden md:block rounded-lg border border-gray-200 overflow-x-auto">
+        <div class="hidden md:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="locations"
             :columns="enhancedColumns"
@@ -31,40 +28,43 @@
             class="location-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex flex-col sm:flex-row gap-2">
-                <button
-                  @click.stop="handleSelectLocation(item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                  :class="{ 'bg-green-200': selectedLocationId === item.id }"
-                >
-                  <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
-                  <SelectIcon v-else size="sm" class="mr-1" />
-                  <span class="hidden lg:inline">{{
-                    selectedLocationId === item.id ? "Selected" : "Select"
-                  }}</span>
-                </button>
+              <!-- Constrain width & enable horizontal scrolling when needed -->
+              <div class="">
+                <div class="flex flex-col  2xl:flex-row gap-2 min-w-max">
+                  <button
+                    @click.stop="handleSelectLocation(item)"
+                    class="inline-flex items-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                    :class="{ 'bg-green-200': selectedLocationId === item.id }"
+                  >
+                    <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
+                    <SelectIcon v-else size="sm" class="mr-1" />
+                    <span >{{
+                      selectedLocationId === item.id ? "Selected" : "Select"
+                    }}</span>
+                  </button>
 
-                <button
-                  @click.stop="$emit('edit-location', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <EditIcon size="sm" class="mr-1" />
-                  <span class="hidden lg:inline">Edit</span>
-                </button>
+                  <button
+                    @click.stop="$emit('edit-location', item)"
+                    class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                  >
+                    <EditIcon size="sm" class="mr-1" />
+                    <span>Edit</span>
+                  </button>
 
-                <button
-                  @click.stop="$emit('delete-location', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <DeleteIcon size="sm" class="mr-1" />
-                  <span class="hidden lg:inline">Delete</span>
-                </button>
+                  <button
+                    @click.stop="$emit('delete-location', item)"
+                    class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                  >
+                    <DeleteIcon size="sm" class="mr-1" />
+                    <span>Delete</span>
+                  </button>
+                </div>
               </div>
             </template>
           </ReusableTable>
         </div>
 
-       <!-- Mobile Card View -->
+        <!-- Mobile Card View -->
         <ReusableMobileCardList
           :items="locations"
           :showNumber="true"
@@ -73,29 +73,35 @@
           class="md:hidden"
         >
           <template #card-content="{ item }">
-  <div class="space-y-4">
-    <div class="border-b border-gray-100 pb-3">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-        {{ locationColumns[0].label }}
-      </div>
-      <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">{{ item.name }}</div>
-    </div>
+            <div class="space-y-4">
+              <div class="border-b border-gray-100 pb-3">
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  {{ locationColumns[0].label }}
+                </div>
+                <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
+                  {{ item.name }}
+                </div>
+              </div>
 
-    <div class="border-b border-gray-100 pb-3">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-        {{ locationColumns[1].label }}
-      </div>
-      <div class="text-gray-600 text-sm leading-relaxed wrap-break-word">{{ item.address }}</div>
-    </div>
+              <div class="border-b border-gray-100 pb-3">
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  {{ locationColumns[1].label }}
+                </div>
+                <div class="text-gray-600 text-sm leading-relaxed wrap-break-word">
+                  {{ item.address }}
+                </div>
+              </div>
 
-    <div>
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-        {{ locationColumns[2].label }}
-      </div>
-      <div class="text-gray-400 text-xs font-medium">{{ formatDate(item.createdAt) }}</div>
-    </div>
-  </div>
-</template>
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  {{ locationColumns[2].label }}
+                </div>
+                <div class="text-gray-400 text-xs font-medium">
+                  {{ formatDate(item.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </template>
 
           <template #card-actions="{ item }">
             <button

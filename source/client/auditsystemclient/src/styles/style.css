@@ -5,8 +5,7 @@
   font-style: normal;
 }
 
-@import 'tailwindcss';
-
+@import "tailwindcss";
 @theme {
     /* Font Family */
     --font-poppins: 'Poppins', sans-serif;
@@ -30,7 +29,7 @@
   --color-gray-base: #495057; /* Slate */
   --color-gray-tint: #d5dae3; /* Pebble */
   --color-gray-shade: #212529; /* Graphite */
-  
+
 
   /* White and Black */
   --color-white: #ffffff; /* White */

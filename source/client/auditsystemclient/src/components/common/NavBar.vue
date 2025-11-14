@@ -1,6 +1,6 @@
 <template>
   <!--NavBar.vue-->
-  <nav class="bg-secondary-base w-full fixed text-white text-xl border-b border-secondary-base">
+  <nav class="bg-linear-to-t  from-secondary-base to-secondary-shade w-full fixed text-white text-xl ">
     <div class="container flex justify-between items-center">
 
       <BaseLink to="/dashboard" variant="logo">
@@ -11,15 +11,15 @@
 
       <div class="flex items-center space-x-6">
         <div v-if="isAuthenticated" class="relative">
-          <button 
-            @click="handleUserMenuClick" 
-            class="focus:outline-none flex items-center cursor-pointer" 
+          <button
+            @click="handleUserMenuClick"
+            class="focus:outline-none flex items-center cursor-pointer"
             style="position: relative; left: -10px;"
           >
             <UserMenu ref="userMenuRef" />
           </button>
         </div>
-        
+
         <BaseLink v-else to="/login" variant="primary">
           Login
         </BaseLink>

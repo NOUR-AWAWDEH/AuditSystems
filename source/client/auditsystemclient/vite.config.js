@@ -5,9 +5,9 @@ import VitePluginVueDevTools from 'vite-plugin-vue-devtools';
 import path from 'path';
 // ... all your other imports
 
-export default defineConfig(({ mode, command }) => {
+export default defineConfig(({ mode}) => {
   const env = loadEnv(mode, '.', '');
-  
+
   const buildTimestamp =
      new Date().toLocaleString('en-US', {
         timeZone: 'Africa/Cairo',

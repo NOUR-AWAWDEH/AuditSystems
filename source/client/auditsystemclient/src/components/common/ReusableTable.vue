@@ -14,7 +14,7 @@
       </div>
 
       <!-- Data -->
-      <div v-else class="space-y-3 px-2 sm:px-4">
+      <div v-else class="space-y-3 px-2 sm:px-4 overflow-hidden">
         <div
           v-for="(item, index) in items"
           :key="item[itemKey] || index"
@@ -42,11 +42,11 @@
                 >
                   <span
                     v-if="column.type === 'date'"
-                    class="text-sm text-gray-900 font-medium wrap-break-word"
+                    class="text-sm text-gray-900 font-medium wrap-break-word min-w-0"
                   >
                     {{ formatDate(item[column.key]) }}
                   </span>
-                  <span v-else class="text-sm text-gray-900 font-medium wrap-break-word">
+                  <span v-else class="text-sm text-gray-900 font-medium wrap-break-word min-w-0">
                     {{ item[column.key] ?? '—' }}
                   </span>
                 </slot>
@@ -75,7 +75,7 @@
     <!-- Desktop Table View -->
     <div class="hidden md:block">
       <div class="overflow-x-auto shadow-md rounded-lg border border-gray-200">
-        <table class="w-full text-sm text-left text-gray-base min-w-max">
+        <table class="w-full text-sm text-left text-gray-base table-fixed">
           <thead class="text-xs text-white uppercase bg-secondary-base">
             <tr>
               <th v-if="showSrNo" class="px-6 py-4 w-16 border-r border-gray-300">#</th>
@@ -122,14 +122,14 @@
               :class="{ 'cursor-pointer': !!$attrs['onRow-click'] }"
               @click="$emit('row-click', item)"
             >
-              <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 border-t  text-gray-600">
+              <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 border-t text-gray-600">
                 {{ index + 1 }}
               </td>
 
               <td
                 v-for="column in columns"
                 :key="column.key"
-                class="px-6 py-4 border-r border-gray-200 border-t last:border-r-0 align-top"
+                class="px-6 py-4 border-r border-gray-200 border-t last:border-r-0 align-top min-w-0 wrap-break-word"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -139,11 +139,11 @@
                 >
                   <span
                     v-if="column.type === 'date'"
-                    class="text-gray-900 font-medium whitespace-nowrap"
+                    class="text-gray-900 font-medium wrap-break-word min-w-0"
                   >
                     {{ formatDate(item[column.key]) }}
                   </span>
-                  <span v-else class="text-gray-900 font-medium wrap-break-word">
+                  <span v-else class="text-gray-900 font-medium wrap-break-word min-w-0">
                     {{ item[column.key] ?? '—' }}
                   </span>
                 </slot>
@@ -198,17 +198,5 @@ function formatDate(value) {
 </script>
 
 <style scoped>
-@media (max-width: 640px) {
-  .space-y-3 > * + * {
-    margin-top: 0.75rem;
-  }
-}
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-th,
-td {
-  word-break: break-word;
-}
+/* No custom CSS needed - Tailwind only */
 </style>

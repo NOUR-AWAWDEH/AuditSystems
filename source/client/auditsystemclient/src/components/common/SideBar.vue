@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-secondary-base text-white fixed top-16 left-0 h-[calc(100vh-4rem)] transition-all duration-300 z-50',
+        'bg-linear-to-b  from-secondary-base to-tertiary-base text-white fixed top-16 left-0 h-[calc(100vh-4rem)] transition-all duration-300 z-50',
         isCollapsed
           ? 'w-12 sm:w-14 md:w-16 px-1'
           : 'w-40 sm:w-48 md:w-56 lg:w-64 px-2 sm:px-3'

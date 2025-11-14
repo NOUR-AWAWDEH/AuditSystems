@@ -7,7 +7,7 @@
       </svg>
       {{ label }}
     </label>
-    
+
     <div class="select-wrapper relative">
       <select
         :id="id"
@@ -31,20 +31,20 @@
           {{ getOptionLabel(option) }}
         </option>
       </select>
-      
+
       <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-        <svg 
-          class="w-5 h-5 text-gray-400 transition-transform duration-200" 
+        <svg
+          class="w-5 h-5 text-gray-400 transition-transform duration-200"
           :class="{ 'rotate-180': isOpen }"
-          fill="none" 
-          stroke="currentColor" 
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
       </div>
     </div>
-    
+
     <div v-if="error" class="flex items-center mt-2 text-sm text-red-600">
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>

@@ -3,6 +3,7 @@
     :to="route"
     :class="[
       'flex items-center rounded transition-all duration-200',
+      isActive ? 'bg-secondary-shade' : '',
       'hover:bg-secondary-shade active:bg-secondary-shade focus:bg-secondary-shade',
       isCollapsed ? 'py-2 px-1 sm:px-2 justify-center' : 'py-2 px-2 sm:px-3 md:px-4',
     ]"
@@ -20,7 +21,10 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const props = defineProps({
   route: {
     type: String,
     required: true,
@@ -37,5 +41,9 @@ defineProps({
     type: Boolean,
     default: false,
   },
-});
+})
+
+const current = useRoute()
+
+const isActive = computed(() => current.path === props.route)
 </script>

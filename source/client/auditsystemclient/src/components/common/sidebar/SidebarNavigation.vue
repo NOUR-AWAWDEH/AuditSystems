@@ -7,12 +7,14 @@
       :label="item.label"
       :icon="item.icon"
       :is-collapsed="isCollapsed"
+      :is-active="current.path === item.route"
     />
   </nav>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import NavigationItem from './NavigationItem.vue'
 import { getVisibleNavigationItems } from '@/config/navigation.js'
 
@@ -23,12 +25,14 @@ defineProps({
   }
 })
 
-// Check authentication status (same logic as your router)
+const current = useRoute()
+
+// Authentication check
 const isAuthenticated = computed(() => {
   return !!localStorage.getItem('token')
 })
 
-// Get navigation items based on auth status
+// Visible items based on auth
 const visibleItems = computed(() => {
   return getVisibleNavigationItems(isAuthenticated.value)
 })

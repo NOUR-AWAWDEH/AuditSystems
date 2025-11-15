@@ -93,7 +93,7 @@
                   {{ locationColumns[2].label }}
                 </div>
                 <div class="text-gray-400 text-xs font-medium">
-                  {{ formatDate(item.createdAt) }}
+                  {{ formatDateSimple(item.createdAt) }}
                 </div>
               </div>
             </div>
@@ -159,6 +159,7 @@ import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import LocationHeader from "./LocationHeader.vue";
+import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
   locations: Array,
@@ -170,6 +171,7 @@ const props = defineProps({
 const emit = defineEmits(["add-location", "edit-location", "delete-location", "location-selected"]);
 
 const selectedLocationId = ref(null);
+
 
 const handleSelectLocation = (location) => {
   selectedLocationId.value = location.id;
@@ -204,10 +206,6 @@ watch(
   { deep: true }
 );
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString();
-};
 </script>
 
 <style scoped>

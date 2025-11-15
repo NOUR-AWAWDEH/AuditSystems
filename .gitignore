@@ -104,3 +104,9 @@ coverage
 Uploads/
 
 pgdata
+
+# Ignore obj folder
+obj/
+
+# Ignore package.g.props file
+*.g.props

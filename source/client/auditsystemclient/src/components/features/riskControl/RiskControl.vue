@@ -86,13 +86,13 @@
 
         <!-- Exit Controls -->
         <div v-if="activeTab === 'exitcontrols'" class="p-3 sm:p-4 md:p-6">
-          <ExitControlVue 
+          <ExitControlVue
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @exit-control-selected="handleExitControlSelected"
           />
         </div>
-        
+
 
         <div v-if="activeTab === 'controldesigns'" class="p-3 sm:p-4 md:p-6">
          <ControlDesignVue
@@ -101,7 +101,7 @@
             @control-design-selected="handleControlDesignSelected"
          />
         </div>
-        
+
         <!-- Audit Programs -->
         <div v-if="activeTab === 'auditprograms'" class="p-3 sm:p-4 md:p-6">
           <AuditProgramVue
@@ -120,7 +120,7 @@
         </div>
         <!-- Recommendations -->
         <div v-if="activeTab === 'recommendations'" class="p-3 sm:p-4 md:p-6">
-         <h2 class="text-lg font-bold text-gray-800 mb-4">Recommendations Comming Soon</h2>
+         <h2 class="text-lg font-bold text-gray-800 mb-4">Recommendations Coming Soon</h2>
           <!-- <Recommendation
             :observations="observations"
             :selected-observation-id="selectedObservationId"
@@ -133,7 +133,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted } from 'vue';
 import RiskControlHeader from './components/RiskControlHeader.vue';
 import AuditProcess from './auditProcess/AuditProcess.vue';
 import SubProcess from './subProcess/SubProcess.vue';
@@ -226,7 +226,7 @@ const setActiveTab = async (tabId) => {
         await getExitControlsByUserId();
         break;
       case 'auditprograms':
-        await getExitControlsByUserId(); 
+        await getExitControlsByUserId();
         break;
       case 'observations':
         await getAuditProgramsByUserId();
@@ -265,9 +265,9 @@ const handleObjectiveSelected = (id) => {
   setActiveTab('exitcontrols');
 };
 
-const handleExitControlSelected = (exitControl) => { 
+const handleExitControlSelected = (exitControl) => {
   selectedExitControlId.value = exitControl.id;
-  if (exitControl.inadequate) { 
+  if (exitControl.inadequate) {
     setActiveTab('controldesigns');
   } else {
     setActiveTab('auditprograms');

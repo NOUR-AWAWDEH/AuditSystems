@@ -120,7 +120,7 @@
 
               <div>
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Created At</div>
-                <div class="text-gray-400 text-xs font-medium">{{ formatDate(item.createdAt) }}</div>
+                <div class="text-gray-400 text-xs font-medium">{{ formatDateSimple(item.createdAt) }}</div>
               </div>
             </div>
           </template>
@@ -196,6 +196,7 @@ import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
+import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
   locations: Array,
@@ -245,12 +246,6 @@ const noDataMessage = computed(() => {
   if (props.searchQuery) return `No departments found for "${props.searchQuery}".`;
   return "No departments found for this location.";
 });
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return "—";
-  const date = new Date(dateStr);
-  return isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleDateString();
-};
 </script>
 
 <style scoped>

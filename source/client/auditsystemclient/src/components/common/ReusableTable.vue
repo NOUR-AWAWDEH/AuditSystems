@@ -9,61 +9,54 @@
       </div>
 
       <!-- No data -->
-      <div v-else-if="items.length === 0" class="text-center py-8 text-gray-base">
+      <div v-else-if="items.length === 0" class="text-center py-8 text-gray-500">
         <p class="text-sm">{{ noDataMessage }}</p>
       </div>
 
-      <!-- Data -->
+      <!-- Mobile Cards -->
       <div v-else class="space-y-3 px-2 sm:px-4 overflow-hidden">
         <div
           v-for="(item, index) in items"
           :key="item[itemKey] || index"
-          class="rounded-lg shadow-sm border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow"
-          :class="{ 'cursor-pointer': !!$attrs['onRow-click'] }"
-          @click="$emit('row-click', item)"
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow relative"
         >
-          <!-- Serial Number -->
-          <div v-if="showSrNo" class="text-xs text-gray-500 mb-3 font-medium">
+          <!-- Serial Number Badge -->
+          <span
+            v-if="showSrNo"
+            class="absolute -top-2 left-4 bg-secondary-base text-white text-xs font-bold px-2 py-1 rounded-full"
+          >
             {{ index + 1 }}
-          </div>
+          </span>
 
-          <!-- Columns -->
+          <!-- Card Content -->
           <div class="space-y-3">
-            <div v-for="column in columns" :key="column.key">
-              <div class="flex flex-col space-y-1">
-                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  {{ column.label }}
+            <div v-for="column in columns" :key="column.key" class="flex flex-col">
+              <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
+                {{ column.label }}
+              </span>
+              <slot
+                :name="`cell-${column.key}`"
+                :item="item"
+                :value="item[column.key]"
+                :column="column"
+              >
+                <span v-if="column.type === 'date'" class="text-sm text-gray-900 font-medium wrap-break-word min-w-0">
+                  {{ formatDate(item[column.key]) }}
                 </span>
-                <slot
-                  :name="`cell-${column.key}`"
-                  :item="item"
-                  :value="item[column.key]"
-                  :column="column"
-                >
-                  <span
-                    v-if="column.type === 'date'"
-                    class="text-sm text-gray-900 font-medium wrap-break-word min-w-0"
-                  >
-                    {{ formatDate(item[column.key]) }}
-                  </span>
-                  <span v-else class="text-sm text-gray-900 font-medium wrap-break-word min-w-0">
-                    {{ item[column.key] ?? '—' }}
-                  </span>
-                </slot>
-              </div>
+                <span v-else class="text-sm text-gray-900 font-medium wrap-break-word min-w-0">
+                  {{ item[column.key] ?? '—' }}
+                </span>
+              </slot>
             </div>
           </div>
 
-          <!-- Mobile Actions -->
-          <div
-            v-if="actions.length > 0"
-            class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2"
-          >
+          <!-- Card Actions -->
+          <div v-if="actions.length > 0" class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
             <button
               v-for="action in actions"
               :key="action.label"
               @click.stop="$emit(action.event, item)"
-              :class="action.class || 'px-3 py-2 text-xs font-medium bg-primary-base text-white rounded-md hover:bg-primary-shade transition-colors'"
+              :class="action.class || 'px-3 py-1.5 text-sm font-medium bg-primary-base text-white rounded-md hover:bg-primary-shade transition-colors whitespace-nowrap'"
             >
               {{ action.label }}
             </button>
@@ -79,11 +72,7 @@
           <thead class="text-xs text-white uppercase bg-secondary-base">
             <tr>
               <th v-if="showSrNo" class="px-6 py-4 w-16 border-r border-gray-300">#</th>
-              <th
-                v-for="column in columns"
-                :key="column.key"
-                class="px-6 py-4 border-r border-gray-300 last:border-r-0 whitespace-nowrap"
-              >
+              <th v-for="column in columns" :key="column.key" class="px-6 py-4 border-r border-gray-300 last:border-r-0 whitespace-nowrap">
                 {{ column.label }}
               </th>
               <th v-if="actions.length > 0" class="px-6 py-4">Actions</th>
@@ -93,10 +82,7 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <!-- Loading -->
             <tr v-if="isLoading">
-              <td
-                :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)"
-                class="px-6 py-8 text-center text-gray-base"
-              >
+              <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length ? 1 : 0)" class="px-6 py-8 text-center text-gray-base">
                 <div class="flex items-center justify-center space-x-2">
                   <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary-base"></div>
                   <span>Loading data...</span>
@@ -106,41 +92,20 @@
 
             <!-- No Data -->
             <tr v-else-if="items.length === 0">
-              <td
-                :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length > 0 ? 1 : 0)"
-                class="px-6 py-8 text-center text-gray-base"
-              >
+              <td :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length ? 1 : 0)" class="px-6 py-8 text-center text-gray-base">
                 {{ noDataMessage }}
               </td>
             </tr>
 
             <!-- Rows -->
-            <tr
-              v-for="(item, index) in items"
-              :key="item[itemKey] || index"
-              class="hover:bg-gray-50 transition-colors"
-              :class="{ 'cursor-pointer': !!$attrs['onRow-click'] }"
-              @click="$emit('row-click', item)"
-            >
+            <tr v-for="(item, index) in items" :key="item[itemKey] || index" class="hover:bg-gray-50 transition-colors" :class="{ 'cursor-pointer': !!$attrs['onRow-click'] }" @click="$emit('row-click', item)">
               <td v-if="showSrNo" class="px-6 py-4 border-r border-gray-200 border-t text-gray-600">
                 {{ index + 1 }}
               </td>
 
-              <td
-                v-for="column in columns"
-                :key="column.key"
-                class="px-6 py-4 border-r border-gray-200 border-t last:border-r-0 align-top min-w-0 wrap-break-word"
-              >
-                <slot
-                  :name="`cell-${column.key}`"
-                  :item="item"
-                  :value="item[column.key]"
-                  :column="column"
-                >
-                  <span
-                    v-if="column.type === 'date'"
-                    class="text-gray-900 font-medium wrap-break-word min-w-0"
-                  >
+              <td v-for="column in columns" :key="column.key" class="px-6 py-4 border-r border-gray-200 border-t last:border-r-0 align-top min-w-0 wrap-break-word">
+                <slot :name="`cell-${column.key}`" :item="item" :value="item[column.key]" :column="column">
+                  <span v-if="column.type === 'date'" class="text-gray-900 font-medium wrap-break-word min-w-0">
                     {{ formatDate(item[column.key]) }}
                   </span>
                   <span v-else class="text-gray-900 font-medium wrap-break-word min-w-0">
@@ -152,12 +117,7 @@
               <!-- Desktop Actions -->
               <td v-if="actions.length > 0" class="px-6 py-4">
                 <div class="flex flex-wrap gap-2">
-                  <button
-                    v-for="action in actions"
-                    :key="action.label"
-                    @click.stop="$emit(action.event, item)"
-                    :class="action.class || 'font-medium text-primary-base hover:text-primary-shade transition-colors'"
-                  >
+                  <button v-for="action in actions" :key="action.label" @click.stop="$emit(action.event, item)" :class="action.class || 'font-medium text-primary-base hover:text-primary-shade transition-colors'">
                     {{ action.label }}
                   </button>
                 </div>
@@ -174,8 +134,8 @@
 defineOptions({ inheritAttrs: false });
 
 defineProps({
-  columns: { type: Array, required: true },
   items: { type: Array, required: true },
+  columns: { type: Array, default: () => [] },
   itemKey: { type: String, default: 'id' },
   showSrNo: { type: Boolean, default: true },
   isLoading: { type: Boolean, default: false },
@@ -189,14 +149,13 @@ function formatDate(value) {
   if (!value) return '—';
   const d = new Date(value);
   if (isNaN(d.getTime())) return 'Invalid Date';
-  return d.toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit'
-  });
+  return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
 }
 </script>
 
 <style scoped>
-/* No custom CSS needed - Tailwind only */
+.wrap-break-word {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 </style>

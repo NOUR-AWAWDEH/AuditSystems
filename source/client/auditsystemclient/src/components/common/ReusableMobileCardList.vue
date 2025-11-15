@@ -1,5 +1,4 @@
 <template>
-  <!-- ReusableMobileCardList.vue -->
   <div class="flex flex-col gap-4">
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-8">
@@ -17,7 +16,7 @@
       v-else
       v-for="(item, index) in items"
       :key="item[itemKey] || index"
-      class="bg-white rounded-lg shadow p-4 border border-gray-200 relative"
+      class="bg-white rounded-lg shadow p-4 border border-gray-200 relative flex flex-col h-full"
     >
       <!-- Serial Number Badge -->
       <span
@@ -28,25 +27,23 @@
       </span>
 
       <!-- Card Content -->
-      <div class="flex justify-between items-start" :class="{ 'pt-2': showNumber }">
-        <div class="flex-1 min-w-0">
-          <slot name="card-content" :item="item" :index="index">
-            <!-- Default Content Fallback -->
-            <div v-for="column in columns" :key="column.key" class="mb-2">
-              <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                {{ column.label }}
-              </span>
-              <p class="text-sm text-gray-900 mt-1 wrap-break-word">
-                {{ item[column.key] ?? "—" }}
-              </p>
-            </div>
-          </slot>
-        </div>
+      <div class="flex-1">
+        <slot name="card-content" :item="item" :index="index">
+          <!-- Default Content Fallback -->
+          <div v-for="column in columns" :key="column.key" class="mb-2">
+            <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              {{ column.label }}
+            </span>
+            <p class="text-sm text-gray-900 mt-1 wrap-break-word">
+              {{ item[column.key] ?? "—" }}
+            </p>
+          </div>
+        </slot>
+      </div>
 
-        <!-- Actions -->
-        <div class="flex flex-col gap-2 ml-4 shrink-0">
-          <slot name="card-actions" :item="item" :index="index"></slot>
-        </div>
+      <!-- Actions at bottom -->
+      <div class="mt-4 pt-2 flex flex-row justify-end gap-2">
+        <slot name="card-actions" :item="item" :index="index"></slot>
       </div>
     </div>
   </div>

@@ -30,7 +30,7 @@
             <template #cell-actions="{ item }">
               <!-- Constrain width & enable horizontal scrolling when needed -->
               <div class="">
-                <div class="flex flex-col  2xl:flex-row gap-2 min-w-max">
+                <div class="flex flex-col 2xl:flex-row gap-2 min-w-max">
                   <button
                     @click.stop="handleSelectLocation(item)"
                     class="inline-flex items-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
@@ -38,9 +38,7 @@
                   >
                     <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
                     <SelectIcon v-else size="sm" class="mr-1" />
-                    <span >{{
-                      selectedLocationId === item.id ? "Selected" : "Select"
-                    }}</span>
+                    <span>{{ selectedLocationId === item.id ? "Selected" : "Select" }}</span>
                   </button>
 
                   <button
@@ -72,6 +70,7 @@
           :noDataMessage="noDataMessage"
           class="md:hidden"
         >
+          <!-- Card Content -->
           <template #card-content="{ item }">
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
@@ -103,32 +102,36 @@
             </div>
           </template>
 
+          <!-- Card Actions (Now at bottom) -->
           <template #card-actions="{ item }">
-            <button
-              @click.stop="handleSelectLocation(item)"
-              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-              :class="{ 'bg-green-200': selectedLocationId === item.id }"
-            >
-              <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
-              <SelectIcon v-else size="sm" class="mr-1" />
-              {{ selectedLocationId === item.id ? "Selected" : "Select" }}
-            </button>
+            <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
+              <!-- Select -->
+              <button
+                @click.stop="handleSelectLocation(item)"
+                class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                :class="{ 'bg-green-200': selectedLocationId === item.id }"
+              >
+                <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
+                <SelectIcon v-else size="sm" class="mr-1" />
+                {{ selectedLocationId === item.id ? "Selected" : "Select" }}
+              </button>
 
-            <button
-              @click.stop="$emit('edit-location', item)"
-              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
-            >
-              <EditIcon size="sm" class="mr-1" />
-              Edit
-            </button>
+              <!-- Edit -->
+              <button
+                @click.stop="$emit('edit-location', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <EditIcon size="sm" class="mr-1" /> Edit
+              </button>
 
-            <button
-              @click.stop="$emit('delete-location', item)"
-              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
-            >
-              <DeleteIcon size="sm" class="mr-1" />
-              Delete
-            </button>
+              <!-- Delete -->
+              <button
+                @click.stop="$emit('delete-location', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+              >
+                <DeleteIcon size="sm" class="mr-1" /> Delete
+              </button>
+            </div>
           </template>
         </ReusableMobileCardList>
 

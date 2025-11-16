@@ -12,7 +12,7 @@
               <DepartmentSelector
                 :departments="departments"
                 :selected-department-id="internalSelectedDepartmentId"
-                @location-changed="handleDepartmentChange"
+                @department-changed="handleDepartmentChange"
               />
             </div>
             <div class="w-full sm:w-auto">

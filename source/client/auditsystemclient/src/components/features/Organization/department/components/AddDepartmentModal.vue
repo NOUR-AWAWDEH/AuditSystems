@@ -2,7 +2,8 @@
   <!--AddDepartmentModal.vue-->
     <Teleport to="body">
         <Transition name="modal">
-            <div v-if="isVisible" class="fixed inset-0 flex items-center justify-center p-4">
+            <div v-if="isVisible"
+              class="fixed inset-0 flex items-center justify-center p-4">
                 <div class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity" @click="$emit('close')"></div>
 
                 <!-- Modal -->
@@ -22,7 +23,7 @@
                         <form @submit.prevent="handleSubmit" class="space-y-4">
                             <!-- Department Name Field -->
                             <div>
-                                <label for="department-name" class="block text-sm font-medium text-gray-700">
+                                <label for="department-name" class="block text-sm font-medium text-secondary-shade mb-1">
                                     Department Name *
                                 </label>
                                 <BaseInput

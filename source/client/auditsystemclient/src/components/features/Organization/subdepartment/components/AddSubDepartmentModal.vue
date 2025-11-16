@@ -2,7 +2,8 @@
     <!--AddSubDepartmentModal.vue-->
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div v-if="isVisible"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity" @click="$emit('close')"></div>
 
@@ -40,7 +41,8 @@
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                 <p class="text-error text-sm">{{ error }}</p>
               </div>
-
+              
+              <!-- Action Buttons -->
               <div class="flex justify-end space-x-3 pt-4">
                 <button type="button" @click="$emit('close')" :disabled="isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-error border border-gray-tint rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">

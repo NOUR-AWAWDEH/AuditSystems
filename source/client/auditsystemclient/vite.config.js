@@ -8,16 +8,6 @@ import path from 'path';
 export default defineConfig(({ mode}) => {
   const env = loadEnv(mode, '.', '');
 
-  const buildTimestamp =
-     new Date().toLocaleString('en-US', {
-        timeZone: 'Africa/Cairo',
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
 
   return {
     // ... keep all your existing config
@@ -30,9 +20,7 @@ export default defineConfig(({ mode}) => {
     },
     define: {
       __VITE_API_URL__: JSON.stringify(env.VITE_API_URL),
-      __VITE_PORT__: JSON.stringify(env.VITE_PORT),
-      __BUILD_TIME__: JSON.stringify(buildTimestamp),
-    },
+      __VITE_PORT__: JSON.stringify(env.VITE_PORT)    },
     preview: {
       host: true,
       allowedHosts: ['auditsystem.online', 'www.auditsystem.online'],

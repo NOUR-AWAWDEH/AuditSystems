@@ -18,7 +18,7 @@
     >
       <button
         @click="goToProfile"
-        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-tint focus:bg-gray-100 transition-colors duration-150"
       >
         <div class="flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -34,7 +34,7 @@
 
       <button
         @click="handleLogout"
-        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-primary-tint focus:bg-gray-100 transition-colors duration-150"
         :disabled="isLoggingOut"
       >
         <div class="flex items-center">

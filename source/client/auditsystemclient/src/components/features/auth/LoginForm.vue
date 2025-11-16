@@ -5,7 +5,7 @@
       <Logo />
     </div>
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
-    
+
     <form @submit.prevent="handleLogin">
       <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
 
@@ -17,7 +17,7 @@
           {{ errorMessage }}
         </div>
       </transition>
-      
+
       <div class="mb-4">
         <label for="username" class="block mb-2 font-medium text-left">User Name</label>
         <BaseInput
@@ -41,27 +41,22 @@
         />
       </div>
 
-      
-      <BaseButton 
-        type="submit" 
-        :disabled="isLoading" 
+
+      <BaseButton
+        type="submit"
+        :disabled="isLoading"
         class="w-full py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base"
       >
         <template #loading>Logging in...</template>
-        <span v-if="!isLoading">Login</span> 
+        <span v-if="!isLoading">Login</span>
         <span v-else>Logging in...</span>
       </BaseButton>
     </form>
-    
+
     <div class="text-center mt-4">
       <BaseLink @click="clearLocalStorage" to="/forgot-password">
         Forgot Password?
       </BaseLink>
-    </div>
-    
-    <!-- Build Time Info (Development Only) -->
-    <div class="text-center mt-2 text-xs text-secondary-base font-mono">
-      Build: {{ buildTime }}
     </div>
   </div>
 </template>
@@ -92,9 +87,6 @@ const isValidationErrorVisible = ref(false);
 
 const errorMessage = ref('')
 const isErrorVisible = ref(false);
-
-// Build time for development
-const buildTime = ref(__BUILD_TIME__);
 
 // Constants
 const ERROR_DISPLAY_DURATION = 5000; // 5 seconds
@@ -140,14 +132,14 @@ const handleLogin = async () => {
   if (!validateForm()) {
     return;
   }
-  
+
   isLoading.value = true;
   errorMessage.value = '';
   isErrorVisible.value = false;
-  
+
   try {
     const response = await login(username.value, password.value);
-    
+
     if (response?.success) {
       router.replace('/dashboard');
     } else {

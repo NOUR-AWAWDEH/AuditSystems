@@ -19,8 +19,7 @@
       aria-label="Toggle password visibility"
     >
       <svg
-        class="h-5 w-5 text-gray-base transition-colors duration-200"
-        :class="{ 'text-secondary-tint': showPassword }"
+        class="h-5 w-5 transition-colors duration-200"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="none"

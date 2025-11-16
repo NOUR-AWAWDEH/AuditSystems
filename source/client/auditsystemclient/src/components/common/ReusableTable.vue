@@ -131,6 +131,7 @@
 </template>
 
 <script setup>
+import { formatDate } from "@/utils/dateUtils";
 defineOptions({ inheritAttrs: false });
 
 defineProps({
@@ -145,12 +146,6 @@ defineProps({
 
 defineEmits(['row-click']);
 
-function formatDate(value) {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (isNaN(d.getTime())) return 'Invalid Date';
-  return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' });
-}
 </script>
 
 <style scoped>

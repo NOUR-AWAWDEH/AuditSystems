@@ -1,20 +1,19 @@
 <template>
   <!--NavBar.vue-->
-  <nav class="bg-linear-to-t  from-secondary-base to-secondary-shade w-full fixed text-white text-xl ">
-    <div class="container flex justify-between items-center">
+  <nav class="bg-linear-to-t from-secondary-base to-secondary-shade w-full fixed text-white text-xl">
+    <div class="w-full px-4 md:px-6 lg:px-8 flex justify-between items-center">
 
       <BaseLink to="/dashboard" variant="logo">
-        <div class="h-16 flex items-center pl-2 py-3">
+        <div class="h-16 flex items-center py-3">
           <Logo variant="white" height="h-5" width="w-auto" />
         </div>
       </BaseLink>
 
-      <div class="flex items-center space-x-6">
-        <div v-if="isAuthenticated" class="relative">
+      <div class="flex items-center">
+        <div v-if="isAuthenticated">
           <button
             @click="handleUserMenuClick"
             class="focus:outline-none flex items-center cursor-pointer"
-            style="position: relative; left: -10px;"
           >
             <UserMenu ref="userMenuRef" />
           </button>

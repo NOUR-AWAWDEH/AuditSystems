@@ -68,6 +68,7 @@
             :sub-departments="subDepartments"
             :selected-sub-department-id="selectedSubDepartmentId"
             @audit-process-selected="handleAuditProcessSelected"
+            @audit-process-deleted="handleAuditProcessDeleted"
           />
         </div>
 
@@ -77,6 +78,7 @@
             :audit-processes="auditProcesses"
             :selected-audit-process-id="selectedAuditProcessId"
             @sub-process-selected="handleSubProcessSelected"
+            @sub-process-deleted="handleSubProcessDeleted"
           />
         </div>
 
@@ -86,6 +88,7 @@
             :sub-processes="subProcesses"
             :selected-sub-process-id="selectedSubProcessId"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
+            @risk-control-matrix-deleted="handleRiskControlMatrixDeleted"
           />
         </div>
 
@@ -96,6 +99,7 @@
             :selected-risk-control-matrix-id="selectedRiskControlMatrixId"
             v-model:selectedObjectiveId="selectedObjectiveId"
             @objective-selected="handleObjectiveSelected"
+            @objective-deleted="handleObjectiveDeleted"
             @add-risks="handleAddRisks"
           />
         </div>
@@ -105,6 +109,7 @@
             v-if="showAddRiskForm"
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
+            @risk-deleted="handleRiskDeleted"
           />
         </div>
 
@@ -114,6 +119,7 @@
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @exit-control-selected="handleExitControlSelected"
+            @exit-control-deleted="handleExitControlDeleted"
           />
         </div>
 
@@ -122,6 +128,7 @@
             :exit-controls="exitControls"
             :selected-exit-control-id="selectedExitControlId"
             @control-design-selected="handleControlDesignSelected"
+            @exit-control-deleted="handleControlDesignDeleted"
           />
         </div>
 
@@ -131,6 +138,7 @@
             :exit-controls="exitControls"
             :selected-exit-control-id="selectedExitControlId"
             @audit-program-selected="handleAuditProgramSelected"
+            @audit-program-deleted="handleAuditProgramDeleted"
           />
         </div>
 
@@ -139,6 +147,7 @@
             :audit-programs="auditPrograms"
             :selected-audit-program-id="selectedAuditProgramId"
             @observation-selected="handleObservationSelected"
+            @observation-deleted="handleObservationDeleted"
           />
         </div>
         <!-- Recommendations -->
@@ -150,6 +159,7 @@
           <!-- <Recommendation
             :observations="observations"
             :selected-observation-id="selectedObservationId"
+            @recommendation-deleted="handleRecommendationDeleted"
           /> -->
         </div>
       </div>
@@ -158,7 +168,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted} from "vue";
+import { useRoute, useRouter } from "vue-router";
+
 import RiskControlHeader from "./components/RiskControlHeader.vue";
 import AuditProcess from "./auditProcess/AuditProcess.vue";
 import SubProcess from "./subProcess/SubProcess.vue";
@@ -179,28 +191,33 @@ import { useGetExitControlsByUserId } from "@/composables/riskControl/exitContro
 import { useGetAuditProgramsByUserId } from "@/composables/riskControl/auditProgram/useGetAuditProgramsByUserId";
 import { useGetObservationsByUserId } from "@/composables/riskControl/observation/useGetObservationsByUserId";
 
+const route = useRoute();
+const router = useRouter();
+
 // State
 const activeTab = ref("processes");
-const isLoading = ref(false);
-const errorMessage = ref(null);
 const showAddRiskForm = ref(false);
 
 // Selected IDs
 const selectedSubDepartmentId = ref(
-  localStorage.getItem("organizationSelectedSubDepartmentId") || ""
+  localStorage.getItem("organizationSelectedSubDepartmentId") || null
 );
-const selectedAuditProcessId = ref(localStorage.getItem("riskControlSelectedAuditProcessId") || "");
-const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId") || "");
+const selectedAuditProcessId = ref(
+  localStorage.getItem("riskControlSelectedAuditProcessId") || null
+);
+const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId") || null);
 const selectedRiskControlMatrixId = ref(
-  localStorage.getItem("riskControlSelectedRiskControlMatrixId") || ""
+  localStorage.getItem("riskControlSelectedRiskControlMatrixId") || null
 );
-const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId") || "");
-const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || "");
+const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId") || null);
+const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || null);
 const selectedControlDesignId = ref(
-  localStorage.getItem("riskControlSelectedControlDesignId") || ""
+  localStorage.getItem("riskControlSelectedControlDesignId") || null
 );
-const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId") || "");
-const selectedObservationId = ref(localStorage.getItem("riskControlSelectedObservationId") || "");
+const selectedAuditProgramId = ref(
+  localStorage.getItem("riskControlSelectedAuditProgramId") || null
+);
+const selectedObservationId = ref(localStorage.getItem("riskControlSelectedObservationId") || null);
 
 // Composables
 const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
@@ -210,12 +227,15 @@ const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskContro
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getExitControlsByUserId, exitControls } = useGetExitControlsByUserId();
 const { getAuditProgramsByUserId, auditPrograms } = useGetAuditProgramsByUserId();
-const { getObservationsByUserId, observations } = useGetObservationsByUserId();
+const { getObservationsByUserId } = useGetObservationsByUserId();
+
+const isLoading = ref(false);
+const errorMessage = ref(null);
 
 // Tabs
 const tabs = ref([
   { id: "processes", name: "Processes" },
-  { id: "subprocesses", name: "Sub Processes" },
+  { id: "subprocesses", name: "Sub-Processes" },
   { id: "matrix", name: "Risk Control Matrix" },
   { id: "objectives", name: "Objectives" },
   { id: "risks", name: "Risks" },
@@ -225,6 +245,75 @@ const tabs = ref([
   { id: "observations", name: "Observations" },
   { id: "recommendations", name: "Recommendations" },
 ]);
+
+const storageKeys = {
+  processes: "riskControlSelectedAuditProcessId",
+  subprocesses: "riskControlSelectedSubProcessId",
+  matrix: "riskControlSelectedRiskControlMatrixId",
+  objectives: "riskControlSelectedObjectiveId",
+  exitcontrols: "riskControlSelectedExitControlId",
+  controldesigns: "riskControlSelectedControlDesignId",
+  auditprograms: "riskControlSelectedAuditProgramId",
+  observations: "riskControlSelectedObservationId",
+};
+
+
+const selectionOrder = [
+  "processes",
+  "subprocesses",
+  "matrix",
+  "objectives",
+  "exitcontrols",
+  "controldesigns",
+  "auditprograms",
+  "observations",
+];
+
+const clearSelectionCascade = (fromKey) => {
+  const start = selectionOrder.indexOf(fromKey);
+  if (start === -1) return;
+  selectionOrder.slice(start).forEach((key) => setSelectedId(key, null));
+};
+
+const setSelectedId = (key, value) => {
+  switch (key) {
+    case "processes":
+      selectedAuditProcessId.value = value;
+      break;
+    case "subprocesses":
+      selectedSubProcessId.value = value;
+      break;
+    case "matrix":
+      selectedRiskControlMatrixId.value = value;
+      break;
+    case "objectives":
+      selectedObjectiveId.value = value;
+      break;
+    case "exitcontrols":
+      selectedExitControlId.value = value;
+      break;
+    case "controldesigns":
+      selectedControlDesignId.value = value;
+      break;
+    case "auditprograms":
+      selectedAuditProgramId.value = value;
+      break;
+    case "observations":
+      selectedObservationId.value = value;
+      break;
+    default:
+      return; // unknown key, nothing to store
+  }
+
+  const storageKey = storageKeys[key];
+  if (!storageKey) return;
+
+  if (value) {
+    localStorage.setItem(storageKey, value);
+  } else {
+    localStorage.removeItem(storageKey);
+  }
+};
 
 // Set active tab & always refresh its data
 const setActiveTab = async (tabId) => {
@@ -318,14 +407,109 @@ const handleObservationSelected = (id) => {
   setActiveTab("recommendations");
 };
 
+// Add Risk
 const handleAddRisks = (objectiveId) => {
   selectedObjectiveId.value = objectiveId;
   activeTab.value = "risks";
   showAddRiskForm.value = true;
 };
 
-// // Init -> load processes tab
-onMounted(() => {
-  setActiveTab("processes");
+// Deleted
+
+
+const handleAuditProcessDeleted = async (deletedId) => {
+  if (selectedAuditProcessId.value === deletedId) {
+    clearSelectionCascade("processes");
+  } await getAuditProcessesByUserId();
+};
+
+const handleSubProcessDeleted = async (deletedId) => {
+  if (selectedSubProcessId.value === deletedId) {
+    clearSelectionCascade("subprocesses");
+  } await getSubProcessesByUserId();
+};
+
+const handleRiskControlMatrixDeleted = async (deletedId) => {
+  if (selectedRiskControlMatrixId.value === deletedId) {
+    clearSelectionCascade("matrix");
+  } await getRiskControlMatricesByUserId();
+};
+
+const handleObjectiveDeleted = async (deletedId) => {
+  if (selectedObjectiveId.value === deletedId) {
+    clearSelectionCascade("objectives");
+  } await getObjectivesByUserId();
+};
+
+const handleRiskDeleted = async () => { await getObjectivesByUserId(); };
+
+const handleExitControlDeleted = async (deletedId) => {
+  if (selectedExitControlId.value === deletedId) {
+    clearSelectionCascade("exitcontrols");
+  } await getExitControlsByUserId();
+};
+
+const handleControlDesignDeleted = async (deletedId) => {
+  if (selectedControlDesignId.value === deletedId) {
+    clearSelectionCascade("controldesigns");
+  } await getExitControlsByUserId();
+};
+
+const handleAuditProgramDeleted = async (deletedId) => {
+  if (selectedAuditProgramId.value === deletedId){
+    clearSelectionCascade("auditprograms");
+  } await getAuditProgramsByUserId();
+};
+
+const handleObservationDeleted = async (deletedId) => {
+  if (selectedObservationId.value === deletedId) {
+    clearSelectionCascade("observations");
+  } await getObservationsByUserId();
+};
+
+//const handleRecommendationDeleted = async () => { await getObservationsByUserId() };
+
+
+const handleRouteQueries = async () => {
+  const {
+    subDepartmentId,
+    auditProcessId,
+    subProcessId,
+    riskControlMatrixId,
+    objectiveId,
+    exitControlId,
+    controlDesignId,
+    auditProgramId,
+    observationId,
+    tab,
+  } = route.query;
+
+  if (tab && tabs.value.some((t) => t.id === tab)) {
+    activeTab.value = tab;
+  }
+
+  if (subDepartmentId) {
+    selectedSubDepartmentId.value = subDepartmentId;
+    localStorage.setItem("organizationSelectedSubDepartmentId", subDepartmentId);
+    await getSubDepartmentsByUserId();
+  }
+
+  if (auditProcessId) setSelectedId("processes", auditProcessId);
+  if (subProcessId) setSelectedId("subprocesses", subProcessId);
+  if (riskControlMatrixId) setSelectedId("matrix", riskControlMatrixId);
+  if (objectiveId) setSelectedId("objectives", objectiveId);
+  if (exitControlId) setSelectedId("exitcontrols", exitControlId);
+  if (controlDesignId) setSelectedId("controldesigns", controlDesignId);
+  if (auditProgramId) setSelectedId("auditprograms", auditProgramId);
+  if (observationId) setSelectedId("observations", observationId);
+
+  if (Object.keys(route.query).length) {
+    await router.replace({ path: "/risk-control" });
+  }
+};
+
+onMounted(async () => {
+  await handleRouteQueries();
+  await setActiveTab(activeTab.value);
 });
 </script>

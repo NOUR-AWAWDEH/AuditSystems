@@ -116,8 +116,7 @@ const router = useRouter();
 const activeTab = ref("locations");
 const selectedLocationId = ref(localStorage.getItem("organizationSelectedLocationId") || null);
 const selectedDepartmentId = ref(localStorage.getItem("organizationSelectedDepartmentId") || null);
-const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || null
-);
+const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || null);
 
 const { getLocationsByUserId, locations } = useGetLocationsByUserId();
 const { getLocationById } = useGetLocationById();
@@ -136,20 +135,34 @@ const tabs = ref([
   { id: "subdepartments", name: "Sub-Departments" },
 ]);
 
+const storageKeys = {
+  locations: "organizationSelectedLocationId",
+  departments: "organizationSelectedDepartmentId",
+  subdepartments: "organizationSelectedSubDepartmentId"
+}
+
 const setSelectedId = (key, value) => {
   switch (key) {
     case "location":
       selectedLocationId.value = value;
-      localStorage.setItem("organizationSelectedLocationId", value || "");
       break;
     case "department":
       selectedDepartmentId.value = value;
-      localStorage.setItem("organizationSelectedDepartmentId", value || "");
       break;
     case "subDepartment":
       selectedSubDepartmentId.value = value;
-      localStorage.setItem("organizationSelectedSubDepartmentId", value || "");
       break;
+    default:
+      return;
+  }
+
+  const storageKey = storageKeys[key];
+  if (!storageKey) return;
+
+  if (value) {
+    localStorage.setItem(storageKey, value);
+  } else {
+    localStorage.removeItem(storageKey)
   }
 };
 
@@ -207,10 +220,10 @@ const handleSubDepartmentDeleted = (deletedId) => {
 
 const setActiveTab = async (tabId) => {
   activeTab.value = tabId;
-  try {
-    isLoading.value = true;
-    errorMessage.value = null;
+  isLoading.value = true;
+  errorMessage.value = null;
 
+  try {
     switch (tabId) {
       case "locations":
         if (locationViewRef.value) {

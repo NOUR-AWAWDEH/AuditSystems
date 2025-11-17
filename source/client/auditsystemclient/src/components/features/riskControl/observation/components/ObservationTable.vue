@@ -30,7 +30,7 @@
 
                 <!-- Keep only this Selected AuditProgram Info section -->
                 <div v-if="selectedAuditProgramId"
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                     class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                      <div class="flex items-center justify-between">
                          <div class="flex items-center">
                              <AuditProgramIcon size="xxl" custom-class="text-blue-600 mr-2" />
@@ -54,13 +54,13 @@
 
                 <!-- Table Container - Show when AuditProgram is Selected -->
                 <div v-if="selectedAuditProgramId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
-                        :items="observations" 
-                        :columns="enhancedColumns" 
-                        :is-loading="isLoading" 
+                    <ReusableTable
+                        :items="observations"
+                        :columns="enhancedColumns"
+                        :is-loading="isLoading"
                         :actions="[]"
-                        :no-data-message="noDataMessage" 
-                        class="observation-table" 
+                        :no-data-message="noDataMessage"
+                        class="observation-table"
                         >
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
@@ -97,9 +97,9 @@
                 </div>
 
                 <!-- No AuditProgram Selected - Show when no auditProgram is selected -->
-                 <NoAuditProgramSelected 
+                 <NoAuditProgramSelected
                     v-if="!isAuditProgramLoading && auditPrograms.length === 0"
-                    :audit-programs="auditPrograms" 
+                    :audit-programs="auditPrograms"
                  />
 
             </div>

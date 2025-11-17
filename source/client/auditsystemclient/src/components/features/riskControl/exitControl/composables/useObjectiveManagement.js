@@ -54,7 +54,7 @@ export function useObjectiveManagement(objectives) {
 
     const currentObjective = computed(() => {
         const objective = fetchObjective?.value || selectedObjective?.value;
-        return objective?.ObjectiveModel || objective;
+        return objective?.objectiveModel || objective;
     });
 
     return {

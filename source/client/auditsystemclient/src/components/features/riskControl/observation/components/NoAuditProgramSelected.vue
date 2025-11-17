@@ -4,7 +4,7 @@
         <!-- When audit programs are available but none selected -->
         <div v-if="auditPrograms && auditPrograms.length > 0" class="max-w-md mx-auto">
             <div
-                class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
+                class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
                 <AuditProgramIcon size="xxxl" custom-class="text-blue-600" />
             </div>
             <h3 class="text-2xl font-bold text-gray-800 mb-4">
@@ -26,7 +26,7 @@
         <!-- When no audit programs are available -->
         <div v-else class="max-w-lg mx-auto">
             <div
-                class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
+                class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
                 <AuditProgramIcon size="xxxl" custom-class="text-gray-400" />
             </div>
             <h3 class="text-2xl font-bold text-gray-800 mb-4">

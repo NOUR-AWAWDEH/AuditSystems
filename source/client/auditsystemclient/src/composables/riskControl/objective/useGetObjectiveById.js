@@ -38,7 +38,7 @@ export function useGetObjectiveById() {
         }
     };
 
-    const getObjectiveById = async (objectiveId) => {   
+    const getObjectiveById = async (objectiveId) => {
         try {
             isLoading.value = true;
             error.value = null;
@@ -46,7 +46,7 @@ export function useGetObjectiveById() {
 
             const validationError = validateObjectiveId(objectiveId);
             if (validationError) {
-                return handleFetchFailure({ message: validationError });
+                return handleFetchFailure(validationError);
             }
 
             const response = await getObjectiveByIdRepository.getObjectiveById(objectiveId);
@@ -59,7 +59,7 @@ export function useGetObjectiveById() {
 
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch objective');
-        
+
         } finally {
             isLoading.value = false;
         }

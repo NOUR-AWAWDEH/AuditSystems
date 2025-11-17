@@ -22,8 +22,8 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div 
-        v-for="stat in dashboardStats" 
+      <div
+        v-for="stat in dashboardStats"
         :key="stat.title"
         class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
       >
@@ -32,7 +32,7 @@
             <p class="text-gray-600 text-sm font-medium mb-1">{{ stat.title }}</p>
             <p class="text-3xl font-bold text-secondary-base">{{ stat.value }}</p>
             <div class="flex items-center mt-2">
-              <span 
+              <span
                 :class="[
                   'text-sm font-medium',
                   stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
@@ -59,8 +59,8 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 class="text-xl font-semibold text-secondary-base mb-4">Quick Actions</h3>
           <div class="space-y-4">
-            <div 
-              v-for="action in quickActions" 
+            <div
+              v-for="action in quickActions"
               :key="action.title"
               class="flex items-center p-4 rounded-lg border border-gray-200 hover:border-primary-base hover:shadow-sm transition-all duration-200 cursor-pointer group"
             >
@@ -91,13 +91,13 @@
             </button>
           </div>
           <div class="space-y-4">
-            <div 
-              v-for="activity in recentActivities" 
+            <div
+              v-for="activity in recentActivities"
               :key="activity.id"
               class="flex items-start p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200"
             >
-              <div class="flex-shrink-0 mr-4">
-                <div 
+              <div class="shrink-0 mr-4">
+                <div
                   :class="[
                     'w-10 h-10 rounded-full flex items-center justify-center',
                     activity.type === 'create' ? 'bg-green-100' :
@@ -106,22 +106,22 @@
                     'bg-orange-100'
                   ]"
                 >
-                  <svg 
-                    class="w-5 h-5" 
+                  <svg
+                    class="w-5 h-5"
                     :class="[
                       activity.type === 'create' ? 'text-green-600' :
                       activity.type === 'upload' ? 'text-blue-600' :
                       activity.type === 'complete' ? 'text-purple-600' :
                       'text-orange-600'
                     ]"
-                    fill="none" 
-                    stroke="currentColor" 
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      stroke-width="2" 
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
                       :d="activity.type === 'create' ? 'M12 4v16m8-8H4' :
                           activity.type === 'upload' ? 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10' :
                           activity.type === 'complete' ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' :
@@ -152,7 +152,7 @@
             <div class="relative w-24 h-24 mx-auto mb-4">
               <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"></circle>
-                <circle cx="50" cy="50" r="40" stroke="#8b5cf6" stroke-width="8" fill="none" 
+                <circle cx="50" cy="50" r="40" stroke="#8b5cf6" stroke-width="8" fill="none"
                         stroke-dasharray="251.2" stroke-dashoffset="75.36" stroke-linecap="round"></circle>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">
@@ -166,7 +166,7 @@
             <div class="relative w-24 h-24 mx-auto mb-4">
               <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"></circle>
-                <circle cx="50" cy="50" r="40" stroke="#10b981" stroke-width="8" fill="none" 
+                <circle cx="50" cy="50" r="40" stroke="#10b981" stroke-width="8" fill="none"
                         stroke-dasharray="251.2" stroke-dashoffset="50.24" stroke-linecap="round"></circle>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">
@@ -180,7 +180,7 @@
             <div class="relative w-24 h-24 mx-auto mb-4">
               <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"></circle>
-                <circle cx="50" cy="50" r="40" stroke="#f59e0b" stroke-width="8" fill="none" 
+                <circle cx="50" cy="50" r="40" stroke="#f59e0b" stroke-width="8" fill="none"
                         stroke-dasharray="251.2" stroke-dashoffset="100.48" stroke-linecap="round"></circle>
               </svg>
               <div class="absolute inset-0 flex items-center justify-center">

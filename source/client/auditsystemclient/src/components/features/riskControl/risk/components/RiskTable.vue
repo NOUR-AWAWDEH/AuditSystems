@@ -28,7 +28,7 @@
                 </div>
 
                 <div v-if="selectedObjectiveId"
-                    class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                    class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
@@ -67,7 +67,7 @@
 
                         <template #cell-actions="{ item }">
                             <div class="flex items-center gap-2">
-                                
+
                                 <button @click.stop="$emit('edit-risk', item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200">
                                     <EditIcon size="sm" custom-class="mr-1" />
@@ -94,7 +94,7 @@
 
                 <div v-else class="text-center py-20">
                     <div v-if="objectives && objectives.length > 0" class="max-w-md mx-auto">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
+                        <div class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
                             <ObjectiveIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">Select an Objective</h3>
@@ -107,7 +107,7 @@
                     </div>
 
                     <div v-else class="max-w-lg mx-auto">
-                        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
+                        <div class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
                             <ObjectiveIcon size="xxxl" custom-class="text-gray-400" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">No Objectives Available</h3>
@@ -188,7 +188,7 @@ watch(internalSelectedObjectiveId, (newVal) => {
     props.handleObjectiveChange(newVal);
 });
 
-const emit = defineEmits([
+defineEmits([
     'add-risk',
     'edit-risk',
     'delete-risk',

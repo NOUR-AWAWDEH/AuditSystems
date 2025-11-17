@@ -5,17 +5,17 @@
       <!-- Main Content with full height -->
       <div class="flex-1 min-h-screen p-3 sm:p-4 md:p-6">
         <h2 class="text-lg sm:text-xl md:text-2xl font-bold mb-4 md:mb-6 text-secondary-base">Supporting Documents</h2>
-        
+
         <!-- Loading State -->
         <div v-if="isLoadingDocuments" class="text-center py-6 md:py-8">
           <div class="inline-block animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-primary-base"></div>
           <p class="mt-2 text-gray-600 text-sm md:text-base">Loading your documents...</p>
         </div>
-        
+
         <!-- Error State -->
         <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-md p-3 md:p-4 mb-4">
           <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
-            <svg class="h-5 w-5 text-red-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
             <div class="flex-1">
@@ -27,17 +27,17 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Main Content -->
         <div v-else class="space-y-4 md:space-y-6">
           <DocumentUploadSection @documents-refreshed="handleDocumentsRefreshed" />
           <div>
-            <DocumentsTable 
-              :documents="documents" 
+            <DocumentsTable
+              :documents="documents"
               @delete-document="handleDocumentDeleted"
             />
           </div>
-          
+
           <!-- Debug Info (remove in production) -->
           <div v-if="documents.length === 0" class="mt-4 p-3 md:p-4 bg-primary-base rounded-md">
             <p class="text-white text-sm md:text-base">No documents found. Upload some documents to see them here.</p>
@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Confirm Delete Dialog -->
     <ConfirmDialog
       v-model="showConfirmDialog"
@@ -107,7 +107,7 @@ async function loadDocuments() {
   try {
     isLoadingDocuments.value = true;
     error.value = null;
-    
+
     const token = authService.getLocalToken();
     if (!token) {
       error.value = 'Please login to view documents';
@@ -121,7 +121,7 @@ async function loadDocuments() {
 
     if (authStatus.value?.userId) {
       const response = await fetchDocumentsByUserId(authStatus.value.userId);
-      
+
       if (response?.success) {
         setDocuments(response.result);
       } else {
@@ -152,10 +152,10 @@ function handleDocumentDeleted(document) {
 // Handle confirmation from dialog
 async function confirmDelete() {
   if (!documentToDelete.value) return;
-  
+
   try {
     const result = await deleteSupportingDocumentById(documentToDelete.value.id);
-    
+
     if (result.success) {
       // Remove from local state
       removeDocument(documentToDelete.value.id);
@@ -174,15 +174,15 @@ async function confirmDelete() {
 // Helper function for clean file name (same as in DocumentsTable)
 function getCleanFileName(fileName) {
   if (!fileName) return 'Unknown';
-  
+
   // Remove the unique ID pattern (underscore followed by 32 characters before the file extension)
   const regex = /^(.+)_[a-f0-9]{32}(\.[^.]+)$/i;
   const match = fileName.match(regex);
-  
+
   if (match) {
     return match[1] + match[2]; // Return original name + extension
   }
-  
+
   return fileName;
 }
 

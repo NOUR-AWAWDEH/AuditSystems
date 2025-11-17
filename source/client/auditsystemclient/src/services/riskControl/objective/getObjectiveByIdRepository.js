@@ -25,7 +25,7 @@ export const getObjectiveByIdRepository = {
             responseData = data;
 
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result?.ObjectiveModel, data?.successMessage || 'Objective retrieved successfully');
+                return ApiResponseT.ok(data?.result?.objectiveModel, data?.successMessage || 'Objective retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

@@ -11,6 +11,7 @@
 
         <!-- Department Management -->
         <DepartmentTable
+            v-if="props.locations && props.locations.length > 0"
             :locations="props.locations"
             :departments="departments"
             :is-loading="isLoading"
@@ -25,6 +26,10 @@
             @edit-department="handleEditDepartment"
             @delete-department="handleDeleteDepartment"
             @department-selected="handleDepartmentSelected"
+        />
+
+        <!-- Show big Location icon when no Location exist -->
+        <NoLocationExit v-else
         />
 
         <!-- Edit Department Modal -->
@@ -58,6 +63,7 @@ import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
 import { watch } from 'vue';
 import { useDepartmentModals } from './composables/useDepartmentModals';
+import  NoLocationExit from './components/NoLocationExist.vue'
 
 const props = defineProps({
     locations: {

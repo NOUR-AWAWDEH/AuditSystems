@@ -3,8 +3,8 @@
     :to="route"
     :class="[
       'flex items-center rounded transition-all duration-200',
-      isActive ? 'bg-secondary-shade' : '',
-      'hover:bg-secondary-shade active:bg-secondary-shade focus:bg-secondary-shade',
+      isActive ? 'bg-tertiary-shade' : '',
+      'hover:bg-secondary-shade active:bg-tertiary-shade focus:bg-tertiary-shade',
       isCollapsed ? 'py-2 px-1 sm:px-2 justify-center' : 'py-2 px-2 sm:px-3 md:px-4',
     ]"
   >

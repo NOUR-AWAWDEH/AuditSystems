@@ -168,7 +168,12 @@ const props = defineProps({
   handleSearch: Function,
 });
 
-const emit = defineEmits(["add-location", "edit-location", "delete-location", "location-selected"]);
+const emit = defineEmits([
+  "add-location",
+  "edit-location",
+  "delete-location",
+  "location-selected"
+]);
 
 const selectedLocationId = ref(null);
 

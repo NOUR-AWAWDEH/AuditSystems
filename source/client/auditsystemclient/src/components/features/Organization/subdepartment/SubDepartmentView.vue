@@ -10,6 +10,7 @@
         />
 
         <SubDepartmentTable
+          v-if="props.departments && props.departments.length > 0"
             :departments="props.departments"
             :sub-departments="subDepartments"
             :is-loading="isLoading"
@@ -24,6 +25,10 @@
             @edit-sub-department="handleEditSubDepartment"
             @delete-sub-department="handleDeleteSubDepartment"
             @sub-department-selected="handleSubDepartmentSelected"
+        />
+
+        <!-- Show big department icon when no sub-departments exist -->
+        <NoDepartmentExist v-else
         />
 
         <!-- Edit SubDepartment Modal -->
@@ -56,6 +61,7 @@ import AddSubDepartmentModal from './components/AddSubDepartmentModal.vue'
 import EditSubDepartmentModal from './components/EditSubDepartmentModal.vue';
 import { useSubDepartmentTable } from './composables/useSubDepartmentTable';
 import { useSubDepartmentModals } from './composables/useSubDepartmentModals';
+import NoDepartmentExist from './components/NoDepartmentExist.vue';
 import { watch} from 'vue';
 
 const props = defineProps({

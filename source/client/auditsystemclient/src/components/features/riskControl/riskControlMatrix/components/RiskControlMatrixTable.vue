@@ -30,7 +30,7 @@
 
                 <!-- Keep only this Selected SubProcess Info section -->
                 <div v-if="selectedSubProcessId"
-                     class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                     class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
                      <div class="flex items-center justify-between">
                          <div class="flex items-center">
                              <ProcessIcon size="lg" custom-class="text-blue-600 mr-2" />
@@ -54,7 +54,7 @@
 
                 <!-- Table Container - Show when SubProcess is Selected -->
                 <div v-if="selectedSubProcessId" class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                    <ReusableTable 
+                    <ReusableTable
                         :items="riskControlMatrices"
                         :columns="enhancedColumns"
                         :is-loading="isLoading"
@@ -100,7 +100,7 @@
                 <div v-else class="text-center py-20">
                     <!-- When sub processes are available but none selected -->
                     <div v-if="subProcesses && subProcesses.length > 0" class="max-w-md mx-auto">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
+                        <div class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg">
                             <ProcessIcon size="xxxl" custom-class="text-blue-600" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Sub Process</h3>
@@ -114,7 +114,7 @@
 
                     <!-- When no sub processes are available -->
                     <div v-else class="max-w-lg mx-auto">
-                        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
+                        <div class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300">
                             <ProcessIcon size="xxxl" custom-class="text-gray-400" />
                         </div>
                         <h3 class="text-2xl font-bold text-gray-800 mb-4">No Sub Processes Available</h3>

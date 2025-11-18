@@ -46,11 +46,11 @@ export function useGetExitControlById() {
 
             const validationError = validateExitControlId(exitControlId);
             if (validationError) {
-                return handleFetchFailure({ message: validationError });
+                return handleFetchFailure(validationError);
             }
 
             const response = await getExitControlByIdRepository.getExitControlById(exitControlId);
-            
+
             if (response?.success) {
                 return handleFetchSuccess(response);
             } else {
@@ -59,7 +59,7 @@ export function useGetExitControlById() {
 
         } catch (error) {
             return handleFetchFailure(error, error.message || 'Failed to fetch exit control');
-        
+
         } finally {
             isLoading.value = false;
         }

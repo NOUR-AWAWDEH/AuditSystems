@@ -4,28 +4,28 @@
     <Transition name="modal">
       <div v-if="isVisible && isMounted" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div 
+        <div
           class="absolute inset-0 bg-gray-shade bg-opacity-80 transition-opacity"
           @click="onCancel"
         ></div>
-        
+
         <!-- Dialog -->
         <div class="relative bg-white rounded-lg shadow-xl max-w-sm sm:max-w-md w-full mx-4 transform transition-all">
           <!-- Header -->
           <div class="flex items-center p-3 sm:p-4 border-b border-gray-tint">
-            <div class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-soft-error rounded-full flex items-center justify-center">
+            <div class="shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-soft-error rounded-full flex items-center justify-center">
               <svg class="w-4 h-4 sm:w-5 sm:h-5 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
             <h3 class="ml-2 sm:ml-3 text-sm sm:text-base font-medium text-gray-shade font-poppins">{{ title }}</h3>
           </div>
-          
+
           <!-- Content -->
           <div class="p-3 sm:p-4">
             <p class="text-xs sm:text-sm text-gray-base font-poppins leading-relaxed" v-html="formattedMessage"></p>
           </div>
-          
+
           <!-- Actions -->
           <div class="flex flex-col gap-2 p-3 sm:p-4 border-t border-gray-tint">
             <button
@@ -95,11 +95,11 @@ const formattedMessage = computed(() => {
   if (!props.highlightText) {
     return props.message;
   }
-  
+
   // Escape HTML and highlight the specified text
   const escapedMessage = props.message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const escapedHighlight = props.highlightText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  
+
   return escapedMessage.replace(
     new RegExp(`"${escapedHighlight}"`, 'g'),
     `"<span class="text-error font-medium">${escapedHighlight}</span>"`

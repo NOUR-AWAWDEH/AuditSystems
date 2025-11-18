@@ -1,5 +1,5 @@
 <template>
-    <!--ControlDesignVue.vue-->
+  <!--ControlDesignVue.vue-->
   <div class="space-y-6">
     <!-- Add Control Design Modal -->
     <AddControlDesignModal
@@ -32,18 +32,18 @@
     <div v-else class="text-center py-20">
       <div class="max-w-lg mx-auto">
         <div
-          class="bg-gradient-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32
-          mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base"
+          class="bg-linear-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base"
         >
           <RiskIcon size="xxxl" custom-class="text-primary-shade" />
         </div>
         <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Control Designs Available</h3>
         <p class="text-gray-base mb-6 text-sm leading-relaxed">
-          You need to create exit controls with inadequate status first before you can manage Control Designs
+          You need to create exit controls with inadequate status first before you can manage
+          Control Designs
         </p>
         <div class="bg-white border border-tertiary-shade rounded-lg p-6">
           <div class="flex items-start space-x-3">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <svg
                 class="w-6 h-6 text-tertiary-shade"
                 fill="none"
@@ -54,8 +54,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 
-                  4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 
+                  d="M12 9v2m0 4h.01m-6.938
+                  4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732
                   0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                 />
               </svg>
@@ -97,62 +97,62 @@
 </template>
 
 <script setup>
-import { watch, computed } from 'vue';
-import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import ControlDesignTable from './components/ControlDesignTable.vue';
-import AddControlDesignModal from './components/AddControlDesignModal.vue';
-import EditControlDesignModal from './components/EditControlDesignModal.vue';
-import { useControlDesignTable } from './composables/useControlDesignTable.js';
-import { useControlDesignModals } from './composables/useControlDesignModals.js';
-import RiskIcon from '@/components/common/icons/RiskIcon.vue';
+import { watch, computed } from "vue";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import ControlDesignTable from "./components/ControlDesignTable.vue";
+import AddControlDesignModal from "./components/AddControlDesignModal.vue";
+import EditControlDesignModal from "./components/EditControlDesignModal.vue";
+import { useControlDesignTable } from "./composables/useControlDesignTable.js";
+import { useControlDesignModals } from "./composables/useControlDesignModals.js";
+import RiskIcon from "@/components/common/icons/RiskIcon.vue";
 
 const props = defineProps({
-    exitControls: {
-        type: Array,
-        default: () => [],
-    },
-    selectedExitControlId: {
-        type: [String, Number],
-        default: null
-    }
+  exitControls: {
+    type: Array,
+    default: () => [],
+  },
+  selectedExitControlId: {
+    type: [String, Number],
+    default: null,
+  },
 });
 
 const emit = defineEmits([
-    'control-design-selected',
-    'control-design-added',
-    'control-design-updated',
-    'control-design-deleted'
+  "control-design-selected",
+  "control-design-added",
+  "control-design-updated",
+  "control-design-deleted",
 ]);
 
 // Computed property to filter exitControls
 const filteredExitControls = computed(() => {
-  return props.exitControls.filter(control => control.inadequate);
+  return props.exitControls.filter((control) => control.inadequate);
 });
 
 // Composable
 const {
-    controlDesigns,
-    isLoading,
-    selectedExitControlId : internalSelectedExitControlId,
-    selectedExitControl,
-    currentExitControl,
-    isExitControlLoading,
-    searchQuery,
-    handleControlDesignChange,
-    handleSearch,
-    resetToDefaultView,
+  controlDesigns,
+  isLoading,
+  selectedExitControlId: internalSelectedExitControlId,
+  selectedExitControl,
+  currentExitControl,
+  isExitControlLoading,
+  searchQuery,
+  handleControlDesignChange,
+  handleSearch,
+  resetToDefaultView,
 } = useControlDesignTable(props.exitControls);
 
 // ✅ Single watcher (merged both into one)
 watch(
   () => props.selectedExitControlId,
   (newExitControlId) => {
-    if (newExitControlId && !filteredExitControls.value.some(ec => ec.id === newExitControlId)) {
+    if (newExitControlId && !filteredExitControls.value.some((ec) => ec.id === newExitControlId)) {
       // Clear invalid selection
-      internalSelectedExitControlId.value = '';
+      internalSelectedExitControlId.value = "";
       localStorage.removeItem("riskControlSelectedExitControlId");
     } else {
-      internalSelectedExitControlId.value = newExitControlId || '';
+      internalSelectedExitControlId.value = newExitControlId || "";
     }
 
     // If still no selection, auto-select first valid exit control
@@ -170,36 +170,35 @@ watch(
 
 // Modal handling
 const {
-    showAddControlDesignModal,
-    showEditControlDesignModal,
-    controlDesignToEdit,
-    showDeleteDialog,
-    deleteDialogTitle,
-    deleteDialogMessage,
-    itemToDelete,
-    handleAddControlDesign,
-    handleEditControlDesign,
-    handleControlDesignAdded,
-    handleControlDesignUpdated,
-    confirmDelete,
-    handleCloseAddControlDesignModal,
-    handleCloseEditControlDesignModal,
-    handleDeleteControlDesign,
-    cancelDelete
+  showAddControlDesignModal,
+  showEditControlDesignModal,
+  controlDesignToEdit,
+  showDeleteDialog,
+  deleteDialogTitle,
+  deleteDialogMessage,
+  itemToDelete,
+  handleAddControlDesign,
+  handleEditControlDesign,
+  handleControlDesignAdded,
+  handleControlDesignUpdated,
+  confirmDelete,
+  handleCloseAddControlDesignModal,
+  handleCloseEditControlDesignModal,
+  handleDeleteControlDesign,
+  cancelDelete,
 } = useControlDesignModals(controlDesigns, emit);
 
 // Forward selection event
 const handleControlDesignSelected = (controlDesign) => {
-  emit('control-design-selected', controlDesign);
+  emit("control-design-selected", controlDesign);
 };
 
 defineExpose({
   controlDesigns,
   selectedExitControlId: internalSelectedExitControlId,
-  resetToDefaultView
+  resetToDefaultView,
 });
 </script>
-
 
 <style scoped>
 .control-design-table .table-row {

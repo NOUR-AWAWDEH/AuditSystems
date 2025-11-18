@@ -1,34 +1,28 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const notification = ref({
-  show: false,
-  message: '',
-  type: 'info', // success, error, warning, info
-  timeout: null,
-});
+const notifications = ref([]);
 
 export function useNotification() {
-  const showNotification = (message, type = 'info', duration = 4000) => {
-    if (notification.value.timeout) {
-      clearTimeout(notification.value.timeout);
-    }
-    notification.value.show = true;
-    notification.value.message = message;
-    notification.value.type = type;
-    notification.value.timeout = setTimeout(() => {
-      notification.value.show = false;
-    }, duration);
+  const showNotification = (message, type = "info", duration = 4000) => {
+    const id = Date.now();
+
+    notifications.value.push({
+      id,
+      message,
+      type,
+      show: true,
+    });
+
+    setTimeout(() => hideNotification(id), duration);
   };
 
-  const hideNotification = () => {
-    if (notification.value.timeout) {
-      clearTimeout(notification.value.timeout);
-    }
-    notification.value.show = false;
+  const hideNotification = (id) => {
+    const index = notifications.value.findIndex((n) => n.id === id);
+    if (index !== -1) notifications.value.splice(index, 1);
   };
 
   return {
-    notification,
+    notifications,
     showNotification,
     hideNotification,
   };

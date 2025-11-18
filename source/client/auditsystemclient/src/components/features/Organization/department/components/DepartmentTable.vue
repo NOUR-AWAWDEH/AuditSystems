@@ -12,6 +12,7 @@
               <LocationSelector
                 :locations="locations"
                 :selected-location-id="internalSelectedLocationId"
+                @update:selected-location="(id) => (internalSelectedLocationId = id)"
                 @location-changed="handleLocationChange"
               />
             </div>
@@ -37,8 +38,8 @@
               <div class="flex-1 min-w-0">
                 <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
                   <span>Showing departments for:</span>
-                  <span class="ml-1 font-semibold text-blue-800">
-                    <span v-if="isLocationLoading">Loading...</span>
+                  <span class="ml-1 font-semibold text-primary-shade">
+                    <span v-if="isLocationLoading">Loading location...</span>
                     <span v-else>{{ currentLocation?.name }}</span>
                   </span>
                   <span v-if="searchQuery" class="ml-2 text-blue-600">
@@ -82,7 +83,7 @@
 
                 <button
                   @click.stop="$emit('edit-department', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
@@ -90,8 +91,7 @@
 
                 <button
                   @click.stop="$emit('delete-department', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
-                >
+                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200">
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>

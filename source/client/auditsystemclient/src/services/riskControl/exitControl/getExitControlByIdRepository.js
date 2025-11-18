@@ -21,7 +21,8 @@ export const getExitControlByIdRepository = {
                 });
 
             const { data, status } = response;
-            responseData = data;
+          responseData = data;
+          
             if (status === 200 && data?.success !== false) {
                 return ApiResponseT.ok(data?.result?.exitControlModel, data?.successMessage || 'Exit Control retrieved successfully');
             }

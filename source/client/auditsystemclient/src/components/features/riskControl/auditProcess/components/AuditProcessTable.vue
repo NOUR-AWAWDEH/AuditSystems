@@ -15,7 +15,6 @@
               @sub-department-changed="(id) => (internalSelectedSubDepartmentId = id)"
             />
           </div>
-
           <div class="w-full sm:w-auto">
             <SearchFilter
               :search="searchQuery"
@@ -60,8 +59,7 @@
         </div>
 
         <!-- Desktop Table -->
-        <div
-          v-if="internalSelectedSubDepartmentId" class="hidden md:block rounded-lg border border-gray-200">
+        <div v-if="internalSelectedSubDepartmentId" class="hidden md:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="auditProcesses"
             :columns="enhancedColumns"
@@ -77,18 +75,14 @@
                   class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                   :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
                 >
-                  <CheckIcon
-                    v-if="selectedAuditProcessId === item.id"
-                    size="sm"
-                    custom-class="mr-1"
-                  />
+                  <CheckIcon v-if="selectedAuditProcessId === item.id" size="sm" custom-class="mr-1" />
                   <SelectIcon v-else size="sm" custom-class="mr-1" />
                   {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
                 </button>
 
-                <button
+               <button
                   @click.stop="$emit('edit-audit-process', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-primary-shade focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
@@ -96,75 +90,74 @@
 
                 <button
                   @click.stop="$emit('delete-audit-process', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
-                >
+                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200">
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>
               </div>
             </template>
           </ReusableTable>
+        </div>
 
-          <!-- Mobile Card View -->
-
-          <ReusableMobileCardList
-            v-if="internalSelectedSubDepartmentId"
-            :items="auditProcesses"
-            :showNumber="true"
-            :isLoading="isLoading"
-            :noDataMessage="noDataMessage"
-            class="md:hidden"
-          >
-            <template #card-content="{ item }">
-              <div class="space-y-4">
-                <div class="border-b border-gray-100 pb-3">
-                  <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                    Process Name
-                  </div>
-                  <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
-                    {{ item.processName }}
-                  </div>
+        <!-- Mobile Card View -->
+        <ReusableMobileCardList
+          v-if="internalSelectedSubDepartmentId"
+          :items="auditProcesses"
+          :showNumber="true"
+          :isLoading="isLoading"
+          :noDataMessage="noDataMessage"
+          class="md:hidden"
+        >
+          <template #card-content="{ item }">
+            <div class="space-y-4">
+              <div class="border-b border-gray-100 pb-3">
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Process Name
                 </div>
-
-                <div>
-                  <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                    Created At
-                  </div>
-                  <div class="text-gray-400 text-xs font-medium">
-                    {{ formatDateSimple(item.createdAt) }}
-                  </div>
+                <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
+                  {{ item.processName }}
                 </div>
               </div>
-            </template>
 
-            <template #card-actions="{ item }">
-              <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
-                <button
-                  @click.stop="handleSelectDepartment(item)"
-                  class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
-                  :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
-                >
-                  <CheckIcon v-if="selectedAuditProcessId === item.id" size="sm" class="mr-1" />
-                  <SelectIcon v-else size="sm" class="mr-1" />
-                  {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
-                </button>
-
-                <button
-                  @click.stop="$emit('edit-department', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
-                >
-                  <EditIcon size="sm" class="mr-1" /> Edit
-                </button>
-
-                <button
-                  @click.stop="$emit('delete-department', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
-                >
-                  <DeleteIcon size="sm" class="mr-1" /> Delete
-                </button>
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Created At
+                </div>
+                <div class="text-gray-400 text-xs font-medium">
+                  {{ formatDateSimple(item.createdAt) }}
+                </div>
               </div>
-            </template>
-          </ReusableMobileCardList>
+            </div>
+          </template>
+
+          <template #card-actions="{ item }">
+            <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
+              <button
+                @click.stop="handleSelectAuditProcess(item)"
+                class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
+              >
+                <CheckIcon v-if="selectedAuditProcessId === item.id" size="sm" class="mr-1" />
+                <SelectIcon v-else size="sm" class="mr-1" />
+                {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
+              </button>
+
+              <button
+                @click.stop="$emit('edit-audit-process', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <EditIcon size="sm" class="mr-1" /> Edit
+              </button>
+
+              <button
+                @click.stop="$emit('delete-audit-process', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+              >
+                <DeleteIcon size="sm" class="mr-1" /> Delete
+              </button>
+            </div>
+          </template>
+        </ReusableMobileCardList>
 
           <!-- Clear Search Button (shown when no results and searching) -->
           <div
@@ -179,40 +172,28 @@
               Clear Search
             </button>
           </div>
+
+        <!-- No results while searching -->
+        <div
+          v-if="searchQuery && auditProcesses.length === 0 && !isLoading"
+          class="text-center py-4 border-t border-gray-200"
+        >
+          <button
+            @click="handleSearch('')"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
+          >
+            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+            Clear Search
+          </button>
         </div>
 
-        <!-- No SubDepartment Selected - Show when no subDepartment is selected -->
-        <div v-else class="text-center py-20">
-          <!-- When sub-departments are available but none selected -->
-          <div v-if="subDepartments && subDepartments.length > 0" class="max-w-md mx-auto">
-            <div
-              class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg"
-            >
-              <DepartmentIcon size="xxxl" custom-class="text-blue-600" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Sub-Department</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              Choose a sub-department from the dropdown above to view and manage audit processes
-            </p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p class="text-sm text-blue-700">
-                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a
-                sub-department and start managing audit processes
-              </p>
-            </div>
-          </div>
-
-          <!-- When no sub-departments are available -->
-          <div v-else class="max-w-lg mx-auto">
-            <div
-              class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300"
-            >
-              <DepartmentIcon size="xxxl" custom-class="text-gray-400" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Sub-Departments Available</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              You need to create sub-departments first before you can manage audit processes
-            </p>
+        <!-- No sub-department Selected -->
+        <div v-else-if="!internalSelectedSubDepartmentId" class="text-center py-16">
+          <DepartmentIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a sub-department to view Audit Processes</h3>
+          <p class="text-gray-500 mb-6">Choose a sub-department from the dropdown above to get started</p>
+          <div v-if="!subDepartments || subDepartments.length === 0">
+            <p class="text-sm text-gray-400">Please add a sub-department first to manage Audit Processes</p>
           </div>
         </div>
       </div>

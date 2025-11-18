@@ -1,7 +1,7 @@
 <template>
   <!-- RiskControl.vue -->
   <div
-    class="min-h-[calc(100vh-4rem)] bg-gray-50 p-2 sm:p-3 md:p-6 lg:p-8 xl:p-10 transition-all duration-300"
+    class="min-h-[calc(100vh)] bg-gray-50 p-2 sm:p-3 md:p-6 lg:p-8 xl:p-10 transition-all duration-300"
   >
     <!-- Header Section -->
     <div class="mb-3 sm:mb-5 md:mb-8">

@@ -1,4 +1,5 @@
 <template>
+  <!-- Mobile card view -->
   <div class="flex flex-col gap-4">
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-8">

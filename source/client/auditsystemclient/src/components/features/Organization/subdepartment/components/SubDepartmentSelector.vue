@@ -20,7 +20,7 @@ defineProps({
     type: Array,
     default: () => []
   },
-  selectedSubDepartmentId: { 
+  selectedSubDepartmentId: {
     type: String,
     default: ''
   },
@@ -30,10 +30,10 @@ defineProps({
   }
 });
 
-const emit = defineEmits(['update:selectedSubDepartment', 'sub-department-changed']);
+const emit = defineEmits(['update:selected-sub-department', 'sub-department-changed']);
 
-const handleSubDepartmentChange = (value) => {  
-    emit('update:selectedSubDepartment', value);
+const handleSubDepartmentChange = (value) => {
+    emit('update:selected-sub-department', value);
     emit('sub-department-changed', value);
 };
 </script>

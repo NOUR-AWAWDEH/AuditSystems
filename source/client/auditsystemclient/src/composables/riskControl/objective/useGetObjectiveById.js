@@ -21,7 +21,7 @@ export function useGetObjectiveById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
+        //showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -33,7 +33,7 @@ export function useGetObjectiveById() {
     const validateObjectiveId = (objectiveId) => {
         if (!objectiveId) {
             const message = 'Objective ID is required.';
-            showNotification(message, 'error');
+            //showNotification(message, 'error');
             return { success: false, message };
         }
     };

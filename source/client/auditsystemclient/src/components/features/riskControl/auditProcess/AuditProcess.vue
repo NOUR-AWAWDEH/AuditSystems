@@ -29,8 +29,7 @@
     />
 
     <!-- Show big department icon when no sub-departments exist -->
-      <NoSubDepartmentExist v-else
-      />
+    <NoSubDepartmentExist v-else />
 
     <!-- Edit Audit Process Modal -->
     <EditAuditProcessModal

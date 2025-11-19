@@ -59,7 +59,9 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="internalSelectedSubDepartmentId" class="hidden md:block rounded-lg border border-gray-200">
+        <div v-if="internalSelectedSubDepartmentId"
+          class="hidden md:block rounded-lg border border-gray-200"
+        >
           <ReusableTable
             :items="auditProcesses"
             :columns="enhancedColumns"
@@ -159,30 +161,16 @@
           </template>
         </ReusableMobileCardList>
 
-          <!-- Clear Search Button (shown when no results and searching) -->
-          <div
-            v-if="searchQuery && auditProcesses.length === 0 && !isLoading"
-            class="text-center py-4 border-t border-gray-200"
-          >
-            <button
-              @click="handleSearch('')"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
-            >
-              <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
-              Clear Search
-            </button>
-          </div>
-
-        <!-- No results while searching -->
+        <!-- Clear Search Button (shown when no results and searching) -->
         <div
           v-if="searchQuery && auditProcesses.length === 0 && !isLoading"
           class="text-center py-4 border-t border-gray-200"
         >
           <button
             @click="handleSearch('')"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
           >
-            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+            <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
             Clear Search
           </button>
         </div>

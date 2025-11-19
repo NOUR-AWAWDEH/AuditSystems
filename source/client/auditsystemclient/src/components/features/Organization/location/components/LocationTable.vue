@@ -131,11 +131,6 @@
             </div>
           </template>
         </ReusableMobileCardList>
-
-        <!-- No data message -->
-        <div v-if="!locations.length" class="text-gray-500 text-center py-6">
-          {{ noDataMessage }}
-        </div>
       </div>
 
       <!-- Loading -->

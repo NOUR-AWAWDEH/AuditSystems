@@ -38,6 +38,10 @@ _ReSharper*/
 *.ldf
 *.ndf
 
+# keys
+keys/
+source/server/Infrastructure/AuditSystem.Host/keys/
+
 # NuGet
 packages/
 *.nupkg

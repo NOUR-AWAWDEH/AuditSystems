@@ -1,4 +1,5 @@
 <template>
+  <!-- ReusableMobileCardList.vue -->
   <!-- Mobile card view -->
   <div class="flex flex-col gap-4">
     <!-- Loading State -->

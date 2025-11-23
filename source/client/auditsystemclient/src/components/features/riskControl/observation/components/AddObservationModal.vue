@@ -2,7 +2,7 @@
     <!--AddObservationModal.vue-->
     <Teleport to="body">
         <Transition name="modal">
-            <div v-if="isVisible" class="fixed inset-0 flex items-center justify-center p-4">
+            <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity" @click="$emit('close')"></div>
 
                 <!-- Modal -->
@@ -76,9 +76,9 @@
                                     placeholder="Enter Observation Action Plan"
                                     :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.actionPlan ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
-                                <p v-if="errors.actionPlan" class="text-error text-sm mt-1">{{ errors.actionPlan }}</p> 
+                                <p v-if="errors.actionPlan" class="text-error text-sm mt-1">{{ errors.actionPlan }}</p>
                             </div>
-                            
+
                             <!--  Observation Action date Field -->
                             <div>
                                  <label for="observation-action-date" class="block text-sm font-medium text-gray-700">
@@ -92,7 +92,7 @@
                                 />
                                 <p v-if="errors.actionDate" class="text-error text-sm mt-1">{{ errors.actionDate }}</p>
                             </div>
-                            
+
                             <!--  Observation Note Field -->
                             <div>
                                  <label for="observation-note" class="block text-sm font-medium text-gray-700">
@@ -100,7 +100,7 @@
                                 </label>
                                 <BaseInput
                                     id="observation-note"
-                                    v-model="formData.note" 
+                                    v-model="formData.note"
                                     label="Observation Note"
                                     placeholder="Enter Observation Note"
                                     :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.note ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
@@ -273,7 +273,7 @@ const handleSubmit = async () => {
                 ...observationData,
                 createdAt: new Date().toISOString()
             };
-            
+
             showNotification(`Observation "${newObservation.description}" has been added successfully!`, 'success');
             emit('observation-added', newObservation);
             emit('close');

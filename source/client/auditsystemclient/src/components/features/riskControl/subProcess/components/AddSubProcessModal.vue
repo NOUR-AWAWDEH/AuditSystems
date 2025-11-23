@@ -2,7 +2,7 @@
     <!--AddSubProcessModal.vue-->
     <Teleport to="body">
         <Transition name="modal">
-            <div v-if="isVisible" class="fixed inset-0 flex items-center justify-center p-4">
+            <div v-if="isVisible" class="fixed z-50 inset-0 flex items-center justify-center p-4">
                 <div class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity" @click="$emit('close')"></div>
 
                 <!-- Modal -->
@@ -138,7 +138,7 @@ const handleSubmit = async () => {
                 ...subProcessData,
                 createdAt: new Date().toISOString()
             };
-            
+
             showNotification(`Sub Process "${newSubProcess.particular}" has been added successfully!`, 'success');
             emit('sub-process-added', newSubProcess);
             emit('close');

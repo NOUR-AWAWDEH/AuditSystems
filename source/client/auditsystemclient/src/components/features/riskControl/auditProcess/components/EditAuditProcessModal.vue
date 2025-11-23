@@ -29,6 +29,8 @@
                 <p v-if="errors.name" class="text-error text-sm mt-1">{{ errors.name }}</p>
               </div>
 
+              
+
               <!-- Error Display -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                 <p class="text-error text-sm">{{ error }}</p>
@@ -154,7 +156,7 @@ const handleSubmit = async () => {
         ...auditProcessData,
         ...result.data
       };
-      
+
       showNotification(`Audit Process "${updatedAuditProcessData.processName}" has been updated successfully!`, 'success');
       emit('audit-process-updated', updatedAuditProcessData);
       emit('close');

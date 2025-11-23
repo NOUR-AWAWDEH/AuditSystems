@@ -32,8 +32,7 @@
 
         <!-- Show big RiskControlMatrix icon when no Risk Control Matrix  exist -->
 
-        <NoRiskControlMatricesExist v-else
-        />
+        <NoRiskControlMatricesExist v-else />
 
         <!-- Edit Objective Modal -->
         <EditObjectiveModal

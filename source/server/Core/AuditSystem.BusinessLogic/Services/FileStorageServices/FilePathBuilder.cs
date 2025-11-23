@@ -3,15 +3,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace AuditSystem.BusinessLogic.Services.FileStorageServices;
 
-public class FilePathBuilder : IFilePathBuilder
+public class FilePathBuilder(IConfiguration config) : IFilePathBuilder
 {
-    private readonly string _rootPath;
-
-    public FilePathBuilder(IConfiguration config)
-    {
-        _rootPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
+    private readonly string _rootPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
             ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH");
-    }
 
     public string GetFullPath(Guid userId, string serviceName, string fileName)
     {

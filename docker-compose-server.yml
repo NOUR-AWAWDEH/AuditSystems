@@ -23,7 +23,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       DB_CONNECTION_STRING: Host=auditsystem.db;Port=5432;Database=auditsystemdb;Username=postgres;Password=64pxEr075zbliN
       FILE_STORAGE_BASE_URL: https://api.auditsystem.online/
-      FILESTORAGE_UPLOADPATH: ../../uploads
+      FILESTORAGE_UPLOADPATH: /app/uploads
       JWT_AUDIENCE: https://api.auditsystem.online
       JWT_EXPIRATION_MINUTES: 60
       JWT_ISSUER: https://api.auditsystem.online
@@ -43,6 +43,10 @@ services:
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
 
       CORS_ALLOWED_ORIGIN: https://auditsystem.online,https://www.auditsystem.online
+    
+    volumes:
+      - ./uploads:/app/uploads
+
     depends_on:
       - auditsystem.db
     networks:

@@ -110,6 +110,7 @@ services:
       - "traefik.http.routers.auditsystem-client-https.tls.certresolver=le"
       - "traefik.http.routers.auditsystem-client-https.service=auditsystem-client-svc"
       - "traefik.http.services.auditsystem-client-svc.loadbalancer.server.port=10000"
+      
       # www subdomain routers
       - "traefik.http.routers.auditsystem-client-http-www.entrypoints=http"
       - "traefik.http.routers.auditsystem-client-http-www.rule=Host(`www.auditsystem.online`)"

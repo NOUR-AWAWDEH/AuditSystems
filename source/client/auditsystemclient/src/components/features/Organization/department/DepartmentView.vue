@@ -29,8 +29,7 @@
         />
 
         <!-- Show big Location icon when no Location exist -->
-        <NoLocationExit v-else
-        />
+        <NoLocationExist v-else />
 
         <!-- Edit Department Modal -->
         <EditDepartmentModal
@@ -63,7 +62,7 @@ import EditDepartmentModal from './components/EditDepartmentModal.vue';
 import { useDepartmentTable } from './composables/useDepartmentTable';
 import { watch } from 'vue';
 import { useDepartmentModals } from './composables/useDepartmentModals';
-import  NoLocationExit from './components/NoLocationExist.vue'
+import NoLocationExist from './components/NoLocationExist.vue'
 
 const props = defineProps({
     locations: {

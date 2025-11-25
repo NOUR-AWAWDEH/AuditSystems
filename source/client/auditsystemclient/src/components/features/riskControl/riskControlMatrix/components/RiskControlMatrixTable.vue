@@ -67,8 +67,8 @@
                                 <button @click.stop="handleSelectRiskControlMatrix(item)"
                                     class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
                                     :class="{ 'bg-green-200': selectedRiskControlMatrixId === item.id }">
-                                    <CheckIcon v-if="selectedRiskControlMatrixId === item.id" size="sm" custom-class="mr-1" />
-                                    <SelectIcon v-else size="sm" custom-class="mr-1" />
+                                    <CheckIcon v-if="selectedRiskControlMatrixId === item.id" size="md" custom-class="mr-1" />
+                                    <SelectIcon v-else size="md" custom-class="mr-1" />
                                     {{ selectedRiskControlMatrixId === item.id ? 'Selected' : 'Select' }}
                                 </button>
                                 <button @click.stop="$emit('edit-risk-control-matrix', item)"

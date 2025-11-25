@@ -28,8 +28,8 @@
       @control-design-selected="handleControlDesignSelected"
     />
 
-    <!-- Empty state  No Control Designs Exist-->
-    <NoControlDesignsExist v-else />
+    <!-- Empty state  No Exit Control Exist-->
+    <NoExitControlExist v-else />
 
 
     <!-- Edit Control Design Modal -->
@@ -61,7 +61,7 @@ import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import ControlDesignTable from "./components/ControlDesignTable.vue";
 import AddControlDesignModal from "./components/AddControlDesignModal.vue";
 import EditControlDesignModal from "./components/EditControlDesignModal.vue";
-import NoControlDesignsExist from "./components/NoControlDesignsExist.vue";
+import NoExitControlExist from "./components/NoExitControlExist.vue";
 import { useControlDesignTable } from "./composables/useControlDesignTable.js";
 import { useControlDesignModals } from "./composables/useControlDesignModals.js";
 

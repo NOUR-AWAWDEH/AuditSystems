@@ -38,7 +38,7 @@
             <tr v-else-if="items.length === 0">
               <td
                 :colspan="columns.length + (showSrNo ? 1 : 0) + (actions.length ? 1 : 0)"
-                class="px-6 py-8 text-center text-gray-base"
+                class="px-6 py-8 text-center text-gray-base font-bold "
               >
                 {{ noDataMessage }}
               </td>

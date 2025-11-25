@@ -1,12 +1,14 @@
 <template>
+
   <!--ExitControlTable.vue-->
-  <div class="space-y-6">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div class="p-6">
-        <!-- Objective and Filters - Stack on mobile -->
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-          <div class="flex-1 max-w-md">
-            <ExitControlHeader />
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-3 sm:p-4 md:p-6">
+      <!-- Objective and Filters - Stack on mobile -->
+      <div class="flex flex-col gap-4 mb-6">
+        <ExitControlHeader />
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="w-full sm:min-w-64 sm:max-w-xs">
             <ObjectiveSelector
               :objectives="objectives"
               :selected-objective-id="internalSelectedObjectiveId"
@@ -15,161 +17,204 @@
             />
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="flex-1 sm:flex-initial">
-              <SearchFilter
-                :search="searchQuery"
-                :search-placeholder="'Search exit controls...'"
-                @update:search="handleSearch"
-                class="w-full sm:w-auto"
-              />
-            </div>
+          <div class="w-full sm:w-auto">
+            <SearchFilter
+              :search="searchQuery"
+              :search-placeholder="'Search exit controls...'"
+              @update:search="handleSearch"
+            />
           </div>
         </div>
+      </div>
 
-        <!-- Keep only this Selected objective Info section -->
-        <div
-          v-if="selectedObjectiveId"
-          class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <ObjectiveIcon size="xxl" custom-class="text-blue-600 mr-2" />
-
-              <p class="text-sm text-gray-700">
-                Showing Exit Controls for: &nbsp;&nbsp;
-                <span class="font-semibold text-blue-800">
+      <!-- Selected objective Info -->
+      <div
+        v-if="internalSelectedObjectiveId"
+        class="mb-6 p-3 sm:p-4 bg-linear-to-r from-primary-soft to-indigo-50 rounded-lg border border-primary-base"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="flex items-start sm:items-center gap-2 flex-1 min-w-0">
+            <ObjectiveIcon size="lg" custom-class="text-blue-600" />
+            <div class="flex-1 min-w-0">
+              <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
+                <span>Showing Exit Controls for:</span>
+                <span class="ml-1 font-semibold text-primary-base">
                   <span v-if="isObjectiveLoading">Loading objective...</span>
                   <span v-else>{{ currentObjective?.description || "Loading..." }}</span>
                 </span>
-                <span v-if="searchQuery" class="ml-2 text-blue-600"
-                  >| Search: "{{ searchQuery }}"</span
-                >
+                <span v-if="searchQuery" class="ml-2 text-primary-base">
+                  | Search: "{{ searchQuery }}"
+                </span>
               </p>
             </div>
-            <button
-              @click="$emit('add-exit-control')"
-              class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
-            >
-              <PlusIcon :stroke-width="3" />
-              Add Exit Control
-            </button>
           </div>
-        </div>
 
-        <!-- Table Container - Show when objective is Selected -->
-        <div
-          v-if="selectedObjectiveId"
-          class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden"
-        >
-          <ReusableTable
-            :items="exitControls"
-            :columns="enhancedColumns"
-            :is-loading="isLoading"
-            :actions="[]"
-            :no-data-message="noDataMessage"
-            class="exit-control-table"
+          <button
+            @click="$emit('add-exit-control')"
+            class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
           >
-            <template #cell-inadequate="{ item }">
-              <span
+            <PlusIcon :stroke-width="3" />
+            Add Exit Control
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Table -->
+      <div
+        v-if="internalSelectedObjectiveId"
+        class="hidden md:block rounded-lg border border-gray-200"
+      >
+        <ReusableTable
+          :items="exitControls"
+          :columns="enhancedColumns"
+          :is-loading="isLoading"
+          :actions="[]"
+          :no-data-message="noDataMessage"
+          class="exit-control-table min-w-full"
+        >
+          <template #cell-inadequate="{ item }">
+            <span
+              :class="inadequateColorMap[item.inadequate]"
+              class="flex flex-col items-center-safe justify-center-safe lg:px-2 2xl:flex-row gap-2 py-1 max-w-27 rounded-md font-bold"
+            >
+              {{ inadequateLabelMap[item.inadequate] }}
+            </span>
+          </template>
+
+          <template #cell-actions="{ item }">
+            <div class="flex flex-col justify-start items-start 2xl:flex-row gap-2 min-w-max">
+              <button
+                @click.stop="handleSelectExitControl(item)"
+                class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                :class="{ 'bg-green-200': selectedExitControlId === item.id }"
+              >
+                <CheckIcon v-if="selectedExitControlId === item.id" size="md" custom-class="mr-1" />
+                <SelectIcon v-else size="md" custom-class="mr-1" />
+                {{ selectedExitControlId === item.id ? "Selected" : "Select" }}
+              </button>
+
+              <button
+                @click.stop="$emit('edit-exit-control', item)"
+                class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-green-200 transition-all duration-200"
+              >
+                <EditIcon size="sm" custom-class="mr-1" />
+                Edit
+              </button>
+
+              <button
+                @click.stop="$emit('delete-exit-control', item)"
+                class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+              >
+                <DeleteIcon size="sm" custom-class="mr-1" />
+                Delete
+              </button>
+            </div>
+          </template>
+        </ReusableTable>
+      </div>
+      <!-- Mobile Card View -->
+      <ReusableMobileCardList
+        v-if="internalSelectedObjectiveId"
+        :items="exitControls"
+        :showNumber="true"
+        :isLoading="isLoading"
+        :noDataMessage="noDataMessage"
+        class="md:hidden"
+      >
+        <template #card-content="{ item }">
+          <div class="space-y-4">
+            <div class="border-b border-gray-100 pb-3">
+              <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                {{ exitControlColumns[0].label }}
+              </div>
+              <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
+                {{ item.description }}
+              </div>
+            </div>
+
+            <div class="border-b border-gray-100 pb-3">
+              <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                {{ exitControlColumns[1].label }}
+              </div>
+              <div
                 :class="inadequateColorMap[item.inadequate]"
-                class="px-2 py-1 rounded-full text-xs font-semibold"
+                class="inline-block px-3 py-1 rounded-md text-sm font-medium"
               >
                 {{ inadequateLabelMap[item.inadequate] }}
-              </span>
-            </template>
-
-            <template #cell-actions="{ item }">
-              <div class="flex items-center gap-2">
-                <button
-                  @click.stop="handleSelectExitControl(item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
-                  :class="{ 'bg-green-200': selectedExitControlId === item.id }"
-                >
-                  <CheckIcon
-                    v-if="selectedExitControlId === item.id"
-                    size="sm"
-                    custom-class="mr-1"
-                  />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
-                  {{ selectedExitControlId === item.id ? "Selected" : "Select" }}
-                </button>
-                <button
-                  @click.stop="$emit('edit-exit-control', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <EditIcon size="sm" custom-class="mr-1" />
-                  Edit
-                </button>
-                <button
-                  @click.stop="$emit('delete-exit-control', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
-                >
-                  <DeleteIcon size="sm" custom-class="mr-1" />
-                  Delete
-                </button>
               </div>
-            </template>
-          </ReusableTable>
+            </div>
 
-          <!-- Clear Search Button (shown when no results and searching) -->
-          <div
-            v-if="searchQuery && exitControls.length === 0 && !isLoading"
-            class="text-center py-4 border-t border-gray-200"
-          >
+            <div class="border-b border-gray-100 pb-3">
+              <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                {{ exitControlColumns[2].label }}
+              </div>
+              <div class="text-gray-400 text-xs font-medium">
+                {{ formatDateSimple(item.createdAt) }}
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <template #card-actions="{ item }">
+          <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
             <button
-              @click="handleSearch('')"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
+              @click.stop="handleSelectExitControl(item)"
+              class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+              :class="{ 'bg-green-200': selectedExitControlId === item.id }"
             >
-              <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
-              Clear Search
+              <CheckIcon v-if="selectedExitControlId === item.id" size="sm" class="mr-1" />
+              <SelectIcon v-else size="sm" class="mr-1" />
+              {{ selectedExitControlId === item.id ? "Selected" : "Select" }}
+            </button>
+
+            <button
+              @click.stop="$emit('edit-exit-control', item)"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+            >
+              <EditIcon size="sm" class="mr-1" /> Edit
+            </button>
+
+            <button
+              @click.stop="$emit('delete-exit-control', item)"
+              class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+            >
+              <DeleteIcon size="sm" class="mr-1" /> Delete
             </button>
           </div>
+        </template>
+      </ReusableMobileCardList>
+      
+        <!-- No results while searching -->
+        <div
+          v-if="searchQuery && exitControls.length === 0 && !isLoading"
+          class="text-center py-4 border-t border-gray-200"
+        >
+          <button
+            @click="handleSearch('')"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
+          >
+            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+            Clear Search
+          </button>
         </div>
 
-        <!-- No Objective Selected - Show when no objective is selected -->
-
-        <div v-else class="text-center py-20">
-          <!-- When objectives are available but none selected -->
-          <div v-if="objectives && objectives.length > 0" class="max-w-md mx-auto">
-            <div
-              class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg"
-            >
-              <ObjectiveIcon size="xxxl" custom-class="text-blue-600" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Select an Objective</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              Choose an objective from the dropdown above to view and manage exit controls
-            </p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p class="text-sm text-blue-700">
-                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select an
-                objective and start managing exit controls
-              </p>
-            </div>
-          </div>
-
-          <!-- When no objectives are available -->
-          <div v-else class="max-w-lg mx-auto">
-            <div
-              class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300"
-            >
-              <ObjectiveIcon size="xxxl" custom-class="text-gray-400" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Objectives Available</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              You need to create objectives first before you can manage exit controls
-            </p>
+        <!-- No Objective Selected -->
+        <div v-else-if="!internalSelectedObjectiveId" class="text-center py-16">
+          <ObjectiveIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select an Objective to view exit controls</h3>
+          <p class="text-gray-500 mb-6">Choose an objective from the dropdown above to get started</p>
+          <div v-if="!objectives || objectives.length === 0">
+            <p class="text-sm text-gray-400">Please add an objective first to manage exit controls</p>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from "vue";
 import ReusableTable from "@/components/common/ReusableTable.vue";
+import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import ObjectiveSelector from "@/components/features/riskControl/objective/components/ObjectiveSelector.vue";
 import ObjectiveIcon from "@/components/common/icons/ObjectiveIcon.vue";
@@ -180,6 +225,7 @@ import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import ExitControlHeader from "./ExitControlHeader.vue";
+import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
   objectives: {
@@ -271,8 +317,8 @@ const noDataMessage = computed(() => {
 });
 
 const inadequateColorMap = {
-  true: "bg-red-100 text-red-800", // Bad → Inadequate
-  false: "bg-green-100 text-green-800", // Good → Adequate
+  true: "bg-red-100 text-red-800 no-wrap", // Bad → Inadequate
+  false: "bg-green-100 text-green-800 no-wrap", // Good → Adequate
 };
 
 const inadequateLabelMap = {

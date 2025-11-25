@@ -28,20 +28,20 @@
             class="location-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex flex-col 2xl:flex-row gap-2 min-w-max">
+              <div class="flex flex-col items-start justify-start 2xl:flex-row gap-2 min-w-max">
                 <button
                   @click.stop="handleSelectLocation(item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                   :class="{ 'bg-green-200': selectedLocationId === item.id }"
                 >
-                  <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
-                  <SelectIcon v-else size="sm" class="mr-1" />
+                  <CheckIcon v-if="selectedLocationId === item.id" size="md" class="mr-1" />
+                  <SelectIcon v-else size="md" class="mr-1" />
                   <span>{{ selectedLocationId === item.id ? "Selected" : "Select" }}</span>
                 </button>
 
                 <button
                   @click.stop="$emit('edit-location', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <EditIcon size="sm" class="mr-1" />
                   <span>Edit</span>
@@ -49,7 +49,7 @@
 
                 <button
                   @click.stop="$emit('delete-location', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <DeleteIcon size="sm" class="mr-1" />
                   <span>Delete</span>

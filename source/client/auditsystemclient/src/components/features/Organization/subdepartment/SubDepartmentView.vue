@@ -28,8 +28,7 @@
         />
 
         <!-- Show big department icon when no sub-departments exist -->
-        <NoDepartmentExist v-else
-        />
+        <NoDepartmentExist v-else />
 
         <!-- Edit SubDepartment Modal -->
         <EditSubDepartmentModal

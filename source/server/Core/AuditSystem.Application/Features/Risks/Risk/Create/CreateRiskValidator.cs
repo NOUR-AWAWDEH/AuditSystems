@@ -10,12 +10,6 @@ public sealed class CreateRiskValidator : AbstractValidator<CreateRiskCommand>
         RuleFor(x => x.RiskName)
             .ValidateRequiredString(2, 255, "Risk name");
 
-        RuleFor(x => x.RateId)
-            .NotEmpty()
-            .WithMessage("Rate is required.")
-            .Must(x => x != Guid.Empty)
-            .WithMessage("Rate is required.");
-
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");

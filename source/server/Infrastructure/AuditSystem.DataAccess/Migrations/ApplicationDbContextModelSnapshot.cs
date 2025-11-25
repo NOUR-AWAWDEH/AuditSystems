@@ -550,9 +550,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("ObjectiveId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("RateId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("RiskName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -566,8 +563,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("Description");
 
                     b.HasIndex("ObjectiveId");
-
-                    b.HasIndex("RateId");
 
                     b.ToTable("Risks");
                 });
@@ -1036,15 +1031,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rate")
-                        .WithMany("Risks")
-                        .HasForeignKey("RateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Objective");
-
-                    b.Navigation("Rate");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.SupportingDocs.SupportingDoc", b =>
@@ -1127,11 +1114,6 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditProgram", b =>
                 {
                     b.Navigation("Observations");
-                });
-
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Common.Rate", b =>
-                {
-                    b.Navigation("Risks");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Observations.Observation", b =>

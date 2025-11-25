@@ -214,6 +214,7 @@ import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
+import ProcessIcon from "@/components/common/icons/ProcessIcon.vue";
 import SubProcessHeader from "./SubProcessHeader.vue";
 import { formatDateSimple } from "@/utils/dateUtils.js";
 

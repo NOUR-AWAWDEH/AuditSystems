@@ -62,22 +62,13 @@
         <!-- Desktop Table -->
         <div v-if="selectedObjectiveId" class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
-            :items="transformedRisks"
+            :items="enhancedRisks"
             :columns="enhancedColumns"
             :is-loading="isLoading"
             :actions="[]"
             :no-data-message="noDataMessage"
             class="risk-table min-w-full"
           >
-            <template #cell-rate="{ item }">
-              <span
-                :class="rateColorMap[item.rate]"
-                class="inline-block px-3 py-1 rounded-md text-sm font-medium"
-              >
-                {{ item.rate }}
-              </span>
-            </template>
-
             <template #cell-actions="{ item }">
               <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
@@ -103,7 +94,7 @@
         <!-- Mobile Card View -->
         <ReusableMobileCardList
           v-if="selectedObjectiveId"
-          :items="transformedRisks"
+          :items="enhancedRisks"
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
@@ -126,18 +117,6 @@
                 </div>
                 <div class="text-gray-700 text-sm leading-snug wrap-break-word">
                   {{ item.description }}
-                </div>
-              </div>
-
-              <div class="border-b border-gray-100 pb-3">
-                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Rate Level
-                </div>
-                <div
-                  :class="rateColorMap[item.rate]"
-                  class="inline-block px-3 py-1 rounded-md text-sm font-medium"
-                >
-                  {{ item.rate }}
                 </div>
               </div>
 
@@ -282,9 +261,17 @@ defineEmits(["add-risk", "edit-risk", "delete-risk"]);
 const riskColumns = [
   { key: "riskName", label: "Name" },
   { key: "description", label: "Description" },
-  { key: "rate", label: "Rate Level" },
+
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
+
+const enhancedRisks = computed(() => {
+  return props.risks.map((risk) => {
+    return {
+      ...risk,
+    };
+  });
+});
 
 const enhancedColumns = computed(() => {
   return [...riskColumns, { key: "actions", label: "Actions" }];
@@ -295,33 +282,6 @@ const noDataMessage = computed(() => {
     return `No Risks found for "${props.searchQuery}".`;
   }
   return "No Risks found for this Objective.";
-});
-
-const rateLevelMap = {
-  "11111111-1111-1111-1111-111111111111": "Critical",
-  "22222222-2222-2222-2222-222222222222": "High",
-  "33333333-3333-3333-3333-333333333333": "Medium",
-  "44444444-4444-4444-4444-444444444444": "Low",
-  "55555555-5555-5555-5555-555555555555": "Minimal",
-};
-
-const rateColorMap = {
-  Critical: "bg-red-100 text-red-800",
-  High: "bg-orange-100 text-orange-800",
-  Medium: "bg-yellow-100 text-yellow-800",
-  Low: "bg-green-100 text-green-800",
-  Minimal: "bg-blue-100 text-blue-800",
-  Unknown: "bg-gray-100 text-gray-800",
-};
-
-const transformedRisks = computed(() => {
-  return props.risks.map((risk) => {
-    const rate = rateLevelMap[risk.rateId] || "Unknown";
-    return {
-      ...risk,
-      rate,
-    };
-  });
 });
 </script>
 

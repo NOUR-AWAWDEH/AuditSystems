@@ -111,7 +111,6 @@ public class RiskSearchHelper(
             {
                 Id = r.Id,
                 Description = r.Description,
-                RateId = r.RateId,
                 ObjectiveId = r.ObjectiveId,
                 RiskName = r.RiskName,
                 CreatedAt = r.CreatedAt,

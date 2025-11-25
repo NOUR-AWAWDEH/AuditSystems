@@ -26,12 +26,6 @@ public sealed class UpdateRiskValidator : AbstractValidator<UpdateRiskCommand>
             .MaximumLength(100)
             .WithMessage("RiskName must not exceed 100 characters.");
         
-        RuleFor(x => x.RateId)
-            .NotEmpty()
-            .WithMessage("RateId is required.")
-            .Must(BeAValidGuid)
-            .WithMessage("RateId must not be empty.");
-        
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");

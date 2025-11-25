@@ -1,5 +1,5 @@
 <template>
-    <!--AddRiskModal.vue-->
+  <!--AddRiskModal.vue-->
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -9,7 +9,9 @@
         ></div>
 
         <!-- Modal -->
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all">
+        <div
+          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+        >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
             <h3 class="text-base font-medium text-secondary-shade font-poppins">Add Risk</h3>
@@ -60,20 +62,6 @@
                 </p>
               </div>
 
-              <!-- Rate Selector -->
-              <RateSelector
-                v-if="!isLoadingRates"
-                :rates="rates"
-                :selectedRateId="selectedRateId"
-                label="Risk Level"
-                placeholder="Select a risk level"
-                :error="errors.rate"
-                @update:selectedRateId="handleRateChange"
-              />
-              <p v-if="errors.rate" class="text-error text-sm mt-1">
-                {{ errors.rate }}
-              </p>
-
               <!-- API Error -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
                 <p class="text-error text-sm">{{ error }}</p>
@@ -108,79 +96,58 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import BaseInput from '@/components/base/BaseInput.vue';
-import CloseIcon from '@/components/common/icons/CloseIcon.vue';
-import { useCreateRisk } from '@/composables/riskControl/risk/useCreateRisk.js';
-import { useNotification } from '@/composables/notification/useNotification';
-import RateSelector from '@/components/common/rate/RateSelector.vue';
-import { useSearchRates } from '@/composables/common/rate/useSearchRates';
+import { ref, watch } from "vue";
+import BaseInput from "@/components/base/BaseInput.vue";
+import CloseIcon from "@/components/common/icons/CloseIcon.vue";
+import { useCreateRisk } from "@/composables/riskControl/risk/useCreateRisk.js";
+import { useNotification } from "@/composables/notification/useNotification";
 
 const props = defineProps({
   isVisible: { type: Boolean, default: false },
-  objectiveId: { type: [String, Number], default: null }
+  objectiveId: { type: [String, Number], default: null },
 });
 
-const emit = defineEmits(['close', 'risk-added']);
+const emit = defineEmits(["close", "risk-added"]);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createRisk, resetState } = useCreateRisk();
-const rates = ref([]);
-const isLoadingRates = ref(true);
-
-const { searchRates, searchResults } = useSearchRates();
-const selectedRateId = ref('');
 
 const formData = ref({
-  riskName: '',
-  description: '',
-  rate: ''
+  riskName: "",
+  description: "",
 });
 
 const errors = ref({
-  riskName: '',
-  description: '',
-  rate: ''
+  riskName: "",
+  description: "",
 });
 
-watch(() => props.isVisible, async (newValue) => {
-  if (newValue) {
-    resetForm();
-    isLoadingRates.value = true; // Start loading
-    await searchRates(); // Fetch rates
-    rates.value = searchResults.value; // Assign fetched rates to the reactive rates ref
-    isLoadingRates.value = false; // End loading
+watch(
+  () => props.isVisible,
+  async (newValue) => {
+    if (newValue) {
+      resetForm();
+    }
   }
-});
+);
 
 const resetForm = () => {
-  formData.value = { riskName: '', description: '', rate: '' };
+  formData.value = { riskName: "", description: "" };
 
-  errors.value = { riskName: '', description: '', rate: '' };
-  selectedRateId.value = '';
+  errors.value = { riskName: "", description: "" };
   resetState();
 };
 
-
-
-const handleRateChange = (value) => {
-  selectedRateId.value = value;
-};
-
 const validateForm = () => {
-  errors.value = { riskName: '', description: '', rate: '' };
+  errors.value = { riskName: "", description: "" };
   let isValid = true;
 
   if (!formData.value.riskName.trim()) {
-    errors.value.riskName = 'Risk name is required';
+    errors.value.riskName = "Risk name is required";
     isValid = false;
   }
   if (!formData.value.description.trim()) {
-    errors.value.description = 'Risk description is required';
-    isValid = false;
-  }
-  if (!selectedRateId.value) {
-    errors.value.rate = 'Risk rate is required';
+    errors.value.description = "Risk description is required";
     isValid = false;
   }
 
@@ -189,7 +156,7 @@ const validateForm = () => {
 
 const handleSubmit = async () => {
   if (!props.objectiveId) {
-    showNotification('Objective is required', 'error');
+    showNotification("Objective is required", "error");
     return;
   }
 
@@ -199,8 +166,8 @@ const handleSubmit = async () => {
     const riskData = {
       riskName: formData.value.riskName.trim(),
       description: formData.value.description.trim(),
-      rateId: selectedRateId.value,
-      objectiveId: props.objectiveId
+
+      objectiveId: props.objectiveId,
     };
 
     const result = await createRisk(riskData);
@@ -212,16 +179,15 @@ const handleSubmit = async () => {
         createdAt: new Date().toISOString(),
       };
 
-      showNotification(`Risk "${newRisk.riskName}" has been added successfully!`, 'success');
-      emit('risk-added', newRisk);
-      emit('close');
-
+      showNotification(`Risk "${newRisk.riskName}" has been added successfully!`, "success");
+      emit("risk-added", newRisk);
+      emit("close");
     } else {
-      showNotification(result?.message || 'Failed to create risk', 'error');
+      showNotification(result?.message || "Failed to create risk", "error");
     }
   } catch (err) {
-    console.error('Error creating risk:', err);
-    showNotification('Failed to create risk. Please try again.', 'error');
+    console.error("Error creating risk:", err);
+    showNotification("Failed to create risk. Please try again.", "error");
   }
 };
 </script>

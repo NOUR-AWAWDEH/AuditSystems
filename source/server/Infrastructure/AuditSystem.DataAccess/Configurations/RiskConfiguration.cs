@@ -20,17 +20,8 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                         .IsRequired(true)
                         .HasMaxLength(250);
 
-                builder.Property(r => r.RateId)
-                        .IsRequired(true);
-
                 builder.Property(r => r.ObjectiveId)
                         .IsRequired(true);
-
-                // Relationship with Rate
-                builder.HasOne(r => r.Rate)
-                        .WithMany(r => r.Risks)
-                        .HasForeignKey(r => r.RateId)
-                        .OnDelete(DeleteBehavior.Restrict);
 
                 builder.HasIndex(r => r.ObjectiveId);
                 builder.HasIndex(r => r.Description);

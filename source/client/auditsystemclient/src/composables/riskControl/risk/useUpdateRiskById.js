@@ -1,6 +1,6 @@
-import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
-import { updateRiskByIdRepository } from '@/services/riskControl/risk/updateRiskByIdRepository';
+import { ref } from "vue";
+import { useNotification } from "@/composables/notification/useNotification";
+import { updateRiskByIdRepository } from "@/services/riskControl/risk/updateRiskByIdRepository";
 
 export function useUpdateRiskById() {
   const isUpdating = ref(false);
@@ -10,14 +10,14 @@ export function useUpdateRiskById() {
 
   const handleUpdateSuccess = (response) => {
     updatedRisk.value = response.result;
-    const message = response?.successMessage || 'Risk updated successfully';
-    showNotification(message, 'success');
+    const message = response?.successMessage || "Risk updated successfully";
+    showNotification(message, "success");
     return { success: true, data: response.result };
   };
 
-  const handleUpdateFailure = (message = 'Failed to update risk', errors = []) => {
+  const handleUpdateFailure = (message = "Failed to update risk", errors = []) => {
     error.value = message;
-    showNotification(message, 'error');
+    showNotification(message, "error");
     return {
       success: false,
       message,
@@ -26,11 +26,11 @@ export function useUpdateRiskById() {
   };
 
   const validateUpdateRisk = (riskData) => {
-    if (!riskData.id) return 'Risk ID is required';
-    if (!riskData.riskName?.trim()) return 'Risk name is required';
-    if (!riskData.description?.trim()) return 'Risk description is required';
-    if (!riskData.objectiveId) return 'Objective ID is required';
-    if (!riskData.rateId) return 'Rate ID is required';
+    if (!riskData.id) return "Risk ID is required";
+    if (!riskData.riskName?.trim()) return "Risk name is required";
+    if (!riskData.description?.trim()) return "Risk description is required";
+    if (!riskData.objectiveId) return "Objective ID is required";
+
     return null;
   };
 
@@ -48,16 +48,16 @@ export function useUpdateRiskById() {
 
       // API call
       const response = await updateRiskByIdRepository.updateRiskById(riskData);
-      
+
       if (response?.success) {
         return handleUpdateSuccess(response);
       } else {
         const message =
-          response?.errors?.[0]?.message || response?.successMessage || 'Failed to update risk';
+          response?.errors?.[0]?.message || response?.successMessage || "Failed to update risk";
         return handleUpdateFailure(message, response?.errors || []);
       }
     } catch (err) {
-      const message = err?.message || 'Unexpected error while updating risk';
+      const message = err?.message || "Unexpected error while updating risk";
       return handleUpdateFailure(message);
     } finally {
       isUpdating.value = false;

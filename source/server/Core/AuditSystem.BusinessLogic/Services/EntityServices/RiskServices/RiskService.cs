@@ -130,7 +130,6 @@ internal sealed class RiskService(
                 Id = ap.Id,
                 RiskName = ap.RiskName,
                 ObjectiveId = ap.ObjectiveId,
-                RateId = ap.RateId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })

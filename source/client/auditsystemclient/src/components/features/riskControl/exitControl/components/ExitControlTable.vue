@@ -1,5 +1,4 @@
 <template>
-
   <!--ExitControlTable.vue-->
   <div class="bg-white rounded-xl shadow-lg border border-gray-200">
     <div class="p-3 sm:p-4 md:p-6">
@@ -62,7 +61,7 @@
       <!-- Desktop Table -->
       <div
         v-if="internalSelectedObjectiveId"
-        class="hidden md:block rounded-lg border border-gray-200"
+        class="hidden lg:block rounded-lg border border-gray-200"
       >
         <ReusableTable
           :items="exitControls"
@@ -119,7 +118,7 @@
         :showNumber="true"
         :isLoading="isLoading"
         :noDataMessage="noDataMessage"
-        class="md:hidden"
+        class="lg:hidden"
       >
         <template #card-content="{ item }">
           <div class="space-y-4">
@@ -162,8 +161,8 @@
               class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
               :class="{ 'bg-green-200': selectedExitControlId === item.id }"
             >
-              <CheckIcon v-if="selectedExitControlId === item.id" size="sm" class="mr-1" />
-              <SelectIcon v-else size="sm" class="mr-1" />
+              <CheckIcon v-if="selectedExitControlId === item.id" size="md" class="mr-1" />
+              <SelectIcon v-else size="md" class="mr-1" />
               {{ selectedExitControlId === item.id ? "Selected" : "Select" }}
             </button>
 
@@ -183,32 +182,34 @@
           </div>
         </template>
       </ReusableMobileCardList>
-      
-        <!-- No results while searching -->
-        <div
-          v-if="searchQuery && exitControls.length === 0 && !isLoading"
-          class="text-center py-4 border-t border-gray-200"
-        >
-          <button
-            @click="handleSearch('')"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
-          >
-            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
-            Clear Search
-          </button>
-        </div>
 
-        <!-- No Objective Selected -->
-        <div v-else-if="!internalSelectedObjectiveId" class="text-center py-16">
-          <ObjectiveIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
-          <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select an Objective to view exit controls</h3>
-          <p class="text-gray-500 mb-6">Choose an objective from the dropdown above to get started</p>
-          <div v-if="!objectives || objectives.length === 0">
-            <p class="text-sm text-gray-400">Please add an objective first to manage exit controls</p>
-          </div>
+      <!-- No results while searching -->
+      <div
+        v-if="searchQuery && exitControls.length === 0 && !isLoading"
+        class="text-center py-4 border-t border-gray-200"
+      >
+        <button
+          @click="handleSearch('')"
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
+        >
+          <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+          Clear Search
+        </button>
+      </div>
+
+      <!-- No Objective Selected -->
+      <div v-else-if="!internalSelectedObjectiveId" class="text-center py-16">
+        <ObjectiveIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+        <h3 class="text-xl font-semibold text-secondary-shade mb-4">
+          Please select an Objective to view exit controls
+        </h3>
+        <p class="text-gray-500 mb-6">Choose an objective from the dropdown above to get started</p>
+        <div v-if="!objectives || objectives.length === 0">
+          <p class="text-sm text-gray-400">Please add an objective first to manage exit controls</p>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup>

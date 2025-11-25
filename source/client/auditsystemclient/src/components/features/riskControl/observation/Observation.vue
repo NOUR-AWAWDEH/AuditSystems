@@ -29,10 +29,8 @@
     />
 
     <!-- No Observations Message -->
-    <NoObservations
-      v-if="!isLoading && props.auditPrograms.length === 0"
-    />
-    
+    <NoObservations v-else />
+
     <!-- Edit Observation Modal -->
     <EditObservationModal
       v-if="showEditObservationModal"
@@ -57,14 +55,14 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
-import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
-import ObservationTable from './components/ObservationTable.vue';
-import AddObservationModal from './components/AddObservationModal.vue';
-import EditObservationModal from './components/EditObservationModal.vue';
-import { useObservationTable } from './composables/useObservationTable';
-import { useObservationModals } from './composables/useObservationModals';
-import NoObservations from './components/NoObservations.vue';
+import { watch } from "vue";
+import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
+import ObservationTable from "./components/ObservationTable.vue";
+import AddObservationModal from "./components/AddObservationModal.vue";
+import EditObservationModal from "./components/EditObservationModal.vue";
+import { useObservationTable } from "./composables/useObservationTable";
+import { useObservationModals } from "./composables/useObservationModals";
+import NoObservations from "./components/NoObservations.vue";
 
 const props = defineProps({
   auditPrograms: {
@@ -78,14 +76,13 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-    'observation-selected',
-    'observation-added',
-    'observation-updated',
-    'observation-deleted'
+  "observation-selected",
+  "observation-added",
+  "observation-updated",
+  "observation-deleted",
 ]);
 
-
-// Use composables -now with integrated backend search
+// Use composables - now with integrated backend search
 const {
   observations,
   isLoading,
@@ -100,12 +97,14 @@ const {
 } = useObservationTable(props.auditPrograms);
 
 // Watch for prop changes and update internal state
-watch(() => props.selectedAuditProgramId, (newAuditProgramId) => {
+watch(
+  () => props.selectedAuditProgramId,
+  (newAuditProgramId) => {
     if (newAuditProgramId !== internalSelectedAuditProgramId.value) {
-       handleObservationChange(newAuditProgramId);
+      handleObservationChange(newAuditProgramId);
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 // Use modal composable for dialog management
@@ -130,7 +129,7 @@ const {
 
 // Handle observation selection and forward to parent
 const handleObservationSelected = (observationId) => {
-  emit('observation-selected', observationId);
+  emit("observation-selected", observationId);
 };
 
 defineExpose({

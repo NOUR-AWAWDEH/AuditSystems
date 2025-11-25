@@ -31,7 +31,6 @@
     <!-- Empty state  No Exit Control Exist-->
     <NoExitControlExist v-else />
 
-
     <!-- Edit Control Design Modal -->
     <EditControlDesignModal
       v-if="showEditControlDesignModal"
@@ -158,9 +157,3 @@ defineExpose({
   resetToDefaultView,
 });
 </script>
-
-<style scoped>
-.control-design-table .table-row {
-  transition: all 0.2s ease;
-}
-</style>

@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <div class="hidden md:block rounded-lg border border-gray-200">
+        <div class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="locations"
             :columns="enhancedColumns"
@@ -65,7 +65,7 @@
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
-          class="md:hidden"
+          class="lg:hidden"
         >
           <!-- Card Content -->
           <template #card-content="{ item }">
@@ -108,8 +108,8 @@
                 class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                 :class="{ 'bg-green-200': selectedLocationId === item.id }"
               >
-                <CheckIcon v-if="selectedLocationId === item.id" size="sm" class="mr-1" />
-                <SelectIcon v-else size="sm" class="mr-1" />
+                <CheckIcon v-if="selectedLocationId === item.id" size="md" class="mr-1" />
+                <SelectIcon v-else size="md" class="mr-1" />
                 {{ selectedLocationId === item.id ? "Selected" : "Select" }}
               </button>
 
@@ -163,15 +163,9 @@ const props = defineProps({
   handleSearch: Function,
 });
 
-const emit = defineEmits([
-  "add-location",
-  "edit-location",
-  "delete-location",
-  "location-selected"
-]);
+const emit = defineEmits(["add-location", "edit-location", "delete-location", "location-selected"]);
 
 const selectedLocationId = ref(null);
-
 
 const handleSelectLocation = (location) => {
   selectedLocationId.value = location.id;
@@ -205,7 +199,6 @@ watch(
   },
   { deep: true }
 );
-
 </script>
 
 <style scoped>

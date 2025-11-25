@@ -1,24 +1,24 @@
 <template>
-  <!-- ObjectiveTable.vue -->
-  <div class="space-y-6">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div class="p-6">
-        <!-- Risk Control Matrix and Filters - Stack on mobile -->
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-          <div class="flex-1 max-w-md">
-            <ObjectiveHeader />
-            <RiskControlMatrixSelector
-              :risk-control-matrices="riskControlMatrices"
-              :selected-risk-control-matrix-id="internalSelectedRiskControlMatrixId"
-              @update:selected-risk-control-matrix="
-                (id) => (internalSelectedRiskControlMatrixId = id)
-              "
-              @risk-control-matrix-changed="(id) => (internalSelectedRiskControlMatrixId = id)"
-            />
-          </div>
+  <div>
+    <!-- Objective Container -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <div class="p-3 sm:p-4 md:p-6">
+        <!-- Header -->
+        <div class="flex flex-col gap-4 mb-6">
+          <ObjectiveHeader />
 
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="flex-1 sm:flex-initial">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="w-full sm:min-w-64 sm:max-w-xs">
+              <RiskControlMatrixSelector
+                :risk-control-matrices="riskControlMatrices"
+                :selected-risk-control-matrix-id="internalSelectedRiskControlMatrixId"
+                @update:selected-risk-control-matrix="
+                  (id) => (internalSelectedRiskControlMatrixId = id)
+                "
+                @risk-control-matrix-changed="(id) => (internalSelectedRiskControlMatrixId = id)"
+              />
+            </div>
+            <div class="w-full sm:w-auto">
               <SearchFilter
                 :search="searchQuery"
                 :search-placeholder="'Search objectives...'"
@@ -29,39 +29,42 @@
           </div>
         </div>
 
-        <!-- Keep only this Selected risk control matrix Info section -->
+        <!-- Selected Risk Control Matrix Info -->
         <div
           v-if="selectedRiskControlMatrixId"
-          class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"
+          class="mb-6 p-3 sm:p-4 bg-linear-to-r from-primary-soft to-indigo-200 rounded-lg border border-primary-base"
         >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <RiskControlMatrixIcon size="xxl" custom-class="text-blue-600 mr-2" />
-              <p class="text-sm text-gray-700">
-                Showing Objectives for: &nbsp;&nbsp;
-                <span class="font-semibold text-blue-800">
-                  <span v-if="isRiskControlMatrixLoading">Loading risk control matrix...</span>
-                  <span v-else>{{ currentRiskControlMatrix?.description || "Loading..." }}</span>
-                </span>
-                <span v-if="searchQuery" class="ml-2 text-blue-600"
-                  >| Search: "{{ searchQuery }}"
-                </span>
-              </p>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-2 flex-1 min-w-0">
+              <RiskControlMatrixIcon size="lg" custom-class="text-blue-600" />
+              <div class="flex-1 min-w-0">
+                <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
+                  <span>Showing Objectives for:</span>
+                  <span class="ml-1 font-semibold text-primary-shade">
+                    <span v-if="isRiskControlMatrixLoading">Loading risk control matrix...</span>
+                    <span v-else>{{ currentRiskControlMatrix?.description || "Loading..." }}</span>
+                  </span>
+                  <span v-if="searchQuery" class="ml-2 text-blue-600">
+                    | Search: "{{ searchQuery }}"
+                  </span>
+                </p>
+              </div>
             </div>
+
             <button
               @click="$emit('add-objective')"
-              class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
+              class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
             >
-              <PlusIcon :stroke-width="3" />
+              <PlusIcon :stroke-width="3" class="w-5 h-5" />
               Add Objective
             </button>
           </div>
         </div>
 
-        <!-- Table Container - Show when risk control matrix is Selected -->
+        <!-- Desktop Table -->
         <div
           v-if="selectedRiskControlMatrixId"
-          class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden"
+          class="hidden lg:block rounded-lg border border-gray-200"
         >
           <ReusableTable
             :items="objectives"
@@ -69,30 +72,31 @@
             :is-loading="isLoading"
             :actions="[]"
             :no-data-message="noDataMessage"
-            class="objective-table"
+            class="objective-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
                   @click.stop="handleSelectObjective(item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                   :class="{ 'bg-green-200': selectedObjectiveId === item.id }"
                 >
-                  <CheckIcon v-if="selectedObjectiveId === item.id" size="sm" custom-class="mr-1" />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
+                  <CheckIcon v-if="selectedObjectiveId === item.id" size="md" custom-class="mr-1" />
+                  <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedObjectiveId === item.id ? "Selected" : "Select" }}
                 </button>
 
                 <button
                   @click.stop="$emit('edit-objective', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
                 </button>
+
                 <button
                   @click.stop="$emit('delete-objective', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
@@ -100,7 +104,7 @@
 
                 <button
                   @click.stop="$emit('add-risks', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <AddIcon size="sm" custom-class="mr-1" />
                   Add Risks
@@ -108,59 +112,101 @@
               </div>
             </template>
           </ReusableTable>
-
-          <!-- Clear Search Button (shown when no results and searching) -->
-          <div
-            v-if="searchQuery && objectives.length === 0 && !isLoading"
-            class="text-center py-4 border-t border-gray-200"
-          >
-            <button
-              @click="handleSearch('')"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
-            >
-              <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
-              Clear Search
-            </button>
-          </div>
         </div>
 
-        <!-- No Risk Control Matrix Selected - Show when no risk control matrix is selected -->
+        <!-- Mobile Card View -->
+        <ReusableMobileCardList
+          v-if="selectedRiskControlMatrixId"
+          :items="objectives"
+          :showNumber="true"
+          :isLoading="isLoading"
+          :noDataMessage="noDataMessage"
+          class="lg:hidden"
+        >
+          <template #card-content="{ item }">
+            <div class="space-y-4">
+              <div class="border-b border-gray-100 pb-3">
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Description
+                </div>
+                <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
+                  {{ item.description }}
+                </div>
+              </div>
 
-        <div v-else class="text-center py-20">
-          <!-- When risk Control matrices are available but none selected -->
-          <div
-            v-if="riskControlMatrices && riskControlMatrices.length > 0"
-            class="max-w-md mx-auto"
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Created At
+                </div>
+                <div class="text-gray-400 text-xs font-medium">
+                  {{ formatDateSimple(item.createdAt) }}
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template #card-actions="{ item }">
+            <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
+              <button
+                @click.stop="handleSelectObjective(item)"
+                class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                :class="{ 'bg-green-200': selectedObjectiveId === item.id }"
+              >
+                <CheckIcon v-if="selectedObjectiveId === item.id" size="md" class="mr-1" />
+                <SelectIcon v-else size="md" class="mr-1" />
+                {{ selectedObjectiveId === item.id ? "Selected" : "Select" }}
+              </button>
+
+              <button
+                @click.stop="$emit('edit-objective', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <EditIcon size="sm" class="mr-1" /> Edit
+              </button>
+
+              <button
+                @click.stop="$emit('delete-objective', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+              >
+                <DeleteIcon size="sm" class="mr-1" /> Delete
+              </button>
+
+              <button
+                @click.stop="$emit('add-risks', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <AddIcon size="sm" class="mr-1" /> Add Risks
+              </button>
+            </div>
+          </template>
+        </ReusableMobileCardList>
+
+        <!-- No results while searching -->
+        <div
+          v-if="searchQuery && objectives.length === 0 && !isLoading"
+          class="text-center py-4 border-t border-gray-200"
+        >
+          <button
+            @click="handleSearch('')"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
           >
-            <div
-              class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg"
-            >
-              <RiskControlMatrixIcon size="xxxl" custom-class="text-blue-600" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Risk Control Matrix</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              Choose a risk control matrix from the dropdown above to view and manage objectives
-            </p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p class="text-sm text-blue-700">
-                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a
-                risk control matrix and start managing objectives
-              </p>
-            </div>
-          </div>
+            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+            Clear Search
+          </button>
+        </div>
 
-          <!-- When no risk control matrices are available -->
-          <div v-else class="max-w-lg mx-auto">
-            <div
-              class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300"
-            >
-              <RiskControlMatrixIcon size="xxxl" custom-class="text-gray-400" />
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">
-              No Risk Control Matrices Available
-            </h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              You need to create risk control matrices first before you can manage objectives
+        <!-- No Risk Control Matrix Selected -->
+        <div v-else-if="!selectedRiskControlMatrixId" class="text-center py-16">
+          <RiskControlMatrixIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">
+            Please select a Risk Control Matrix to view objectives
+          </h3>
+          <p class="text-gray-500 mb-6">
+            Choose a risk control matrix from the dropdown above to get started
+          </p>
+          <div v-if="!riskControlMatrices || riskControlMatrices.length === 0">
+            <p class="text-sm text-gray-400">
+              Please add a risk control matrix first to manage objectives
             </p>
           </div>
         </div>
@@ -172,6 +218,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import ReusableTable from "@/components/common/ReusableTable.vue";
+import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import RiskControlMatrixSelector from "@/components/features/riskControl/riskControlMatrix/components/RiskControlMatrixSelector.vue";
 import RiskControlMatrixIcon from "@/components/common/icons/RiskControlMatrixIcon.vue";
@@ -183,6 +230,7 @@ import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import AddIcon from "@/components/common/icons/AddIcon.vue";
 import ObjectiveHeader from "./ObjectiveHeader.vue";
+import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
   riskControlMatrices: {

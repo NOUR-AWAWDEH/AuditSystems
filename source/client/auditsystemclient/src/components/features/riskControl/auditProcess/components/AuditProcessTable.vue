@@ -59,8 +59,9 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="internalSelectedSubDepartmentId"
-          class="hidden md:block rounded-lg border border-gray-200"
+        <div
+          v-if="internalSelectedSubDepartmentId"
+          class="hidden lg:block rounded-lg border border-gray-200"
         >
           <ReusableTable
             :items="auditProcesses"
@@ -77,12 +78,16 @@
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                   :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
                 >
-                  <CheckIcon v-if="selectedAuditProcessId === item.id" size="md" custom-class="mr-1" />
+                  <CheckIcon
+                    v-if="selectedAuditProcessId === item.id"
+                    size="md"
+                    custom-class="mr-1"
+                  />
                   <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
                 </button>
 
-               <button
+                <button
                   @click.stop="$emit('edit-audit-process', item)"
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
                 >
@@ -92,7 +97,8 @@
 
                 <button
                   @click.stop="$emit('delete-audit-process', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200">
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+                >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>
@@ -108,7 +114,7 @@
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
-          class="md:hidden"
+          class="lg:hidden"
         >
           <template #card-content="{ item }">
             <div class="space-y-4">
@@ -139,8 +145,8 @@
                 class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                 :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
               >
-                <CheckIcon v-if="selectedAuditProcessId === item.id" size="sm" class="mr-1" />
-                <SelectIcon v-else size="sm" class="mr-1" />
+                <CheckIcon v-if="selectedAuditProcessId === item.id" size="md" class="mr-1" />
+                <SelectIcon v-else size="md" class="mr-1" />
                 {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
               </button>
 
@@ -178,10 +184,16 @@
         <!-- No sub-department Selected -->
         <div v-else-if="!internalSelectedSubDepartmentId" class="text-center py-16">
           <DepartmentIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
-          <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a sub-department to view Audit Processes</h3>
-          <p class="text-gray-500 mb-6">Choose a sub-department from the dropdown above to get started</p>
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">
+            Please select a sub-department to view Audit Processes
+          </h3>
+          <p class="text-gray-500 mb-6">
+            Choose a sub-department from the dropdown above to get started
+          </p>
           <div v-if="!subDepartments || subDepartments.length === 0">
-            <p class="text-sm text-gray-400">Please add a sub-department first to manage Audit Processes</p>
+            <p class="text-sm text-gray-400">
+              Please add a sub-department first to manage Audit Processes
+            </p>
           </div>
         </div>
       </div>

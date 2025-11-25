@@ -60,7 +60,10 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="internalSelectedLocationId" class="hidden md:block rounded-lg border border-gray-200">
+        <div
+          v-if="internalSelectedLocationId"
+          class="hidden lg:block rounded-lg border border-gray-200"
+        >
           <ReusableTable
             :items="departments"
             :columns="enhancedColumns"
@@ -76,7 +79,11 @@
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                   :class="{ 'bg-green-200': selectedDepartmentId === item.id }"
                 >
-                  <CheckIcon v-if="selectedDepartmentId === item.id" size="md" custom-class="mr-1" />
+                  <CheckIcon
+                    v-if="selectedDepartmentId === item.id"
+                    size="md"
+                    custom-class="mr-1"
+                  />
                   <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedDepartmentId === item.id ? "Selected" : "Select" }}
                 </button>
@@ -91,7 +98,8 @@
 
                 <button
                   @click.stop="$emit('delete-department', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap">
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>
@@ -107,20 +115,26 @@
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
-          class="md:hidden"
+          class="lg:hidden"
         >
-          <template #card-content="{ item}">
+          <template #card-content="{ item }">
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
-                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Name</div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Name
+                </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
                   {{ item.name }}
                 </div>
               </div>
 
               <div>
-                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Created At</div>
-                <div class="text-gray-400 text-xs font-medium">{{ formatDateSimple(item.createdAt) }}</div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Created At
+                </div>
+                <div class="text-gray-400 text-xs font-medium">
+                  {{ formatDateSimple(item.createdAt) }}
+                </div>
               </div>
             </div>
           </template>
@@ -132,8 +146,8 @@
                 class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                 :class="{ 'bg-green-200': selectedDepartmentId === item.id }"
               >
-                <CheckIcon v-if="selectedDepartmentId === item.id" size="sm" class="mr-1" />
-                <SelectIcon v-else size="sm" class="mr-1" />
+                <CheckIcon v-if="selectedDepartmentId === item.id" size="md" class="mr-1" />
+                <SelectIcon v-else size="md" class="mr-1" />
                 {{ selectedDepartmentId === item.id ? "Selected" : "Select" }}
               </button>
 
@@ -171,7 +185,9 @@
         <!-- No Location Selected -->
         <div v-else-if="!internalSelectedLocationId" class="text-center py-16">
           <LocationIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
-          <h3 class="text-xl font-semibold text-secondary-shade mb-4">Please select a Location to view departments</h3>
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">
+            Please select a Location to view departments
+          </h3>
           <p class="text-gray-500 mb-6">Choose a location from the dropdown above to get started</p>
           <div v-if="!locations || locations.length === 0">
             <p class="text-sm text-gray-400">Please add a location first to manage departments</p>
@@ -219,13 +235,20 @@ const emit = defineEmits([
 
 const internalSelectedLocationId = ref(props.selectedLocationId);
 
-watch(() => props.selectedLocationId, (newVal) => {
-  internalSelectedLocationId.value = newVal;
-});
+watch(
+  () => props.selectedLocationId,
+  (newVal) => {
+    internalSelectedLocationId.value = newVal;
+  }
+);
 
-watch(internalSelectedLocationId, (newVal) => {
-  props.handleLocationChange(newVal);
-}, { immediate: true });
+watch(
+  internalSelectedLocationId,
+  (newVal) => {
+    props.handleLocationChange(newVal);
+  },
+  { immediate: true }
+);
 
 // Department selection state
 const selectedDepartmentId = ref(null);
@@ -240,7 +263,10 @@ const departmentColumns = [
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
 
-const enhancedColumns = computed(() => [...departmentColumns, { key: "actions", label: "Actions" }]);
+const enhancedColumns = computed(() => [
+  ...departmentColumns,
+  { key: "actions", label: "Actions" },
+]);
 
 const noDataMessage = computed(() => {
   if (props.searchQuery) return `No departments found for "${props.searchQuery}".`;

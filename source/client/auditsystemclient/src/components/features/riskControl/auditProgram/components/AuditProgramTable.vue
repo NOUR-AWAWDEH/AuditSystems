@@ -1,23 +1,23 @@
 <template>
-  <!--AuditProgramTable.vue-->
-  <div class="space-y-6">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div class="p-6">
-        <!-- Exit Control and Filters - Stack on mobile -->
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-          <div class="flex-1 max-w-md">
-            <AuditProgramHeader />
-            <ExitControlSelector
-              :exit-controls="exitControls"
-              label="Select Exit Control (Adequate)"
-              :selected-exit-control-id="internalSelectedExitControlId"
-              @update:selected-exit-control="(id) => (internalSelectedExitControlId = id)"
-              @exit-control-changed="(id) => (internalSelectedExitControlId = id)"
-            />
-          </div>
+  <div>
+    <!-- Audit Program Container -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <div class="p-3 sm:p-4 md:p-6">
+        <!-- Header -->
+        <div class="flex flex-col gap-4 mb-6">
+          <AuditProgramHeader />
 
-          <div class="flex flex-col sm:flex-row gap-3">
-            <div class="flex-1 sm:flex-initial">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="w-full sm:min-w-64 sm:max-w-xs">
+              <ExitControlSelector
+                :exit-controls="exitControls"
+                label="Select Exit Control (Adequate)"
+                :selected-exit-control-id="internalSelectedExitControlId"
+                @update:selected-exit-control="(id) => (internalSelectedExitControlId = id)"
+                @exit-control-changed="(id) => (internalSelectedExitControlId = id)"
+              />
+            </div>
+            <div class="w-full sm:w-auto">
               <SearchFilter
                 :search="searchQuery"
                 :search-placeholder="'Search Audit Programs...'"
@@ -28,74 +28,75 @@
           </div>
         </div>
 
-        <!-- Keep only this Selected exit control Info section -->
+        <!-- Selected Exit Control Info -->
         <div
           v-if="selectedExitControlId"
-          class="mb-6 p-4 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"
+          class="mb-6 p-3 sm:p-4 bg-linear-to-r from-primary-soft to-indigo-200 rounded-lg border border-primary-base"
         >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <ExitControlIcon size="xxl" custom-class="text-blue-600 mr-2" />
-
-              <p class="text-sm text-gray-700">
-                Showing Audit Programs for: &nbsp;&nbsp;
-                <span class="font-semibold text-blue-800">
-                  <span v-if="isExitControlLoading">Loading exit control...</span>
-                  <span v-else>{{ currentExitControl?.description || "Loading..." }}</span>
-                </span>
-                <span v-if="searchQuery" class="ml-2 text-blue-600"
-                  >| Search: "{{ searchQuery }}"</span
-                >
-              </p>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-start sm:items-center gap-2 flex-1 min-w-0">
+              <ExitControlIcon size="lg" custom-class="text-blue-600" />
+              <div class="flex-1 min-w-0">
+                <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
+                  <span>Showing Audit Programs for:</span>
+                  <span class="ml-1 font-semibold text-primary-shade">
+                    <span v-if="isExitControlLoading">Loading exit control...</span>
+                    <span v-else>{{ currentExitControl?.description || "Loading..." }}</span>
+                  </span>
+                  <span v-if="searchQuery" class="ml-2 text-blue-600">
+                    | Search: "{{ searchQuery }}"
+                  </span>
+                </p>
+              </div>
             </div>
+
             <button
               @click="$emit('add-audit-program')"
-              class="px-4 py-2 rounded-md text-sm font-medium bg-secondary-base hover:bg-secondary-shade text-white"
+              class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
             >
-              <PlusIcon :stroke-width="3" />
+              <PlusIcon :stroke-width="3" class="w-5 h-5" />
               Add Audit Program
             </button>
           </div>
         </div>
 
-        <!-- Table Container - Show when exit control is Selected -->
-        <div
-          v-if="selectedExitControlId"
-          class="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden"
-        >
+        <!-- Desktop Table -->
+        <div v-if="selectedExitControlId" class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="auditPrograms"
             :columns="enhancedColumns"
             :is-loading="isLoading"
             :actions="[]"
             :no-data-message="noDataMessage"
-            class="audit-program-table"
+            class="audit-program-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
                   @click.stop="handleSelectAuditProgram(item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                   :class="{ 'bg-green-200': selectedAuditProgramId === item.id }"
                 >
                   <CheckIcon
                     v-if="selectedAuditProgramId === item.id"
-                    size="sm"
+                    size="md"
                     custom-class="mr-1"
                   />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
+                  <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedAuditProgramId === item.id ? "Selected" : "Select" }}
                 </button>
+
                 <button
                   @click.stop="$emit('edit-audit-program', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
                 </button>
+
                 <button
                   @click.stop="$emit('delete-audit-program', item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
@@ -103,54 +104,94 @@
               </div>
             </template>
           </ReusableTable>
-
-          <!-- Clear Search Button (shown when no results and searching) -->
-          <div
-            v-if="searchQuery && auditPrograms.length === 0 && !isLoading"
-            class="text-center py-4 border-t border-gray-200"
-          >
-            <button
-              @click="handleSearch('')"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
-            >
-              <CloseIcon size="sm" stroke-width="3" custom-class="mr-1" />
-              Clear Search
-            </button>
-          </div>
         </div>
 
-        <!-- No exit control  Selected - Show when no exit control is selected -->
+        <!-- Mobile Card View -->
+        <ReusableMobileCardList
+          v-if="selectedExitControlId"
+          :items="auditPrograms"
+          :showNumber="true"
+          :isLoading="isLoading"
+          :noDataMessage="noDataMessage"
+          class="lg:hidden"
+        >
+          <template #card-content="{ item }">
+            <div class="space-y-4">
+              <div class="border-b border-gray-100 pb-3">
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Description
+                </div>
+                <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
+                  {{ item.description }}
+                </div>
+              </div>
 
-        <div v-else class="text-center py-20">
-          <!-- When exit Control are available but none selected -->
-          <div v-if="exitControls && exitControls.length > 0" class="max-w-md mx-auto">
-            <div
-              class="bg-linear-to-br from-blue-50 to-indigo-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg"
-            >
-              <ExitControlIcon size="xxxl" custom-class="text-blue-600" />
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Created At
+                </div>
+                <div class="text-gray-400 text-xs font-medium">
+                  {{ formatDateSimple(item.createdAt) }}
+                </div>
+              </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">Select a Exit Control</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              Choose a exit control from the dropdown above to view and manage exit controls
-            </p>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p class="text-sm text-blue-700">
-                <span class="font-medium">💡 Tip:</span> Use the dropdown menu above to select a
-                exit control and start managing exit controls
-              </p>
-            </div>
-          </div>
+          </template>
 
-          <!-- When no exit controls are available -->
-          <div v-else class="max-w-lg mx-auto">
-            <div
-              class="bg-linear-to-br from-gray-50 to-gray-100 rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-gray-300"
-            >
-              <ExitControlIcon size="xxxl" custom-class="text-gray-400" />
+          <template #card-actions="{ item }">
+            <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
+              <button
+                @click.stop="handleSelectAuditProgram(item)"
+                class="w-42 min-h-10 inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                :class="{ 'bg-green-200': selectedAuditProgramId === item.id }"
+              >
+                <CheckIcon v-if="selectedAuditProgramId === item.id" size="md" class="mr-1" />
+                <SelectIcon v-else size="md" class="mr-1" />
+                {{ selectedAuditProgramId === item.id ? "Selected" : "Select" }}
+              </button>
+
+              <button
+                @click.stop="$emit('edit-audit-program', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <EditIcon size="sm" class="mr-1" /> Edit
+              </button>
+
+              <button
+                @click.stop="$emit('delete-audit-program', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+              >
+                <DeleteIcon size="sm" class="mr-1" /> Delete
+              </button>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Exit Controls Available</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">
-              You need to create exit controls first before you can manage exit controls
+          </template>
+        </ReusableMobileCardList>
+
+        <!-- No results while searching -->
+        <div
+          v-if="searchQuery && auditPrograms.length === 0 && !isLoading"
+          class="text-center py-4 border-t border-gray-200"
+        >
+          <button
+            @click="handleSearch('')"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
+          >
+            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
+            Clear Search
+          </button>
+        </div>
+
+        <!-- No Exit Control Selected -->
+        <div v-else-if="!selectedExitControlId" class="text-center py-16">
+          <ExitControlIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+          <h3 class="text-xl font-semibold text-secondary-shade mb-4">
+            Please select an Exit Control to view audit programs
+          </h3>
+          <p class="text-gray-500 mb-6">
+            Choose an exit control from the dropdown above to get started
+          </p>
+          <div v-if="!exitControls || exitControls.length === 0">
+            <p class="text-sm text-gray-400">
+              Please add an exit control first to manage audit programs
             </p>
           </div>
         </div>
@@ -162,6 +203,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import ReusableTable from "@/components/common/ReusableTable.vue";
+import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import AuditProgramHeader from "./AuditProgramHeader.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import ExitControlIcon from "@/components/common/icons/RiskIcon.vue";
@@ -172,6 +214,7 @@ import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import ExitControlSelector from "../../exitControl/components/ExitControlSelector.vue";
+import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
   exitControls: {
@@ -261,21 +304,3 @@ const noDataMessage = computed(() => {
   return "No Audit Programs found for this Exit Control.";
 });
 </script>
-
-<style scoped>
-.audit-program-table .table-row {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.audit-program-table .table-row:hover {
-  background-color: #f8fafc;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.audit-program-table .table-row.selected {
-  background-color: #e6f7ff;
-  border-left: 4px solid #3b82f6;
-}
-</style>

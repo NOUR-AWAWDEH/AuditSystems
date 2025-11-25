@@ -106,7 +106,6 @@
 
         <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
           <RiskVue
-            v-if="showAddRiskForm"
             :objectives="objectives"
             :selected-objective-id="selectedObjectiveId"
             @risk-deleted="handleRiskDeleted"
@@ -168,7 +167,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted} from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import RiskControlHeader from "./components/RiskControlHeader.vue";
@@ -196,7 +195,6 @@ const router = useRouter();
 
 // State
 const activeTab = ref("processes");
-const showAddRiskForm = ref(false);
 
 // Selected IDs
 const selectedSubDepartmentId = ref(
@@ -256,7 +254,6 @@ const storageKeys = {
   auditprograms: "riskControlSelectedAuditProgramId",
   observations: "riskControlSelectedObservationId",
 };
-
 
 const selectionOrder = [
   "processes",
@@ -407,68 +404,75 @@ const handleObservationSelected = (id) => {
   setActiveTab("recommendations");
 };
 
-// Add Risk
+// Add Risk - Navigate to risks tab with selected objective
 const handleAddRisks = (objectiveId) => {
   selectedObjectiveId.value = objectiveId;
-  activeTab.value = "risks";
-  showAddRiskForm.value = true;
+  setActiveTab("risks");
 };
 
 // Deleted
 
-
 const handleAuditProcessDeleted = async (deletedId) => {
   if (selectedAuditProcessId.value === deletedId) {
     clearSelectionCascade("processes");
-  } await getAuditProcessesByUserId();
+  }
+  await getAuditProcessesByUserId();
 };
 
 const handleSubProcessDeleted = async (deletedId) => {
   if (selectedSubProcessId.value === deletedId) {
     clearSelectionCascade("subprocesses");
-  } await getSubProcessesByUserId();
+  }
+  await getSubProcessesByUserId();
 };
 
 const handleRiskControlMatrixDeleted = async (deletedId) => {
   if (selectedRiskControlMatrixId.value === deletedId) {
     clearSelectionCascade("matrix");
-  } await getRiskControlMatricesByUserId();
+  }
+  await getRiskControlMatricesByUserId();
 };
 
 const handleObjectiveDeleted = async (deletedId) => {
   if (selectedObjectiveId.value === deletedId) {
     clearSelectionCascade("objectives");
-  } await getObjectivesByUserId();
+  }
+  await getObjectivesByUserId();
 };
 
-const handleRiskDeleted = async () => { await getObjectivesByUserId(); };
+const handleRiskDeleted = async () => {
+  await getObjectivesByUserId();
+};
 
 const handleExitControlDeleted = async (deletedId) => {
   if (selectedExitControlId.value === deletedId) {
     clearSelectionCascade("exitcontrols");
-  } await getExitControlsByUserId();
+  }
+  await getExitControlsByUserId();
 };
 
 const handleControlDesignDeleted = async (deletedId) => {
   if (selectedControlDesignId.value === deletedId) {
     clearSelectionCascade("controldesigns");
-  } await getExitControlsByUserId();
+  }
+  await getExitControlsByUserId();
 };
 
 const handleAuditProgramDeleted = async (deletedId) => {
-  if (selectedAuditProgramId.value === deletedId){
+  if (selectedAuditProgramId.value === deletedId) {
     clearSelectionCascade("auditprograms");
-  } await getAuditProgramsByUserId();
+  }
+  await getAuditProgramsByUserId();
 };
 
 const handleObservationDeleted = async (deletedId) => {
   if (selectedObservationId.value === deletedId) {
     clearSelectionCascade("observations");
-  } await getObservationsByUserId();
+  }
+  await getObservationsByUserId();
 };
 
 //const handleRecommendationDeleted = async () => { await getObservationsByUserId() };
-
 
 const handleRouteQueries = async () => {
   const {

@@ -71,20 +71,20 @@
             class="audit-process-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex flex-col 2xl:flex-row gap-2 min-w-max">
+              <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
                   @click.stop="handleSelectAuditProcess(item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                   :class="{ 'bg-green-200': selectedAuditProcessId === item.id }"
                 >
-                  <CheckIcon v-if="selectedAuditProcessId === item.id" size="sm" custom-class="mr-1" />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
+                  <CheckIcon v-if="selectedAuditProcessId === item.id" size="md" custom-class="mr-1" />
+                  <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedAuditProcessId === item.id ? "Selected" : "Select" }}
                 </button>
 
                <button
                   @click.stop="$emit('edit-audit-process', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-primary-shade bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
@@ -92,7 +92,7 @@
 
                 <button
                   @click.stop="$emit('delete-audit-process', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200">
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200">
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>

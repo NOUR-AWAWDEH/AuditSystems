@@ -67,6 +67,7 @@
         <!-- Locations -->
         <div v-if="activeTab === 'locations'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
           <LocationView
+            :locations="locations"
             @location-selected="handleLocationSelected"
             @location-deleted="handleLocationDeleted"
           />
@@ -126,8 +127,6 @@ const { getSubDepartmentById } = useGetSubDepartmentById();
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
-const locationViewRef = ref(null);
-const organizationLocations = ref([]);
 
 const tabs = ref([
   { id: "locations", name: "Locations" },
@@ -226,18 +225,17 @@ const setActiveTab = async (tabId) => {
   try {
     switch (tabId) {
       case "locations":
-        if (locationViewRef.value) {
-          await nextTick();
-          if (typeof locationViewRef.value.refreshData === "function") {
-            await locationViewRef.value.refreshData();
-            organizationLocations.value = locationViewRef.value.locations;
-          }
+        if(!locations.value || locations.value.length === 0) {
+          await getLocationsByUserId();
         }
         break;
       case "departments":
-        await getDepartmentsByUserId();
+        if (!locations.value || locations.value.length === 0) { 
+          await getLocationsByUserId();
+        }
         break;
       case "subdepartments":
+        await getDepartmentsByUserId();
         break;
     }
   } catch (err) {

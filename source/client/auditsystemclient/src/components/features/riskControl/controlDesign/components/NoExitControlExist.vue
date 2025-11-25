@@ -1,15 +1,15 @@
 <template>
+  <!-- NoExitControlExist.vue -->
   <div class="text-center py-20">
     <div class="max-w-lg mx-auto">
       <div
         class="bg-linear-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base"
       >
-        <ControlDesignIcon size="xxxl" custom-class="text-primary-shade" />
+        <ExitControlIcon size="xxxl" custom-class="text-primary-shade" />
       </div>
-      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Control Designs Available</h3>
+      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Exit Control Exist</h3>
       <p class="text-gray-base mb-6 text-sm leading-relaxed">
-        You need to create exit controls with inadequate status first before you can manage Control
-        Designs
+        You need to create exit controls with <span class="text-green-500 bg-green-50 px-1 font-bold">Inadequate</span> status first before you can manage Control Design
       </p>
       <div class="bg-white border border-tertiary-shade rounded-lg p-6">
         <div class="flex items-start space-x-3">
@@ -34,8 +34,8 @@
             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
               <li>Navigate to the Risk Control section</li>
-              <li>Create or select an exit control</li>
-              <li>Return here to manage Control Designs</li>
+              <li>Create Exit Control with Inadequate status</li>
+              <li>Return here to manage Control Design</li>
             </ol>
           </div>
         </div>
@@ -45,5 +45,5 @@
 </template>
 
 <script setup>
-import ControlDesignIcon from '@/components/common/icons/ControlDesignIcon.vue';
+import ExitControlIcon from '@/components/common/icons/ExitControlIcon.vue';
 </script>

@@ -1,5 +1,4 @@
 <template>
-  <div>
     <!-- Sub Department Container -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
       <div class="p-3 sm:p-4 md:p-6">
@@ -20,7 +19,6 @@
                 :search="searchQuery"
                 :searchPlaceholder="'Search departments...'"
                 @update:search="handleSearch"
-                class="w-full sm:w-auto"
               />
             </div>
           </div>
@@ -37,11 +35,11 @@
               <div class="flex-1 min-w-0">
                 <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
                   <span>Showing sub departments for:</span>
-                  <span class="ml-1 font-semibold text-blue-800">
+                  <span class="ml-1 font-semibold text-primary-base">
                     <span v-if="isDepartmentLoading">Loading...</span>
                     <span v-else>{{ currentDepartment?.name }}</span>
                   </span>
-                  <span v-if="searchQuery" class="ml-2 text-blue-600">
+                  <span v-if="searchQuery" class="ml-2 text-primary-base">
                     | Search: "{{ searchQuery }}"
                   </span>
                 </p>
@@ -59,7 +57,8 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="internalSelectedDepartmentId" class="hidden md:block rounded-lg border border-gray-200">
+        <div v-if="internalSelectedDepartmentId"
+          class="hidden md:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="subDepartments"
             :columns="enhancedColumns"
@@ -69,20 +68,20 @@
             class="sub-department-table min-w-full"
           >
             <template #cell-actions="{ item }">
-              <div class="flex flex-col 2xl:flex-row gap-2 min-w-max">
+              <div class="flex flex-col justify-start items-start xl:flex-row gap-2 min-w-max">
                 <button
                   @click.stop="handleSelectSubDepartment(item)"
-                  class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 transition-all duration-200"
                   :class="{ 'bg-green-200': selectedSubDepartmentId === item.id }"
                 >
-                  <CheckIcon v-if="selectedSubDepartmentId === item.id" size="sm" custom-class="mr-1" />
-                  <SelectIcon v-else size="sm" custom-class="mr-1" />
+                  <CheckIcon v-if="selectedSubDepartmentId === item.id" size="md" custom-class="mr-1" />
+                  <SelectIcon v-else size="md" custom-class="mr-1" />
                   {{ selectedSubDepartmentId === item.id ? "Selected" : "Select" }}
                 </button>
 
                 <button
                   @click.stop="$emit('edit-sub-department', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
                 >
                   <EditIcon size="sm" custom-class="mr-1" />
                   Edit
@@ -90,7 +89,7 @@
 
                 <button
                   @click.stop="$emit('delete-sub-department', item)"
-                  class="inline-flex items-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 transition-all duration-200"
                 >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
@@ -179,7 +178,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>

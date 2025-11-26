@@ -1,5 +1,6 @@
 using AuditSystem.Domain.Entities.Audit;
 using AuditSystem.Domain.Entities.Observations;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,6 +22,12 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
         builder.HasOne(ap => ap.ExitControl)
             .WithMany(ec => ec.AuditPrograms) 
             .HasForeignKey(ap => ap.ExitControlId)
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(ap => ap.ActionOwner)
+            .WithMany(au => au.AuditPrograms)
+            .HasForeignKey(ap => ap.ActionOwnerId)
             .IsRequired(true)
             .OnDelete(DeleteBehavior.Restrict);
 

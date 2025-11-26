@@ -222,6 +222,7 @@ internal sealed class AuditProgramService(
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
+                ActionOwnerId = d.ActionOwnerId,
                 ControlDesignId = d.ControlDesignId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,

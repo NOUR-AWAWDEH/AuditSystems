@@ -1,5 +1,6 @@
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Organization;
+using AuditSystem.Domain.Entities.Audit;
 using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Domain.Entities.Users;
@@ -25,5 +26,6 @@ public class User : IdentityUser<Guid>
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public virtual ICollection<Location> Locations { get; set; } = new HashSet<Location>();
     public virtual ICollection<SupportingDocs.SupportingDoc> SupportingDocs { get; set; } = new List<SupportingDocs.SupportingDoc>();
+    public virtual ICollection<AuditProgram> AuditPrograms { get; set; } = new HashSet<AuditProgram>();
     public virtual Company? Company { get; set; } = null!;
 }

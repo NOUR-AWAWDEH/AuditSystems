@@ -107,6 +107,7 @@ public class AuditProgramSearchHelper(
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
+                ActionOwnerId = ap.ActionOwnerId,
                 ControlDesignId = ap.ControlDesignId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt

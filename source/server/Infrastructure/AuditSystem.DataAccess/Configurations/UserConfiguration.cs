@@ -39,6 +39,11 @@ public class UserConfiguration() : IEntityTypeConfiguration<User>
             .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(u => u.AuditPrograms)
+            .WithOne(ap => ap.ActionOwner)
+            .HasForeignKey(ap => ap.ActionOwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes
         builder.HasIndex(u => u.CompanyId);
         builder.HasIndex(u => u.LastLogin);

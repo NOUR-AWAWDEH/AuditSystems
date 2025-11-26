@@ -24,6 +24,12 @@ public sealed class UpdateAuditProgramValidator : AbstractValidator<UpdateAuditP
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
 
+        RuleFor(x => x.ActionOwnerId)
+            .NotEmpty()
+            .WithMessage("Action Owner Id is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("Action Owner Id must not be empty.");
+
         RuleFor(x => x.ExitControlId)
             .NotEmpty()
             .WithMessage("Id is required.")

@@ -21,7 +21,7 @@ public class AuditProcessSearchHelper(
 
     public Expression<Func<AuditProcess, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subDepartmentId)
     {
-        return ap => ap.SubDepartment.Department.Location.UserId == userId &&  
+        return ap => ap.CreatedByUserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || ap.ProcessName.Contains(searchTerm)) &&
                 ap.SubDepartmentId == subDepartmentId;
     }

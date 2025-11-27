@@ -9,10 +9,10 @@ public static class AuditProcessConstants
     public static readonly string[] ListTags = ["audit-process-list"];
     
     public static readonly Expression<Func<AuditProcess, Guid>> AuditProcessOwnerIdSelector =
-        ap => ap.SubDepartment.Department.Location.UserId;
+        ap => ap.CreatedByUserId;
     
     public static Expression<Func<AuditProcess, bool>> AuditProcessOwnerPredicate(Guid userId) =>
-        ap => ap.SubDepartment.Department.Location.UserId == userId;
+        ap => ap.CreatedByUserId == userId;
         
     public const string EntityName = "AuditProcess";
 

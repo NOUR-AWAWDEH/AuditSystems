@@ -1,4 +1,3 @@
-using AuditSystem.Application.Constants.Organization.DepartmentConst;
 using AuditSystem.Application.Constants.Organization.SubDepartmentConst;
 using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using AuditSystem.BusinessLogic.Utilities;

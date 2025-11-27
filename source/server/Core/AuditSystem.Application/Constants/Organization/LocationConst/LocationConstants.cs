@@ -9,10 +9,10 @@ public static class LocationConstants
     public static readonly string[] LocationTags = ["locations", "location-list"];
     public static readonly string[] ListTags = ["location-list"];
     public static readonly Expression<Func<Location, Guid>> LocationOwnerIdSelector =
-        l => l.UserId;
+        l => l.CreatedByUserId;
     
     public static Expression<Func<Location, bool>> LocationOwnerPredicate(Guid userId) =>
-        l => l.UserId == userId;
+        l => l.CreatedByUserId == userId;
         
     public const string EntityName = "Location";
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access location {1}.";

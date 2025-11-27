@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Services.Account;
 
-public class AccountService(UserManager<User> userManager) : IAccountService
+public class AccountService(UserManager<ApplicationUser> userManager) : IAccountService
 {
     public async Task<IdentityResult> ConfirmEmailAsync(string uid, string token)
     {
@@ -15,7 +15,7 @@ public class AccountService(UserManager<User> userManager) : IAccountService
         return await userManager.ConfirmEmailAsync(user, token);
     }
 
-    public Task<User?> FindByEmailAsync(string email)
+    public Task<ApplicationUser?> FindByEmailAsync(string email)
     {
         return userManager.FindByEmailAsync(email);
     }

@@ -10,12 +10,10 @@ public static class ExitControlConstants
     public static readonly string[] ListTags = ["exit-control-list"];
     // Ownership path expressions
     public static readonly Expression<Func<ExitControl, Guid>> ExitControlOwnerIdSelector = 
-        ec => ec.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.Location.UserId;
+        ec => ec.CreatedByUserId;
     
     public static Expression<Func<ExitControl, bool>> ExitControlOwnerPredicate(Guid userId) =>
-        ec => ec.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        ec => ec.CreatedByUserId == userId;
         
     public const string EntityName = "ExitControl";
 

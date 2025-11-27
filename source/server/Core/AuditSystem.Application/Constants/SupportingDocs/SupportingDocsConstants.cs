@@ -9,10 +9,10 @@ public static class SupportingDocsConstants
     public static readonly string[] SupportingDocTags = ["supporting-docs", "supporting-doc-list"];
     public static readonly string[] ListTags = ["supporting-doc-list"];
     public static readonly Expression<Func<SupportingDocEntity, Guid>> SupportingDocOwnerIdSelector = 
-        s => s.UserId;
+        s => s.CreatedByUserId;
     
     public static Expression<Func<SupportingDocEntity, bool>> SupportingDocOwnerPredicate(Guid userId) =>
-        s => s.UserId == userId;
+        s => s.CreatedByUserId == userId;
         
     public const string EntityName = "SupportingDoc";
     public const string ServiceName = "SupportingDocs";

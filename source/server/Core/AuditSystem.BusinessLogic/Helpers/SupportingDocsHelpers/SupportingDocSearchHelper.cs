@@ -23,7 +23,7 @@ public class SupportingDocSearchHelper(
 
     public static Expression<Func<SupportingDoc, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {
-        return s => s.UserId == userId && 
+        return s => s.CreatedByUserId == userId && 
                 (string.IsNullOrEmpty(searchTerm) || s.FileName.Contains(searchTerm));
     }
 
@@ -58,7 +58,6 @@ public class SupportingDocSearchHelper(
             .Select( s => new SupportingDocModel
             {
                 Id = s.Id,
-                UserId = s.UserId,
                 FileName = s.FileName,
                 FileSize = s.FileSize,
                 DriveFileId = s.DriveFileId,

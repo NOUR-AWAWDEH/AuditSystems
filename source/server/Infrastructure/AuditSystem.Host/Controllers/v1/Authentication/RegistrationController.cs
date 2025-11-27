@@ -14,7 +14,7 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 [ApiController]
 public sealed class RegistrationController(
         IRegistrationService _registrationService,
-        UserManager<User> _userManager,
+        UserManager<ApplicationUser> _userManager,
         ILogger<RegistrationController> _logger) 
         : ControllerBase
 {

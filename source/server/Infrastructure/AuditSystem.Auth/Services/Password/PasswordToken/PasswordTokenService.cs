@@ -3,54 +3,32 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth.Services.Password.PasswordToken;
 
-public class PasswordTokenService(UserManager<User> userManager) : IPasswordTokenService
+/// <summary>
+/// Service for generating secure password reset tokens using ASP.NET Identity.
+/// Tokens are cryptographically secure, time-limited, and single-use.
+/// </summary>
+public class PasswordTokenService : IPasswordTokenService
 {
-    public  bool ValidateResetTokenAsync(User user, string token)
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public PasswordTokenService(UserManager<ApplicationUser> userManager)
+    {
+        _userManager = userManager;
+    }
+
+    /// <summary>
+    /// Generates a cryptographically secure password reset token for the specified user.
+    /// The token is URL-safe and should be sent to the user via email.
+    /// Token expiration is configured in Identity options (default: 1 day).
+    /// </summary>
+    /// <param name="user">The user requesting a password reset.</param>
+    /// <returns>A secure token string.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when user is null.</exception>
+    public async Task<string> GeneratePasswordResetTokenAsync(ApplicationUser user)
     {
         if (user == null)
-        {
-            return false;
-        }
+            throw new ArgumentNullException(nameof(user));
 
-        if (string.IsNullOrEmpty(token))
-        {
-            return false;
-        }
-
-        if (user.PasswordResetToken == null)
-        {
-            return false;
-        }
-
-        if (user.PasswordResetToken != token || user.PasswordResetTokenExpiration < DateTime.UtcNow)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public async Task<string> GenerateAndStorePasswordResetTokenAsync(User user)
-    {
-        var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
-        user.PasswordResetToken = token;
-        user.PasswordResetTokenExpiration = DateTime.UtcNow.AddHours(1);  // Set expiration if needed
-
-        // Save updated user data to database
-        await userManager.UpdateAsync(user);
-
-        return token;
-    }
-
-    public async Task<string?> GeneratePasswordResetTokenAsync(User request)
-    {
-        if (string.IsNullOrWhiteSpace(request.Email))
-            return null;
-
-        var user = await userManager.FindByEmailAsync(request.Email);
-        if (user == null) return null;
-
-        return await userManager.GeneratePasswordResetTokenAsync(user);
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
     }
 }

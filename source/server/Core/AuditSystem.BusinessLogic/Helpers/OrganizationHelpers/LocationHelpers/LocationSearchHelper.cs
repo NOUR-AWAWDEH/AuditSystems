@@ -24,7 +24,7 @@ public class LocationSearchHelper(
 
     public Expression<Func<Location, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm)
     {
-        return l => l.UserId == userId && 
+        return l => l.CreatedByUserId == userId && 
                    (string.IsNullOrEmpty(searchTerm) || l.Name.Contains(searchTerm));
     }
 
@@ -62,7 +62,6 @@ public class LocationSearchHelper(
                 Name = l.Name,
                 Address = l.Address,
                 CompanyId = l.CompanyId,
-                UserId = l.UserId,
                 CreatedAt = l.CreatedAt,
                 UpdatedAt = l.UpdatedAt
             })

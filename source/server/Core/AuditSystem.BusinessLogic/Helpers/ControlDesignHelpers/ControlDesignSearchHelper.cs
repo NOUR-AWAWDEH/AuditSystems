@@ -25,7 +25,7 @@ public class ControlDesignSearchHelper(
 
     public Expression<Func<ControlDesign, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid? exitControlId)
     {
-        return cd => cd.ExitControl.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
+        return cd => cd.CreatedByUserId == userId &&
                         (string.IsNullOrEmpty(searchTerm) || cd.Description.Contains(searchTerm)) &&
                         cd.ExitControlId == (exitControlId ?? cd.ExitControlId);
     }

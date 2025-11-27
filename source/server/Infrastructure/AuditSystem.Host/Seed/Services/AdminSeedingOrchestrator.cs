@@ -6,13 +6,13 @@ using AuditSystem.Host.Seed.Interfaces;
 namespace AuditSystem.Host.Seed.Services;
 
 public class AdminSeedingOrchestrator(
-    UserManager<User> userManager,
+    UserManager<ApplicationUser> userManager,
     RoleManager<Role> roleManager,
     ApplicationDbContext dbContext,
     ILogger<AdminSeedingOrchestrator> logger
 ) : IAdminSeedingOrchestrator
 {
-    private readonly UserManager<User> _userManager = userManager;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly RoleManager<Role> _roleManager = roleManager;
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly ILogger<AdminSeedingOrchestrator> _logger = logger;
@@ -137,7 +137,7 @@ public class AdminSeedingOrchestrator(
             return;
         }
 
-        var user = new User
+        var user = new ApplicationUser
         {
             Id = Guid.NewGuid(),
             UserName = config.Username,

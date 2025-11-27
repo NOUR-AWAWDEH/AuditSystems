@@ -9,12 +9,10 @@ public static class AuditProgramConstants
     public static readonly string[] ListTags = ["audit-list"];
 
     public static readonly Expression<Func<AuditProgram, Guid>> AuditProgramOwnerIdSelector =
-        a => a.ExitControl.Objective.RiskControlMatrix.SubProcess
-            .AuditProcess.SubDepartment.Department.Location.UserId;
+        a => a.CreatedByUserId;
     
     public static Expression<Func<AuditProgram, bool>> AuditProgramOwnerPredicate(Guid userId) =>
-        ap => ap.ExitControl.Objective.RiskControlMatrix.SubProcess
-            .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        ap => ap.CreatedByUserId == userId;
 
 
     public const string EntityName = "AuditProgram";    

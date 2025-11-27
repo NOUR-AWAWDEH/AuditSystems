@@ -21,8 +21,7 @@ public class RecommendationSearchHelper(
 
     public Expression<Func<Recommendation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid observationId)
     {
-        return ap => ap.ObservationId == observationId &&
-                ap.Observation.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&  
+        return ap => ap.CreatedByUserId == userId &&
                 (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm));
     }
 

@@ -10,166 +10,164 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text;
 
-namespace AuditSystem.Auth.Services.Registration
+namespace AuditSystem.Auth.Services.Registration;
+
+public class RegistrationService : IRegistrationService
 {
-    public class RegistrationService(
-        UserManager<User> userManager,
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<Role> _roleManager;
+    private readonly IEmailService _emailService;
+    private readonly ILogger<RegistrationService> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly ApplicationDbContext _dbContext;
+
+    public RegistrationService(
+        UserManager<ApplicationUser> userManager,
         RoleManager<Role> roleManager,
         ILogger<RegistrationService> logger,
         IEmailService emailService,
         IConfiguration configuration,
-        ApplicationDbContext applicationDbContext) : IRegistrationService
+        ApplicationDbContext dbContext)
     {
-        private readonly UserManager<User> _userManager = userManager;
-        private readonly RoleManager<Role> _roleManager = roleManager;
-        private readonly IEmailService _emailService = emailService;
-        private readonly ILogger<RegistrationService> _logger = logger;
-        private readonly IConfiguration _configuration = configuration;
-        private readonly ApplicationDbContext _dbContext = applicationDbContext;
+        _userManager = userManager;
+        _roleManager = roleManager;
+        _logger = logger;
+        _emailService = emailService;
+        _configuration = configuration;
+        _dbContext = dbContext;
+    }
 
-        public async Task RegisterAsync(RegisterDto request, string scheme)
+    // ========================= REGISTER =========================
+
+    public async Task RegisterAsync(RegisterDto request, string scheme)
+    {
+        try
         {
-            try
-            {
-                var role = await ValidateAndGetRoleAsync(request.RoleName);
-                await ValidateUserDoesNotExistAsync(request.UserName);
-                var newUser = await CreateUserAsync(request, role);
-                var confirmationLink = await GenerateConfirmationLinkAsync(newUser, scheme);
-                await SendConfirmationEmailAsync(newUser, confirmationLink);
+            var role = await ValidateAndGetRoleAsync(request.RoleName);
+            await ValidateUserDoesNotExistAsync(request.UserName);
 
-                _logger.LogInformation("Confirmation email sent to {Email}", newUser.Email);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Registration failed for {Username}", request.UserName);
-                throw;
-            }
+            var identityUser = await CreateIdentityUserAsync(request);
+            await AssignRoleAsync(identityUser, role.Name!);
+            await CreateBusinessProfileAsync(identityUser, request);
+            await CreateInitialRefreshTokenAsync(identityUser);
+
+            var confirmationLink = await GenerateConfirmationLinkAsync(identityUser, scheme);
+            await SendConfirmationEmailAsync(identityUser, confirmationLink);
+
+            _logger.LogInformation("User registered and confirmation email sent: {Email}", identityUser.Email);
         }
-
-        public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme)
+        catch (Exception ex)
         {
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(request.Email);
-                if (user == null)
-                    throw new InvalidOperationException($"User with email '{request.Email}' does not exist");
-                
-
-                var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme);
-                await SendConfirmationEmailAsync(user, confirmationLink);
-
-                _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Verification Email failed for {UserEmail}", request.Email);
-                throw;
-            }
-        }
-
-        private async Task<Role> ValidateAndGetRoleAsync(string roleName)
-        {
-            var role = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-            if (role == null)
-                throw new ArgumentException($"Role '{roleName}' does not exist");
-            return role;
-        }
-
-        private async Task ValidateUserDoesNotExistAsync(string userName)
-        {
-            var existingUser = await _userManager.FindByNameAsync(userName);
-            if (existingUser != null)
-                throw new InvalidOperationException($"Username '{userName}' already exists");
-        }
-
-        private async Task<User> CreateUserAsync(RegisterDto request, Role role)
-        {
-            var refreshToken = new RefreshToken
-            {
-                Id = Guid.NewGuid(),
-                Token = Guid.NewGuid().ToString(),
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-                CreatedAt = DateTime.UtcNow,
-                IsRevoked = false
-            };
-
-            var newUser = new User
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                CompanyId = request.CompanyId,
-                IsActive = true,
-                EmailConfirmed = false
-            };
-
-            var creationResult = await _userManager.CreateAsync(newUser, request.Password);
-
-            if (creationResult.Succeeded)
-            {
-                // Set the FK now that user is created
-                refreshToken.UserId = newUser.Id;
-
-                // Save refresh token manually
-                _dbContext.RefreshTokens.Add(refreshToken);
-                await _userManager.AddToRoleAsync(newUser, role.Name ?? throw new InvalidOperationException("Role name cannot be null"));
-                await _dbContext.SaveChangesAsync();
-
-                return newUser;
-            }
-
-            await HandleFailedCreationAsync(request.UserName, creationResult);
-            throw CreateExceptionFromErrors("User creation failed", creationResult.Errors);
-        }
-
-        private async Task HandleFailedCreationAsync(string username, IdentityResult creationResult)
-        {
-            var existingUser = await _userManager.FindByNameAsync(username);
-            if (existingUser == null) return;
-
-            var deletionResult = await _userManager.DeleteAsync(existingUser);
-            if (!deletionResult.Succeeded)
-            {
-                throw CreateExceptionFromErrors(
-                    "User creation failed and cleanup failed",
-                    creationResult.Errors.Concat(deletionResult.Errors));
-            }
-        }
-
-        private static InvalidOperationException CreateExceptionFromErrors(string prefix, IEnumerable<IdentityError> errors)
-        {
-            var errorDescriptions = errors.Select(e => e.Description);
-            return new InvalidOperationException(
-                $"{prefix}: {string.Join(", ", errorDescriptions)}");
-        }
-
-        private async Task<string> GenerateConfirmationLinkAsync(User user, string scheme)
-        {
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var domain = Environment.GetEnvironmentVariable("APP_DOMAIN");
-            if (string.IsNullOrWhiteSpace(domain))
-                throw new ArgumentException("APP_DOMAIN environment variable is not set or is invalid.", nameof(scheme));
-
-            // Encode to prevent modification during transmission
-            var tokenBytes = Encoding.UTF8.GetBytes(token);
-            var base64Token = Convert.ToBase64String(tokenBytes);
-            var encodedToken = WebUtility.UrlEncode(base64Token);
-
-            var confirmationLink = $"{scheme}://{domain}/confirm-email?uid={user.Id}&token={encodedToken}";
-
-            return confirmationLink;
-        }
-
-        private async Task SendConfirmationEmailAsync(User user, string confirmationLink)
-        {
-            await _emailService.SendEmailAsync(
-                new EmailConfirmationRequest(
-                    email: user.Email ?? throw new ArgumentNullException(nameof(user), "User email cannot be null"),
-                    userName: user.UserName ?? throw new ArgumentNullException(nameof(user), "User username cannot be null"),
-                    confirmationLink: confirmationLink
-                )
-            );
+            _logger.LogError(ex, "Registration failed for {Username}", request.UserName);
+            throw;
         }
     }
+
+    // ========================= VERIFY EMAIL =========================
+
+    public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email)
+            ?? throw new InvalidOperationException($"User with email '{request.Email}' does not exist");
+
+        var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme);
+        await SendConfirmationEmailAsync(user, confirmationLink);
+    }
+
+    // ========================= HELPERS =========================
+
+    private async Task<Role> ValidateAndGetRoleAsync(string roleName) =>
+        await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == roleName)
+            ?? throw new ArgumentException($"Role '{roleName}' does not exist");
+
+    private async Task ValidateUserDoesNotExistAsync(string userName)
+    {
+        if (await _userManager.FindByNameAsync(userName) != null)
+            throw new InvalidOperationException($"Username '{userName}' already exists");
+    }
+
+    private async Task<ApplicationUser> CreateIdentityUserAsync(RegisterDto request)
+    {
+        var user = new ApplicationUser
+        {
+            UserName = request.UserName,
+            Email = request.Email,
+            EmailConfirmed = false
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+            throw CreateExceptionFromErrors("Identity creation failed", result.Errors);
+
+        return user;
+    }
+
+    private async Task AssignRoleAsync(ApplicationUser user, string roleName)
+    {
+        var result = await _userManager.AddToRoleAsync(user, roleName);
+        if (!result.Succeeded)
+            throw CreateExceptionFromErrors("Role assignment failed", result.Errors);
+    }
+
+    private async Task CreateBusinessProfileAsync(ApplicationUser identityUser, RegisterDto request)
+    {
+        var appUser = new AppUser
+        {
+            Id = Guid.NewGuid(),
+            IdentityUserId = identityUser.Id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            UserName = identityUser.UserName,
+            CompanyId = request.CompanyId,
+            JobTitleId = request.JobTitleId,
+            IsActive = true
+        };
+
+        _dbContext.AppUsers.Add(appUser);
+        await _dbContext.SaveChangesAsync();
+    }
+
+
+    private async Task CreateInitialRefreshTokenAsync(ApplicationUser user)
+    {
+        _dbContext.RefreshTokens.Add(new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            Token = Guid.NewGuid().ToString(),
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            IsRevoked = false,
+            UserId = user.Id
+        });
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    private async Task<string> GenerateConfirmationLinkAsync(ApplicationUser user, string scheme)
+    {
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        var domain = _configuration["APP_DOMAIN"]
+            ?? throw new InvalidOperationException("APP_DOMAIN is not configured.");
+
+        var encodedToken = WebUtility.UrlEncode(
+            Convert.ToBase64String(Encoding.UTF8.GetBytes(token)));
+
+        return $"{scheme}://{domain}/confirm-email?uid={user.Id}&token={encodedToken}";
+    }
+
+    private async Task SendConfirmationEmailAsync(ApplicationUser user, string confirmationLink)
+    {
+        if (user.Email == null || user.UserName == null)
+            throw new InvalidOperationException("User email or username is null.");
+
+        await _emailService.SendEmailAsync(new EmailConfirmationRequest(
+            user.Email,
+            user.UserName,
+            confirmationLink
+        ));
+    }
+
+    private static InvalidOperationException CreateExceptionFromErrors(string prefix, IEnumerable<IdentityError> errors)
+        => new($"{prefix}: {string.Join(", ", errors.Select(e => e.Description))}");
 }

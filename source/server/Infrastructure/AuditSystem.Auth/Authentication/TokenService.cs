@@ -110,8 +110,7 @@ public class TokenService : ITokenService
             Token = refreshToken,
             UserId = user.Id,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
-            IsRevoked = false,
-            CreatedAt = DateTime.UtcNow
+            IsRevoked = false
         };
 
         _applicationDbContext.RefreshTokens.Add(refreshTokenEntity);

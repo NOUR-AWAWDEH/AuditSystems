@@ -8,10 +8,10 @@ public static class DepartmentConstants
     public static readonly string[] DepartmentTags = ["department", "department-list"];
     public static readonly string[] ListTags = ["department-list"];
     public static readonly Expression<Func<Department, Guid>> DepartmentOwnerIdSelector =
-        d => d.Location.UserId;
+        d => d.CreatedByUserId;
     
     public static Expression<Func<Department, bool>> DepartmentOwnerPredicate(Guid userId) =>
-        d => d.Location.UserId == userId;
+        d => d.CreatedByUserId == userId;
         
     public const string EntityName = "Department";
 

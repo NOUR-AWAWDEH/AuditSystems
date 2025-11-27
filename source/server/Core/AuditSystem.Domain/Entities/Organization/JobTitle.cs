@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Domain.Entities.Organization;
 
-public class JobTitle : AuditableEntity<Guid>
+public class JobTitle : Entity<Guid>
 {
     public string Name { get; set; } = string.Empty;
 

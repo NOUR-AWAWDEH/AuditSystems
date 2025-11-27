@@ -21,12 +21,7 @@ namespace AuditSystem.DataAccess.Configurations
                    .WithOne(l => l.Company)
                    .HasForeignKey(l => l.CompanyId)
                    .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(e => e.CreatedBy)
-               .WithMany()
-               .HasForeignKey(e => e.CreatedByUserId)
-               .OnDelete(DeleteBehavior.Restrict);
-
+          
             // Seed data
 
             builder.HasData(
@@ -34,8 +29,6 @@ namespace AuditSystem.DataAccess.Configurations
                 {
                     Id = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
                     Name = "FUTURE-LINKS",
-                    CreatedAt = new DateTime(2025, 9, 17, 20, 0, 0, DateTimeKind.Utc),
-                    CreatedByUserId = new Guid("11111111-1111-1111-1111-111111111111")
                 }
             );
 

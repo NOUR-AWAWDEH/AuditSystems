@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Domain.Entities.Organization;
 
-public class Company : AuditableEntity<Guid>
+public class Company : Entity<Guid>
 {
     public required string Name { get; set; }
 

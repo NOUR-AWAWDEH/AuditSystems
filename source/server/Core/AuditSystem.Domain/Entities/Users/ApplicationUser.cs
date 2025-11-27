@@ -6,5 +6,5 @@ namespace AuditSystem.Domain.Entities.Users;
 public class ApplicationUser : IdentityUser<Guid>
 {
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-    public virtual ICollection<AppUser> AppUsers { get; set; } = [];
+    public virtual AppUser? AppUser { get; set; }
 }

@@ -216,10 +216,10 @@ public class AdminSeedingOrchestrator(
 
     private async Task CreateAppUserAsync(Guid identityUserId, AdminConfig config)
     {
-        var appUserId = Guid.NewGuid();
+
         var appUser = new AppUser
         {
-            Id = appUserId,
+            Id = identityUserId,
             IdentityUserId = identityUserId,
             FirstName = config.FirstName,
             LastName = config.LastName,
@@ -230,7 +230,7 @@ public class AdminSeedingOrchestrator(
             IsActive = true,
             SubDepartmentId = null,
             // Self-reference for the first admin user
-            CreatedByUserId = appUserId // Note: AuditableEntity usually expects AppUser Id here, not Identity Id
+            CreatedByUserId = identityUserId
         };
 
         _dbContext.AppUsers.Add(appUser);

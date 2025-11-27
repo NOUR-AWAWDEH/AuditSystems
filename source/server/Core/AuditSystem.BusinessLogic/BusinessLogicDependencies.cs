@@ -25,6 +25,7 @@ using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.UserServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.BusinessLogic.Services.UrlServices;
@@ -202,7 +203,9 @@ public static class BusinessLogicDependencies
             .AddScoped<IDecodeDownloadService, DecodeDownloadService>()
 
             // User Service
-            .AddScoped<IUserService, UserService>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IUserSessionManager, UserSessionManager>();
+
 
         return services;
     }

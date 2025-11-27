@@ -33,6 +33,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Role, Gui
     public virtual DbSet<Location> Locations { get; set; } = null!;
     public virtual DbSet<Department> Departments { get; set; } = null!;
     public virtual DbSet<SubDepartment> SubDepartments { get; set; } = null!;
+    public virtual DbSet<JobTitle> JobTitles { get; set; } = null!;
 
     // -------------------
     // Process

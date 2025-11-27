@@ -7,4 +7,5 @@ public interface IAccountService
 {
     Task<ApplicationUser?> FindByEmailAsync(string email);
     Task<IdentityResult> ConfirmEmailAsync(string uid, string token);
+    Task RevokeAllRefreshTokensAsync(ApplicationUser user);
 }

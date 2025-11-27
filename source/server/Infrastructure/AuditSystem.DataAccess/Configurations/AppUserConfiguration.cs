@@ -58,6 +58,12 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                      .HasForeignKey(u => u.SubDepartmentId)
                      .OnDelete(DeleteBehavior.Restrict);
 
+              // Auditable Entity Relationships
+              builder.HasOne(u => u.CreatedBy)
+                     .WithMany()
+                     .HasForeignKey(u => u.CreatedByUserId)
+                     .OnDelete(DeleteBehavior.Restrict);
+
               // Indexes
               builder.HasIndex(u => u.IdentityUserId).IsUnique();
               builder.HasIndex(u => u.CompanyId);

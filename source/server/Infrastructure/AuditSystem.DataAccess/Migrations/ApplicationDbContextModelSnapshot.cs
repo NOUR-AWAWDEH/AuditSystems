@@ -37,6 +37,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -54,6 +60,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("ControlDesignId");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("Description");
 
                     b.HasIndex("ExitControlId");
@@ -67,9 +75,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -80,9 +85,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -100,16 +102,10 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Level")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -122,37 +118,27 @@ namespace AuditSystem.DataAccess.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Level = "Critical",
-                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Level = "Critical"
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Level = "High",
-                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Level = "High"
                         },
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Level = "Medium",
-                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Level = "Medium"
                         },
                         new
                         {
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Level = "Low",
-                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Level = "Low"
                         },
                         new
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
-                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Level = "Minimal",
-                            UpdatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
+                            Level = "Minimal"
                         });
                 });
 
@@ -186,6 +172,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -202,6 +194,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("AuditProgramId");
 
+                    b.HasIndex("CreatedById");
+
                     b.ToTable("Observations", (string)null);
                 });
 
@@ -214,6 +208,9 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -224,6 +221,9 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Companies", (string)null);
 
                     b.HasData(
@@ -231,6 +231,7 @@ namespace AuditSystem.DataAccess.Migrations
                         {
                             Id = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
                             CreatedAt = new DateTime(2025, 9, 17, 20, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
                             Name = "FUTURE-LINKS"
                         });
                 });
@@ -243,6 +244,12 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uuid");
@@ -257,11 +264,94 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("LocationId");
 
                     b.HasIndex("Name");
 
                     b.ToTable("Departments", (string)null);
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.JobTitle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("JobTitles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "System Administrator"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "Audit Manager"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "Senior Auditor"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "Auditor"
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "Risk Manager"
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Name = "Compliance Officer"
+                        });
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
@@ -280,6 +370,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -288,16 +384,13 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("CreatedById");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Name");
 
                     b.ToTable("Locations", (string)null);
                 });
@@ -310,6 +403,9 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uuid");
@@ -340,6 +436,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("ProcessName")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -352,6 +454,8 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("ProcessName");
 
@@ -372,6 +476,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Particular")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -383,6 +493,8 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AuditProcessId");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("Particular");
 
@@ -397,6 +509,12 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -416,6 +534,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("ObservationId");
 
                     b.ToTable("Recommendations", (string)null);
@@ -430,6 +550,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -442,6 +568,8 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("Description");
 
@@ -459,6 +587,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -471,6 +605,8 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("Description");
 
@@ -488,6 +624,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -500,6 +642,8 @@ namespace AuditSystem.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("ExitControlId");
 
@@ -514,6 +658,12 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -531,6 +681,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("Inadequate");
 
                     b.HasIndex("ObjectiveId");
@@ -546,6 +698,12 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -565,6 +723,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedById");
+
                     b.HasIndex("Description");
 
                     b.HasIndex("ObjectiveId");
@@ -581,6 +741,12 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("DriveFileId")
                         .HasColumnType("uuid");
 
@@ -595,17 +761,165 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("FileName");
+
+                    b.ToTable("SupportingDocs", (string)null);
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.AppUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CompanyId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("IdentityUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("JobTitleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("JobTitleId2")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SubDepartmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SubDepartmentId1")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DriveFileId")
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("CompanyId1")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("SupportingDocs", (string)null);
+                    b.HasIndex("IdentityUserId")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("JobTitleId");
+
+                    b.HasIndex("JobTitleId2")
+                        .IsUnique();
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SubDepartmentId");
+
+                    b.HasIndex("SubDepartmentId1")
+                        .IsUnique();
+
+                    b.ToTable("AppUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.ApplicationUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Users.Role", b =>
@@ -649,122 +963,36 @@ namespace AuditSystem.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.UserSessionInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("CompanyId")
+                    b.Property<Guid>("AppUserId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
 
                     b.Property<DateTime?>("CurrentSessionStart")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
-                    b.Property<DateTime>("LastLogin")
+                    b.Property<DateTime?>("LastLogin")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("LastLogoutTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordResetCode")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime?>("PasswordResetCodeExpiration")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PasswordResetToken")
-                        .HasMaxLength(3000)
-                        .HasColumnType("character varying(3000)");
-
-                    b.Property<DateTime?>("PasswordResetTokenExpiration")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid?>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
 
                     b.Property<TimeSpan>("TotalSessionTime")
-                        .HasColumnType("interval");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("interval")
+                        .HasDefaultValue(new TimeSpan(0, 0, 0, 0, 0));
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("AppUserId");
 
-                    b.HasIndex("IsActive");
-
-                    b.HasIndex("LastLogin");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("UserSessions", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -872,8 +1100,8 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditProgram", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "ActionOwner")
-                        .WithMany("AuditPrograms")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "ActionOwner")
+                        .WithMany("OwnedAuditPrograms")
                         .HasForeignKey("ActionOwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -882,6 +1110,12 @@ namespace AuditSystem.DataAccess.Migrations
                         .WithMany("AuditPrograms")
                         .HasForeignKey("ControlDesignId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("AuditSystem.Domain.Entities.Risks.ExitControl", "ExitControl")
                         .WithMany("AuditPrograms")
@@ -893,12 +1127,14 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Navigation("ControlDesign");
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("ExitControl");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Auth.RefreshToken", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -915,18 +1151,45 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AuditProgram");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Location", "Location")
                         .WithMany("Departments")
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.JobTitle", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
@@ -937,15 +1200,15 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
-                        .WithMany("Locations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
 
-                    b.Navigation("User");
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubDepartment", b =>
@@ -961,11 +1224,19 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
                         .WithMany("AuditProcesses")
                         .HasForeignKey("SubDepartmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("SubDepartment");
                 });
@@ -978,87 +1249,143 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AuditProcess");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Recommendations.Recommendation", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.Observations.Observation", "Observation")
                         .WithMany("Recommendations")
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("Observation");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", "RiskControlMatrix")
                         .WithMany("Objectives")
                         .HasForeignKey("RiskControlMatrixId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("RiskControlMatrix");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.Processes.SubProcess", "SubProcess")
                         .WithMany("RiskControlMatrices")
                         .HasForeignKey("SubProcessId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("SubProcess");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.ControlDesign", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.Risks.ExitControl", "ExitControl")
                         .WithMany("ControlDesigns")
                         .HasForeignKey("ExitControlId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("ExitControl");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.ExitControl", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.RiskControls.Objective", "Objective")
                         .WithMany("ExitControls")
                         .HasForeignKey("ObjectiveId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("Objective");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Risks.Risk", b =>
                 {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AuditSystem.Domain.Entities.RiskControls.Objective", "Objective")
                         .WithMany("Risks")
                         .HasForeignKey("ObjectiveId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("CreatedBy");
+
                     b.Navigation("Objective");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.SupportingDocs.SupportingDoc", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", "User")
-                        .WithMany("SupportingDocs")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.AppUser", b =>
                 {
                     b.HasOne("AuditSystem.Domain.Entities.Organization.Company", "Company")
                         .WithMany("Users")
@@ -1066,11 +1393,65 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.Company", null)
+                        .WithOne("CreatedBy")
+                        .HasForeignKey("AuditSystem.Domain.Entities.Users.AppUser", "CompanyId1");
+
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", "IdentityUser")
+                        .WithMany("AppUsers")
+                        .HasForeignKey("IdentityUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.JobTitle", "JobTitle")
+                        .WithMany("Users")
+                        .HasForeignKey("JobTitleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.JobTitle", null)
+                        .WithOne("CreatedBy")
+                        .HasForeignKey("AuditSystem.Domain.Entities.Users.AppUser", "JobTitleId2");
+
                     b.HasOne("AuditSystem.Domain.Entities.Users.Role", null)
                         .WithMany("Users")
                         .HasForeignKey("RoleId");
 
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", "SubDepartment")
+                        .WithMany("Users")
+                        .HasForeignKey("SubDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AuditSystem.Domain.Entities.Organization.SubDepartment", null)
+                        .WithOne("CreatedBy")
+                        .HasForeignKey("AuditSystem.Domain.Entities.Users.AppUser", "SubDepartmentId1");
+
                     b.Navigation("Company");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("IdentityUser");
+
+                    b.Navigation("JobTitle");
+
+                    b.Navigation("SubDepartment");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.UserSessionInfo", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "AppUser")
+                        .WithMany("UserSessions")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1084,7 +1465,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1093,7 +1474,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1108,7 +1489,7 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1117,7 +1498,7 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("AuditSystem.Domain.Entities.Users.User", null)
+                    b.HasOne("AuditSystem.Domain.Entities.Users.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1136,6 +1517,9 @@ namespace AuditSystem.DataAccess.Migrations
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Company", b =>
                 {
+                    b.Navigation("CreatedBy")
+                        .IsRequired();
+
                     b.Navigation("Locations");
 
                     b.Navigation("Users");
@@ -1146,6 +1530,14 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("SubDepartments");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.JobTitle", b =>
+                {
+                    b.Navigation("CreatedBy")
+                        .IsRequired();
+
+                    b.Navigation("Users");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Location", b =>
                 {
                     b.Navigation("Departments");
@@ -1154,6 +1546,11 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.SubDepartment", b =>
                 {
                     b.Navigation("AuditProcesses");
+
+                    b.Navigation("CreatedBy")
+                        .IsRequired();
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Processes.AuditProcess", b =>
@@ -1190,20 +1587,23 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("ControlDesigns");
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.AppUser", b =>
+                {
+                    b.Navigation("OwnedAuditPrograms");
+
+                    b.Navigation("UserSessions");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.ApplicationUser", b =>
+                {
+                    b.Navigation("AppUsers");
+
+                    b.Navigation("RefreshTokens");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.Users.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("AuditSystem.Domain.Entities.Users.User", b =>
-                {
-                    b.Navigation("AuditPrograms");
-
-                    b.Navigation("Locations");
-
-                    b.Navigation("RefreshTokens");
-
-                    b.Navigation("SupportingDocs");
                 });
 #pragma warning restore 612, 618
         }

@@ -2,6 +2,8 @@ using AuditSystem.Domain.Entities.Users;
 using AuditSystem.DataAccess.Contexts;
 using Microsoft.AspNetCore.Identity;
 using AuditSystem.Host.Seed.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.Host.Seed.Services;
 
@@ -23,6 +25,7 @@ public class AdminSeedingOrchestrator(
 
         var config = LoadAdminConfiguration();
         await ValidateCompanyExistsAsync(config.CompanyId);
+        await ValidateJobTitleExistsAsync(config.JobTitleId);
         await EnsureRequiredRolesAsync();
         await CreateAdminUserIfMissingAsync(config);
 
@@ -33,7 +36,10 @@ public class AdminSeedingOrchestrator(
         string Email,
         string Password,
         string Username,
-        Guid CompanyId
+        string FirstName,
+        string LastName,
+        Guid CompanyId,
+        Guid JobTitleId
     );
 
     // -----------------------------
@@ -45,7 +51,10 @@ public class AdminSeedingOrchestrator(
             GetRequiredEnvironmentVariable("ADMIN_INITIAL_EMAIL"),
             GetRequiredEnvironmentVariable("ADMIN_INITIAL_PASSWORD"),
             GetRequiredEnvironmentVariable("ADMIN_INITIAL_USERNAME"),
-            GetRequiredGuidEnvironmentVariable("ADMIN_INITIAL_COMPANY_ID")
+            GetOptionalEnvironmentVariable("ADMIN_INITIAL_FIRSTNAME", "System"),
+            GetOptionalEnvironmentVariable("ADMIN_INITIAL_LASTNAME", "Admin"),
+            GetRequiredGuidEnvironmentVariable("ADMIN_INITIAL_COMPANY_ID"),
+            GetRequiredGuidEnvironmentVariable("ADMIN_INITIAL_JOBTITLE_ID")
         );
     }
 
@@ -59,6 +68,12 @@ public class AdminSeedingOrchestrator(
         return value.Trim();
     }
 
+    private static string GetOptionalEnvironmentVariable(string key, string defaultValue)
+    {
+        var value = Environment.GetEnvironmentVariable(key);
+        return string.IsNullOrWhiteSpace(value) ? defaultValue : value.Trim();
+    }
+
     private static Guid GetRequiredGuidEnvironmentVariable(string key)
     {
         var value = GetRequiredEnvironmentVariable(key);
@@ -70,7 +85,7 @@ public class AdminSeedingOrchestrator(
     }
 
     // -----------------------------
-    // COMPANY VALIDATION
+    // VALIDATION
     // -----------------------------
     private async Task ValidateCompanyExistsAsync(Guid companyId)
     {
@@ -83,6 +98,19 @@ public class AdminSeedingOrchestrator(
         }
 
         _logger.LogInformation("Company validated: {CompanyName}", company.Name);
+    }
+
+    private async Task ValidateJobTitleExistsAsync(Guid jobTitleId)
+    {
+        var jobTitle = await _dbContext.Set<JobTitle>().FindAsync(jobTitleId);
+
+        if (jobTitle is null)
+        {
+            _logger.LogError("JobTitle {JobTitleId} not found in DB.", jobTitleId);
+            throw new InvalidOperationException($"JobTitle not found: {jobTitleId}. Ensure JobTitle is seeded first.");
+        }
+
+        _logger.LogInformation("JobTitle validated: {JobTitleName}", jobTitle.Name);
     }
 
     // -----------------------------
@@ -124,41 +152,52 @@ public class AdminSeedingOrchestrator(
     // -----------------------------
     private async Task CreateAdminUserIfMissingAsync(AdminConfig config)
     {
-        var existing = await _userManager.FindByEmailAsync(config.Email);
+        // Check if ApplicationUser already exists
+        var existingIdentityUser = await _userManager.FindByEmailAsync(config.Email);
 
-        if (existing is not null)
+        if (existingIdentityUser is not null)
         {
-            _logger.LogInformation("Admin user already exists: {Email}", config.Email);
+            _logger.LogInformation("Admin ApplicationUser already exists: {Email}", config.Email);
 
             // Ensure role still assigned
-            if (!await _userManager.IsInRoleAsync(existing, Role.Admin))
-                await _userManager.AddToRoleAsync(existing, Role.Admin);
+            if (!await _userManager.IsInRoleAsync(existingIdentityUser, Role.Admin))
+                await _userManager.AddToRoleAsync(existingIdentityUser, Role.Admin);
+
+            // Check if AppUser exists
+            var existingAppUser = await _dbContext.AppUsers
+                .FirstOrDefaultAsync(au => au.IdentityUserId == existingIdentityUser.Id);
+
+            if (existingAppUser is null)
+            {
+                _logger.LogWarning("ApplicationUser exists but AppUser is missing. Creating AppUser for {Email}", config.Email);
+                await CreateAppUserAsync(existingIdentityUser.Id, config);
+            }
 
             return;
         }
 
-        var user = new ApplicationUser
+        // Create new ApplicationUser (Identity)
+        var identityUser = new ApplicationUser
         {
             Id = Guid.NewGuid(),
             UserName = config.Username,
             Email = config.Email,
-            EmailConfirmed = true,
-            IsActive = true,
-            FirstName = "System",
-            LastName = "Admin",
-            CompanyId = config.CompanyId
+            EmailConfirmed = true
         };
 
-        var createResult = await _userManager.CreateAsync(user, config.Password);
+        var createResult = await _userManager.CreateAsync(identityUser, config.Password);
 
         if (!createResult.Succeeded)
         {
             var errors = string.Join(", ", createResult.Errors.Select(x => x.Description));
-            _logger.LogError("Admin creation failed: {Errors}", errors);
-            throw new InvalidOperationException($"Admin user creation failed: {errors}");
+            _logger.LogError("ApplicationUser creation failed: {Errors}", errors);
+            throw new InvalidOperationException($"ApplicationUser creation failed: {errors}");
         }
 
-        var roleResult = await _userManager.AddToRoleAsync(user, Role.Admin);
+        _logger.LogInformation("ApplicationUser created: {Email}", config.Email);
+
+        // Assign Admin role
+        var roleResult = await _userManager.AddToRoleAsync(identityUser, Role.Admin);
 
         if (!roleResult.Succeeded)
         {
@@ -167,6 +206,36 @@ public class AdminSeedingOrchestrator(
             throw new InvalidOperationException($"Admin role assignment failed: {errors}");
         }
 
-        _logger.LogInformation("Admin user created and role assigned: {Email}", config.Email);
+        _logger.LogInformation("Admin role assigned to: {Email}", config.Email);
+
+        // Create linked AppUser (Business entity)
+        await CreateAppUserAsync(identityUser.Id, config);
+
+        _logger.LogInformation("Admin user fully created: {Email}", config.Email);
+    }
+
+    private async Task CreateAppUserAsync(Guid identityUserId, AdminConfig config)
+    {
+        var appUserId = Guid.NewGuid();
+        var appUser = new AppUser
+        {
+            Id = appUserId,
+            IdentityUserId = identityUserId,
+            FirstName = config.FirstName,
+            LastName = config.LastName,
+            Email = config.Email,
+            UserName = config.Username,
+            CompanyId = config.CompanyId,
+            JobTitleId = config.JobTitleId,
+            IsActive = true,
+            SubDepartmentId = null,
+            // Self-reference for the first admin user
+            CreatedByUserId = appUserId // Note: AuditableEntity usually expects AppUser Id here, not Identity Id
+        };
+
+        _dbContext.AppUsers.Add(appUser);
+        await _dbContext.SaveChangesAsync();
+
+        _logger.LogInformation("AppUser created and linked to ApplicationUser: {Email}", config.Email);
     }
 }

@@ -135,4 +135,73 @@ public class EmailService : IEmailService
 
         return template;
     }
+
+    /// <summary>
+    /// Sends a password reset email with a reset link.
+    /// This is a convenience method that uses the PasswordResetEmailRequest.
+    /// </summary>
+    public async Task SendPasswordResetEmailAsync(string email, string resetLink)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+
+        if (string.IsNullOrWhiteSpace(resetLink))
+            throw new ArgumentException("Reset link cannot be empty", nameof(resetLink));
+
+        var request = new PasswordResetEmailRequest(
+            email: email,
+            userName: email.Split('@')[0], // Use email prefix as fallback username
+            resetUrl: resetLink,
+            supportEmail: "support@AuditSystem.com"
+        );
+
+        await SendEmailAsync(request);
+    }
+
+    /// <summary>
+    /// Sends a confirmation email to the user after their password has been changed.
+    /// This is a security notification to alert users of password changes.
+    /// </summary>
+    public async Task SendPasswordChangedConfirmationAsync(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be empty", nameof(email));
+
+        const string subject = "Your Password Has Been Changed";
+        const string body = @"
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+                    .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 5px 5px; }
+                    .alert { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+                    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h2>Password Changed Successfully</h2>
+                    </div>
+                    <div class='content'>
+                        <p>Hello,</p>
+                        <p>This is a confirmation that your password has been successfully changed.</p>
+                        <div class='alert'>
+                            <strong>⚠️ Security Notice:</strong><br>
+                            If you did not make this change, please contact our support team immediately at support@AuditSystem.com
+                        </div>
+                        <p>For your security, all active sessions have been logged out. Please log in again with your new password.</p>
+                        <p>Best regards,<br>The Audit System Team</p>
+                    </div>
+                    <div class='footer'>
+                        <p>&copy; 2025 Audit System. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+
+        await SendEmailAsync(email, subject, body, isHtml: true);
+    }
 }

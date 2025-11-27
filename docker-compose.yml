@@ -38,7 +38,7 @@ services:
       ADMIN_INITIAL_PASSWORD: Havana123%100
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
-      
+      ADMIN_INITIAL_JOBTITLE_ID: 11111111-1111-1111-1111-111111111111
     volumes:
       - ./uploads:/app/uploads
       

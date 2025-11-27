@@ -23,6 +23,12 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                 builder.Property(r => r.ObjectiveId)
                         .IsRequired(true);
 
+                builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
                 builder.HasIndex(r => r.ObjectiveId);
                 builder.HasIndex(r => r.Description);
         }

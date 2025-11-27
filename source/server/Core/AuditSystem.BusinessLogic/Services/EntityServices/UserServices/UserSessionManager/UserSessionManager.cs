@@ -1,41 +1,69 @@
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
+using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
-
 public class UserSessionManager : IUserSessionManager
 {
-    public TimeSpan GetCurrentSessionDuration(User user)
+    private readonly IRepository<Guid, UserSessionInfo> _sessionRepository;
+
+    public UserSessionManager(IRepository<Guid, UserSessionInfo> sessionRepository)
     {
-        return user.CurrentSessionStart.HasValue
-            ? DateTime.UtcNow - user.CurrentSessionStart.Value
-            : TimeSpan.Zero;
+        _sessionRepository = sessionRepository;
     }
 
-    public void StartSession(User user)
+    public async Task StartSessionAsync(AppUser user)
     {
-        user.CurrentSessionStart = DateTime.UtcNow;
-        user.LastLogin = DateTime.UtcNow;
-        user.IsActive = true;
-    }
-
-    public void EndSession(User user)
-    {
-        if (user.CurrentSessionStart.HasValue)
+        var session = new UserSessionInfo
         {
-            user.TotalSessionTime += GetCurrentSessionDuration(user);
-            user.CurrentSessionStart = null;
-            user.IsActive = false;
-        }
+            Id = Guid.NewGuid(),
+            AppUserId = user.Id,
+            CurrentSessionStart = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow,
+            IsActive = true
+        };
+
+        await _sessionRepository.CreateAsync(session);
     }
 
-    public TimeSpan GetTotalSessionTime(User user)
+    public async Task EndSessionAsync(AppUser user)
     {
-        var totalTime = user.TotalSessionTime;
-        if (user.IsActive && user.CurrentSessionStart.HasValue)
-        {
-            totalTime += GetCurrentSessionDuration(user);
-        }
-        return totalTime;
+        var activeSession = await _sessionRepository.Query()
+            .FirstOrDefaultAsync(s => s.AppUserId == user.Id && s.IsActive);
+
+        if (activeSession is null) return;
+
+        activeSession.TotalSessionTime += DateTime.UtcNow - activeSession.CurrentSessionStart!.Value;
+        activeSession.CurrentSessionStart = null;
+        activeSession.IsActive = false;
+
+        await _sessionRepository.UpdateAsync(activeSession);
+    }
+
+    public async Task<TimeSpan> GetCurrentSessionDurationAsync(AppUser user)
+    {
+        var activeSession = await _sessionRepository.Query()
+            .FirstOrDefaultAsync(s => s.AppUserId == user.Id && s.IsActive);
+
+        if (activeSession == null || !activeSession.CurrentSessionStart.HasValue)
+            return TimeSpan.Zero;
+
+        return DateTime.UtcNow - activeSession.CurrentSessionStart.Value;
+    }
+
+    public async Task<TimeSpan> GetTotalSessionTimeAsync(AppUser user)
+    {
+        var sessions = await _sessionRepository.Query()
+            .Where(s => s.AppUserId == user.Id)
+            .ToListAsync();
+
+        TimeSpan total = sessions.Aggregate(TimeSpan.Zero, (sum, s) => sum + s.TotalSessionTime);
+
+        var activeSession = sessions.FirstOrDefault(s => s.IsActive && s.CurrentSessionStart.HasValue);
+        if (activeSession != null)
+            total += DateTime.UtcNow - activeSession.CurrentSessionStart!.Value;
+
+        return total;
     }
 }

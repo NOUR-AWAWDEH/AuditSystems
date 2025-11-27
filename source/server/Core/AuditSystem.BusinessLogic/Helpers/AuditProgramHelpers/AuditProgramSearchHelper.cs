@@ -23,7 +23,7 @@ public class AuditProgramSearchHelper(
 
     public Expression<Func<AuditProgram, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid exitControlId)
     {
-        return ap => ap.ExitControl.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
+        return ap => ap.CreatedByUserId == userId &&
                     (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm)) &&
                     ap.ExitControlId == exitControlId;
     }
@@ -107,6 +107,7 @@ public class AuditProgramSearchHelper(
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
+                ActionOwnerId = ap.ActionOwnerId,
                 ControlDesignId = ap.ControlDesignId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt

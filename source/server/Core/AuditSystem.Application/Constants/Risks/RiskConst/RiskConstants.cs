@@ -10,12 +10,10 @@ public static class RiskConstants
     public static readonly string[] ListTags = ["risk-list"];
     
     public static readonly Expression<Func<Risk, Guid>> RiskOwnerIdSelector = 
-        r => r.Objective.RiskControlMatrix.SubProcess   
-                .AuditProcess.SubDepartment.Department.Location.UserId;
+        r => r.CreatedByUserId;
     
     public static Expression<Func<Risk, bool>> RiskOwnerPredicate(Guid userId) =>
-        r => r.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        r => r.CreatedByUserId == userId;
         
     public const string EntityName = "Risk";
 

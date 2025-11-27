@@ -9,10 +9,10 @@ public static class SubProcessConstants
     public static readonly string[] ListTags = ["sub-process-list"];
     
     public static readonly Expression<Func<SubProcess, Guid>> SubProcessOwnerIdSelector =
-        sp => sp.AuditProcess.SubDepartment.Department.Location.UserId;
+        sp => sp.CreatedByUserId;
     
     public static Expression<Func<SubProcess, bool>> SubProcessOwnerPredicate(Guid userId) =>
-        sp => sp.AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        sp => sp.CreatedByUserId == userId;
         
     public const string EntityName = "SubProcess";
 

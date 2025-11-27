@@ -45,6 +45,7 @@ internal sealed class AuditProcessService(
         await _validationHelper.ValidateSubDepartmentOwnershipAsync(processModel.SubDepartmentId, userId);
 
         var entity = mapper.Map<AuditProcess>(processModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

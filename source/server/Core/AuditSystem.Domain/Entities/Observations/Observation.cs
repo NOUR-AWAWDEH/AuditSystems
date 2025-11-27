@@ -4,7 +4,7 @@ using AuditSystem.Domain.Entities.Recommendations;
 
 namespace AuditSystem.Domain.Entities.Observations;
 
-public class Observation : Entity<Guid>
+public class Observation : AuditableEntity<Guid>
 {
     public required string Description { get; set; }
     public required string ActionOwner { get; set; }

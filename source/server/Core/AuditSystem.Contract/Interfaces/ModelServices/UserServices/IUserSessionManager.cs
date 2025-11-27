@@ -4,8 +4,8 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 
 public interface IUserSessionManager
 {
-    TimeSpan GetCurrentSessionDuration(User user);
-    void StartSession(User user);
-    void EndSession(User user);
-    TimeSpan GetTotalSessionTime(User user);
+    Task StartSessionAsync(AppUser user);
+    Task EndSessionAsync(AppUser user);
+    Task<TimeSpan> GetCurrentSessionDurationAsync(AppUser user);
+    Task<TimeSpan> GetTotalSessionTimeAsync(AppUser user);
 }

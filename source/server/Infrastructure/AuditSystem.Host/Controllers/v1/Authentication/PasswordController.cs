@@ -1,5 +1,4 @@
-﻿﻿﻿﻿﻿using AuditSystem.Auth.Dtos.Password;
-using AuditSystem.Auth.Dtos.Register;
+﻿﻿using AuditSystem.Auth.Dtos.Password;
 using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Email;
 using AuditSystem.Auth.Services.Password.PasswordToken;
@@ -10,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
+/// <summary>
+/// Controller for secure password reset operations using ASP.NET Identity tokens.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public sealed class PasswordController(
@@ -20,96 +22,119 @@ public sealed class PasswordController(
         ILogger<PasswordController> _logger) :
         ControllerBase
 {
+    /// <summary>
+    /// Step 1: User requests password reset by providing their email.
+    /// Generates a secure token and sends it via email.
+    /// </summary>
     [HttpPost("forgot-password")]
     [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
-        // 1. Input Validation: Email is required
-        if (string.IsNullOrEmpty(request.Email))
+        // Input validation
+        if (string.IsNullOrWhiteSpace(request.Email))
         {
             return BadRequest(ApiResponse.BadRequest("Email is required."));
         }
 
         try
         {
-            // 2. Find User: Check if the user exists
+            // Find user by email
             var user = await _accountService.FindByEmailAsync(request.Email);
 
+            // SECURITY: Always return success even if user doesn't exist
+            // This prevents email enumeration attacks
             if (user == null)
             {
                 _logger.LogWarning("Password reset attempted for non-existent email: {Email}", request.Email);
-                return NotFound(ApiResponse.NotFound(new List<ApiErrorResponse>
-                {
-                    new ApiErrorResponse($"The user was not found.")
-                }));
+                // Return success to prevent email enumeration
+                return Ok(ApiResponse.Ok("If the email exists in our system, a password reset link has been sent."));
             }
 
-            // 3. Generate and Save Reset Code
-            var resetCode = _passwordResetService.GenerateResetCode();
-            await _passwordResetService.SaveResetCodeAsync(request.Email, resetCode);
+            // Generate secure token (cryptographically secure, time-limited, one-time use)
+            var token = await _passwordTokenService.GeneratePasswordResetTokenAsync(user);
 
-            // 4. Send Password Reset Email
-            await _emailService.SendEmailAsync(new PasswordResetEmailRequest(
-                email: request.Email,
-                userName: user.UserName ?? string.Empty,
-                resetCode: resetCode,
-                supportEmail: "support@AuditSystem.com"
-            ));
+            // Build reset URL with encoded token
+            // TODO: Replace with your actual frontend URL
+            var resetUrl = $"{Request.Scheme}://{Request.Host}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
 
-            // 5. Success Response
-            return Ok(ApiResponse.Ok("Password reset code sent successfully. Please check your email."));
+            // Send password reset email with the secure token link
+            await _emailService.SendPasswordResetEmailAsync(user.Email!, resetUrl);
+
+            _logger.LogInformation("Password reset token generated and email sent for user: {Email}", request.Email);
+
+            // Return success (same response whether user exists or not)
+            return Ok(ApiResponse.Ok("If the email exists in our system, a password reset link has been sent."));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred during password reset for email: {Email}", request.Email);
-            return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.InternalServerError("An unexpected error occurred. Please try again later."));
+            _logger.LogError(ex, "An unexpected error occurred during password reset request for email: {Email}", request.Email);
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                ApiResponse.InternalServerError("An unexpected error occurred. Please try again later."));
         }
     }
 
-    [HttpPost("verify-reset-code")]
-    [PreventBruteForce]
-    public async Task<ActionResult<ApiResponse<VerifyResetCodeResponseDto>>> VerifyResetCode([FromBody] VerifyResetCodeDto request)
-    {
-        var user = await _accountService.FindByEmailAsync(request.Email);
-        if (user == null)
-            return NotFound(ApiResponse<VerifyResetCodeResponseDto>.NotFound("User not found"));
-
-        var isValid = await _passwordResetService.VerifyResetCodeAsync(request.Email, request.Code);
-        if (!isValid)
-            return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid or expired reset code"));
-
-        var token = await _passwordTokenService.GenerateAndStorePasswordResetTokenAsync(user);
-        return Ok(ApiResponse<VerifyResetCodeResponseDto>.Ok(new VerifyResetCodeResponseDto
-        {
-            ResetToken = token,
-            Success = true,
-            SuccessMessage = "Reset code verified successfully",
-            StatusCode = 200
-        }));
-    }
-
+    /// <summary>
+    /// Step 2: User submits new password with the token from their email.
+    /// Validates the token and resets the password.
+    /// </summary>
     [HttpPost("reset-password")]
     [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ResetPassword([FromBody] ResetPasswordDto request)
     {
+        // Input validation
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(ApiResponse.BadRequest("Email is required."));
+
+        if (string.IsNullOrWhiteSpace(request.Token))
+            return BadRequest(ApiResponse.BadRequest("Reset token is required."));
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(ApiResponse.BadRequest("New password is required."));
+
         if (request.NewPassword != request.ConfirmNewPassword)
-            return BadRequest(ApiResponse.BadRequest("Passwords do not match"));
+            return BadRequest(ApiResponse.BadRequest("Passwords do not match."));
 
-        var user = await _accountService.FindByEmailAsync(request.Email);
-        if (user == null)
-            return NotFound(ApiResponse.NotFound(new List<ApiErrorResponse> { new ApiErrorResponse("User") }));
-
-        if (!_passwordTokenService.ValidateResetTokenAsync(user, request.Token))
-            return BadRequest(ApiResponse.BadRequest("Invalid or expired reset token"));
-
-        var result = await _passwordResetService.ResetPasswordAsync(user, request.NewPassword);
-        if (!result.Succeeded)
+        try
         {
-            var errors = result.Errors.Select(e => new ApiErrorResponse(e.Description));
-            return BadRequest(ApiResponse.BadRequest(errors));
-        }
+            // Find user by email
+            var user = await _accountService.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                _logger.LogWarning("Password reset attempted for non-existent email: {Email}", request.Email);
+                return BadRequest(ApiResponse.BadRequest("Invalid reset request."));
+            }
 
-        await _passwordResetService.ClearResetCodeAsync(user);
-        return Ok(ApiResponse.Ok("Password reset successfully"));
+            // Reset password using the secure token
+            // Identity automatically validates:
+            // - Token hasn't expired (default: 1 day, configurable)
+            // - Token hasn't been used before (one-time use)
+            // - Token hasn't been tampered with (cryptographic validation)
+            var result = await _passwordResetService.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => new ApiErrorResponse(e.Description));
+                _logger.LogWarning("Password reset failed for user {Email}: {Errors}", 
+                    request.Email, 
+                    string.Join(", ", result.Errors.Select(e => e.Description)));
+                return BadRequest(ApiResponse.BadRequest(errors));
+            }
+
+            _logger.LogInformation("Password successfully reset for user: {Email}", request.Email);
+
+            // Send confirmation email
+            await _emailService.SendPasswordChangedConfirmationAsync(user.Email!);
+
+            // Invalidate all existing refresh tokens/sessions for security
+            await _accountService.RevokeAllRefreshTokensAsync(user);
+
+            return Ok(ApiResponse.Ok("Password has been reset successfully. You can now log in with your new password."));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred during password reset for email: {Email}", request.Email);
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                ApiResponse.InternalServerError("An unexpected error occurred. Please try again later."));
+        }
     }
 }

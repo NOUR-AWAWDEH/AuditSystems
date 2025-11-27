@@ -19,9 +19,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.CompanyId)
             .IsRequired(true);
 
-        builder.Property(l => l.UserId)
-            .IsRequired(true);
-
         // Optional properties with constraints
         builder.Property(l => l.Address)
             .HasMaxLength(500);
@@ -32,10 +29,10 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasForeignKey(l => l.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(l => l.User)
-            .WithMany(l => l.Locations)
-            .HasForeignKey(l => l.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(l => l.Departments)
             .WithOne(sl => sl.Location)
@@ -44,7 +41,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
 
         // Indexes for performance
         builder.HasIndex(l => l.CompanyId);
-        builder.HasIndex(l => l.UserId);
         builder.HasIndex(l => l.Name);
     }
 }

@@ -5,6 +5,7 @@ namespace AuditSystem.Auth.Services.Account;
 
 public interface IAccountService
 {
-    Task<User?> FindByEmailAsync(string email);
+    Task<ApplicationUser?> FindByEmailAsync(string email);
     Task<IdentityResult> ConfirmEmailAsync(string uid, string token);
+    Task RevokeAllRefreshTokensAsync(ApplicationUser user);
 }

@@ -9,12 +9,10 @@ public static class RecommendationConstants
     public static readonly string[] ListTags = ["recommendation-list"];
 
     public static readonly Expression<Func<Recommendation, Guid>> RecommendationOwnerIdSelector =
-        o => o.Observation.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.
-            AuditProcess.SubDepartment.Department.Location.UserId;
+        o => o.CreatedByUserId;
     
     public static Expression<Func<Recommendation, bool>> RecommendationOwnerPredicate(Guid userId) =>
-        o => o.Observation.AuditProgram.ExitControl.Objective.RiskControlMatrix.SubProcess.
-            AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        o => o.CreatedByUserId == userId;
     
     public const string EntityName = "Recommendation";
     

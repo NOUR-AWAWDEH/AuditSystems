@@ -45,6 +45,7 @@ internal class ObjectiveService(
         await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(objectiveModel.RiskControlMatrixId, userId);
 
         var entity = mapper.Map<Objective>(objectiveModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

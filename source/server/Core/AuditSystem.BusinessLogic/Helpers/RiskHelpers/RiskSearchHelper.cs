@@ -24,7 +24,7 @@ public class RiskSearchHelper(
     public Expression<Func<Risk, bool>> BuildUserSearchPredicate(
         Guid userId, string? searchTerm, Guid objectiveId)
     {
-        return r => r.Objective.RiskControlMatrix.SubProcess.AuditProcess.SubDepartment.Department.Location.UserId == userId &&
+        return r => r.CreatedByUserId == userId &&
                 (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
                 r.ObjectiveId == objectiveId;
     }

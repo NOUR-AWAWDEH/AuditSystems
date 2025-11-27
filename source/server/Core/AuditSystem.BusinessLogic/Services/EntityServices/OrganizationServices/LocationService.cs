@@ -43,7 +43,7 @@ internal sealed class LocationService(
         _logger.LogInformation("Creating location for user {UserId}", userId);
 
         var entity = mapper.Map<Location>(locationModel);
-        entity.UserId = userId;
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);
@@ -63,7 +63,7 @@ internal sealed class LocationService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<LocationModel>(
             id, 
             userId, 
-            entity => entity.UserId, 
+            LocationConstants.LocationOwnerIdSelector, 
             LocationConstants.UnauthorizedAccessMessage);
             
         if (cachedResult != null)
@@ -166,12 +166,11 @@ internal sealed class LocationService(
 
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(l => l.UserId == userId)
+            .Where(LocationConstants.LocationOwnerPredicate(userId))
             .Select(l => new LocationModel
             {
                 Id = l.Id,
                 Name = l.Name,
-                UserId = l.UserId,
                 CreatedAt = l.CreatedAt,
                 UpdatedAt = l.UpdatedAt,
                 Address = l.Address,

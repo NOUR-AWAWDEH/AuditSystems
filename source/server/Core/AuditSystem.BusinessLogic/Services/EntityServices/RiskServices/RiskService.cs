@@ -46,6 +46,7 @@ internal sealed class RiskService(
         await _validationHelper.ValidateObjectiveOwnershipAsync(riskModel.ObjectiveId, userId);
 
         var entity = mapper.Map<Risk>(riskModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

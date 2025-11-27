@@ -47,6 +47,7 @@ internal sealed class DepartmentService(
         await _validationHelper.ValidateLocationOwnershipAsync(departmentModel.LocationId, userId);
 
         var entity = mapper.Map<Department>(departmentModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);
@@ -121,7 +122,7 @@ internal sealed class DepartmentService(
     {
         DepartmentValidationHelper.ValidateUserId(userId);
 
-        _logger.LogDebug("Retriving all departments for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all departments for user {UserId}", userId);
 
 
         return await repository.GetAll()

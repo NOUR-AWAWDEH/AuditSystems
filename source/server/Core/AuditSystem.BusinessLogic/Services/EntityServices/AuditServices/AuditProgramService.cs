@@ -45,6 +45,7 @@ internal sealed class AuditProgramService(
         await _validationHelper.ValidateExitControlOwnershipAsync(auditProgramModel.ExitControlId, userId);
 
         var entity = mapper.Map<AuditProgram>(auditProgramModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity); 
@@ -112,22 +113,6 @@ internal sealed class AuditProgramService(
             throw new KeyNotFoundException($"Audit program with ID '{id}' was not found.");
         }
 
-        // Validate ownership with safe method
-        var ownerId = GetOwnerIdSafely(entity, id);
-        if (ownerId == Guid.Empty)
-        {
-            _logger.LogError("Unable to determine owner for audit program {AuditProgramId}", id);
-            throw new InvalidOperationException($"Unable to determine ownership for audit program {id}");
-        }
-
-        if (ownerId != userId)
-        {
-            _logger.LogWarning("User {UserId} not authorized to access audit program {AuditProgramId} owned by {OwnerId}", 
-                userId, id, ownerId);
-            throw new UnauthorizedAccessException(
-                string.Format(AuditProgramConstants.UnauthorizedAccessMessage, userId, id));
-        }
-
         // Cache the entity
         await CacheEntityAsync(entity);
 
@@ -137,81 +122,11 @@ internal sealed class AuditProgramService(
         return result;
     }
 
-    private Guid GetOwnerIdSafely(AuditProgram auditProgram, Guid auditProgramId)
-    {
-        try
-        {
-            // Step-by-step navigation with null checking
-            var exitControl = auditProgram?.ExitControl;
-            if (exitControl == null)
-            {
-                _logger.LogError("ExitControl is null for audit program {AuditProgramId}", auditProgramId);
-                return Guid.Empty;
-            }
-
-            var objective = exitControl.Objective;
-            if (objective == null)
-            {
-                _logger.LogError("Objective is null for exit control {ExitControlId}", exitControl.Id);
-                return Guid.Empty;
-            }
-
-            var riskControlMatrix = objective.RiskControlMatrix;
-            if (riskControlMatrix == null)
-            {
-                _logger.LogError("RiskControlMatrix is null for objective {ObjectiveId}", objective.Id);
-                return Guid.Empty;
-            }
-
-            var subProcess = riskControlMatrix.SubProcess;
-            if (subProcess == null)
-            {
-                _logger.LogError("SubProcess is null for risk control matrix {RCMId}", riskControlMatrix.Id);
-                return Guid.Empty;
-            }
-
-            var auditProcess = subProcess.AuditProcess;
-            if (auditProcess == null)
-            {
-                _logger.LogError("AuditProcess is null for sub process {SubProcessId}", subProcess.Id);
-                return Guid.Empty;
-            }
-
-            var subDepartment = auditProcess.SubDepartment;
-            if (subDepartment == null)
-            {
-                _logger.LogError("SubDepartment is null for audit process {AuditProcessId}", auditProcess.Id);
-                return Guid.Empty;
-            }
-
-            var department = subDepartment.Department;
-            if (department == null)
-            {
-                _logger.LogError("Department is null for sub department {SubDepartmentId}", subDepartment.Id);
-                return Guid.Empty;
-            }
-
-            var location = department.Location;
-            if (location == null)
-            {
-                _logger.LogError("Location is null for department {DepartmentId}", department.Id);
-                return Guid.Empty;
-            }
-
-            return location.UserId;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error getting owner ID for audit program {AuditProgramId}", auditProgramId);
-            return Guid.Empty;
-        }
-    }
-
     public async Task<IReadOnlyList<AuditProgramModel>> GetAuditProgramsByUserIdAsync(Guid userId)
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        _logger.LogDebug("Retriving all audit programs for user {UserId}", userId);
+        _logger.LogDebug("Retrieving all audit programs for user {UserId}", userId);
 
 
         return await repository.GetAll()
@@ -222,6 +137,7 @@ internal sealed class AuditProgramService(
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
+                ActionOwnerId = d.ActionOwnerId,
                 ControlDesignId = d.ControlDesignId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,

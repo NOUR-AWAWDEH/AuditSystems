@@ -33,6 +33,17 @@ public class SubDepartmentConfiguration : IEntityTypeConfiguration<SubDepartment
             .HasForeignKey(ap => ap.SubDepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasMany(sd => sd.Users)
+            .WithOne(u => u.SubDepartment)
+            .HasForeignKey(u => u.SubDepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
         builder.HasIndex(sd => sd.DepartmentId);
         builder.HasIndex(sd => sd.Name);
     }

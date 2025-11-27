@@ -24,7 +24,7 @@ public class SubProcessSearchHelper(
     public Expression<Func<SubProcess, bool>> BuildUserSearchPredicate(
         Guid userId, string? searchTerm, Guid auditProcessId)
     {
-        return sp => sp.AuditProcess.SubDepartment.Department.Location.UserId == userId &&  
+        return sp => sp.CreatedByUserId == userId &&  
                 (string.IsNullOrEmpty(searchTerm) || sp.Particular.Contains(searchTerm)) &&
                 sp.AuditProcessId == auditProcessId;
     }

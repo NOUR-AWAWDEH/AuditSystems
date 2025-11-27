@@ -11,38 +11,44 @@ public class ObservationConfiguration : IEntityTypeConfiguration<Observation>
         builder.ToTable("Observations");
 
         builder.HasKey(x => x.Id);
-        
+
         builder.Property(x => x.Description)
             .IsRequired(true)
             .HasMaxLength(500);
-        
+
         builder.Property(x => x.ActionOwner)
             .IsRequired(true)
             .HasMaxLength(500);
-            
+
         builder.Property(x => x.Background)
             .IsRequired(true)
             .HasMaxLength(500);
-            
+
         builder.Property(x => x.ActionPlan)
             .IsRequired(true)
             .HasMaxLength(500);
-            
+
         builder.Property(x => x.ActionDate)
             .IsRequired(true);
 
         builder.Property(x => x.Note)
             .HasMaxLength(500)
             .IsRequired(false);
-        
+
         builder.HasOne(x => x.AuditProgram)
             .WithMany(x => x.Observations)
             .HasForeignKey(x => x.AuditProgramId)
             .IsRequired(true);
-            
+
         builder.HasMany(x => x.Recommendations)
             .WithOne(x => x.Observation)
             .HasForeignKey(x => x.ObservationId)
             .IsRequired(true);
+
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
     }
 }

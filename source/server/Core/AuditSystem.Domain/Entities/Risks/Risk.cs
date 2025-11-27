@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.Domain.Entities.Risks;
 
-public class Risk : Entity<Guid>
+public class Risk : AuditableEntity<Guid>
 {
     public required Guid ObjectiveId { get; set; }
     public required string RiskName { get; set; }

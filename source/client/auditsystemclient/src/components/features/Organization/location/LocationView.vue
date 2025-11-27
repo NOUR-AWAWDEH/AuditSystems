@@ -4,6 +4,7 @@
     <!-- Add Location Modal -->
     <AddLocationForm
       :is-visible="showAddLocationModal"
+      :companyId="companyId"
       @close="handleCloseAddLocationModal"
       @location-added="handleLocationAdded"
     />
@@ -49,6 +50,9 @@ import EditLocationModal from "./components/EditLocationModal.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import { useLocationTable } from "./composables/useLocationTable";
 import { useLocationActions } from "./composables/useLocationActions";
+import { useAuthStatus } from "@/composables/auth/useAuthStatus";
+
+const {companyId } = useAuthStatus();
 
 const emit = defineEmits([
   "location-selected",

@@ -30,6 +30,12 @@ public class SubProcessConfiguration : IEntityTypeConfiguration<SubProcess>
                      .HasForeignKey(rcm => rcm.SubProcessId)
                      .OnDelete(DeleteBehavior.Restrict);
 
+              builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
               // Indexes for performance
               builder.HasIndex(sp => sp.AuditProcessId);
               builder.HasIndex(sp => sp.Particular);

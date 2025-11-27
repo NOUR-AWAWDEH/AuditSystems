@@ -2,12 +2,15 @@ using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.FileStorage;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Models.SupportingDocs;
+using AuditSystem.Domain.Entities.SupportingDocs;
+using AutoMapper;
 using MediatR;
 
 namespace AuditSystem.Application.Features.SupportingDocs.Get.GetURLByFileId;
 
 internal class GetSupportingDocURLQueryByIdHandler(
     ISupportingDocService supportingDocService,
+    IMapper mapper,
     IURLService URLService)
     : IRequestHandler<GetSupportingDocURLQueryById, Result<GetSupportingDocURLQueryByIdResponse>>
 {
@@ -22,7 +25,9 @@ internal class GetSupportingDocURLQueryByIdHandler(
             return Result.NotFound("Document not found.");
         }
 
-        var result = await _URLService.GenerateSignedURLAsync(supportingDoc.UserId, supportingDoc.FileName, "SupportingDocs");
+        var entity = mapper.Map<SupportingDoc>(supportingDoc);
+
+        var result = await _URLService.GenerateSignedURLAsync(entity.CreatedByUserId, supportingDoc.FileName, "SupportingDocs");
         if (!result.IsSuccess)
         {
             return Result.Error(new ErrorList(result.Errors));

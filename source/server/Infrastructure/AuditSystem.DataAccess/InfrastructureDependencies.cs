@@ -48,7 +48,7 @@ public static class InfrastructureDependencies
 
     private static IServiceCollection AddIdentity(this IServiceCollection services)
     {
-        services.AddIdentity<User, Role>(options =>
+        services.AddIdentity<ApplicationUser, Role>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
@@ -123,6 +123,8 @@ public static class InfrastructureDependencies
         //SupportingDocs
         .AddRepository<Guid, SupportingDoc>()
         //Auth
+        .AddRepository<Guid, AppUser>()
+        .AddRepository<Guid, UserSessionInfo>()
         .AddRepository<Guid, RefreshToken>();
 
     private static IServiceCollection AddRepository<TId, TEntity>(this IServiceCollection services)

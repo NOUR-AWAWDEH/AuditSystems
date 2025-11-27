@@ -20,10 +20,16 @@ public class ControlDesignConfiguration : IEntityTypeConfiguration<ControlDesign
             .WithMany(ec => ec.ControlDesigns)
             .HasForeignKey(cd => cd.ExitControlId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.HasMany(cd => cd.AuditPrograms)
             .WithOne(ap => ap.ControlDesign)
             .HasForeignKey(ap => ap.ControlDesignId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
     }
 }

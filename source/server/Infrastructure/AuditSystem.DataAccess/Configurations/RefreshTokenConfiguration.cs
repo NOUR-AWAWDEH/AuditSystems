@@ -22,13 +22,11 @@ public void Configure(EntityTypeBuilder<RefreshToken> builder)
        builder.Property(rt => rt.IsRevoked)
               .IsRequired(true);
 
-       builder.Property(rt => rt.CreatedAt)
-              .IsRequired(true);
-
-       // Relationship: Many RefreshTokens belong to one User
-       builder.HasOne(rt => rt.User)
-              .WithMany(u => u.RefreshTokens)
-              .HasForeignKey(rt => rt.UserId)
-              .OnDelete(DeleteBehavior.Cascade);
+              // Relationship: Many RefreshTokens belong to one User
+              builder.HasOne(rt => rt.User)
+                     .WithMany(u => u.RefreshTokens)
+                     .HasForeignKey(rt => rt.UserId)
+                     .OnDelete(DeleteBehavior.Cascade);
+       
 }
 }

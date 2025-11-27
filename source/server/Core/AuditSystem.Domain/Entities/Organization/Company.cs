@@ -8,6 +8,6 @@ public class Company : Entity<Guid>
     public required string Name { get; set; }
 
     // Navigation properties
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual ICollection<AppUser> Users { get; set; } = new List<AppUser>();
     public virtual ICollection<Location> Locations { get; set; } = new List<Location>(); // One-to-Many
 }

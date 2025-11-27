@@ -9,12 +9,10 @@ public static class ControlDesignConstants
     public static readonly string[] ListTags = ["control-design-list"];
     
     public static readonly Expression<Func<ControlDesign, Guid>> ControlDesignOwnerIdSelector = 
-        cd => cd.ExitControl.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.Location.UserId;
+        cd => cd.CreatedByUserId;
     
     public static Expression<Func<ControlDesign, bool>> ControlDesignOwnerPredicate(Guid userId) =>
-        cd => cd.ExitControl.Objective.RiskControlMatrix.SubProcess
-                .AuditProcess.SubDepartment.Department.Location.UserId == userId;
+        cd => cd.CreatedByUserId == userId;
         
     public const string EntityName = "ControlDesign";
 

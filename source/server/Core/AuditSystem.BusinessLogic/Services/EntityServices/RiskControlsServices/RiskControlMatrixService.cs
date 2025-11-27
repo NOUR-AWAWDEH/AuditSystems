@@ -45,6 +45,7 @@ internal sealed class RiskControlMatrixService(
         await _validationHelper.ValidateSubProcessOwnershipAsync(riskControlMatrixModel.SubProcessId, userId);
 
         var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

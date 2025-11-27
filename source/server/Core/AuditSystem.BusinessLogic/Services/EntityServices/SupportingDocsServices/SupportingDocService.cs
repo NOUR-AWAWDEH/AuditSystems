@@ -65,7 +65,6 @@ internal sealed class SupportingDocService(
         var supportingDocModel = new SupportingDocModel
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
             FileName = fileSaveResult.Value.SavedFileName,
             FileSize = fileSaveResult.Value.FileSize,
             DriveFileId = Guid.NewGuid(),
@@ -95,7 +94,7 @@ internal sealed class SupportingDocService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<SupportingDocModel>(
             id,
             userId,
-            entity => entity.UserId,
+            SupportingDocsConstants.SupportingDocOwnerIdSelector,
             SupportingDocsConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -120,7 +119,7 @@ internal sealed class SupportingDocService(
 
         var entity = await _validationHelper.ValidateSupportingDocOwnershipAsync(supportingDocId, userId);
         
-        var fullFilePath = _filePathBuilder.GetFullPath(entity.UserId, SupportingDocsConstants.ServiceName, entity.FileName);
+        var fullFilePath = _filePathBuilder.GetFullPath(entity.CreatedByUserId, SupportingDocsConstants.ServiceName, entity.FileName);
         var fileDeleteResult = await _fileStorage.DeleteFileAsync(fullFilePath);
         if (!fileDeleteResult.IsSuccess)
         {
@@ -209,7 +208,7 @@ internal sealed class SupportingDocService(
             return mapper.Map<List<SupportingDocModel>>(cachedDocs);
         }
 
-        var entities = await repository.GetAllAsync(doc => doc.UserId == userId);
+        var entities = await repository.GetAllAsync(doc => doc.CreatedByUserId == userId);
 
         if (entities is not { Count: > 0 })
         {

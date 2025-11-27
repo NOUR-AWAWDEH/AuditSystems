@@ -45,6 +45,7 @@ internal sealed class ObservationService(
         await _validationHelper.ValidateAuditProgramOwnershipAsync(observationModel.AuditProgramId, userId);
 
         var entity = mapper.Map<Observation>(observationModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity); 

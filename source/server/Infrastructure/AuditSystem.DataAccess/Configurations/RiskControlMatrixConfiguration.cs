@@ -33,6 +33,12 @@ public class RiskControlMatrixConfiguration : IEntityTypeConfiguration<RiskContr
             .HasForeignKey(o => o.RiskControlMatrixId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
         // Indexes for performance
         builder.HasIndex(d => d.SubProcessId);
         builder.HasIndex(d => d.Description);

@@ -20,11 +20,17 @@ public class RecommendationConfiguration : IEntityTypeConfiguration<Recommendati
 
         builder.Property(x => x.ObservationId)
             .IsRequired(true);
-        
+
         builder.HasOne(x => x.Observation)
             .WithMany(x => x.Recommendations)
             .HasForeignKey(x => x.ObservationId)
             .IsRequired(true);
+
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
 
         builder.HasIndex(x => x.ObservationId);
     }

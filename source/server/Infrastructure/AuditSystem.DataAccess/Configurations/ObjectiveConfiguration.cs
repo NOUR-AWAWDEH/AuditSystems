@@ -40,6 +40,12 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
                      .OnDelete(DeleteBehavior.Restrict)
                      .IsRequired(true);
 
+              builder.HasOne(e => e.CreatedBy)
+                     .WithMany()
+                     .HasForeignKey(e => e.CreatedByUserId)
+                     .OnDelete(DeleteBehavior.Restrict);
+
+
               // Indexes for performance
               builder.HasIndex(rcm => rcm.RiskControlMatrixId);
               builder.HasIndex(rcm => rcm.Description);

@@ -28,6 +28,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasForeignKey(d => d.LocationId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes for performance
         builder.HasIndex(d => d.LocationId);
         builder.HasIndex(d => d.Name);

@@ -25,6 +25,13 @@ public class AuditProcessConfiguration : IEntityTypeConfiguration<AuditProcess>
                      .HasForeignKey(ap => ap.SubDepartmentId)
                      .OnDelete(DeleteBehavior.Restrict);
 
+
+              builder.HasOne(e => e.CreatedBy)
+                 .WithMany()
+                 .HasForeignKey(e => e.CreatedByUserId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+
               builder.HasMany(ap => ap.SubProcesses)
                      .WithOne(sp => sp.AuditProcess)
                      .HasForeignKey(sp => sp.AuditProcessId)

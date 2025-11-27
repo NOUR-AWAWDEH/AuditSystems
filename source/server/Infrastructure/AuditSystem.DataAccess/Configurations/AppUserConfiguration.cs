@@ -63,6 +63,8 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                      .WithMany()
                      .HasForeignKey(u => u.CreatedByUserId)
                      .OnDelete(DeleteBehavior.Restrict);
+              
+              
 
               // Indexes
               builder.HasIndex(u => u.IdentityUserId).IsUnique();
@@ -70,5 +72,23 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
               builder.HasIndex(u => u.JobTitleId);
               builder.HasIndex(u => u.SubDepartmentId);
               builder.HasIndex(u => u.IsActive);
+
+              // Seed Data
+              builder.HasData(
+                  new AppUser
+                  {
+                         Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                         FirstName = "System",
+                         LastName = "Administrator",
+                         Email = "admin@auditsystem.com",
+                         UserName = "system.admin",
+                         IdentityUserId = Id, // This should match the ASP.NET Core Identity User Id
+                         CompanyId = , // Assuming company with ID 1 exists
+                         JobTitleId = 1, // Assuming job title with ID 1 exists
+                         SubDepartmentId = 1, // Assuming sub-department with ID 1 exists
+                         IsActive = true,
+                         CreatedByUserId = 1, // Self-created
+                         CreatedDate = DateTime.UtcNow
+                  });
        }
 }

@@ -28,6 +28,12 @@ public class ExitControlConfiguration : IEntityTypeConfiguration<ExitControl>
             .HasForeignKey(ec => ec.ObjectiveId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+
         // Indexes
         builder.HasIndex(ec => ec.ObjectiveId);
         builder.HasIndex(ec => ec.Inadequate);

@@ -26,6 +26,11 @@ public class JobTitleConfiguration : IEntityTypeConfiguration<JobTitle>
             .HasForeignKey(u => u.JobTitleId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(e => e.CreatedBy)
+           .WithMany()
+           .HasForeignKey(e => e.CreatedByUserId)
+           .OnDelete(DeleteBehavior.Restrict);
+
         // Indexes
         builder.HasIndex(jt => new { jt.CompanyId, jt.Name })
             .IsUnique();

@@ -1,7 +1,7 @@
-import { ref } from 'vue';
-import { authStatuseRepository } from '@/services/auth/authRepos/authStatuseRepository';
+import { ref, computed } from "vue";
+import { authStatuseRepository } from "@/services/auth/authRepos/authStatuseRepository";
 
-const TOKEN_KEY = 'token';
+const TOKEN_KEY = "token";
 
 export const authStorage = {
   setToken(token) {
@@ -20,7 +20,7 @@ export const authStorage = {
   },
   hasToken() {
     return !!this.getToken();
-  }
+  },
 };
 
 // 🔧 SINGLETON: Create shared reactive state outside the function
@@ -35,7 +35,7 @@ export function useAuthStatus() {
     try {
       const authToken = token || authStorage.getToken();
       if (!authToken) {
-        throw new Error('No authentication token found');
+        throw new Error("No authentication token found");
       }
       const response = await authStatuseRepository.getAuthStatus(authToken);
       if (response?.success && response?.result?.isAuthenticated) {
@@ -47,7 +47,7 @@ export function useAuthStatus() {
           companyId: response.result.companyId,
           roles: response.result.roles,
           expiresAt: response.result.expiresAt,
-          isEmailVerified: response.result.isEmailVerified
+          isEmailVerified: response.result.isEmailVerified,
         };
         return authStatus.value;
       } else {
@@ -56,8 +56,8 @@ export function useAuthStatus() {
         throw new Error(response?.errors?.[0]?.message);
       }
     } catch (err) {
-      console.error('Auth status check failed:', err);
-      error.value = err.message || 'Authentication check failed';
+      console.error("Auth status check failed:", err);
+      error.value = err.message || "Authentication check failed";
       authStatus.value = null;
       return null;
     } finally {
@@ -71,11 +71,15 @@ export function useAuthStatus() {
     }
   };
 
+  // Computed property to extract companyId from authStatus
+  const companyId = computed(() => authStatus.value?.companyId);
+
   return {
     authStatus,
     isChecking,
     error,
     checkAuthStatus,
-    initCheck
+    companyId,
+    initCheck,
   };
 }

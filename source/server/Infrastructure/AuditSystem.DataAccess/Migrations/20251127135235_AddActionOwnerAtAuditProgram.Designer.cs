@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuditSystem.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251127114508_Init")]
-    partial class Init
+    [Migration("20251127135235_AddActionOwnerAtAuditProgram")]
+    partial class AddActionOwnerAtAuditProgram
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

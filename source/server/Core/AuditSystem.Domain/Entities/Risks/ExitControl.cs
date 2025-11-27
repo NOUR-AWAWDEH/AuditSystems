@@ -4,7 +4,7 @@ using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.Domain.Entities.Risks;
 
-public class ExitControl : Entity<Guid>
+public class ExitControl : AuditableEntity<Guid>
 {
     public required Guid ObjectiveId { get; set; }
     public required string Description { get; set; }

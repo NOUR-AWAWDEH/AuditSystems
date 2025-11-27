@@ -85,7 +85,6 @@ internal sealed class RateService(
         }
 
         _mapper.Map(rateModel, existingEntity);
-        existingEntity.UpdatedAt = DateTime.UtcNow;
 
         await _repository.UpdateAsync(existingEntity);
         await CacheEntityAsync(existingEntity);

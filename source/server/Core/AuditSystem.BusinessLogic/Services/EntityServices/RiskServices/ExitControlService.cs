@@ -46,6 +46,7 @@ internal sealed class ExitControlService(
         await _validationHelper.ValidateObjectiveOwnershipAsync(exitControlModel.ObjectiveId, userId);
 
         var entity = mapper.Map<ExitControl>(exitControlModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

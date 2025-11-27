@@ -2,7 +2,7 @@ using AuditSystem.Domain.Entities.Common;
 
 namespace AuditSystem.Domain.Entities.Organization;
 
-public class Department : Entity<Guid>
+public class Department : AuditableEntity<Guid>
 {
     public required string Name { get; set; }
     public required Guid LocationId { get; set; }

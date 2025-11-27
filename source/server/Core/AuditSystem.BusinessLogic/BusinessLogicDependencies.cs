@@ -24,6 +24,7 @@ using AuditSystem.BusinessLogic.Services.EntityServices.RecommendationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.UserServices;
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
 using AuditSystem.BusinessLogic.Services.UrlServices;
@@ -46,6 +47,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ControlDesignServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 using AuditSystem.Contract.Interfaces.Transaction;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Common;
@@ -197,7 +199,10 @@ public static class BusinessLogicDependencies
             .AddScoped<IURLService, URLService>()
 
             // Download Service
-            .AddScoped<IDecodeDownloadService, DecodeDownloadService>();
+            .AddScoped<IDecodeDownloadService, DecodeDownloadService>()
+
+            // User Service
+            .AddScoped<IUserService, UserService>();
 
         return services;
     }

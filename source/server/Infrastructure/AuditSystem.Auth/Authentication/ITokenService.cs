@@ -3,8 +3,8 @@ namespace AuditSystem.Auth.Authentication;
 
 public interface ITokenService
 {
-    Task <string>GenerateAccessTokenAsync(User user);
-    Task <string>GenerateJwtTokenAsync(User request);
+    Task <string>GenerateAccessTokenAsync(ApplicationUser user);
+    Task <string>GenerateJwtTokenAsync(ApplicationUser request);
     string GenerateRefreshToken();
-    Task<bool> SaveRefreshTokenAsync(User user, string refreshToken);
+    Task<bool> SaveRefreshTokenAsync(ApplicationUser user, string refreshToken);
 }

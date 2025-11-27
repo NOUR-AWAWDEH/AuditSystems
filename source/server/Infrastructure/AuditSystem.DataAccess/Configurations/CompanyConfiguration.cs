@@ -1,3 +1,4 @@
+using System;
 using AuditSystem.Domain.Entities.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,19 +10,19 @@ namespace AuditSystem.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<Company> builder)
         {
             builder.ToTable("Companies");
-            builder.HasKey(c => c.Id);
             builder.Property(c => c.Name).IsRequired().HasMaxLength(200);
 
             builder.HasMany(c => c.Users)
                    .WithOne(u => u.Company)
                    .HasForeignKey(u => u.CompanyId)
                    .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasMany(c => c.Locations)
                    .WithOne(l => l.Company)
                    .HasForeignKey(l => l.CompanyId)
                    .OnDelete(DeleteBehavior.Restrict);
             // Seed data
-            
+
             builder.HasData(
                 new Company
                 {
@@ -31,7 +32,7 @@ namespace AuditSystem.DataAccess.Configurations
                 }
             );
 
-
+            builder.HasIndex(c => c.Name).IsUnique();
         }
     }
 }

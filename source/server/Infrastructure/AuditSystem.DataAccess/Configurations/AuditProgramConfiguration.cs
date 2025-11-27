@@ -12,38 +12,52 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
     {
         builder.ToTable("AuditPrograms");
 
+        // Primary Key
         builder.HasKey(ap => ap.Id);
 
+        // Properties
         builder.Property(ap => ap.Description)
-            .IsRequired(true)
-            .HasMaxLength(500);
+               .IsRequired()
+               .HasMaxLength(500);
 
-        // Change this from WithOne to WithMany
+        builder.Property(ap => ap.ExitControlId)
+               .IsRequired();
+
+        builder.Property(ap => ap.ActionOwnerId)
+               .IsRequired();
+
+        builder.Property(ap => ap.ControlDesignId)
+               .IsRequired(false);
+
+        // Relationships
+
+        // ExitControl (required)
         builder.HasOne(ap => ap.ExitControl)
-            .WithMany(ec => ec.AuditPrograms) 
-            .HasForeignKey(ap => ap.ExitControlId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-        
+               .WithMany(ec => ec.AuditPrograms)
+               .HasForeignKey(ap => ap.ExitControlId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        // ActionOwner (required) -> AppUser
         builder.HasOne(ap => ap.ActionOwner)
-            .WithMany(au => au.AuditPrograms)
-            .HasForeignKey(ap => ap.ActionOwnerId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
+               .WithMany(au => au.OwnedAuditPrograms)
+               .HasForeignKey(ap => ap.ActionOwnerId)
+               .OnDelete(DeleteBehavior.Restrict);
 
+        // ControlDesign (optional)
         builder.HasOne(ap => ap.ControlDesign)
-            .WithMany(cd => cd.AuditPrograms)
-            .HasForeignKey(ap => ap.ControlDesignId)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.Restrict);
+               .WithMany(cd => cd.AuditPrograms)
+               .HasForeignKey(ap => ap.ControlDesignId)
+               .OnDelete(DeleteBehavior.Restrict);
 
+        // Observations (collection)
         builder.HasMany(ap => ap.Observations)
-            .WithOne(o => o.AuditProgram)
-            .HasForeignKey(o => o.AuditProgramId)
-            .IsRequired(true)
-            .OnDelete(DeleteBehavior.Restrict);
-        
+               .WithOne(o => o.AuditProgram)
+               .HasForeignKey(o => o.AuditProgramId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        // Indexes
         builder.HasIndex(ap => ap.ExitControlId);
+        builder.HasIndex(ap => ap.ActionOwnerId);
         builder.HasIndex(ap => ap.ControlDesignId);
         builder.HasIndex(ap => ap.Description);
     }

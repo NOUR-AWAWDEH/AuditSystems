@@ -50,6 +50,7 @@ internal sealed class RecommendationService(
         await _validationHelper.ValidateObservationOwnershipAsync(recommendationModel.ObservationId, userId);
 
         var entity = mapper.Map<Recommendation>(recommendationModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity); 

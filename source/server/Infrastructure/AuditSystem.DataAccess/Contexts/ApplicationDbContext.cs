@@ -14,41 +14,66 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.DataAccess.Contexts;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User, Role, Guid>(options)
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Role, Guid>
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
 
+    // -------------------
     // Common
-    public required DbSet<Rate> Rates { get; set; }
+    // -------------------
+    public virtual DbSet<Rate> Rates { get; set; } = null!;
 
+    // -------------------
     // Organization
-    public required DbSet<Company> Companies { get; set; }
-    public required DbSet<Location> Locations { get; set; }
-    public required DbSet<Department> Departments { get; set; }
-    public required DbSet<SubDepartment> SubDepartments { get; set; }
+    // -------------------
+    public virtual DbSet<Company> Companies { get; set; } = null!;
+    public virtual DbSet<Location> Locations { get; set; } = null!;
+    public virtual DbSet<Department> Departments { get; set; } = null!;
+    public virtual DbSet<SubDepartment> SubDepartments { get; set; } = null!;
 
+    // -------------------
     // Process
-    public required DbSet<AuditProcess> AuditProcesses { get; set; }
-    public required DbSet<SubProcess> SubProcesses { get; set; }
+    // -------------------
+    public virtual DbSet<AuditProcess> AuditProcesses { get; set; } = null!;
+    public virtual DbSet<SubProcess> SubProcesses { get; set; } = null!;
 
+    // -------------------
     // Risk Controls
-    public required DbSet<RiskControlMatrix> RiskControlMatrices { get; set; }
-    public required DbSet<Objective> Objectives { get; set; }
-    public required DbSet<Risk> Risks { get; set; }
-    public required DbSet<ExitControl> ExitControls { get; set; }
-    public required DbSet<ControlDesign> ControlDesigns { get; set; }
-    public required DbSet<AuditProgram> AuditPrograms { get; set; }
-    public required DbSet<Observation> Observations { get; set; }
-    public required DbSet<Recommendation> Recommendations { get; set; }
+    // -------------------
+    public virtual DbSet<RiskControlMatrix> RiskControlMatrices { get; set; } = null!;
+    public virtual DbSet<Objective> Objectives { get; set; } = null!;
+    public virtual DbSet<Risk> Risks { get; set; } = null!;
+    public virtual DbSet<ExitControl> ExitControls { get; set; } = null!;
+    public virtual DbSet<ControlDesign> ControlDesigns { get; set; } = null!;
+    public virtual DbSet<AuditProgram> AuditPrograms { get; set; } = null!;
+    public virtual DbSet<Observation> Observations { get; set; } = null!;
+    public virtual DbSet<Recommendation> Recommendations { get; set; } = null!;
 
+    // -------------------
     // Supporting Docs
-    public required DbSet<SupportingDoc> SupportingDocs { get; set; }
-    public new required DbSet<Role> Roles { get; set; }
+    // -------------------
+    public virtual DbSet<SupportingDoc> SupportingDocs { get; set; } = null!;
+
+    // -------------------
+    // User
+    // -------------------
+    public virtual DbSet<AppUser> AppUsers { get; set; } = null!;
+    public virtual DbSet<UserSessionInfo> UserSessions { get; set; } = null!;
+
+
+    // -------------------
     // Auth
-    public required DbSet<RefreshToken> RefreshTokens { get; set; }
+    // -------------------
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Apply all entity configurations
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

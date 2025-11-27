@@ -65,7 +65,6 @@ internal sealed class SupportingDocService(
         var supportingDocModel = new SupportingDocModel
         {
             Id = Guid.NewGuid(),
-            UserId = userId,
             FileName = fileSaveResult.Value.SavedFileName,
             FileSize = fileSaveResult.Value.FileSize,
             DriveFileId = Guid.NewGuid(),
@@ -95,7 +94,7 @@ internal sealed class SupportingDocService(
         var cachedResult = await TryGetFromCacheWithValidationAsync<SupportingDocModel>(
             id,
             userId,
-            entity => entity.UserId,
+            SupportingDocsConstants.SupportingDocOwnerIdSelector,
             SupportingDocsConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)

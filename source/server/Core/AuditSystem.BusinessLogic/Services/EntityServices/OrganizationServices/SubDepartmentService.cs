@@ -45,6 +45,7 @@ internal sealed class SubDepartmentService(
         await _validationHelper.ValidateDepartmentOwnershipAsync(subDepartmentModel.DepartmentId, userId);
 
         var entity = mapper.Map<SubDepartment>(subDepartmentModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

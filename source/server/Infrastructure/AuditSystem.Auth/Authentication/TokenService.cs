@@ -1,5 +1,6 @@
 ﻿using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Auth;
+using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -7,7 +8,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using AuditSystem.Domain.Entities.Users;
 
 namespace AuditSystem.Auth.Authentication;
 
@@ -16,10 +16,12 @@ public class TokenService : ITokenService
     private readonly JwtSettings _jwtSettings;
     private readonly SigningCredentials _signingCredentials;
     private readonly ApplicationDbContext _applicationDbContext;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-
-    public TokenService(IConfiguration config, UserManager<User> userManager, ApplicationDbContext applicationDbContext)
+    public TokenService(
+        IConfiguration config,
+        UserManager<ApplicationUser> userManager,
+        ApplicationDbContext applicationDbContext)
     {
         _jwtSettings = new JwtSettings
         {
@@ -36,9 +38,7 @@ public class TokenService : ITokenService
         if (_jwtSettings.ExpirationMinutes <= 0) missingFields.Add("JWT_EXPIRATION_MINUTES");
 
         if (missingFields.Any())
-        {
             throw new InvalidOperationException($"Missing JWT config values: {string.Join(", ", missingFields)}");
-        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -47,9 +47,7 @@ public class TokenService : ITokenService
         _userManager = userManager;
     }
 
-
-
-    public async Task<string> GenerateJwtTokenAsync(User user)
+    public async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
     {
         if (user == null)
             throw new ArgumentNullException(nameof(user), "User cannot be null.");
@@ -60,15 +58,19 @@ public class TokenService : ITokenService
             throw new InvalidOperationException("User must have at least one assigned role.");
 
         var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.UserName ?? ""),
-        new Claim(ClaimTypes.Email, user.Email ?? ""),
-        new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-        new Claim(JwtRegisteredClaimNames.Nbf, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
-        new Claim("login_time", DateTimeOffset.UtcNow.ToString("o")),
-        new Claim("auth_type", "Bearer")
-    };
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.UserName ?? ""),
+            new(ClaimTypes.Email, user.Email ?? ""),
+            new(JwtRegisteredClaimNames.Iat,
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64),
+            new(JwtRegisteredClaimNames.Nbf,
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
+                ClaimValueTypes.Integer64),
+            new("login_time", DateTimeOffset.UtcNow.ToString("o")),
+            new("auth_type", "Bearer")
+        };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
@@ -83,8 +85,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-
-    public async Task<string> GenerateAccessTokenAsync(User user)
+    public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
     {
         return await GenerateJwtTokenAsync(user);
     }
@@ -92,17 +93,16 @@ public class TokenService : ITokenService
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(randomNumber);
-        }
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
     }
 
-    public async Task<bool> SaveRefreshTokenAsync(User user, string refreshToken)
+    public async Task<bool> SaveRefreshTokenAsync(ApplicationUser user, string refreshToken)
     {
         if (user == null) throw new ArgumentNullException(nameof(user));
-        if (string.IsNullOrEmpty(refreshToken)) throw new ArgumentException("Refresh token cannot be null or empty.", nameof(refreshToken));
+        if (string.IsNullOrEmpty(refreshToken))
+            throw new ArgumentException("Refresh token cannot be null or empty.", nameof(refreshToken));
 
         var refreshTokenEntity = new RefreshToken
         {
@@ -117,7 +117,6 @@ public class TokenService : ITokenService
         _applicationDbContext.RefreshTokens.Add(refreshTokenEntity);
         await _applicationDbContext.SaveChangesAsync();
 
-        return true; 
+        return true;
     }
-
 }

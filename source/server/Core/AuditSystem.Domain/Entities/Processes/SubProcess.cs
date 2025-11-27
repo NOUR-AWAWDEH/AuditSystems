@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.Domain.Entities.Processes;
 
-public class SubProcess : Entity<Guid>
+public class SubProcess : AuditableEntity<Guid>
 {
     public required string Particular { get; set; }
     public required Guid AuditProcessId { get; set; }

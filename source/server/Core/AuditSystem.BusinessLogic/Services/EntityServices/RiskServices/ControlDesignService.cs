@@ -46,6 +46,7 @@ internal sealed class ControlDesignService(
         await _validationHelper.ValidateExitControlOwnershipAsync(controlDesignModel.ExitControlId, userId);
 
         var entity = mapper.Map<ControlDesign>(controlDesignModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);

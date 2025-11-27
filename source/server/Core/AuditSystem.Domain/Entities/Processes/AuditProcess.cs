@@ -3,7 +3,7 @@ using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.Domain.Entities.Processes;
 
-public class AuditProcess : Entity<Guid>
+public class AuditProcess : AuditableEntity<Guid>
 {
     public required string ProcessName { get; set; }
     public required Guid SubDepartmentId { get; set; }

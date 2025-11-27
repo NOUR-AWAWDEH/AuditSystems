@@ -8,34 +8,20 @@ public class SupportingDocConfiguration : IEntityTypeConfiguration<SupportingDoc
 {
     public void Configure(EntityTypeBuilder<SupportingDoc> builder)
     {
-        // Set the table name
         builder.ToTable("SupportingDocs");
 
-        // Configure primary key
-        builder.HasKey(x => x.Id);
-        
-        
-        // Configure properties
-        builder.Property(x => x.FileName)
-            .IsRequired(true)
-            .HasMaxLength(255);
+        builder.HasKey(d => d.Id);
 
-        builder.Property(x => x.FileSize)
-            .IsRequired(true);
+        builder.Property(d => d.FileName)
+               .IsRequired()
+               .HasMaxLength(255);
 
-        builder.Property(x => x.DriveFileId)
-            .IsRequired(true);
+        builder.Property(d => d.FileSize)
+               .IsRequired();
 
-        // Configure relationship with User
-        builder.HasOne(x => x.User)
-            .WithMany(u => u.SupportingDocs)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Restrict) 
-            .IsRequired(true);
+        builder.Property(d => d.DriveFileId)
+               .IsRequired();
 
-        // Optional: Add indexes for performance
-        builder.HasIndex(x => x.UserId);
-        builder.HasIndex(x => x.DriveFileId)
-            .IsUnique();
+        builder.HasIndex(d => d.FileName);
     }
 }

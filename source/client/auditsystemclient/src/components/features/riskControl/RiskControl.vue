@@ -492,10 +492,13 @@ const handleRouteQueries = async () => {
     activeTab.value = tab;
   }
 
+  let dataAlreadyLoaded = false;
+
   if (subDepartmentId) {
     selectedSubDepartmentId.value = subDepartmentId;
     localStorage.setItem("organizationSelectedSubDepartmentId", subDepartmentId);
     await getSubDepartmentsByUserId();
+    dataAlreadyLoaded = true;
   }
 
   if (auditProcessId) setSelectedId("processes", auditProcessId);
@@ -510,10 +513,15 @@ const handleRouteQueries = async () => {
   if (Object.keys(route.query).length) {
     await router.replace({ path: "/risk-control" });
   }
+
+  return dataAlreadyLoaded;
 };
 
 onMounted(async () => {
-  await handleRouteQueries();
-  await setActiveTab(activeTab.value);
+  const dataAlreadyLoaded = await handleRouteQueries();
+  // Only fetch data if it wasn't already loaded from route queries
+  if (!dataAlreadyLoaded) {
+    await setActiveTab(activeTab.value);
+  }
 });
 </script>

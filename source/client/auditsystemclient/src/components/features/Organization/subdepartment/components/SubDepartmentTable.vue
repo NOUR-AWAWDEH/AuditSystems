@@ -261,9 +261,11 @@ const handleSelectSubDepartment = (subDepartment) => {
   selectedSubDepartmentId.value = subDepartment.id;
   emit("sub-department-selected", subDepartment.id);
 
-  // Navigate to RiskControl with selected subdepartment
+  // Navigate to RiskControl with selected subdepartment as query parameter
+  // This ensures the ID is immediately available on component mount, avoiding race conditions
   router.push({
     path: "/risk-control",
+    query: { subDepartmentId: subDepartment.id },
   });
 };
 

@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteRiskControlMatrixByIdRepository } from '@/services/riskControl/riskControlMatrix/deleteRiskControlMatrixByIdRepository';
 
 
@@ -7,12 +6,10 @@ export function useDeleteRiskControlMatrixById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedRiskControlMatrix = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedRiskControlMatrix.value = true;
         const message = response?.successMessage || 'Risk Control Matrix deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -22,7 +19,6 @@ export function useDeleteRiskControlMatrixById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

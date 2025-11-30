@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { getRiskByIdRepository } from '@/services/riskControl/risk/getRiskByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetRiskById() {
     const risk = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         risk.value = response.result;
         const message = response?.successMessage || 'Risk fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +18,6 @@ export function useGetRiskById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -33,7 +29,6 @@ export function useGetRiskById() {
     const validateRiskId = (riskId) => {
         if (!riskId) {
             const message = 'Risk ID is required.';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createRiskRepository } from '@/services/riskControl/risk/createRiskRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateRisk() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdRisk = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdRisk.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateRisk() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

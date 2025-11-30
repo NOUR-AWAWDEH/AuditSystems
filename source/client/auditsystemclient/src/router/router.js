@@ -1,76 +1,76 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from "vue-router";
 
-const Dashboard = () => import('@/components/features/dashboard/DashboardPage.vue');
-const ForgotPassword = () => import('@/components/features/auth/ForgotPassword.vue');
-const ResetPassword = () => import('@/components/features/auth/ResetPassword.vue');
-const SideBar = () => import('@/components/common/SideBar.vue');
-const Login = () => import('@/components/features/auth/LoginForm.vue');
-const SupportingDocManager = () => import('@/components/features/supportingDoc/SupportingDocumentsView.vue');
-const Organization = () => import('@/components/features/Organization/OrganizationView.vue');
-const RiskControl = () => import('@/components/features/riskControl/RiskControl.vue');
+const Dashboard = () => import("@/components/features/dashboard/DashboardPage.vue");
+const ForgotPassword = () => import("@/components/features/auth/ForgotPassword.vue");
+const ResetPassword = () => import("@/components/features/auth/ResetPassword.vue");
+const SideBar = () => import("@/components/common/SideBar.vue");
+const Login = () => import("@/components/features/auth/LoginForm.vue");
+const SupportingDocManager = () => import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
+const Organization = () => import("@/components/features/Organization/OrganizationView.vue");
+const RiskControl = () => import("@/components/features/riskControl/RiskControl.vue");
 const routes = [
   {
-    path: '/',
-    redirect: '/login'
+    path: "/",
+    redirect: "/login",
   },
   {
-    path: '/login',
-    name: 'Login',
+    path: "/login",
+    name: "Login",
     component: Login,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
+    path: "/dashboard",
+    name: "Dashboard",
     component: Dashboard,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/forgot-password',
-    name: 'ForgotPassword',
+    path: "/forgot-password",
+    name: "ForgotPassword",
     component: ForgotPassword,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
   {
-    path: '/reset-password',
-    name: 'ResetPassword',
+    path: "/reset-password",
+    name: "ResetPassword",
     component: ResetPassword,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
   },
   {
-    path: '/logout',
-    name: 'Logout',
+    path: "/logout",
+    name: "Logout",
     beforeEnter: (to, from, next) => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      next('/login');
-    }
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      next("/login");
+    },
   },
   {
-    path: '/sidebar',
-    name: 'Sidebar',
+    path: "/sidebar",
+    name: "Sidebar",
     component: SideBar,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/risk-control',
-    name: 'RiskControl',
+    path: "/risk-control",
+    name: "RiskControl",
     component: RiskControl,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/organization',
-    name: 'Organization',
+    path: "/organization",
+    name: "Organization",
     component: Organization,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
-    path: '/:pathMatch(.*)*',
-    redirect: '/login'
+    path: "/:pathMatch(.*)*",
+    redirect: "/login",
   },
   {
-    path: '/supporting-docs',
-    name: 'SupportingDocs',
+    path: "/supporting-docs",
+    name: "SupportingDocs",
     component: SupportingDocManager,
     meta: { requiresAuth: true },
   },
@@ -80,26 +80,37 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    return savedPosition || { top: 0 }
-  }
+    return savedPosition || { top: 0 };
+  },
 });
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('token');
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+import { isTokenExpired } from "@/utils/jwtUtils";
 
-  if (to.path === '/' && !isAuthenticated) {
-    next('/login');
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("token");
+  const isAuthenticated = !!token;
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  // Check if token is expired
+  if (isAuthenticated && isTokenExpired(token)) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
+    next("/login");
     return;
   }
 
-  if (to.name === 'Login' && isAuthenticated) {
-    next('/dashboard');
+  if (to.path === "/" && !isAuthenticated) {
+    next("/login");
+    return;
+  }
+
+  if (to.name === "Login" && isAuthenticated) {
+    next("/dashboard");
     return;
   }
 
   if (requiresAuth && !isAuthenticated) {
-    next({ name: 'Login', state: { redirectTo: to.fullPath } });
+    next({ name: "Login", state: { redirectTo: to.fullPath } });
     return;
   }
 

@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateObjectiveByIdRepository } from '@/services/riskControl/objective/updateObjectiveByIdRepository';
 
 export function useUpdateObjectiveById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedObjective = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedObjective.value = response.result;
-        const message = response?.successMessage || 'Objective updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useUpdateObjectiveById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -54,7 +49,6 @@ export function useUpdateObjectiveById() {
             
             const validationError = validateUpdateObjective(objectiveData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

@@ -1,17 +1,13 @@
 import { ref } from 'vue';
 import { getExitControlByIdRepository } from '@/services/riskControl/exitControl/getExitControlByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetExitControlById() {
     const exitControl = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         exitControl.value = response.result;
-        const message = response?.successMessage || 'Exit Control fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: exitControl.value };
     };
 
@@ -21,7 +17,6 @@ export function useGetExitControlById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -32,10 +27,9 @@ export function useGetExitControlById() {
 
     const validateExitControlId = (exitControlId) => {
         if (!exitControlId) {
-            const message = 'Exit Control ID is required.';
-            showNotification(message, 'error');
-            return { success: false, message };
+            return 'Exit Control ID is required';
         }
+        return null;
     };
 
     const getExitControlById = async (exitControlId) => {

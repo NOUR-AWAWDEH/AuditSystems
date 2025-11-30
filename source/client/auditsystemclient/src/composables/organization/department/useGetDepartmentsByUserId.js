@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getDepartmentByUserIdRepository } from '@/services/organization/department/getDepartmentsByUserIdRepository';
 
 export function useGetDepartmentsByUserId() {
     const departments = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const departmentsData = response.result?.departments || [];
@@ -20,7 +18,6 @@ export function useGetDepartmentsByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

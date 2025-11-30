@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getObservationsByUserIdRepository } from '@/services/riskControl/observation/getObservationsByUserIdRepository';
 
 export function useGetObservationsByUserId() {
     const observations = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const observationsData =  Array.isArray(response.result)
@@ -23,7 +21,6 @@ export function useGetObservationsByUserId() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

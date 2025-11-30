@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteSubProcessByIdRepository } from '@/services/riskControl/subProcess/deleteSubProcessByIdRepository';
 
 export function useDeleteSubProcessById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedSubProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedSubProcess.value = true;
         const message = response?.successMessage || 'SubProcess deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -21,7 +18,6 @@ export function useDeleteSubProcessById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

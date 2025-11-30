@@ -1,8 +1,6 @@
 import { ref } from 'vue';
 import { searchLocationsByUserIdRepository } from '@/services/organization/location/searchLocationsByUserIdRepository';
 
-import { useNotification } from '@/composables/notification/useNotification';
-
 export function useSearchLocationsByUserId() {
 
   const searchResults = ref([]);
@@ -11,7 +9,6 @@ export function useSearchLocationsByUserId() {
   const totalCount = ref(0);
   const currentPage = ref(1);
   const pageSize = ref(10);
-  const { showNotification } = useNotification();
 
   const searchLocations = async (searchTerm = '', pageNumber = 1, pageSizeParam = 10) => {
     isSearching.value = true;
@@ -49,11 +46,6 @@ export function useSearchLocationsByUserId() {
             error.value = errorMsg;
             searchResults.value = [];
             totalCount.value = 0;
-            
-            if (result.errors && result.errors.length > 0) {
-                showNotification(errorMsg, 'error');
-            }
-            
             return { success: false, message: errorMsg, errors: result.errors };
         }
     } catch (err) {
@@ -61,7 +53,6 @@ export function useSearchLocationsByUserId() {
         error.value = errorMsg;
         searchResults.value = [];
         totalCount.value = 0;
-        showNotification(errorMsg, 'error');
         return { success: false, message: errorMsg };
     } finally {
         isSearching.value = false;

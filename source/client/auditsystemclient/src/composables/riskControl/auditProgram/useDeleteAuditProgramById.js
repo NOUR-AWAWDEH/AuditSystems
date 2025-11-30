@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteAuditProgramByIdRepository } from '@/services/riskControl/auditProgram/deleteAuditProgramByIdRepository';
 
 
@@ -7,12 +6,9 @@ export function useDeleteAuditProgramById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedAuditProgram = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedAuditProgram.value = true;
-        const message = response?.successMessage || 'Audit Program deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 

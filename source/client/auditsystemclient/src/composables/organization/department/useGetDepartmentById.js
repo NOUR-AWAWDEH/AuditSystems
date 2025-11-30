@@ -1,17 +1,13 @@
 import { ref } from 'vue';
 import { getDepartmentByIdRepository } from '@/services/organization/department/getDepartmentByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetDepartmentById() {
     const department = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         department.value = response.result;
-        const message = response?.successMessage || 'Department fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useGetDepartmentById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -33,7 +28,6 @@ export function useGetDepartmentById() {
     const validateDepartmentId = (departmentId) => {
         if (!departmentId) {
             const message = 'Department ID is required';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

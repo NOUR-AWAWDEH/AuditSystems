@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteRiskByIdRepository } from '@/services/riskControl/risk/deleteRiskByIdRepository';
 
 
@@ -7,12 +6,10 @@ export function useDeleteRiskById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedRisk = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedRisk.value = true;
         const message = response?.successMessage || 'Risk deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -22,7 +19,6 @@ export function useDeleteRiskById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

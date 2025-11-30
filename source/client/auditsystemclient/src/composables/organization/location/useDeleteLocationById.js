@@ -1,18 +1,15 @@
 import { ref } from 'vue';
 import { deleteLocationByIdRepository } from '@/services/organization/location/deleteLocationByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useDeleteLocationById() {
 
   const isDeleting = ref(false);
   const error = ref(null);
   const deletedLocation = ref(null);
-  const { showNotification } = useNotification();
 
   const handleDeleteSuccess = (response) => {
     deletedLocation.value = true;
     const message = response?.message || 'Location deleted successfully';
-    showNotification(message, 'success');
     return { success: true, message};
   };
 
@@ -22,7 +19,6 @@ export function useDeleteLocationById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

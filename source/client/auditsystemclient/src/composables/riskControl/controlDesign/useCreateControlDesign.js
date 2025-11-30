@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createControlDesignRepository } from '@/services/riskControl/controlDesign/createControlDesignRepository.js';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateControlDesign() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdControlDesign = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdControlDesign.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateControlDesign() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

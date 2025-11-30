@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { searchObservationsByUserIdRepository } from '@/services/riskControl/observation/searchObservationsByUserIdRepository';
 
 export function useSearchObservationsByUserId() {   
@@ -11,7 +10,6 @@ export function useSearchObservationsByUserId() {
     const pageSize = ref(10);
     const searchTerm = ref('');
     const auditProgramId = ref(null);
-    const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.result?.items || response.result?.items || [];
@@ -31,7 +29,6 @@ export function useSearchObservationsByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

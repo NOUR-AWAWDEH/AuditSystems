@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 import { searchSubDepartmentsByUserIdRepository } from '@/services/organization/subdepartment/searchSubDepartmentsByUserIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 // Create singleton state outside the function
 const searchResults = ref([]);
@@ -14,7 +13,6 @@ const searchTerm = ref('');
 const departmentId = ref(localStorage.getItem('organizationSelectedDepartmentId') || null);
 
 export function useSearchSubDepartmentsByUserId() {
-  const { showNotification } = useNotification();
 
   const handleSearchSuccess = (response) => {
     const items = response.result?.result?.items || response.result?.items || [];
@@ -34,7 +32,6 @@ export function useSearchSubDepartmentsByUserId() {
       : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
 
     return {
       success: false,

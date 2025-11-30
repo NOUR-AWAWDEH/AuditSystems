@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { searchRisksByUserIdRepository } from '@/services/riskControl/risk/searchRisksByUserIdRepository';
 
 export function useSearchRisksByUserId() {
@@ -11,7 +10,6 @@ export function useSearchRisksByUserId() {
     const pageSize = ref(10);
     const searchTerm = ref('');
     const objectiveId = ref(null);
-    const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.items || [];
@@ -32,7 +30,6 @@ export function useSearchRisksByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

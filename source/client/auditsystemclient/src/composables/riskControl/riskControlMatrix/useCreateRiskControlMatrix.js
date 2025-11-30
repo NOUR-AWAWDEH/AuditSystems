@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createRiskControlMatrixRepository } from '@/services/riskControl/riskControlMatrix/createRiskControlMatrixRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateRiskControlMatrix() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdRiskControlMatrix = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdRiskControlMatrix.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateRiskControlMatrix() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

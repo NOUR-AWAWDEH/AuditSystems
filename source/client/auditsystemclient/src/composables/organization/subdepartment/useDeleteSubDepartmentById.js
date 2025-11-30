@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { deleteSubDepartmentByIdRepository } from '@/services/organization/subdepartment/deleteSubDepartmentByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useDeleteSubDepartmentById() {
   const isDeleting = ref(false);
   const error = ref(null);
   const deletedSubDepartment = ref(null);
-  const { showNotification } = useNotification();
 
   const handleDeleteSuccess = (response) => {
     deletedSubDepartment.value = true;
     const message = response?.successMessage || 'SubDepartment deleted successfully!';
-    showNotification(message, 'success');
     return { success: true, message };
   };
   
@@ -21,7 +18,6 @@ export function useDeleteSubDepartmentById() {
       : response?.message || defaultErrorMessage;
     
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
     
     const failureResult = {
       success: false,

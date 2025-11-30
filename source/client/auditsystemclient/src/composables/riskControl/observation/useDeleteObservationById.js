@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteObservationByIdRepository } from '@/services/riskControl/observation/deleteObservationByIdRepository';
 
 export function useDeleteObservationById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedObservation = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedObservation.value = true;
         const message = response?.successMessage || 'Observation deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -21,7 +18,6 @@ export function useDeleteObservationById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

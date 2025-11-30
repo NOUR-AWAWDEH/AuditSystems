@@ -3,8 +3,12 @@ import { ref } from "vue";
 const notifications = ref([]);
 
 export function useNotification() {
-  const showNotification = (message, type = "info", duration = 4000) => {
+  const showNotification = (message, type = "info", duration = null) => {
     const id = Date.now();
+    
+    if (!duration) {
+      duration = type === "error" ? 4000 : 3000;
+    }
 
     notifications.value.push({
       id,

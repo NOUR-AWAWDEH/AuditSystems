@@ -69,7 +69,8 @@ public class TokenService : ITokenService
                 DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64),
             new("login_time", DateTimeOffset.UtcNow.ToString("o")),
-            new("auth_type", "Bearer")
+            new("auth_type", "Bearer"),
+            new("AspNet.Identity.SecurityStamp", user.SecurityStamp ?? "")
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

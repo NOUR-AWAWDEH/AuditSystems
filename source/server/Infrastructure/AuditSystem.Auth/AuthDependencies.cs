@@ -10,7 +10,10 @@ using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
+using AuditSystem.Domain.Entities.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace AuditSystem.Auth
 {
@@ -63,6 +66,42 @@ namespace AuditSystem.Auth
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+                        var userId = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                        if (string.IsNullOrEmpty(userId))
+                        {
+                            context.Fail("Unauthorized");
+                            return;
+                        }
+
+                        var user = await userManager.FindByIdAsync(userId);
+                        if (user == null)
+                        {
+                            context.Fail("Unauthorized");
+                            return;
+                        }
+
+                        // Check security stamp to ensure the user has not changed their password or logout from another device
+                        var tokenSecurityStamp = context.Principal?.FindFirst("AspNet.Identity.SecurityStamp")?.Value;
+                        var userSecurityStamp = await userManager.GetSecurityStampAsync(user);
+
+                        if (tokenSecurityStamp != userSecurityStamp)
+                        {
+                            context.Fail("Unauthorized");
+                        }
+                    }
+                };
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
             });
 
             // Auth-related services

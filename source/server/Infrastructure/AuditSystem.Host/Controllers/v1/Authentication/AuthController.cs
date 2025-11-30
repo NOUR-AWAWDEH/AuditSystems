@@ -28,25 +28,19 @@ public sealed class AuthController(
     }
 
     [HttpPost("logout")]
-    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public async Task<ActionResult<ApiResponse>> LogOut([FromBody] LogoutRequest request)
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<ActionResult<ApiResponse>> LogOut()
     {
-        if (string.IsNullOrEmpty(request.RefreshToken))
-            return BadRequest(ApiResponse.BadRequest("Refresh token is required"));
+        var result = await _authService.SignOutAsync();
 
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized(ApiResponse.Unauthorized("User not found"));
+        if (!result)
+            return BadRequest(ApiResponse.BadRequest("Logout failed"));
 
-        var success = await _authService.RevokeRefreshTokenAsync(userId, request.RefreshToken);
-        if (!success)
-            return BadRequest(ApiResponse.BadRequest("Failed to revoke refresh token"));
-
-        return Ok(ApiResponse.Ok("Logged out successfully"));
+        return Ok(ApiResponse.Ok("Logged out successfully from all sessions"));
     }
 
     [HttpPost("logout-all")]
-    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<ApiResponse>> LogOutAll()
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -71,7 +65,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("auth-status")]
-    [Authorize (AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]// if you want to require auth for this endpoint
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> GetAuthStatus([FromBody] AuthStatusRequestDto request)
     {
         var result = await _authService.GetAuthStatusFromToken(request);

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
 using AuditSystem.Domain.Entities.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
@@ -20,7 +21,7 @@ public sealed class RegistrationController(
 {
 
     [HttpPost("register")]
-    [PreventBruteForce]
+    [Authorize(Policy = "Admin")]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterDto model)
     {
         try

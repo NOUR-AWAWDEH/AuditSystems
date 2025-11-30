@@ -1,6 +1,7 @@
 using AuditSystem.Auth.Authentication;
 using AuditSystem.Auth.Dtos.AuthStatus;
 using AuditSystem.Auth.Dtos.Login;
+using AuditSystem.Auth.Services.Account;
 using AuditSystem.Contract.Common;
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 using AuditSystem.DataAccess.Contexts;
@@ -20,6 +21,7 @@ public class CustomAuthenticationService(
     ApplicationDbContext db,
     ITokenService tokenService,
     IUserSessionManager userSessionManager,
+    IAccountService accountService,
     IHttpContextAccessor httpContextAccessor,
     ILogger<CustomAuthenticationService> logger) : ICustomAuthenticationService
 {
@@ -28,6 +30,7 @@ public class CustomAuthenticationService(
     private readonly ApplicationDbContext _db = db;
     private readonly ITokenService _tokenService = tokenService;
     private readonly IUserSessionManager _userSessionManager = userSessionManager;
+    private readonly IAccountService _accountService = accountService;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private readonly ILogger<CustomAuthenticationService> _logger = logger;
 
@@ -88,17 +91,34 @@ public class CustomAuthenticationService(
     {
         try
         {
-            await _signInManager.SignOutAsync();
+            var userIdStr = _httpContextAccessor.HttpContext?.User?
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(userIdStr, out var identityUserId))
+            if (!Guid.TryParse(userIdStr, out var identityUserId))
+                return false;
+
+
+            // 1. Update security stamp to invalidate all JWTs
+            var user = await _userManager.FindByIdAsync(userIdStr);
+            if (user != null)
             {
-                var appUser = await _db.AppUsers.FirstOrDefaultAsync(au => au.IdentityUserId == identityUserId);
-                if (appUser != null)
-                {
-                    await _userSessionManager.EndSessionAsync(appUser);
-                }
+                await _userManager.UpdateSecurityStampAsync(user); // this invalidates all JWTs
             }
+
+            // 2. Revoke ALL refresh tokens
+            await _accountService.RevokeAllRefreshTokensAsync(identityUserId);
+
+            // 3. End business session
+            var appUser = await _db.AppUsers
+                .FirstOrDefaultAsync(au => au.IdentityUserId == identityUserId);
+
+            if (appUser != null)
+            {   
+                await _userSessionManager.EndSessionAsync(appUser);
+            }
+
+            // 4. Sign out Identity
+            await _signInManager.SignOutAsync();
 
             return true;
         }
@@ -108,6 +128,7 @@ public class CustomAuthenticationService(
             return false;
         }
     }
+
 
     #endregion
 
@@ -197,27 +218,13 @@ public class CustomAuthenticationService(
     public async Task<bool> RevokeAllRefreshTokensAsync(string userId)
     {
         if (!Guid.TryParse(userId, out var uid)) return false;
-
-        var tokens = await _db.RefreshTokens.Where(rt => rt.UserId == uid && !rt.IsRevoked).ToListAsync();
-        if (!tokens.Any()) return false;
-
-        tokens.ForEach(t => t.IsRevoked = true);
-        await _db.SaveChangesAsync();
-        return true;
+        return await _accountService.RevokeAllRefreshTokensAsync(uid);
     }
 
     public async Task<bool> RevokeRefreshTokenAsync(string userId, string refreshToken)
     {
         if (!Guid.TryParse(userId, out var uid)) return false;
-
-        var token = await _db.RefreshTokens.FirstOrDefaultAsync(rt =>
-            rt.UserId == uid && rt.Token == refreshToken && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow);
-
-        if (token == null) return false;
-
-        token.IsRevoked = true;
-        await _db.SaveChangesAsync();
-        return true;
+        return await _accountService.RevokeRefreshTokenAsync(uid, refreshToken);
     }
 
     #endregion

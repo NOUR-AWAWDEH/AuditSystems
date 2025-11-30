@@ -30,18 +30,32 @@ public class AccountService(
     /// </summary>
     public async Task RevokeAllRefreshTokensAsync(ApplicationUser user)
     {
-        if (user == null)
-            throw new ArgumentNullException(nameof(user));
+        if (user == null) throw new ArgumentNullException(nameof(user));
+        await RevokeAllRefreshTokensAsync(user.Id);
+    }
 
-        var refreshTokens = await dbContext.RefreshTokens
-            .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
+    public async Task<bool> RevokeAllRefreshTokensAsync(Guid userId)
+    {
+        var tokens = await dbContext.RefreshTokens
+            .Where(rt => rt.UserId == userId && !rt.IsRevoked)
             .ToListAsync();
 
-        foreach (var token in refreshTokens)
-        {
-            token.IsRevoked = true;
-        }
+        if (!tokens.Any()) return false;
 
+        tokens.ForEach(t => t.IsRevoked = true);
         await dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RevokeRefreshTokenAsync(Guid userId, string refreshToken)
+    {
+        var token = await dbContext.RefreshTokens.FirstOrDefaultAsync(rt =>
+            rt.UserId == userId && rt.Token == refreshToken && !rt.IsRevoked && rt.ExpiresAt > DateTime.UtcNow);
+
+        if (token == null) return false;
+
+        token.IsRevoked = true;
+        await dbContext.SaveChangesAsync();
+        return true;
     }
 }

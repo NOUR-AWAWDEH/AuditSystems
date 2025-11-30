@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getAuditProgramsByUserIdRepository } from '@/services/riskControl/auditProgram/getAuditProgramsByUserIdRepository';
 
 export function useGetAuditProgramsByUserId() {
     const auditPrograms = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const auditProgramsData = Array.isArray(response.result) ? response.result : [];
@@ -20,7 +18,6 @@ export function useGetAuditProgramsByUserId() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

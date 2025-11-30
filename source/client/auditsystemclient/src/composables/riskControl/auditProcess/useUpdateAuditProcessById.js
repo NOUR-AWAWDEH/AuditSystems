@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateAuditProcessByIdRepository } from '@/services/riskControl/auditProcess/updateAuditProcessByIdRepository';
 
 export function useUpdateAuditProcessById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedAuditProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedAuditProcess.value = response.result;
-        const message = response?.successMessage || 'Process updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useUpdateAuditProcessById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -54,7 +49,6 @@ export function useUpdateAuditProcessById() {
             
             const validationError = validateUpdateAuditProcess(auditProcessData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

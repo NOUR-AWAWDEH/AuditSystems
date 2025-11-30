@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteObjectiveByIdRepository } from '@/services/riskControl/objective/deleteObjectiveByIdRepository';
 
 
@@ -7,12 +6,10 @@ export function useDeleteObjectiveById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedObjective = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedObjective.value = true;
         const message = response?.successMessage || 'Objective deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -22,7 +19,6 @@ export function useDeleteObjectiveById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

@@ -1,12 +1,10 @@
-import { ref } from 'vue';
-import { getSubDepartmentByIdRepository } from '@/services/organization/subdepartment/getSubDepartmentByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
+import { ref } from "vue";
+import { getSubDepartmentByIdRepository } from "@/services/organization/subdepartment/getSubDepartmentByIdRepository";
 
 export function useGetSubDepartmentById() {
   const subDepartment = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
-  const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
     const subDepartmentData = response.result.subDepartmentModel;
@@ -14,14 +12,12 @@ export function useGetSubDepartmentById() {
     return { success: true, data: subDepartmentData };
   };
 
-  const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch subDepartment') => {
+  const handleFetchFailure = (response, defaultErrorMessage = "Failed to fetch subDepartment") => {
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
-
     return {
       success: false,
       message: errorMessage,
@@ -31,7 +27,7 @@ export function useGetSubDepartmentById() {
 
   const validateSubDepartmentId = (subDepartmentId) => {
     if (!subDepartmentId) {
-      return 'SubDepartment ID is required';
+      return "SubDepartment ID is required";
     }
     return null;
   };
@@ -56,7 +52,7 @@ export function useGetSubDepartmentById() {
         return handleFetchFailure(response);
       }
     } catch (err) {
-      return handleFetchFailure(err, err.message || 'Failed to fetch subdepartment');
+      return handleFetchFailure(err, err.message || "Failed to fetch subdepartment");
     } finally {
       isLoading.value = false;
     }

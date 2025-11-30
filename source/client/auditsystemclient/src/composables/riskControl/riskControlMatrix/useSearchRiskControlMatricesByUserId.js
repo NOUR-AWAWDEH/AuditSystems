@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { searchRiskControlMatricesByUserIdRepository } from '@/services/riskControl/riskControlMatrix/searchRiskControlMatricesByUserIdRepository';
 
 export function useSearchRiskControlMatricesByUserId() {
@@ -11,7 +10,6 @@ export function useSearchRiskControlMatricesByUserId() {
     const pageSize = ref(10);
     const searchTerm = ref('');
     const subProcessId = ref(null);
-    const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.items || [];
@@ -31,7 +29,6 @@ export function useSearchRiskControlMatricesByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

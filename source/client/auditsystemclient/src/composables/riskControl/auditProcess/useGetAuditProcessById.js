@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { getAuditProcessByIdRepository } from '@/services/riskControl/auditProcess/getAuditProcessByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetAuditProcessById() {
     const auditProcess = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         auditProcess.value = response.result;
         const message = response?.successMessage || 'Process fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +18,6 @@ export function useGetAuditProcessById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -33,7 +29,6 @@ export function useGetAuditProcessById() {
     const validateAuditProcessId = (auditProcessId) => {
         if (!auditProcessId) {
             const message = 'Audit process ID is required.';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

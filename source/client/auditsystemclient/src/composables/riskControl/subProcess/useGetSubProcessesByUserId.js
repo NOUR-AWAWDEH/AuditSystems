@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getSubProcessesByUserIdRepository } from '@/services/riskControl/subProcess/getSubProcessesByUserIdRepository';
 
 export function useGetSubProcessesByUserId() {
     const subProcesses = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const subProcessesData =  Array.isArray(response.result)
@@ -23,7 +21,6 @@ export function useGetSubProcessesByUserId() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

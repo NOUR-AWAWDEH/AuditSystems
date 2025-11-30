@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateExitControlByIdRepository } from '@/services/riskControl/exitControl/updateExitControlByIdRepository';
 
 export function useUpdateExitControlById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedExitControl = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedExitControl.value = response.result;
-        const message = response?.successMessage || 'Exit Control updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useUpdateExitControlById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

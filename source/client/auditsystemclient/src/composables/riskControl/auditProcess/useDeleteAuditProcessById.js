@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteAuditProcessByIdRepository } from '@/services/riskControl/auditProcess/deleteAuditProcessByIdRepository';
 
 export function useDeleteAuditProcessById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedAuditProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedAuditProcess.value = true;
         const message = response?.successMessage || 'Process deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -21,7 +18,6 @@ export function useDeleteAuditProcessById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

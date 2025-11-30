@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { createLocationRepository } from '@/services/organization/location/createLocationRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateLocation() {
   const isCreating = ref(false);
   const error = ref(null);
   const createdLocation = ref(null);
-  const { showNotification } = useNotification();
 
   const handleCreateSuccess = (response) => {
 
     createdLocation.value = response;
-    showNotification(response?.successMessage || 'Location created successfully!', 'success');
     return { success: true, data: response };
   };
 
@@ -22,7 +19,6 @@ export function useCreateLocation() {
       : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
 
     return {
       success: false,

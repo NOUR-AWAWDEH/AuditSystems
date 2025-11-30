@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getRisksByUserIdRepository } from '@/services/riskControl/risk/getRisksByUserIdRepository';
 
 export function useGetRisksByUserId() {
     const risks = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const risksData = response.result?.riskModels || [];
@@ -20,7 +18,6 @@ export function useGetRisksByUserId() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

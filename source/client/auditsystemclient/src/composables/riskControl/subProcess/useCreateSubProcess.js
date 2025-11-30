@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createSubProcessRepository } from '@/services/riskControl/subProcess/createSubProcessRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateSubProcess() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdSubProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdSubProcess.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateSubProcess() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateRiskControlMatrixByIdRepository } from '@/services/riskControl/riskControlMatrix/updateRiskControlMatrixByIdRepository';
 
 export function useUpdateRiskControlMatrixById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedRiskControlMatrix = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedRiskControlMatrix.value = response.result;
         const message = response?.successMessage || 'Risk control matrix updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +18,6 @@ export function useUpdateRiskControlMatrixById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -54,7 +50,6 @@ export function useUpdateRiskControlMatrixById() {
             
             const validationError = validateUpdateRiskControlMatrix(riskControlMatrixData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

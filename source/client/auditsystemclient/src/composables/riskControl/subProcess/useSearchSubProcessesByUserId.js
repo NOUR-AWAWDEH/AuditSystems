@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { searchSubProcessesByUserIdRepository } from '@/services/riskControl/subProcess/searchSubProcessesByUserIdRepository';
 
 export function useSearchSubProcessesByUserId() {
@@ -11,7 +10,6 @@ export function useSearchSubProcessesByUserId() {
     const pageSize = ref(10);
     const searchTerm = ref('');
     const auditProcessId = ref(null);
-    const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.result?.items || response.result?.items || [];
@@ -31,7 +29,6 @@ export function useSearchSubProcessesByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

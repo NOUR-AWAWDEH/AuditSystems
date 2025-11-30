@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateObservationByIdRepository } from '@/services/riskControl/observation/updateObservationByIdRepository';
 
 export function useUpdateObservationById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedObservation = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedObservation.value = response.result;
         const message = response?.successMessage || 'Observation updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +18,6 @@ export function useUpdateObservationById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -70,7 +66,6 @@ export function useUpdateObservationById() {
             
             const validationError = validateUpdateObservation(observationData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

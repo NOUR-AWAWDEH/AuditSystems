@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createObjectiveRepository } from '@/services/riskControl/objective/createObjectiveRepository.js';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateObjective() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdObjective = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdObjective.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateObjective() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

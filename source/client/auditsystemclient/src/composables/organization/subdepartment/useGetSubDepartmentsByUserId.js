@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { getSubDepartmentsByUserIdRepository } from '@/services/organization/subdepartment/getSubDepartmentsByUserIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetSubDepartmentsByUserId() {
   const subDepartments = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
-  const { showNotification } = useNotification();
 
   const handleFetchSuccess = (response) => {
     // Fix: Extract subDepartments array from the nested result object
@@ -21,7 +19,6 @@ export function useGetSubDepartmentsByUserId() {
       : response?.message || defaultErrorMessage;
     
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
     
     return {
       success: false,

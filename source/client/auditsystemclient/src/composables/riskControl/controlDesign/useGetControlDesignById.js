@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { getControlDesignByIdRepository } from '@/services/riskControl/controlDesign/getControlDesignByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetControlDesignById() {
     const controlDesign = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         controlDesign.value = response.result;
         const message = response?.successMessage || 'Control Design fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: controlDesign.value };
     };
 
@@ -33,7 +30,6 @@ export function useGetControlDesignById() {
     const validateControlDesignId = (controlDesignId) => {
         if (!controlDesignId) {
             const message = 'Control Design ID is required.';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

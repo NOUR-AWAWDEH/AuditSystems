@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createExitControlRepository } from '@/services/riskControl/exitControl/createExitControlRepository.js';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateExitControl() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdExitControl = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdExitControl.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateExitControl() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createAuditProcessRepository } from '@/services/riskControl/auditProcess/createAuditProcessRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateAuditProcess() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdAuditProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdAuditProcess.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateAuditProcess() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

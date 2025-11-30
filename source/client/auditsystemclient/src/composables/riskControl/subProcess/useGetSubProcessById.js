@@ -1,18 +1,15 @@
 import { ref } from 'vue';
 import { getSubProcessByIdRepository } from '@/services/riskControl/subProcess/getSubProcessByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 
 export function useGetSubProcessById() {
     const subProcess = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         subProcess.value = response.result;
         const message = response?.successMessage || 'SubProcess fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -22,7 +19,6 @@ export function useGetSubProcessById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -34,7 +30,6 @@ export function useGetSubProcessById() {
     const validateSubProcessId = (subProcessId) => {
         if (!subProcessId) {
             const message = 'SubProcess ID is required.';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

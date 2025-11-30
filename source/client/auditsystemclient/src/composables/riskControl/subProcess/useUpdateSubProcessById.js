@@ -1,17 +1,14 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateSubProcessByIdRepository } from '@/services/riskControl/subProcess/updateSubProcessByIdRepository';
 
 export function useUpdateSubProcessById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedSubProcess = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedSubProcess.value = response.result;
         const message = response?.successMessage || 'SubProcess updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +18,6 @@ export function useUpdateSubProcessById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -54,7 +50,6 @@ export function useUpdateSubProcessById() {
             
             const validationError = validateUpdateSubProcess(subProcessData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

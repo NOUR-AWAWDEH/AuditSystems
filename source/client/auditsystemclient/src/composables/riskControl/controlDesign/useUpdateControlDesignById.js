@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { updateControlDesignByIdRepository } from '@/services/riskControl/controlDesign/updateControlDesignByIdRepository';
 
 export function useUpdateControlDesignById() {
     const isUpdating =ref(false);
     const error = ref(null);
     const updatedControlDesign = ref(null);
-    const { showNotification } = useNotification();
 
     const handleUpdateSuccess = (response) => {
         updatedControlDesign.value = response.result;
-        const message = response?.successMessage || 'Control Design updated successfully';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useUpdateControlDesignById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,
@@ -54,7 +49,6 @@ export function useUpdateControlDesignById() {
             
             const validationError = validateUpdateControlDesign(controlDesignData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

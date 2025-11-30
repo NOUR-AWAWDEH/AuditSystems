@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getAuditProcessesByUserIdRepository } from '@/services/riskControl/auditProcess/getAuditProcessesByUserIdRepository';
 
 export function useGetAuditProcessesByUserId() {
     const auditProcesses = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         let auditProcessesData = response.result || [];

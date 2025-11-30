@@ -1,16 +1,13 @@
 import { ref } from 'vue';
 import { createDepartmentRepository } from '@/services/organization/department/createDepartmentRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateDepartment() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdDepartment = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdDepartment.value = response.result;
-        showNotification(response?.successMessage || 'Department created successfully.', 'success');
         return { success: true, data: response.result };
     };
 
@@ -20,7 +17,6 @@ export function useCreateDepartment() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return { 
             success: false,

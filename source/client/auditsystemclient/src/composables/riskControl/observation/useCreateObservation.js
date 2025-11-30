@@ -1,12 +1,10 @@
 import { ref } from 'vue';
 import { createObservationRepository } from '@/services/riskControl/observation/createObservationRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useCreateObservation() {
     const isCreating = ref(false);
     const error = ref(null);
     const createdObservation = ref(null);
-    const { showNotification } = useNotification();
 
     const handleCreateSuccess = (response) => {
         createdObservation.value = response.result;
@@ -23,7 +21,6 @@ export function useCreateObservation() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
         return {
             success: false,
             message: errorMessage,

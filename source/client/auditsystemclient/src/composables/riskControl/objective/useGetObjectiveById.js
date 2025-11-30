@@ -1,17 +1,13 @@
 import { ref } from 'vue';
 import { getObjectiveByIdRepository } from '@/services/riskControl/objective/getObjectiveByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useGetObjectiveById() {
     const objective = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         objective.value = response.result;
-        const message = response?.successMessage || 'Objective fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -21,7 +17,6 @@ export function useGetObjectiveById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        //showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -33,7 +28,6 @@ export function useGetObjectiveById() {
     const validateObjectiveId = (objectiveId) => {
         if (!objectiveId) {
             const message = 'Objective ID is required.';
-            //showNotification(message, 'error');
             return { success: false, message };
         }
     };

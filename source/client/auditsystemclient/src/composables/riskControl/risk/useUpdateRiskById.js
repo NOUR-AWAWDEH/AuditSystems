@@ -1,23 +1,19 @@
 import { ref } from "vue";
-import { useNotification } from "@/composables/notification/useNotification";
 import { updateRiskByIdRepository } from "@/services/riskControl/risk/updateRiskByIdRepository";
 
 export function useUpdateRiskById() {
   const isUpdating = ref(false);
   const error = ref(null);
   const updatedRisk = ref(null);
-  const { showNotification } = useNotification();
 
   const handleUpdateSuccess = (response) => {
     updatedRisk.value = response.result;
     const message = response?.successMessage || "Risk updated successfully";
-    showNotification(message, "success");
     return { success: true, data: response.result };
   };
 
   const handleUpdateFailure = (message = "Failed to update risk", errors = []) => {
     error.value = message;
-    showNotification(message, "error");
     return {
       success: false,
       message,

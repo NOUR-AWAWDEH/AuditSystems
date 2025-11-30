@@ -1,17 +1,14 @@
 import { ref } from 'vue';
 import { updateSubDepartmentByIdRepository } from '@/services/organization/subdepartment/updateSubDepartmentByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 export function useUpdateSubDepartmentById() {
   const isUpdating = ref(false);
   const error = ref(null);
   const updatedSubDepartment = ref(null);
-  const { showNotification } = useNotification();
 
   const handleUpdateSuccess = (response) => {
     updatedSubDepartment.value = response.result;
     const message = response?.successMessage || 'SubDepartment updated successfully!';
-    showNotification(message, 'success');
     return { success: true, data: response.result };
   };
   
@@ -21,7 +18,6 @@ export function useUpdateSubDepartmentById() {
       : response?.message || defaultErrorMessage;
     
     error.value = errorMessage;
-    showNotification(errorMessage, 'error');
     
     return {
       success: false,
@@ -53,7 +49,6 @@ export function useUpdateSubDepartmentById() {
       // Validate required fields
       const validationError = validateSubDepartmentData(subDepartmentData);
       if (validationError) {
-        showNotification(validationError, 'error');
         return handleUpdateFailure({ message: validationError });
       }
   

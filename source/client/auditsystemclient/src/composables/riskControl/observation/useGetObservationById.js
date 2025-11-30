@@ -1,18 +1,14 @@
 import { ref } from 'vue';
 import { getObservationByIdRepository } from '@/services/riskControl/observation/getObservationByIdRepository';
-import { useNotification } from '@/composables/notification/useNotification';
 
 
 export function useGetObservationById() {
     const observation = ref(null);
     const isLoading = ref(null);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         observation.value = response.result;
-        const message = response?.successMessage || 'Observation fetched successfully!';
-        showNotification(message, 'success');
         return { success: true, data: response.result };
     };
 
@@ -22,7 +18,6 @@ export function useGetObservationById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,
@@ -34,7 +29,6 @@ export function useGetObservationById() {
     const validateObservationId = (observationId) => {
         if (!observationId) {
             const message = 'Observation ID is required.';
-            showNotification(message, 'error');
             return { success: false, message };
         }
     };

@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { searchControlDesignsByUserIdRepository } from '@/services/riskControl/controlDesign/searchControlDesignsByUserIdRepository';
 
 export function useSearchControlDesignsByUserId() {
@@ -11,7 +10,6 @@ export function useSearchControlDesignsByUserId() {
     const pageSize = ref(10);
     const searchTerm = ref('');
     const exitControlId = ref(null);
-    const { showNotification } = useNotification();
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.items || [];
@@ -31,7 +29,6 @@ export function useSearchControlDesignsByUserId() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

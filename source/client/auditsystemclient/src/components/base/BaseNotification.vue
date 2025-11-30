@@ -1,12 +1,12 @@
 <template>
   <div
-    class="fixed z-50 top-20 right-5 2xl:right-20 w-[80%] sm:w-[70%] md:w-[50%] max-w-lg flex flex-col gap-3"
+    class="fixed z-50 top-20 right-2 sm:right-5 2xl:right-20 w-[85%] sm:w-[70%] md:w-[50%] max-w-lg flex flex-col gap-1 sm:gap-3"
   >
     <div
       v-for="n in notifications"
       :key="n.id"
       :class="[
-        'p-4 rounded-md shadow-lg transition-all relative flex items-center',
+        'p-1.5 sm:p-4 rounded-md shadow-lg transition-all relative flex items-center text-xs sm:text-base',
         notificationTypeClass(n),
       ]"
     >
@@ -14,7 +14,7 @@
       <!-- Success -->
       <svg
         v-if="n.type === 'success'"
-        class="w-8 h-8 mr-3 shrink-0"
+        class="w-4 h-4 sm:w-8 sm:h-8 mr-1.5 sm:mr-3 shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -30,7 +30,7 @@
       <!-- Error -->
       <svg
         v-if="n.type === 'error'"
-        class="w-8 h-8 mr-3 shrink-0"
+        class="w-4 h-4 sm:w-8 sm:h-8 mr-1.5 sm:mr-3 shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -46,7 +46,7 @@
       <!-- Warning -->
       <svg
         v-if="n.type === 'warning'"
-        class="w-8 h-8 mr-3 shrink-0"
+        class="w-4 h-4 sm:w-8 sm:h-8 mr-1.5 sm:mr-3 shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -62,7 +62,7 @@
       <!-- Info -->
       <svg
         v-if="n.type === 'info'"
-        class="w-8 h-8 mr-3 shrink-0"
+        class="w-4 h-4 sm:w-8 sm:h-8 mr-1.5 sm:mr-3 shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -75,10 +75,13 @@
         />
       </svg>
 
-      <span>{{ n.message }}</span>
+      <span class="pr-3 sm:pr-6">{{ n.message }}</span>
 
-      <button @click="close(n.id)" class="absolute top-1 right-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button
+        @click="close(n.id)"
+        class="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 p-0.5 sm:p-1"
+      >
+        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

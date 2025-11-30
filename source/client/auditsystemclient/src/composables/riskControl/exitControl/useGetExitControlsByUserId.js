@@ -1,12 +1,10 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { getExitControlsByUserIdRepository } from '@/services/riskControl/exitControl/getExitControlsByUserIdRepository';
 
 export function useGetExitControlsByUserId() {
     const exitControls = ref([]);
     const isLoading = ref(false);
     const error = ref(null);
-    const { showNotification } = useNotification();
 
     const handleFetchSuccess = (response) => {
         const exitControlsData = Array.isArray(response.result) ? response.result : [];
@@ -20,7 +18,6 @@ export function useGetExitControlsByUserId() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

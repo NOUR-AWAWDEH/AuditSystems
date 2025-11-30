@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useNotification } from '@/composables/notification/useNotification';
 import { deleteControlDesignByIdRepository } from '@/services/riskControl/controlDesign/deleteControlDesignByIdRepository';
 
 
@@ -7,12 +6,10 @@ export function useDeleteControlDesignById() {
     const isDeleting = ref(false);
     const error = ref(null);
     const deletedControlDesign = ref(null);
-    const { showNotification } = useNotification();
 
     const handleDeleteSuccess = (response) => {
         deletedControlDesign.value = true;
         const message = response?.successMessage || 'Control Design deleted successfully';
-        showNotification(message, 'success');
         return { success: true, message };
     };
 
@@ -22,7 +19,6 @@ export function useDeleteControlDesignById() {
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         const failureResult = {
             success: false,

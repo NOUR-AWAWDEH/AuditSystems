@@ -1,3 +1,4 @@
+using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Organization;
 
 namespace AuditSystem.Contract.Models.Users;
@@ -9,4 +10,4 @@ public sealed record UserModel(
     string Email,
     string Role,
     SubDepartment SubDepartment,
-    JobTitle JobTitle);
+    JobTitleModel JobTitle);

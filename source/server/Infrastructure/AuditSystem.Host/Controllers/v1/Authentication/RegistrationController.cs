@@ -16,12 +16,13 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 public sealed class RegistrationController(
         IRegistrationService _registrationService,
         UserManager<ApplicationUser> _userManager,
-        ILogger<RegistrationController> _logger) 
+        ILogger<RegistrationController> _logger)
         : ControllerBase
 {
 
     [HttpPost("register")]
     [Authorize(Policy = "Admin")]
+    [AutoInjectUserId]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterDto model)
     {
         try
@@ -33,7 +34,7 @@ public sealed class RegistrationController(
                 return BadRequest(ApiResponse.BadRequest(errors));
             }
 
-            await _registrationService.RegisterAsync(model, Request.Scheme);
+            await _registrationService.RegisterAsync(model, Request.Scheme, model.UserId);
             return Ok(ApiResponse.Ok("User registered successfully. Please check your email for verification"));
         }
         catch (InvalidOperationException ex) when (

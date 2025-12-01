@@ -1,6 +1,7 @@
 using System.Linq;
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
 using AuditSystem.Contract.Interfaces.Repositories;
+using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Contract.Models.Users;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
@@ -38,15 +39,10 @@ internal sealed class UserService(
         }
 
         // 3. Query AppUsers that are in the role AND created by the current user
-        var actionOwners = await appUserRepository.Query()
-            .Include(u => u.IdentityUser)
-            .Include(u => u.SubDepartment)
-            .Include(u => u.JobTitle)
+        // Use projection to avoid circular reference issues
+        var userModels = await appUserRepository.Query()
             .Where(u => actionOwnerIdentityIds.Contains(u.IdentityUserId))
             .Where(u => u.CreatedByUserId == currentAppUser.Id)
-            .ToListAsync();
-
-        var userModels = actionOwners
             .Select(u => new UserModel(
                 u.Id,
                 u.FirstName,
@@ -54,8 +50,8 @@ internal sealed class UserService(
                 u.IdentityUser.Email ?? string.Empty,
                 Role.ActionOwner,
                 u.SubDepartment ?? null!,
-                u.JobTitle))
-            .ToList();
+                new JobTitleModel(u.JobTitle.Id, u.JobTitle.Name, u.JobTitle.CompanyId)))
+            .ToListAsync();
 
         logger.LogDebug("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, currentAppUser.Id);
         return userModels;

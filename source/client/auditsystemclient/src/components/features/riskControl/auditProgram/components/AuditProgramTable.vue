@@ -290,6 +290,7 @@ const handleSelectAuditProgram = (auditProgram) => {
 
 const auditProgramColumns = [
   { key: "description", label: "Description" },
+  { key: "actionOwner", label: "Action Owner" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
 

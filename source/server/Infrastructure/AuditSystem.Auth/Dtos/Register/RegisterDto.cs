@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AuditSystem.Contract.Interfaces;
 
 namespace AuditSystem.Auth.Dtos.Register;
 
-public class RegisterDto
+public class RegisterDto : IUserAwareRequest
 {
     // ========================= AUTH =========================
 
@@ -47,4 +48,7 @@ public class RegisterDto
 
     [Required] // ✅ REQUIRED BY AppUser
     public Guid JobTitleId { get; set; }
+
+    // ========================= AUTO-INJECTED =========================
+    public Guid UserId { get; set; }
 }

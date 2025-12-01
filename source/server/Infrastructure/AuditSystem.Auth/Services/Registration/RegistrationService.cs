@@ -39,25 +39,40 @@ public class RegistrationService : IRegistrationService
 
     // ========================= REGISTER =========================
 
-    public async Task RegisterAsync(RegisterDto request, string scheme)
+    public async Task RegisterAsync(RegisterDto request, string scheme, Guid adminUserId)
     {
+        // Use transaction to ensure all-or-nothing: if AppUser creation fails, rollback Identity user too
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
         try
         {
             var role = await ValidateAndGetRoleAsync(request.RoleName);
             await ValidateUserDoesNotExistAsync(request.UserName);
 
+            // Get the admin's AppUser ID from their ApplicationUser ID (from JWT token)
+            var adminAppUser = await _dbContext.AppUsers
+                .FirstOrDefaultAsync(u => u.IdentityUserId == adminUserId);
+
+            if (adminAppUser == null)
+                throw new InvalidOperationException($"Admin user with Identity ID '{adminUserId}' not found");
+
             var identityUser = await CreateIdentityUserAsync(request);
             await AssignRoleAsync(identityUser, role.Name!);
-            await CreateBusinessProfileAsync(identityUser, request);
+            await CreateBusinessProfileAsync(identityUser, request, adminAppUser.Id);
             await CreateInitialRefreshTokenAsync(identityUser);
 
             var confirmationLink = await GenerateConfirmationLinkAsync(identityUser, scheme);
             await SendConfirmationEmailAsync(identityUser, confirmationLink);
 
+            // Commit transaction - all steps succeeded
+            await transaction.CommitAsync();
+
             _logger.LogInformation("User registered and confirmation email sent: {Email}", identityUser.Email);
         }
         catch (Exception ex)
         {
+            // Rollback transaction - cleanup all changes including Identity user
+            await transaction.RollbackAsync();
             _logger.LogError(ex, "Registration failed for {Username}", request.UserName);
             throw;
         }
@@ -109,11 +124,11 @@ public class RegistrationService : IRegistrationService
             throw CreateExceptionFromErrors("Role assignment failed", result.Errors);
     }
 
-    private async Task CreateBusinessProfileAsync(ApplicationUser identityUser, RegisterDto request)
+    private async Task CreateBusinessProfileAsync(ApplicationUser identityUser, RegisterDto request, Guid adminAppUserId)
     {
         var appUser = new AppUser
         {
-            Id = Guid.NewGuid(),
+            Id = identityUser.Id, // Shared Primary Key with IdentityUser
             IdentityUserId = identityUser.Id,
             FirstName = request.FirstName,
             LastName = request.LastName,
@@ -121,7 +136,8 @@ public class RegistrationService : IRegistrationService
             UserName = identityUser.UserName,
             CompanyId = request.CompanyId,
             JobTitleId = request.JobTitleId,
-            IsActive = true
+            IsActive = true,
+            CreatedByUserId = adminAppUserId // Admin who created this user
         };
 
         _dbContext.AppUsers.Add(appUser);

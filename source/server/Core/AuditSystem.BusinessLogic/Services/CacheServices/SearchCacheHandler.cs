@@ -19,40 +19,42 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
     ILogger logger,
     string cacheKeyPrefix,
     string[] entityTags,
-    string[] listTags) : EntityCacheHandler<TId, TEntity, TModel>(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags)
+    string[] listTags,
+    string searchProperty = "Name") : EntityCacheHandler<TId, TEntity, TModel>(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags)
     where TEntity : Entity<TId>
     where TId : IComparable<TId>
 {
+    private readonly string _searchProperty = searchProperty;
 
     // Non-generic version (returns TModel)
     public async Task<PaginationResult<TModel>?> GetFromCacheAsync(string cacheKey, string countCacheKey, Page page)
     {
-        var cached = await cacheService.GetAsync<List<TEntity>>(cacheKey);
+        var cached = await cacheService.GetAsync<List<TModel>>(cacheKey); // Cache TModel, not TEntity
         var count = await cacheService.GetAsync<int?>(countCacheKey);
 
         if (cached == null || !count.HasValue) return null;
 
         return new PaginationResult<TModel>
         {
-            Items = mapper.Map<List<TModel>>(cached),
+            Items = cached, // Already TModel, no mapping needed
             TotalCount = count.Value,
             PageNumber = page.Number,
             PageSize = page.Size
         };
     }
 
-    // Generic version (returns TTargetModel) - ADD THIS METHOD
+    // Generic version (returns TTargetModel)
     public async Task<PaginationResult<TTargetModel>?> GetFromCacheAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page)
         where TTargetModel : class
     {
-        var cached = await cacheService.GetAsync<List<TEntity>>(cacheKey);
+        var cached = await cacheService.GetAsync<List<TTargetModel>>(cacheKey); // Cache TTargetModel
         var count = await cacheService.GetAsync<int?>(countCacheKey);
 
         if (cached == null || !count.HasValue) return null;
 
         return new PaginationResult<TTargetModel>
         {
-            Items = mapper.Map<List<TTargetModel>>(cached),
+            Items = cached,
             TotalCount = count.Value,
             PageNumber = page.Number,
             PageSize = page.Size
@@ -60,11 +62,14 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
     }
 
     // Non-generic version (returns TModel)
-    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(string cacheKey, string countCacheKey, Page page, string? searchTerm = null)
+    public async Task<PaginationResult<TModel>> GetFromRepositoryAsync(
+        string cacheKey,
+        string countCacheKey,
+        Page page,
+        string? searchTerm = null,
+        Expression<Func<TEntity, bool>>? additionalPredicate = null)
     {
-        Expression<Func<TEntity, bool>> predicate = string.IsNullOrWhiteSpace(searchTerm)
-            ? e => true
-            : BuildSearchPredicate<TEntity>("Name", searchTerm);
+        var predicate = BuildSearchPredicate(searchTerm, additionalPredicate);
 
         var query = repository.GetAll()
                               .AsNoTracking()
@@ -72,22 +77,25 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
                               .OrderBy(e => e.Id);
 
         var projected = query.ProjectTo<TModel>(mapper.ConfigurationProvider);
-
         var result = await projected.PaginateAsync(page, repository);
 
-        await CacheSearchResultsAsync(cacheKey, mapper.Map<List<TEntity>>(result.Items));
+        // Cache the projected models, not the entities
+        await CacheSearchResultsAsync(cacheKey, result.Items);
         await CacheSearchCountAsync(countCacheKey, result.TotalCount);
 
         return result;
     }
 
-    // Generic version (returns TTargetModel) - ADD THIS METHOD
-    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page, string? searchTerm = null)
+    // Generic version (returns TTargetModel)
+    public async Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(
+        string cacheKey,
+        string countCacheKey,
+        Page page,
+        string? searchTerm = null,
+        Expression<Func<TEntity, bool>>? additionalPredicate = null)
         where TTargetModel : class
     {
-        Expression<Func<TEntity, bool>> predicate = string.IsNullOrWhiteSpace(searchTerm)
-            ? e => true
-            : BuildSearchPredicate<TEntity>("Name", searchTerm);
+        var predicate = BuildSearchPredicate(searchTerm, additionalPredicate);
 
         var query = repository.GetAll()
                               .AsNoTracking()
@@ -95,18 +103,26 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
                               .OrderBy(e => e.Id);
 
         var projected = query.ProjectTo<TTargetModel>(mapper.ConfigurationProvider);
-
         var result = await projected.PaginateAsync(page, repository);
 
-        await CacheSearchResultsAsync(cacheKey, mapper.Map<List<TEntity>>(result.Items));
+        // Cache the projected models, not the entities
+        await CacheSearchResultsAsync(cacheKey, result.Items);
         await CacheSearchCountAsync(countCacheKey, result.TotalCount);
 
         return result;
     }
 
-    public async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TEntity> entities)
+    // Cache TModel (non-generic)
+    public async Task CacheSearchResultsAsync(string cacheKey, IEnumerable<TModel> models)
     {
-        await cacheService.SetAsync(cacheKey, entities.ToList(), tags: listTags, expiration: CacheExpirations.MediumTerm);
+        await cacheService.SetAsync(cacheKey, models.ToList(), tags: listTags, expiration: CacheExpirations.MediumTerm);
+    }
+
+    // Cache TTargetModel (generic)
+    public async Task CacheSearchResultsAsync<TTargetModel>(string cacheKey, IEnumerable<TTargetModel> models)
+        where TTargetModel : class
+    {
+        await cacheService.SetAsync(cacheKey, models.ToList(), tags: listTags, expiration: CacheExpirations.MediumTerm);
     }
 
     public async Task CacheSearchCountAsync(string countCacheKey, int count)
@@ -134,16 +150,43 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
     public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page) =>
         (GetSearchCacheKey(searchTerm, page), GetSearchCountCacheKey(searchTerm));
 
-    private static Expression<Func<T, bool>> BuildSearchPredicate<T>(string propertyName, string? searchTerm)
+    private Expression<Func<TEntity, bool>> BuildSearchPredicate(
+        string? searchTerm,
+        Expression<Func<TEntity, bool>>? additionalPredicate = null)
     {
-        var param = Expression.Parameter(typeof(T), "e");
-        var prop = Expression.Property(param, propertyName);
-
-        if (prop.Type != typeof(string))
-            throw new InvalidOperationException($"Property '{propertyName}' is not of type string.");
+        if (string.IsNullOrWhiteSpace(searchTerm) && additionalPredicate == null)
+            return e => true;
 
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return e => true;
+            return additionalPredicate!;
+
+        var searchPredicate = BuildPropertySearchPredicate(searchTerm);
+
+        if (additionalPredicate == null)
+            return searchPredicate;
+
+        // Combine search predicate with additional predicate
+        var param = Expression.Parameter(typeof(TEntity), "e");
+        var combined = Expression.AndAlso(
+            Expression.Invoke(searchPredicate, param),
+            Expression.Invoke(additionalPredicate, param));
+
+        return Expression.Lambda<Func<TEntity, bool>>(combined, param);
+    }
+
+    private Expression<Func<TEntity, bool>> BuildPropertySearchPredicate(string searchTerm)
+    {
+        var param = Expression.Parameter(typeof(TEntity), "e");
+
+        // Check if the search property exists on TEntity
+        var property = typeof(TEntity).GetProperty(_searchProperty);
+        if (property == null)
+            throw new InvalidOperationException($"Property '{_searchProperty}' not found on {typeof(TEntity).Name}");
+
+        var prop = Expression.Property(param, _searchProperty);
+
+        if (property.PropertyType != typeof(string))
+            throw new InvalidOperationException($"Property '{_searchProperty}' is not of type string.");
 
         var toLower = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
         var contains = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
@@ -152,6 +195,37 @@ public class SearchCacheHandler<TId, TEntity, TModel>(
         var loweredTerm = Expression.Constant(searchTerm.ToLower(), typeof(string));
         var containsCall = Expression.Call(loweredProp, contains, loweredTerm);
 
-        return Expression.Lambda<Func<T, bool>>(containsCall, param);
+        return Expression.Lambda<Func<TEntity, bool>>(containsCall, param);
+    }
+
+    // Helper method for common search pattern
+    public async Task<PaginationResult<TModel>> SearchAsync(
+        Page page,
+        string? searchTerm = null,
+        Expression<Func<TEntity, bool>>? additionalPredicate = null)
+    {
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(searchTerm, page);
+
+        var cachedResult = await GetFromCacheAsync(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync(cacheKey, countCacheKey, page, searchTerm, additionalPredicate);
+    }
+
+    // Generic version
+    public async Task<PaginationResult<TTargetModel>> SearchAsync<TTargetModel>(
+        Page page,
+        string? searchTerm = null,
+        Expression<Func<TEntity, bool>>? additionalPredicate = null)
+        where TTargetModel : class
+    {
+        var (cacheKey, countCacheKey) = GetSearchCacheKeys(searchTerm, page);
+
+        var cachedResult = await GetFromCacheAsync<TTargetModel>(cacheKey, countCacheKey, page);
+        if (cachedResult != null)
+            return cachedResult;
+
+        return await GetFromRepositoryAsync<TTargetModel>(cacheKey, countCacheKey, page, searchTerm, additionalPredicate);
     }
 }

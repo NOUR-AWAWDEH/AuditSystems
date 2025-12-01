@@ -15,15 +15,16 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     ILogger<UnifiedCacheService<TId, TEntity, TModel>> logger,
     string cacheKeyPrefix,
     string[] entityTags,
-    string[] listTags) :
+    string[] listTags,
+    string searchProperty = "Name") :
     EntityCacheHandler<TId, TEntity, TModel>(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags),
     IUnifiedCacheService<TId, TEntity, TModel>
     where TEntity : Entity<TId>
     where TId : IComparable<TId>
 {
-    private readonly SearchCacheHandler<TId, TEntity, TModel> searchHandler = 
-        new(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags);
-    private readonly CacheInvalidationHandler<TId, TEntity, TModel> invalidationHandler = 
+    private readonly SearchCacheHandler<TId, TEntity, TModel> searchHandler =
+        new(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags, searchProperty);
+    private readonly CacheInvalidationHandler<TId, TEntity, TModel> invalidationHandler =
         new(repository, mapper, cacheService, logger, cacheKeyPrefix, entityTags, listTags);
 
     #region Entity Cache
@@ -67,7 +68,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     public Task<PaginationResult<TTargetModel>> GetFromRepositoryAsync<TTargetModel>(string cacheKey, string countCacheKey, Page page, string? name = null)
         where TTargetModel : class
         => searchHandler.GetFromRepositoryAsync<TTargetModel>(cacheKey, countCacheKey, page, name);
-    
+
     public (string CacheKey, string CountCacheKey) GetSearchCacheKeys(string? searchTerm, Page page)
         => searchHandler.GetSearchCacheKeys(searchTerm, page);
 

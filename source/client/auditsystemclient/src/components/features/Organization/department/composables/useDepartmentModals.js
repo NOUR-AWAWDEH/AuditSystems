@@ -95,7 +95,6 @@ export function useDepartmentModals(departments, emit) {
 
       emit("department-deleted", deletedDepartment.id);
     } else {
-      console.log("Delete failed, showing error notification:", result.message);
       showNotification(result.message, "error");
     }
     cancelDelete();

@@ -187,10 +187,24 @@ const handleSubmit = async () => {
 
     const result = await createAuditProgram(auditProgramData);
     if (result?.success) {
+      // Find the selected action owner from the list
+      const selectedActionOwner = actionOwners.value.find(
+        (owner) => owner.id === formData.value.actionOwnerId
+      );
+
       const newAuditProgram = {
         id: result.data.auditProgramId,
         ...auditProgramData,
         createdAt: new Date().toISOString(),
+        // Include the full actionOwner object so it displays in the table
+        actionOwner: selectedActionOwner
+          ? {
+              id: selectedActionOwner.id,
+              firstName: selectedActionOwner.firstName,
+              lastName: selectedActionOwner.lastName,
+              email: selectedActionOwner.email,
+            }
+          : null,
       };
 
       showNotification(

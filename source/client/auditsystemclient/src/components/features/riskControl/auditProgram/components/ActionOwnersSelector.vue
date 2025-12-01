@@ -14,7 +14,6 @@
 
 <script setup>
 import CustomSelect from "@/components/common/CustomSelect.vue";
-import { onMounted } from "vue";
 const { actionOwners, selectedActionOwnerId, actionOwnerError } = defineProps({
   actionOwners: {
     type: Array,
@@ -37,7 +36,4 @@ const handleActionOwnerChange = (value) => {
   emit("action-owner-changed", value);
 };
 
-onMounted(() => {
-  console.log("actionOwners", actionOwners);
-});
 </script>

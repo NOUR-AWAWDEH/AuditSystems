@@ -7,4 +7,5 @@ public interface IAuditProgramValidation
 {
     Task<AuditProgram> ValidateAuditProgramOwnershipAsync(Guid auditProgramId, Guid userId);
     Task<ExitControl> ValidateExitControlOwnershipAsync(Guid exitControlId, Guid userId);
+    Task ValidateActionOwnerAssignmentAsync(Guid actionOwnerId, Guid userId);
 }

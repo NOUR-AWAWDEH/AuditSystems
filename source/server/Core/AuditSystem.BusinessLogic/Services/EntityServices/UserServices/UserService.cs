@@ -49,8 +49,16 @@ internal sealed class UserService(
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
                 Role.ActionOwner,
-                u.SubDepartment ?? null!,
-                new JobTitleModel(u.JobTitle.Id, u.JobTitle.Name, u.JobTitle.CompanyId)))
+                u.SubDepartment == null ? null : new SubDepartmentModel
+                {
+                    Id = u.SubDepartment.Id,
+                    Name = u.SubDepartment.Name,
+                    DepartmentId = u.SubDepartment.DepartmentId
+                },
+                u.JobTitle == null ? null : new JobTitleModel(
+                    u.JobTitle.Id,
+                    u.JobTitle.Name,
+                    u.JobTitle.CompanyId)))
             .ToListAsync();
 
         logger.LogDebug("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, currentAppUser.Id);

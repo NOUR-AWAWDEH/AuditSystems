@@ -5,7 +5,7 @@ namespace AuditSystem.Application.Constants.Audit.AuditProgramConst;
 
 public static class AuditProgramConstants
 {
-    public static readonly string[] AuditProgramTags = ["audit-program", "audit-program-list"];
+    private static readonly string[] auditProgramTags = ["audit-program", "audit-program-list"];
     public static readonly string[] ListTags = ["audit-list"];
 
     public static readonly Expression<Func<AuditProgram, Guid>> AuditProgramOwnerIdSelector =
@@ -24,4 +24,6 @@ public static class AuditProgramConstants
     public const string UserIdEmptyMessage = "UserId cannot be empty";
     public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";
     public const string RetrievedSearchResultsFromCacheMessage = "Retrieved audit programs search results from cache";
+
+    public static string[] AuditProgramTags => auditProgramTags;
 }

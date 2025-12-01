@@ -9,17 +9,20 @@ using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Application.Constants;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.Application.Constants.Audit.AuditProgramConst;
+using AutoMapper;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
 public class AuditProgramSearchHelper(
     IRepository<Guid, AuditProgram> repository,
     ICacheService cacheService,
+    IMapper mapper,
     ILogger<AuditProgramSearchHelper> logger) : IAuditProgramSearch
 {
     private readonly IRepository<Guid, AuditProgram> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
     private readonly ILogger<AuditProgramSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
     public Expression<Func<AuditProgram, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid exitControlId)
     {
@@ -36,20 +39,20 @@ public class AuditProgramSearchHelper(
 
         string cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey,
-            CacheKeys.AuditProgram,  
-            userId,                  
-            normalizedSearchTerm,    
-            exitControlIdStr,        
-            page.Number,             
-            page.Size                
+            CacheKeys.AuditProgram,
+            userId,
+            normalizedSearchTerm,
+            exitControlIdStr,
+            page.Number,
+            page.Size
         );
 
         string countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
-            CacheKeys.AuditProgram,  
-            userId,                  
-            normalizedSearchTerm,    
-            exitControlIdStr         
+            CacheKeys.AuditProgram,
+            userId,
+            normalizedSearchTerm,
+            exitControlIdStr
         );
 
         return (cacheKey, countCacheKey);
@@ -89,32 +92,32 @@ public class AuditProgramSearchHelper(
     }
 
     public async Task<PaginationResult<AuditProgramModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid exitControlId, Page page, string cacheKey, string countCacheKey)
+     Guid userId,
+     string? searchTerm,
+     Guid exitControlId,
+     Page page,
+     string cacheKey,
+     string countCacheKey)
     {
         var predicate = BuildUserSearchPredicate(userId, searchTerm, exitControlId);
 
         var query = _repository.GetAll()
             .Where(predicate)
+            .Include(ap => ap.ActionOwner)
+                .ThenInclude(u => u.JobTitle)
+            .Include(ap => ap.ActionOwner)
+                .ThenInclude(u => u.SubDepartment)
             .AsNoTracking();
 
         var totalCount = await query.CountAsync();
 
-        var items = await query
+        var entities = await query
+            .OrderBy(ap => ap.CreatedAt)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .Select(ap => new AuditProgramModel
-            {
-                Id = ap.Id,
-                Description = ap.Description,
-                ExitControlId = ap.ExitControlId,
-                ActionOwnerId = ap.ActionOwnerId,
-                ControlDesignId = ap.ControlDesignId,
-                CreatedAt = ap.CreatedAt,
-                UpdatedAt = ap.UpdatedAt
-            })
-            .OrderBy(ap => ap.CreatedAt)
-            .ToArrayAsync();
+            .ToListAsync();
 
+        var items = _mapper.Map<List<AuditProgramModel>>(entities);
         var result = new PaginationResult<AuditProgramModel>
         {
             Items = items,
@@ -123,7 +126,6 @@ public class AuditProgramSearchHelper(
             PageSize = page.Size
         };
 
-        // Proper async error handling
         try
         {
             await Task.WhenAll(
@@ -139,8 +141,9 @@ public class AuditProgramSearchHelper(
 
         return result;
     }
-    
-    private async Task CacheSearchResultsAsync(string cacheKey, AuditProgramModel[] items)
+
+
+    private async Task CacheSearchResultsAsync(string cacheKey, List<AuditProgramModel> items)
     {
         await _cacheService.SetAsync(cacheKey, items, AuditProgramConstants.AuditProgramTags, CacheExpirations.MediumTerm);
     }

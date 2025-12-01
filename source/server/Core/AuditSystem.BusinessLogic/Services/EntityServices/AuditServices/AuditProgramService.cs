@@ -21,7 +21,7 @@ internal sealed class AuditProgramService(
     ICacheService cacheService,
     ILogger<AuditProgramService> _logger,
     IAuditProgramValidation validationHelper,
-    IAuditProgramSearch searchHelper) : 
+    IAuditProgramSearch searchHelper) :
     UnifiedCacheService<Guid, AuditProgram, AuditProgramModel>(
         repository,
         mapper,
@@ -29,7 +29,8 @@ internal sealed class AuditProgramService(
         _logger,
         CacheKeys.AuditProgram,
         AuditProgramConstants.AuditProgramTags,
-        AuditProgramConstants.ListTags
+        AuditProgramConstants.ListTags,
+        "Description"  // AuditProgram uses Description field, not Name
     ),
     IAuditProgramService
 {
@@ -49,7 +50,7 @@ internal sealed class AuditProgramService(
         entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
-        await CacheEntityAsync(createdEntity); 
+        await CacheEntityAsync(createdEntity);
         await InvalidateEntityTagsCacheAsync();
 
         _logger.LogInformation("Successfully created audit program {AuditProgramId} for user {UserId}", createdEntity.Id, userId);
@@ -60,7 +61,7 @@ internal sealed class AuditProgramService(
     public async Task DeleteAuditProgramAsync(Guid auditProgramId, Guid userId)
     {
         AuditProgramValidationHelper.ValidateUserId(userId);
-            
+
         _logger.LogInformation("Deleting audit program {AuditProgramId} for user {UserId}", auditProgramId, userId);
 
         await _validationHelper.ValidateAuditProgramOwnershipAsync(auditProgramId, userId);
@@ -70,11 +71,11 @@ internal sealed class AuditProgramService(
 
         await repository.DeleteAsync(auditProgramId);
         await ClearEntityCacheAsync(auditProgramId);
-        
+
         // Clear all related caches
         await ClearUserRelatedCachesAsync(userId, AuditProgramConstants.EntityName, exitControlId);
         await InvalidateEntityTagsCacheAsync();
-        
+
         _logger.LogInformation("Successfully deleted audit program {AuditProgramId}", auditProgramId);
     }
 
@@ -86,7 +87,7 @@ internal sealed class AuditProgramService(
 
         // Try to get from cache first
         var cachedResult = await TryGetFromCacheWithValidationAsync<AuditProgramModel>(
-            id, userId, AuditProgramConstants.AuditProgramOwnerIdSelector, 
+            id, userId, AuditProgramConstants.AuditProgramOwnerIdSelector,
             AuditProgramConstants.UnauthorizedAccessMessage);
 
         if (cachedResult != null)
@@ -160,7 +161,7 @@ internal sealed class AuditProgramService(
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<AuditProgramModel>(cacheKey, countCacheKey, page);
-        if (cachedResult != null) 
+        if (cachedResult != null)
         {
             _logger.LogDebug(AuditProgramConstants.RetrievedSearchResultsFromCacheMessage);
             return cachedResult;
@@ -177,16 +178,9 @@ internal sealed class AuditProgramService(
         _logger.LogDebug("Searching audit programs for user {UserId} with term: {SearchTerm} and exit control: {ExitControlId}",
             userId, searchTerm ?? "(none)", exitControlId.ToString() ?? "(none)");
 
+        // User-specific searches are not cached due to complex nested object serialization issues
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, exitControlId, page);
-
-        var cachedResult = await GetFromCacheAsync<AuditProgramModel>(cacheKey, countCacheKey, page);
-        if (cachedResult != null) 
-        {
-            _logger.LogDebug(AuditProgramConstants.RetrievedUserSearchResultsFromCacheMessage);
-            return cachedResult;
-        }
-        var result = await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, exitControlId, page, cacheKey, countCacheKey);
-        return result;
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, exitControlId, page, cacheKey, countCacheKey);
     }
 
     public async Task UpdateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId)

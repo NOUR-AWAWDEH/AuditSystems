@@ -13,6 +13,7 @@ using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.BusinessLogic.Mappings;
+using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
@@ -94,7 +95,7 @@ public static class BusinessLogicDependencies
             .AddSingleton(fileStorageSettings)
             .AddScoped<IFileStorage, LocalFileStorage>()
             .AddScoped<ITransaction, Transaction>()
-            .AddScoped<IRiskService, RiskService>()
+            .AddScoped<IRiskService, RiskService>()    
             .AddMemoryCache()
 
 
@@ -108,6 +109,7 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, AuditProgram, AuditProgramModel>, AuditProgramService>()
             .AddScoped<IAuditProgramValidation, AuditProgramValidationHelper>()
             .AddScoped<IAuditProgramSearch, AuditProgramSearchHelper>()
+
 
             // Organization
             //Company

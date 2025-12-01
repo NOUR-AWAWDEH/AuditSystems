@@ -5,34 +5,51 @@ using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Domain.Entities.Audit;
 using Microsoft.Extensions.Logging;
-using AuditSystem.Contract.Interfaces.Cache;
 using AuditSystem.Application.Constants;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.Application.Constants.Audit.AuditProgramConst;
-using AutoMapper;
+using AuditSystem.Contract.Models.Users;
+using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Domain.Entities.Users;
+using AuditSystem.Contract.Interfaces.Cache;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
-public class AuditProgramSearchHelper(
-    IRepository<Guid, AuditProgram> repository,
-    ICacheService cacheService,
-    IMapper mapper,
-    ILogger<AuditProgramSearchHelper> logger) : IAuditProgramSearch
+public sealed class AuditProgramSearchHelper : IAuditProgramSearch
 {
-    private readonly IRepository<Guid, AuditProgram> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
-    private readonly ILogger<AuditProgramSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+    private readonly IRepository<Guid, AuditProgram> _repository;
+    private readonly ILogger<AuditProgramSearchHelper> _logger;
 
-    public Expression<Func<AuditProgram, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid exitControlId)
+    public AuditProgramSearchHelper(
+        IRepository<Guid, AuditProgram> repository,
+        ILogger<AuditProgramSearchHelper> logger)
     {
-        return ap => ap.CreatedByUserId == userId &&
-                    (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm)) &&
-                    ap.ExitControlId == exitControlId;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    // --------------------------------------------------------------------
+    // ✅ Predicate
+    // --------------------------------------------------------------------
+    public Expression<Func<AuditProgram, bool>> BuildUserSearchPredicate(
+        Guid userId,
+        string? searchTerm,
+        Guid exitControlId)
+    {
+        return ap =>
+            ap.CreatedByUserId == userId &&
+            (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm)) &&
+            ap.ExitControlId == exitControlId;
+    }
+
+    // --------------------------------------------------------------------
+    // ✅ Cache Key Builders
+    // --------------------------------------------------------------------
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid exitControlId, Page page)
+        Guid userId,
+        string? searchTerm,
+        Guid exitControlId,
+        Page page)
     {
         string normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var exitControlIdStr = exitControlId == Guid.Empty ? "all" : exitControlId.ToString();
@@ -44,28 +61,31 @@ public class AuditProgramSearchHelper(
             normalizedSearchTerm,
             exitControlIdStr,
             page.Number,
-            page.Size
-        );
+            page.Size);
 
         string countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
             CacheKeys.AuditProgram,
             userId,
             normalizedSearchTerm,
-            exitControlIdStr
-        );
+            exitControlIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Page page)
+        Guid userId,
+        string? searchTerm,
+        Page page)
     {
         return GetUserSearchCacheKeys(userId, searchTerm, Guid.Empty, page);
     }
 
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid? exitControlId, Page page)
+        Guid userId,
+        string? searchTerm,
+        Guid? exitControlId,
+        Page page)
     {
         string normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
         var exitControlIdStr = exitControlId?.ToString() ?? "all";
@@ -77,47 +97,70 @@ public class AuditProgramSearchHelper(
             normalizedSearchTerm,
             exitControlIdStr,
             page.Number,
-            page.Size
-        );
+            page.Size);
 
         string countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
             CacheKeys.AuditProgram,
             userId,
             normalizedSearchTerm,
-            exitControlIdStr
-        );
+            exitControlIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
+    // --------------------------------------------------------------------
+    // ✅ STANDARDIZED Repository Search (DTO ONLY)
+    // --------------------------------------------------------------------
     public async Task<PaginationResult<AuditProgramModel>> GetUserSearchFromRepositoryAsync(
-     Guid userId,
-     string? searchTerm,
-     Guid exitControlId,
-     Page page,
-     string cacheKey,
-     string countCacheKey)
+        Guid userId,
+        string? searchTerm,
+        Guid exitControlId,
+        Page page,
+        string cacheKey,
+        string countCacheKey)
     {
         var predicate = BuildUserSearchPredicate(userId, searchTerm, exitControlId);
 
-        var query = _repository.GetAll()
+        var totalCount = await _repository.GetAll()
             .Where(predicate)
-            .Include(ap => ap.ActionOwner)
-                .ThenInclude(u => u.JobTitle)
-            .Include(ap => ap.ActionOwner)
-                .ThenInclude(u => u.SubDepartment)
-            .AsNoTracking();
+            .CountAsync();
 
-        var totalCount = await query.CountAsync();
-
-        var entities = await query
+        var items = await _repository.GetAll()
+            .AsNoTracking()
+            .Where(predicate)
             .OrderBy(ap => ap.CreatedAt)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
+            .Select(ap => new AuditProgramModel
+            {
+                Id = ap.Id,
+                Description = ap.Description,
+                ExitControlId = ap.ExitControlId,
+                ActionOwnerId = ap.ActionOwnerId,
+                ControlDesignId = ap.ControlDesignId,
+                CreatedAt = ap.CreatedAt,
+                UpdatedAt = ap.UpdatedAt,
+                ActionOwner = ap.ActionOwner == null ? null : new UserModel(
+                    ap.ActionOwner.Id,
+                    ap.ActionOwner.FirstName,
+                    ap.ActionOwner.LastName,
+                    ap.ActionOwner.Email,
+                    Role.ActionOwner,
+                    ap.ActionOwner.SubDepartment == null ? null : new SubDepartmentModel
+                    {
+                        Id = ap.ActionOwner.SubDepartment.Id,
+                        Name = ap.ActionOwner.SubDepartment.Name,
+                        DepartmentId = ap.ActionOwner.SubDepartment.DepartmentId
+                    },
+                    ap.ActionOwner.JobTitle == null ? null : new JobTitleModel(
+                        ap.ActionOwner.JobTitle.Id,
+                        ap.ActionOwner.JobTitle.Name,
+                        ap.ActionOwner.JobTitle.CompanyId)
+                )
+            })
             .ToListAsync();
 
-        var items = _mapper.Map<List<AuditProgramModel>>(entities);
         var result = new PaginationResult<AuditProgramModel>
         {
             Items = items,
@@ -125,31 +168,6 @@ public class AuditProgramSearchHelper(
             PageNumber = page.Number,
             PageSize = page.Size
         };
-
-        try
-        {
-            await Task.WhenAll(
-                CacheSearchResultsAsync(cacheKey, items),
-                CacheSearchCountAsync(countCacheKey, totalCount)
-            );
-            _logger.LogDebug("Successfully cached audit program search results");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to cache audit program search results");
-        }
-
         return result;
-    }
-
-
-    private async Task CacheSearchResultsAsync(string cacheKey, List<AuditProgramModel> items)
-    {
-        await _cacheService.SetAsync(cacheKey, items, AuditProgramConstants.AuditProgramTags, CacheExpirations.MediumTerm);
-    }
-
-    private async Task CacheSearchCountAsync(string countCacheKey, int totalCount)
-    {
-        await _cacheService.SetAsync(countCacheKey, totalCount, AuditProgramConstants.AuditProgramTags, CacheExpirations.MediumTerm);
     }
 }

@@ -5,7 +5,7 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgr
 
 public interface IAuditProgramService
 {
-    Task<Guid> CreateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId );
+    Task<Guid> CreateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId);
     Task UpdateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId);
     Task DeleteAuditProgramAsync(Guid auditProgramId, Guid userId); 
     Task<AuditProgramModel> GetAuditProgramByIdAsync(Guid id, Guid userId);

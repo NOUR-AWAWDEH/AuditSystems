@@ -7,6 +7,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramSe
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Pagination;
+using AuditSystem.Contract.Models.Users;
 using AuditSystem.Domain.Entities.Audit;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -96,6 +97,8 @@ internal sealed class AuditProgramService(
 
         // If not in cache, load from database with PROPER includes
         var entity = await repository.GetAll()
+            .Include(ap => ap.ActionOwner)
+                .ThenInclude(u => u.JobTitle)
             .Include(ap => ap.ExitControl)
                 .ThenInclude(ec => ec.Objective)
                 .ThenInclude(o => o.RiskControlMatrix)
@@ -104,8 +107,9 @@ internal sealed class AuditProgramService(
                 .ThenInclude(ap => ap.SubDepartment)
                 .ThenInclude(sd => sd.Department)
                 .ThenInclude(d => d.Location)
-            .AsSplitQuery() // Important for deep includes
+            .AsSplitQuery()
             .FirstOrDefaultAsync(ap => ap.Id == id);
+
 
         if (entity == null)
         {
@@ -127,6 +131,7 @@ internal sealed class AuditProgramService(
         AuditProgramValidationHelper.ValidateUserId(userId);
 
         _logger.LogDebug("Retrieving all audit programs for user {UserId}", userId);
+
 
 
         return await repository.GetAll()
@@ -186,13 +191,17 @@ internal sealed class AuditProgramService(
 
     public async Task UpdateAuditProgramAsync(AuditProgramModel auditProgramModel, Guid userId)
     {
-        ArgumentNullException.ThrowIfNull(auditProgramModel, nameof(auditProgramModel));
+        ArgumentNullException.ThrowIfNull(auditProgramModel);
         AuditProgramValidationHelper.ValidateUserId(userId);
 
-        _logger.LogInformation("Updating audit program {AuditProgramId} for user {UserId}", auditProgramModel.Id, userId);
+        var existingEntity = await _validationHelper
+            .ValidateAuditProgramOwnershipAsync(auditProgramModel.Id, userId);
 
-        var existingEntity = await _validationHelper.ValidateAuditProgramOwnershipAsync(auditProgramModel.Id, userId);
-        
+        await _validationHelper.ValidateActionOwnerAssignmentAsync(
+            auditProgramModel.ActionOwnerId,
+            userId
+        );
+
         mapper.Map(auditProgramModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
 
@@ -200,7 +209,6 @@ internal sealed class AuditProgramService(
 
         await CacheEntityAsync(existingEntity);
         await InvalidateEntityTagsCacheAsync();
-
-        _logger.LogInformation("Successfully updated audit program {AuditProgramId}", auditProgramModel.Id);
     }
+
 }

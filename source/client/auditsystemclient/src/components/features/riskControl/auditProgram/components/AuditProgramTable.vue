@@ -70,6 +70,12 @@
             :no-data-message="noDataMessage"
             class="audit-program-table min-w-full"
           >
+            <template #cell-actionOwner="{ item }">
+              <span class="text-sm text-gray-700">
+                {{ item.actionOwner?.firstName }} {{ item.actionOwner?.lastName }}
+              </span>
+            </template>
+
             <template #cell-actions="{ item }">
               <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
@@ -123,6 +129,15 @@
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
                   {{ item.description }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Action Owner
+                </div>
+                <div class="text-gray-900 text-sm font-medium">
+                  {{ item.actionOwner?.firstName }} {{ item.actionOwner?.lastName }}
                 </div>
               </div>
 
@@ -290,6 +305,7 @@ const handleSelectAuditProgram = (auditProgram) => {
 
 const auditProgramColumns = [
   { key: "description", label: "Description" },
+  { key: "actionOwner", label: "Action Owner" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
 

@@ -63,9 +63,7 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                      .WithMany()
                      .HasForeignKey(u => u.CreatedByUserId)
                      .OnDelete(DeleteBehavior.Restrict);
-              
-              
-
+                     
               // Indexes
               builder.HasIndex(u => u.IdentityUserId).IsUnique();
               builder.HasIndex(u => u.CompanyId);

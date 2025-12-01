@@ -15,7 +15,7 @@ namespace AuditSystem.Host.Controllers.v1.Users;
 public sealed class UsersController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Get Action Owners
-    [HttpGet("get-action-owners")]
+    [HttpGet("get-action-owners-by-admin-id")]
     [ProducesResponseType(typeof(ApiResponse<GetActionOwnersQueryResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]

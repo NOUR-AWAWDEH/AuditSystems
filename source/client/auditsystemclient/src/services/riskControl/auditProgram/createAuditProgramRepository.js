@@ -13,6 +13,7 @@ export const createAuditProgramRepository = {
             const payload = {
                 description: AuditProgramData.description,
                 exitControlId: AuditProgramData.exitControlId,
+                actionOwnerId: AuditProgramData.actionOwnerId,
                 controlDesignId: AuditProgramData.controlDesignId ?? null,
             }
 

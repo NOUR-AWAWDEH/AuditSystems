@@ -22,6 +22,9 @@ public sealed class OrganizationMappingProfile : Profile
         CreateMap<CreateCompanyCommand, CompanyModel>();
         CreateMap<UpdateCompanyCommand, CompanyModel>();
 
+        //JobTitle
+        CreateMap<JobTitleModel, JobTitle>().ReverseMap();
+
         //Location
         CreateMap<LocationModel, Location>().ReverseMap();
         CreateMap<CreateLocationCommand, LocationModel>();

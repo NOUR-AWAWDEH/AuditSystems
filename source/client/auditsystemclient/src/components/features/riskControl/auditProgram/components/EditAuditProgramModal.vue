@@ -109,8 +109,6 @@ const props = defineProps({
   },
   auditProgram: {
     type: Object,
-    // Remove the default value to ensure it's either passed or undefined
-    // default: () => ({})
   },
 });
 
@@ -135,7 +133,6 @@ const errors = ref({
   actionOwnerId: "",
 });
 
-// Reset form when modal opens/closes or audit program changes
 watch([() => props.isVisible, () => props.auditProgram], async ([newVisible, newAuditProgram]) => {
   if (newVisible && newAuditProgram) {
     resetForm();
@@ -173,7 +170,6 @@ const handleActionOwnerChange = (value) => {
   errors.value.actionOwnerId = "";
 };
 
-// Initialize auth status when component mounts
 onMounted(async () => {
   if (!authStatus.value) {
     await checkAuthStatus();
@@ -182,7 +178,6 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
-  // Check if user is authenticated
   if (!authStatus.value) {
     console.error("Authentication status not loaded");
     showNotification("Authentication required. Please refresh the page and try again.", "error");
@@ -214,16 +209,14 @@ const handleSubmit = async () => {
     const result = await updateAuditProgram(auditProgramData);
 
     if (result?.success) {
-      // Find the selected action owner from the list to update the UI immediately
       const selectedActionOwner = actionOwners.value.find(
         (owner) => owner.id === formData.value.actionOwnerId
       );
 
       const updatedAuditProgramData = {
-        ...props.auditProgram, // Preserve all original data
-        ...auditProgramData, // Override with updated fields
+        ...props.auditProgram,
+        ...auditProgramData,
         ...result.data,
-        // Ensure the actionOwner object is updated for the table display
         actionOwner: selectedActionOwner
           ? {
               id: selectedActionOwner.id,
@@ -231,7 +224,7 @@ const handleSubmit = async () => {
               lastName: selectedActionOwner.lastName,
               email: selectedActionOwner.email,
             }
-          : props.auditProgram.actionOwner, // Fallback to existing if not found (shouldn't happen if selected)
+          : props.auditProgram.actionOwner,
       };
 
       showNotification(

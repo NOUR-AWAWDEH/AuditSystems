@@ -20,7 +20,7 @@ public sealed class RegistrationController(
         : ControllerBase
 {
 
-    [HttpPost("register")]
+    [HttpPost("create-user")]
     [Authorize(Policy = "Admin")]
     [AutoInjectUserId]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterDto model)

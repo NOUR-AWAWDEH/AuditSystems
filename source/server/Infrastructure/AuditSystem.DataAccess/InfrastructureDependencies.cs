@@ -83,7 +83,7 @@ public static class InfrastructureDependencies
                 ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
 
         return services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString, 
+        options.UseNpgsql(connectionString,
             npgsqlOptions => npgsqlOptions.MigrationsAssembly("AuditSystem.DataAccess"))
                 .EnableSensitiveDataLogging(false)
                 .LogTo(Console.WriteLine, LogLevel.Information)
@@ -106,6 +106,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Location>()
         .AddRepository<Guid, Department>()
         .AddRepository<Guid, Company>()
+        .AddRepository<Guid, JobTitle>()
         //Processes
         .AddRepository<Guid, SubProcess>()
         .AddRepository<Guid, AuditProcess>()

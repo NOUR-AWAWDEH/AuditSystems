@@ -19,13 +19,20 @@ public static class MiddlewareExtensions
         return builder.UseMiddleware<ErrorHandlingMiddleware>();
     }
 
+
+    public static IApplicationBuilder UseResponseTime(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<ResponseTimeMiddleware>();
+    }
+
     // Recommended extension method for proper middleware ordering
     public static IApplicationBuilder UseCustomMiddlewarePipeline(this IApplicationBuilder builder)
     {
         // Recommended order:
         return builder
-            .UseScopedLogging()        // First - setup request logging
-            .UseValidation()           // Second - handle validation
+            .UseResponseTime()         // First - track response time
+            .UseScopedLogging()        // Second - setup request logging
+            .UseValidation()           // Third - handle validation
             .UseErrorHandling();      // Last - catch all exceptions
     }
 }

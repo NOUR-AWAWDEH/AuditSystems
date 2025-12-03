@@ -14,12 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.DataAccess.Contexts;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Role, Guid>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, Role, Guid>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
 
     // -------------------
     // Common

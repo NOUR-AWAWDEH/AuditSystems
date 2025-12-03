@@ -63,10 +63,12 @@ public class JobTitleSearchHelper(
             .OrderBy(d => d.Name)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
-            .Select(d => new JobTitleModel(
-                d.Id,
-                d.Name,
-                d.CompanyId))
+            .Select(d => new JobTitleModel
+            {
+                Id = d.Id,
+                Name = d.Name,
+                CompanyId = d.CompanyId
+            })
             .ToArrayAsync();
 
         var result = new PaginationResult<JobTitleModel>
@@ -78,9 +80,9 @@ public class JobTitleSearchHelper(
         };
 
         _ = CacheSearchResultsAsync(cacheKey, items)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
         _ = CacheSearchCountAsync(countCacheKey, totalCount)
-                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.NotOnFaulted);
+                .ContinueWith(t => _logger.LogError(t.Exception, "Cache failed"), TaskContinuationOptions.OnlyOnFaulted);
 
         return result;
     }

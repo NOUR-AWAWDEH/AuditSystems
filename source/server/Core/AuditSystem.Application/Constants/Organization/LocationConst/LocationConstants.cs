@@ -19,5 +19,5 @@ public static class LocationConstants
     public const string LocationNotFoundMessage = "Location with ID {0} not found.";
     public const string UserIdEmptyMessage = "UserId cannot be empty";
     public const string UnauthorizedLocationAccessMessage = "User {0} is not authorized to access location {1}.";
-    public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";
+    public const string RetrievedLocationSearchResultsFromCacheMessage = "Retrieved location search results from cache";
 }

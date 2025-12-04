@@ -3,11 +3,12 @@ import { createRouter, createWebHistory } from "vue-router";
 const Dashboard = () => import("@/components/features/dashboard/DashboardPage.vue");
 const ForgotPassword = () => import("@/components/features/auth/ForgotPassword.vue");
 const ResetPassword = () => import("@/components/features/auth/ResetPassword.vue");
-const SideBar = () => import("@/components/common/SideBar.vue");
 const Login = () => import("@/components/features/auth/LoginForm.vue");
-const SupportingDocManager = () => import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
+const SupportingDocManager = () =>
+  import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
 const Organization = () => import("@/components/features/Organization/OrganizationView.vue");
 const RiskControl = () => import("@/components/features/riskControl/RiskControl.vue");
+
 const routes = [
   {
     path: "/",
@@ -45,12 +46,6 @@ const routes = [
       localStorage.removeItem("refreshToken");
       next("/login");
     },
-  },
-  {
-    path: "/sidebar",
-    name: "Sidebar",
-    component: SideBar,
-    meta: { requiresAuth: true },
   },
   {
     path: "/risk-control",

@@ -5,10 +5,10 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Job
 
 public interface IJobTitleService
 {
-    Task<Guid> CreateJobTitleAsync(JobTitleModel model,Guid userId);
-    Task UpdateJobTitleAsync(JobTitleModel model,Guid userId);
-    Task DeleteJobTitleAsync(Guid id,Guid userId);
-    Task<JobTitleModel> GetJobTitleByIdAsync(Guid id,Guid userId);
+    Task<Guid> CreateJobTitleAsync(JobTitleModel model, Guid userId);
+    Task UpdateJobTitleAsync(JobTitleModel model, Guid userId);
+    Task DeleteJobTitleAsync(Guid id, Guid userId);
+    Task<JobTitleModel> GetJobTitleByIdAsync(Guid id, Guid userId);
     Task<IReadOnlyList<JobTitleModel>> GetJobTitlesByUserIdAsync(Guid userId);
-    Task<PaginationResult<JobTitleModel>> SearchByCompanyIdAsync(string? searchTerm, Guid companyId, Page page,Guid userId);
+    Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId);
 }

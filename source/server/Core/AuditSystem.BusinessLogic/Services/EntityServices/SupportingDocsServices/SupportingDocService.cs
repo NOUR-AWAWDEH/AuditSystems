@@ -17,14 +17,14 @@ using Microsoft.Extensions.Logging;
 namespace AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 
 internal sealed class SupportingDocService(
-    IRepository<Guid, SupportingDoc> repository, 
-    IMapper mapper, 
-    ICacheService cacheService, 
-    IFileStorage fileStorage, 
-    IFilePathBuilder filePathBuilder, 
+    IRepository<Guid, SupportingDoc> repository,
+    IMapper mapper,
+    ICacheService cacheService,
+    IFileStorage fileStorage,
+    IFilePathBuilder filePathBuilder,
     ILogger<SupportingDocService> _logger,
     ISupportingDocValidation validationHelper,
-    ISupportingDocSearch searchHelper) 
+    ISupportingDocSearch searchHelper)
     : UnifiedCacheService<Guid, SupportingDoc, SupportingDocModel>(
         repository,
         mapper,
@@ -43,7 +43,7 @@ internal sealed class SupportingDocService(
     public async Task<Result<Guid>> CreateSupportingDocAsync(IFormFile file, string fileName, Guid userId)
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
-        
+
         _logger.LogInformation("Creating supporting document for user {UserId}", userId);
 
         // Validate file
@@ -72,15 +72,16 @@ internal sealed class SupportingDocService(
             UpdatedAt = DateTime.UtcNow
         };
 
-        // Create supporting document entity
+        // Create supporting document entity and set the CreatedByUserId
         var entity = mapper.Map<SupportingDoc>(supportingDocModel);
+        entity.CreatedByUserId = userId;
         var createdEntity = await repository.CreateAsync(entity);
 
         await CacheEntityAsync(createdEntity);
 
-        _logger.LogInformation("Successfully created supporting document {SupportingDocId} for user {UserId}", 
+        _logger.LogInformation("Successfully created supporting document {SupportingDocId} for user {UserId}",
             createdEntity.Id, userId);
-        
+
         return Result.Created(createdEntity.Id);
     }
 
@@ -88,7 +89,7 @@ internal sealed class SupportingDocService(
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
         SupportingDocValidationHelper.ValidateSupportingDocId(id);
-        
+
         _logger.LogDebug("Retrieving supporting document {SupportingDocId} for user {UserId}", id, userId);
 
         var cachedResult = await TryGetFromCacheWithValidationAsync<SupportingDocModel>(
@@ -104,9 +105,9 @@ internal sealed class SupportingDocService(
         }
 
         var entity = await _validationHelper.ValidateSupportingDocOwnershipAsync(id, userId);
-        
+
         await CacheEntityAsync(entity);
-        
+
         return mapper.Map<SupportingDocModel>(entity);
     }
 
@@ -114,25 +115,25 @@ internal sealed class SupportingDocService(
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
         SupportingDocValidationHelper.ValidateSupportingDocId(supportingDocId);
-        
+
         _logger.LogInformation("Deleting supporting document {SupportingDocId} for user {UserId}", supportingDocId, userId);
 
         var entity = await _validationHelper.ValidateSupportingDocOwnershipAsync(supportingDocId, userId);
-        
+
         var fullFilePath = _filePathBuilder.GetFullPath(entity.CreatedByUserId, SupportingDocsConstants.ServiceName, entity.FileName);
         var fileDeleteResult = await _fileStorage.DeleteFileAsync(fullFilePath);
         if (!fileDeleteResult.IsSuccess)
         {
-            _logger.LogWarning("Failed to delete physical file {FileName} for document {Id}: {Error}", 
+            _logger.LogWarning("Failed to delete physical file {FileName} for document {Id}: {Error}",
                 entity.FileName, supportingDocId, string.Join("; ", fileDeleteResult.Errors));
         }
-        
+
         await repository.DeleteAsync(supportingDocId);
-        
+
         await ClearEntityCacheAsync(supportingDocId);
-        
+
         await ClearUserRelatedCachesAsync(userId, SupportingDocsConstants.EntityName);
-        
+
         _logger.LogInformation("Successfully deleted supporting document {SupportingDocId}", supportingDocId);
     }
 
@@ -140,27 +141,27 @@ internal sealed class SupportingDocService(
     {
         ArgumentNullException.ThrowIfNull(supportingDocModel, nameof(supportingDocModel));
         SupportingDocValidationHelper.ValidateUserId(userId);
-        
-        _logger.LogInformation("Updating supporting document {SupportingDocId} for user {UserId}", 
+
+        _logger.LogInformation("Updating supporting document {SupportingDocId} for user {UserId}",
             supportingDocModel.Id, userId);
-    
+
         var existingEntity = await _validationHelper.ValidateSupportingDocOwnershipAsync(supportingDocModel.Id, userId);
-    
+
         mapper.Map(supportingDocModel, existingEntity);
-        
+
         await repository.UpdateAsync(existingEntity);
-    
+
         await CacheEntityAsync(existingEntity);
-        
+
         _logger.LogInformation("Successfully updated supporting document {SupportingDocId}", supportingDocModel.Id);
     }
 
     public async Task<PaginationResult<SupportingDocModel>> SearchAsync(string? name, Page page)
     {
         ArgumentNullException.ThrowIfNull(page, nameof(page));
-        
+
         _logger.LogDebug("Searching supporting documents with name filter: {Name}", name ?? "(none)");
-        
+
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<SupportingDocModel>(cacheKey, countCacheKey, page);
@@ -177,26 +178,26 @@ internal sealed class SupportingDocService(
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
-        
-        _logger.LogDebug("Searching supporting documents for user {UserId} with term: {SearchTerm}", 
+
+        _logger.LogDebug("Searching supporting documents for user {UserId} with term: {SearchTerm}",
             userId, searchTerm ?? "(none)");
-        
+
         var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, page);
-    
+
         var cachedResult = await GetFromCacheAsync<SupportingDocModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
         {
             _logger.LogDebug("Retrieved user search results from cache");
             return cachedResult;
         }
-    
+
         return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, page, cacheKey, countCacheKey);
     }
 
     public async Task<IReadOnlyList<SupportingDocModel>> GetSupportingDocsByUserIdAsync(Guid userId)
     {
         SupportingDocValidationHelper.ValidateUserId(userId);
-        
+
         _logger.LogDebug("Retrieving all supporting documents for user {UserId}", userId);
 
         var cacheKey = $"{CacheKeys.SupportingDoc}:user:{userId}";
@@ -217,7 +218,7 @@ internal sealed class SupportingDocService(
         }
 
         await cacheService.SetAsync(cacheKey, entities, tags: SupportingDocsConstants.ListTags);
-        
+
         _logger.LogDebug("Retrieved {Count} supporting documents for user {UserId}", entities.Count, userId);
         return mapper.Map<List<SupportingDocModel>>(entities);
     }

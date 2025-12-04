@@ -14,8 +14,8 @@ public static class JobTitleConstants
     public static readonly Expression<Func<JobTitle, Guid>> JobTitleOwnerIdSelector =
        j => j.Users.Select(u => u.IdentityUserId).FirstOrDefault();
 
-    public static Expression<Func<JobTitle, bool>> JobTitleOwnerPredicate(Guid userId) =>
-       l => l.Users.Select(u => u.IdentityUserId).FirstOrDefault() == userId;
+    // public static Expression<Func<JobTitle, bool>> JobTitleOwnerPredicate(Guid userId) =>
+    //    l => l.Users.Select(u => u.IdentityUserId).FirstOrDefault() == userId;
 
     public const string EntityName = "JobTitle";
 

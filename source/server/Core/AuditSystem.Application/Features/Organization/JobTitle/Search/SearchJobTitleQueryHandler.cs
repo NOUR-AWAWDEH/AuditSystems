@@ -13,7 +13,7 @@ internal sealed class SearchJobTitleQueryHandler(IJobTitleService jobTitleServic
     public async Task<Result<PaginationRequestResponse<JobTitleModel>>> Handle(SearchJobTitleQuery request, CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
-        var searchResult = await jobTitleService.SearchByCompanyIdAsync(request.SearchTerm, request.CompanyId, page, request.UserId);
+        var searchResult = await jobTitleService.SearchByUserIdAsync(request.SearchTerm, page, request.UserId);
         var response = new PaginationRequestResponse<JobTitleModel>(searchResult.Items, searchResult.TotalCount);
         return Result.Success(response);
     }

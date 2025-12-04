@@ -5,8 +5,7 @@ using AuditSystem.Contract.Models.Organization;
 namespace AuditSystem.Application.Features.Organization.JobTitle.Search;
 
 public sealed record SearchJobTitleQuery(
-    string? SearchTerm,
-    Guid CompanyId
+    string? SearchTerm
 ) : PaginationRequest<JobTitleModel>, IUserAwareRequest
 {
     public Guid UserId { get; set; }

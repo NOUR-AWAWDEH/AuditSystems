@@ -14,10 +14,6 @@ public class SearchJobTitleQueryValidator : PaginationRequestValidator<JobTitleM
             .Must(BeAValidGuid)
             .WithMessage("User ID must be a valid GUID.");
 
-        RuleFor(x => x.CompanyId)
-            .Must(BeAValidGuid)
-            .WithMessage("CompanyId ID must be a valid GUID");
-
         RuleFor(x => x.SearchTerm)
             .MaximumLength(200)
             .WithMessage("Search term must not exceed 200 characters.");

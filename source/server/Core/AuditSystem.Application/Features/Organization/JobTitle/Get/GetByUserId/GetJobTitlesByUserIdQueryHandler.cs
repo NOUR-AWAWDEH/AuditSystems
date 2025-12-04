@@ -19,6 +19,6 @@ internal sealed class GetJobTitlesByUserIdQueryHandler(
         logger.LogDebug("Job titles retrieved successfully for user {UserId}", request.UserId);
         return Result<GetJobTitlesByUserIdQueryResponse>.Success(
             new(jobTitles),
-            "Departments retrieved successfully");
+            "Job titles retrieved successfully");
     }
 }

@@ -41,6 +41,7 @@ internal sealed class JobTitleService(
         JobTitleValidationHelper.ValidateUserId(userId);
 
         await _validationHelper.ValidateJobTitleCreationAsync(userId, jobTitleModel.CompanyId);
+        await _validationHelper.ValidateJobTitleNameUniquenessAsync(jobTitleModel.Name, jobTitleModel.CompanyId);
 
         _logger.LogInformation("Creating job title for user {UserId}", userId);
 
@@ -110,6 +111,9 @@ internal sealed class JobTitleService(
         // Get the tracked entity from validation
         var existingEntity = await _validationHelper.ValidateJobTitleOwnershipAsync(model.Id, userId);
 
+        // Validate that the new name doesn't conflict with another JobTitle in the same company
+        await _validationHelper.ValidateJobTitleNameUniquenessAsync(model.Name, model.CompanyId, model.Id);
+
         // Map the model to the existing tracked entity
         mapper.Map(model, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -118,34 +122,39 @@ internal sealed class JobTitleService(
 
         await CacheEntityAsync(existingEntity);
 
-        _logger.LogInformation("Successfully updatd job title {JobTitleId}", model.Id);
+        _logger.LogInformation("Successfully updated job title {JobTitleId}", model.Id);
     }
-   
+
     public async Task<IReadOnlyList<JobTitleModel>> GetJobTitlesByUserIdAsync(Guid userId)
     {
         JobTitleValidationHelper.ValidateUserId(userId);
 
         _logger.LogDebug("Retrieving all job titles for user {UserId}", userId);
 
+        var user = await _validationHelper.ValidateUserAsync(userId);
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(JobTitleConstants.JobTitleOwnerPredicate(userId))
-            .Select(l => new JobTitleModel
+            .Where(j => j.CompanyId == user.CompanyId)
+            .Select(j => new JobTitleModel
             {
-                Id = l.Id,
-                Name = l.Name,
-                CompanyId = l.CompanyId,
-                CreatedAt = l.CreatedAt,
-                UpdatedAt = l.UpdatedAt,
+                Id = j.Id,
+                Name = j.Name,
+                CompanyId = j.CompanyId,
+                CreatedAt = j.CreatedAt,
+                UpdatedAt = j.UpdatedAt
             })
-            .OrderBy(l => l.CreatedAt)
+            .OrderBy(j => j.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<JobTitleModel>> SearchByCompanyIdAsync(string? searchTerm, Guid companyId, Page page, Guid userId)
+    public async Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId)
     {
         JobTitleValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
+
+        var user = await _validationHelper.ValidateUserAsync(userId);
+
+        var companyId = user.CompanyId;
 
         _logger.LogDebug("Searching job titles for user {UserId} with term: {SearchTerm} and location: {LocationId}",
             userId, searchTerm ?? "(none)", companyId.ToString() ?? "(none)");

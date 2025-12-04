@@ -6,7 +6,7 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.Job
 public interface IJobTitleService
 {
     Task<Guid> CreateJobTitleAsync(JobTitleModel model,Guid userId);
-    Task UpdateJobTitleAsync(Guid id, JobTitleModel model,Guid userId);
+    Task UpdateJobTitleAsync(JobTitleModel model,Guid userId);
     Task DeleteJobTitleAsync(Guid id,Guid userId);
     Task<JobTitleModel> GetJobTitleByIdAsync(Guid id,Guid userId);
     Task<IReadOnlyList<JobTitleModel>> GetJobTitlesByUserIdAsync(Guid userId);

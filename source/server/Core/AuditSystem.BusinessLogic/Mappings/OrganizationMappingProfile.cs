@@ -2,6 +2,8 @@
 using AuditSystem.Application.Features.Organization.Company.Update;
 using AuditSystem.Application.Features.Organization.Department.Create;
 using AuditSystem.Application.Features.Organization.Department.Update;
+using AuditSystem.Application.Features.Organization.JobTitle.Create;
+using AuditSystem.Application.Features.Organization.JobTitle.Update;
 using AuditSystem.Application.Features.Organization.Location.Create;
 using AuditSystem.Application.Features.Organization.Location.Update;
 using AuditSystem.Application.Features.Organization.SubDepartment.Create;
@@ -24,6 +26,8 @@ public sealed class OrganizationMappingProfile : Profile
 
         //JobTitle
         CreateMap<JobTitleModel, JobTitle>().ReverseMap();
+        CreateMap<CreateJobTitleCommand, JobTitleModel>().ReverseMap();
+        CreateMap<UpdateJobTitleCommand, JobTitleModel>();
 
         //Location
         CreateMap<LocationModel, Location>().ReverseMap();

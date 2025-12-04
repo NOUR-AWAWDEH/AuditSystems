@@ -100,15 +100,15 @@ internal sealed class JobTitleService(
         _logger.LogInformation("Successfully deleted job title {JobTitleId} for user {UserId}", jobTitleId, userId);
     }
 
-    public async Task UpdateJobTitleAsync(Guid id, JobTitleModel model, Guid userId)
+    public async Task UpdateJobTitleAsync(JobTitleModel model, Guid userId)
     {
         JobTitleValidationHelper.ValidateUserId(userId);
 
         _logger.LogInformation("Updating job title {JobTitleId} for user {UserId}",
-            id, userId);
+            model.Id, userId);
 
         // Get the tracked entity from validation
-        var existingEntity = await _validationHelper.ValidateJobTitleOwnershipAsync(id, userId);
+        var existingEntity = await _validationHelper.ValidateJobTitleOwnershipAsync(model.Id, userId);
 
         // Map the model to the existing tracked entity
         mapper.Map(model, existingEntity);
@@ -118,7 +118,7 @@ internal sealed class JobTitleService(
 
         await CacheEntityAsync(existingEntity);
 
-        _logger.LogInformation("Successfully updated job title {JobTitleId}", id);
+        _logger.LogInformation("Successfully updatd job title {JobTitleId}", model.Id);
     }
    
     public async Task<IReadOnlyList<JobTitleModel>> GetJobTitlesByUserIdAsync(Guid userId)
@@ -166,7 +166,6 @@ internal sealed class JobTitleService(
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         _logger.LogDebug("Searching job titles with name filter: {Name}", name ?? "(none)");
-
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 
         var cachedResult = await GetFromCacheAsync<JobTitleModel>(cacheKey, countCacheKey, page);

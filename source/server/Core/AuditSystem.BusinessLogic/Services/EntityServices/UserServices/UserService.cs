@@ -55,10 +55,12 @@ internal sealed class UserService(
                     Name = u.SubDepartment.Name,
                     DepartmentId = u.SubDepartment.DepartmentId
                 },
-                u.JobTitle == null ? null : new JobTitleModel(
-                    u.JobTitle.Id,
-                    u.JobTitle.Name,
-                    u.JobTitle.CompanyId)))
+                u.JobTitle == null ? null : new JobTitleModel
+                {
+                    Id = u.JobTitle.Id,
+                    Name = u.JobTitle.Name,
+                    CompanyId = u.JobTitle.CompanyId
+                }))
             .ToListAsync();
 
         logger.LogDebug("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, currentAppUser.Id);

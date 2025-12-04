@@ -3,7 +3,6 @@ using MediatR;
 using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 
-
 namespace AuditSystem.Application.Features.Organization.Department.Delete;
 
 internal sealed class DeleteDepartmentCommandHandler(

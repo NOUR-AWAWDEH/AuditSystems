@@ -157,7 +157,7 @@ public class AdminSeedingOrchestrator(
 
         if (existingIdentityUser is not null)
         {
-            _logger.LogInformation("Admin ApplicationUser already exists: {Email}", config.Email);
+            _logger.LogInformation("Admin User is already exists nothing to do!");
 
             // Ensure role still assigned
             if (!await _userManager.IsInRoleAsync(existingIdentityUser, Role.Admin))

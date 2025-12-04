@@ -1,9 +1,8 @@
 ﻿using AuditSystem.Contract.Interfaces.FileStorage;
-using Microsoft.Extensions.Configuration;
 
 namespace AuditSystem.BusinessLogic.Services.FileStorageServices;
 
-public class FilePathBuilder(IConfiguration config) : IFilePathBuilder
+public class FilePathBuilder : IFilePathBuilder
 {
     private readonly string _rootPath = Environment.GetEnvironmentVariable("FILESTORAGE_UPLOADPATH")
             ?? throw new InvalidOperationException("Missing FILESTORAGE_UPLOADPATH");

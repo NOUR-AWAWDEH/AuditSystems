@@ -30,7 +30,7 @@ public class UnifiedCacheService<TId, TEntity, TModel>(
     #region Entity Cache
 
     //Generic version (returns TTargetModel)
-    public Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
+    public new Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
         TId id,
         Guid userId,
         System.Linq.Expressions.Expression<Func<TEntity, Guid>> userIdSelector,

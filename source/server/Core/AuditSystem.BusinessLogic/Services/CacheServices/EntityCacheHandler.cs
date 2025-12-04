@@ -86,26 +86,6 @@ public class EntityCacheHandler<TId, TEntity, TModel>(
         }
     }
 
-
-
-    // public async Task<TTargetModel?> TryGetFromCacheWithValidationAsync<TTargetModel>(
-    //     TId id,
-    //     Guid userId,
-    //     Expression<Func<TEntity, Guid>> userIdSelector,
-    //     string unauthorizedMessage)
-    //     where TTargetModel : class
-    // {
-    //     var cacheKey = GetCacheKey(id);
-    //     var cached = await cacheService.GetAsync<TEntity>(cacheKey);
-    //     if (cached == null) return default;
-
-    //     var compiled = userIdSelector.Compile();
-    //     if (compiled(cached) != userId)
-    //         throw new UnauthorizedAccessException(string.Format(unauthorizedMessage, userId, id));
-
-    //     return mapper.Map<TTargetModel>(cached);
-    // }
-
     public async Task ClearEntityCacheAsync(TId id)
     {
         var cacheKey = GetCacheKey(id);

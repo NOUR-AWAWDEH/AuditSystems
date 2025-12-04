@@ -1,6 +1,5 @@
 ﻿using AuditSystem.Auth.Dtos.AuthStatus;
 using AuditSystem.Auth.Dtos.Login;
-using AuditSystem.Auth.Dtos.Logout;
 using AuditSystem.Auth.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +8,16 @@ using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
 using AuditSystem.Auth.Dtos.RefreshToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuditSystem.DataAccess.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
 [Route("api/[controller]")]
 [ApiController]
 public sealed class AuthController(
-        ICustomAuthenticationService _authService) :
+        ICustomAuthenticationService _authService,
+        ApplicationDbContext _context) :
         ControllerBase
 {
 
@@ -74,4 +76,17 @@ public sealed class AuthController(
 
         return Ok(result);
     }
+
+    [HttpGet("db-test")]
+    public async Task<IActionResult> DbTest()
+    {
+        var users = await _context.AppUsers
+            .AsNoTracking()
+            .OrderBy(x => Guid.NewGuid())
+            .Take(50)
+            .ToListAsync();
+
+        return Ok(users.Count);
+    }
+
 }

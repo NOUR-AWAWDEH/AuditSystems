@@ -4,6 +4,7 @@ using AuditSystem.BusinessLogic.Helpers.ControlDesignHelpers;
 using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 using AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.JobTitleHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.SubDepartmentHelpers;
 using AuditSystem.BusinessLogic.Helpers.RecommendationHelpers;
@@ -13,7 +14,6 @@ using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.BusinessLogic.Mappings;
-using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.CommonServices;
@@ -38,6 +38,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.JobTitleServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
@@ -95,7 +96,7 @@ public static class BusinessLogicDependencies
             .AddSingleton(fileStorageSettings)
             .AddScoped<IFileStorage, LocalFileStorage>()
             .AddScoped<ITransaction, Transaction>()
-            .AddScoped<IRiskService, RiskService>()    
+            .AddScoped<IRiskService, RiskService>()
             .AddMemoryCache()
 
 
@@ -115,6 +116,12 @@ public static class BusinessLogicDependencies
             //Company
             .AddScoped<ICompanyService, CompanyService>()
             .AddScoped<IUnifiedCacheService<Guid, Company, CompanyModel>, CompanyService>()
+
+            // JobTitle
+            .AddScoped<IJobTitleService, JobTitleService>()
+            .AddScoped<IUnifiedCacheService<Guid, JobTitle, JobTitleModel>, JobTitleService>()
+            .AddScoped<IJobTitleValidation, JobTitleValidationHelper>()
+            .AddScoped<IJobTitleSearch, JobTitleSearchHelper>()
 
             // Department
             .AddScoped<IDepartmentService, DepartmentService>()

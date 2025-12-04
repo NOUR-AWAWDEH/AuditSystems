@@ -156,7 +156,7 @@ public class CustomAuthenticationService(
                         ?? _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString();
 
         var expiresAt = jwtToken?.ValidTo > DateTime.MinValue ? jwtToken.ValidTo : (DateTime?)null;
-        var authenticatedAt = jwtToken.ValidFrom > DateTime.MinValue ? jwtToken.ValidFrom : (DateTime?)null;
+        var authenticatedAt = jwtToken?.ValidFrom > DateTime.MinValue ? jwtToken.ValidFrom : (DateTime?)null;
 
         var appUser = await _db.AppUsers.FirstOrDefaultAsync(au => au.IdentityUserId == user.Id);
 
@@ -166,8 +166,8 @@ public class CustomAuthenticationService(
             UserId = user.Id.ToString(),
             Email = user.Email,
             CompanyId = appUser?.CompanyId.ToString(),
-            Roles = string.Join(", ", roles),
-            AuthenticationType = jwtToken.Claims.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",
+            Roles = string.Join(", ", roles!),
+            AuthenticationType = jwtToken?.Claims.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",
             IsEmailVerified = user.EmailConfirmed,
             ExpiresAtRaw = expiresAt,
             AuthenticatedAtRaw = authenticatedAt,

@@ -153,10 +153,12 @@ public sealed class AuditProgramSearchHelper : IAuditProgramSearch
                         Name = ap.ActionOwner.SubDepartment.Name,
                         DepartmentId = ap.ActionOwner.SubDepartment.DepartmentId
                     },
-                    ap.ActionOwner.JobTitle == null ? null : new JobTitleModel(
-                        ap.ActionOwner.JobTitle.Id,
-                        ap.ActionOwner.JobTitle.Name,
-                        ap.ActionOwner.JobTitle.CompanyId)
+                    ap.ActionOwner.JobTitle == null ? null : new JobTitleModel
+                    {
+                        Id = ap.ActionOwner.JobTitle.Id,
+                        Name = ap.ActionOwner.JobTitle.Name,
+                        CompanyId = ap.ActionOwner.JobTitle.CompanyId
+                    }
                 )
             })
             .ToListAsync();

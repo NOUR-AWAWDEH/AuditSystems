@@ -14,5 +14,5 @@ graph TD
 
     C --> J[AuditSystem.Auth]
     C --> H[AuditSystem.DataAccess]
-    C --> I[AuditSystem.Host]
-    
+    C --> I[AuditSystem.Host]    
+```

@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.DataAccess;
 
@@ -67,29 +66,14 @@ public static class InfrastructureDependencies
 
     private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration, bool isProduction)
     {
-        // Using Sql Server
-
-        //var connectionString = configuration[ConfigurationKeys.DefaultConnectionString] ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
-        //return services.AddDbContext<ApplicationDbContext>(options =>
-        //    options.UseSqlServer(connectionString)
-        //           .EnableSensitiveDataLogging(false)
-        //           .LogTo(Console.WriteLine, LogLevel.Information)
-        //           .ConfigureWarnings(warnings => warnings.Ignore(
-        //                Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.SavepointsDisabledBecauseOfMARS)));
-
-        // Using PostgreSQL
 
         var connectionString = configuration[ConfigurationKeys.DefaultConnectionString]
                 ?? throw new ArgumentNullException("DB_CONNECTION_STRING", "Database connection string is missing in configuration");
 
-        return services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(connectionString, 
-            npgsqlOptions => npgsqlOptions.MigrationsAssembly("AuditSystem.DataAccess"))
-                .EnableSensitiveDataLogging(false)
-                .LogTo(Console.WriteLine, LogLevel.Information)
-                .ConfigureWarnings(warnings => warnings.Ignore(
-                    Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning))
-        );
+        return services.AddDbContextPool<ApplicationDbContext>(options =>
+            options.UseNpgsql(connectionString,
+                npgsqlOptions => npgsqlOptions.MigrationsAssembly("AuditSystem.DataAccess"))
+                    .EnableSensitiveDataLogging(false));
     }
 
     private static IServiceCollection AddRepositories(this IServiceCollection services) =>
@@ -106,6 +90,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Location>()
         .AddRepository<Guid, Department>()
         .AddRepository<Guid, Company>()
+        .AddRepository<Guid, JobTitle>()
         //Processes
         .AddRepository<Guid, SubProcess>()
         .AddRepository<Guid, AuditProcess>()

@@ -4,6 +4,7 @@ namespace AuditSystem.Contract.Models.Users;
 
 public sealed record UserModel(
     Guid Id,
+    string UserName,
     string FirstName,
     string LastName,
     string Email,

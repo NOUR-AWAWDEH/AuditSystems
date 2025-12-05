@@ -118,7 +118,7 @@ public class AdminSeedingOrchestrator(
     // -----------------------------
     private async Task EnsureRequiredRolesAsync()
     {
-        string[] roles = { Role.Admin, Role.ActionOwner };
+        string[] roles = [Role.Admin, Role.ActionOwner];
 
         foreach (var roleName in roles)
             await EnsureRoleExistsAsync(roleName);
@@ -225,6 +225,7 @@ public class AdminSeedingOrchestrator(
             LastName = config.LastName,
             Email = config.Email,
             UserName = config.Username,
+            Role = Role.Admin,
             CompanyId = config.CompanyId,
             JobTitleId = config.JobTitleId,
             IsActive = true,

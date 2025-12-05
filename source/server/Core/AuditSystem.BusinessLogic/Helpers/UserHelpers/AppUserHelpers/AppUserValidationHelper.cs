@@ -35,12 +35,6 @@ public class AppUserValidationHelper(
         return identityUser;
     }
 
-    // public async Task<AppUser?> GetAppUserByIdentityUserId(Guid identityUserId)
-    // {
-    //     return await _appUserRepository.Query()
-    //         .FirstOrDefaultAsync(u => u.IdentityUserId == identityUserId);
-    // }
-
     public async Task<AppUser> ValidateAppUserExists(Guid userId)
     {
         var appUser = await _appUserRepository.Query()

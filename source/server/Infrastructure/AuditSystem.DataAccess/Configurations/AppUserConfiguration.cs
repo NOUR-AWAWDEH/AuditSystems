@@ -18,6 +18,7 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
               builder.Property(u => u.FirstName).IsRequired();
               builder.Property(u => u.LastName).IsRequired();
               builder.Property(u => u.Email).IsRequired();
+              builder.Property(u => u.Role).IsRequired();
               builder.Property(u => u.UserName).IsRequired();
               builder.Property(u => u.IdentityUserId).IsRequired();
               builder.Property(u => u.CompanyId).IsRequired();
@@ -63,7 +64,7 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                      .WithMany()
                      .HasForeignKey(u => u.CreatedByUserId)
                      .OnDelete(DeleteBehavior.Restrict);
-                     
+
               // Indexes
               builder.HasIndex(u => u.IdentityUserId).IsUnique();
               builder.HasIndex(u => u.CompanyId);

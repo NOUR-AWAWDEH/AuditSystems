@@ -49,6 +49,8 @@ public class RegisterDto : IUserAwareRequest
     [Required] // ✅ REQUIRED BY AppUser
     public Guid JobTitleId { get; set; }
 
+    public Guid? SubDepartmentId { get; set; } // Optional - nullable
+
     // ========================= AUTO-INJECTED =========================
     public Guid UserId { get; set; }
 }

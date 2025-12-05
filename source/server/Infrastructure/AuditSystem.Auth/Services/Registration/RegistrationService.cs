@@ -122,8 +122,10 @@ public class RegistrationService(
             LastName = request.LastName,
             Email = request.Email,
             UserName = identityUser.UserName,
+            Role = request.RoleName,
             CompanyId = request.CompanyId,
             JobTitleId = request.JobTitleId,
+            SubDepartmentId = request.SubDepartmentId,
             IsActive = true,
             CreatedByUserId = adminAppUserId // Admin who created this user
         };

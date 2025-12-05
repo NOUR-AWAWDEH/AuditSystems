@@ -73,9 +73,58 @@ internal sealed class AppUserService(
         }
     }
 
-    public Task UpdateUserAsync(UserModel user, Guid adminUserId)
+    public async Task UpdateUserAsync(UserModel user, Guid adminUserId)
     {
-        throw new NotImplementedException();
+        appLogger.LogInformation("Updating user {UserId} by admin {AdminId}", user.Id, adminUserId);
+
+        // 1. Validate admin owns the user
+        var appUser = await appUserValidation.ValidateAdminOwnsUser(user.Id, adminUserId);
+
+        // 2. Validate identity user exists
+        var identityUser = await appUserValidation.ValidateIdentityUserExists(appUser.IdentityUserId);
+
+        // 3. Begin transaction to ensure consistency between both entities
+        await using var transaction = await appUserRepository.BeginTransactionAsync();
+
+        try
+        {
+            // 4. Update AppUser properties
+            appUser.FirstName = user.FirstName;
+            appUser.LastName = user.LastName;
+            appUser.Email = user.Email;
+            appUser.UserName = user.UserName;
+            appUser.Role = user.Role;
+            appUser.SubDepartmentId = user.SubDepartment?.Id;
+            appUser.JobTitleId = user.JobTitle?.Id ?? appUser.JobTitleId;
+            appUser.UpdatedAt = DateTime.UtcNow;
+
+            // 5. Update ApplicationUser (Identity) properties
+            identityUser.Email = user.Email;
+            identityUser.NormalizedEmail = user.Email.ToUpperInvariant();
+            identityUser.UserName = user.UserName;
+            identityUser.NormalizedUserName = user.UserName.ToUpperInvariant();
+
+            // 6. Save ApplicationUser changes
+            var identityResult = await userManager.UpdateAsync(identityUser);
+            if (!identityResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    string.Join(", ", identityResult.Errors.Select(e => e.Description)));
+            }
+
+            // 7. Save AppUser changes
+            await appUserRepository.UpdateAsync(appUser);
+
+            // 8. Commit transaction
+            await transaction.CommitAsync();
+
+            appLogger.LogInformation("User {UserId} updated successfully", user.Id);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<List<UserModel>> GetActionOwnersByAdminIdAsync(Guid adminUserId)
@@ -106,6 +155,7 @@ internal sealed class AppUserService(
             .Where(u => u.CreatedByUserId == adminAppUser.Id)
             .Select(u => new UserModel(
                 u.Id,
+                u.IdentityUser.UserName ?? string.Empty,
                 u.FirstName,
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
@@ -128,18 +178,120 @@ internal sealed class AppUserService(
         return userModels;
     }
 
-    public Task<UserModel> GetUserByIdAsync(Guid id, Guid adminUserId)
+    public async Task<UserModel> GetUserByIdAsync(Guid id, Guid adminUserId)
     {
-        throw new NotImplementedException();
+        appLogger.LogDebug("Retrieving user {UserId} for admin {AdminId}", id, adminUserId);
+
+        // 1. Get user and validate ownership
+        var appUser = await appUserValidation.ValidateAdminOwnsUser(id, adminUserId);
+
+        // 2. Load related entities
+        var userWithRelations = await appUserRepository.Query()
+            .Include(u => u.IdentityUser)
+            .Include(u => u.SubDepartment)
+            .Include(u => u.JobTitle)
+            .FirstOrDefaultAsync(u => u.Id == id)
+            ?? throw new KeyNotFoundException("User not found");
+
+        // 3. Get user role from Identity
+        var identityUser = await userManager.FindByIdAsync(userWithRelations.IdentityUserId.ToString());
+        var roles = identityUser != null ? await userManager.GetRolesAsync(identityUser) : new List<string>();
+        var role = roles.FirstOrDefault() ?? string.Empty;
+
+        // 4. Map to UserModel
+        var userModel = new UserModel(
+            userWithRelations.Id,
+            userWithRelations.IdentityUser.UserName ?? string.Empty,
+            userWithRelations.FirstName,
+            userWithRelations.LastName,
+            userWithRelations.IdentityUser.Email ?? string.Empty,
+            role,
+            userWithRelations.SubDepartment == null ? null : new SubDepartmentModel
+            {
+                Id = userWithRelations.SubDepartment.Id,
+                Name = userWithRelations.SubDepartment.Name,
+                DepartmentId = userWithRelations.SubDepartment.DepartmentId
+            },
+            userWithRelations.JobTitle == null ? null : new JobTitleModel
+            {
+                Id = userWithRelations.JobTitle.Id,
+                Name = userWithRelations.JobTitle.Name,
+                CompanyId = userWithRelations.JobTitle.CompanyId
+            });
+
+        appLogger.LogDebug("Retrieved user {UserId} successfully", id);
+        return userModel;
     }
 
-    public Task<IReadOnlyList<UserModel>> GetUsersByAdminIdAsync(Guid adminUserId)
+    public async Task<IReadOnlyList<UserModel>> GetUsersByAdminIdAsync(Guid adminUserId)
     {
-        throw new NotImplementedException();
+        appLogger.LogDebug("Retrieving all users for admin {AdminId}", adminUserId);
+
+        // 1. Validate admin exists
+        var adminAppUser = await appUserValidation.ValidateAppUserExists(adminUserId);
+
+        // 2. Query all users created by this admin
+        var users = await appUserRepository.Query()
+            .Where(u => u.CreatedByUserId == adminAppUser.Id)
+            .Include(u => u.IdentityUser)
+            .Include(u => u.SubDepartment)
+            .Include(u => u.JobTitle)
+            .AsNoTracking()
+            .ToListAsync();
+
+        // 3. Map to UserModel list with roles
+        var userModels = new List<UserModel>();
+        foreach (var user in users)
+        {
+            var identityUser = await userManager.FindByIdAsync(user.IdentityUserId.ToString());
+            var roles = identityUser != null ? await userManager.GetRolesAsync(identityUser) : new List<string>();
+            var role = roles.FirstOrDefault() ?? string.Empty;
+
+            var userModel = new UserModel(
+                user.Id,
+                user.IdentityUser.UserName ?? string.Empty,
+                user.FirstName,
+                user.LastName,
+                user.IdentityUser.Email ?? string.Empty,
+                role,
+                user.SubDepartment == null ? null : new SubDepartmentModel
+                {
+                    Id = user.SubDepartment.Id,
+                    Name = user.SubDepartment.Name,
+                    DepartmentId = user.SubDepartment.DepartmentId
+                },
+                user.JobTitle == null ? null : new JobTitleModel
+                {
+                    Id = user.JobTitle.Id,
+                    Name = user.JobTitle.Name,
+                    CompanyId = user.JobTitle.CompanyId
+                });
+
+            userModels.Add(userModel);
+        }
+
+        appLogger.LogInformation("Retrieved {Count} users for admin {AdminId}", userModels.Count, adminUserId);
+        return userModels.AsReadOnly();
     }
 
-    public Task<PaginationResult<UserModel>> SearchByAdminIdAsync(Guid adminUserId, string? searchTerm, Page page)
+    public async Task<PaginationResult<UserModel>> SearchByAdminIdAsync(Guid adminUserId, string? searchTerm, Page page)
     {
-        throw new NotImplementedException();
+        appLogger.LogDebug("Searching users for admin {AdminId} with term: {SearchTerm}",
+            adminUserId, searchTerm ?? "(none)");
+
+        // 1. Validate admin exists
+        var adminAppUser = await appUserValidation.ValidateAppUserExists(adminUserId);
+
+        // 2. Use the search helper to get paginated results
+        var (cacheKey, countCacheKey) = appUserSearch.GetUserSearchCacheKeys(
+            adminAppUser.Id, searchTerm, null, page);
+
+        var result = await appUserSearch.GetUserSearchFromRepositoryAsync(
+            adminAppUser.Id, searchTerm, null, page, cacheKey, countCacheKey);
+
+        appLogger.LogInformation("Search returned {Count} users for admin {AdminId}",
+            result.TotalCount, adminUserId);
+
+        return result;
     }
 }

@@ -74,10 +74,11 @@ public class AppUserSearchHelper(
             .Take(page.Size)
             .Select(u => new UserModel(
                 u.Id,
+                u.IdentityUser.UserName ?? string.Empty,
                 u.FirstName,
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
-                string.Empty, // Role - may need to be resolved separately
+                u.Role,
                 u.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = u.SubDepartment.Id,

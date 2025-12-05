@@ -21,6 +21,6 @@ internal sealed class SearchLocationQueryHandler(
 
         logger.LogInformation("Locations with user id: {UserId} were retrieved successfully.", request.UserId);
         var response = new PaginationRequestResponse<LocationModel>(searchResult.Items, searchResult.TotalCount);
-        return Result.Success(response);
+        return Result.Success(response, "Locations fetched successfully.");
     }
 }

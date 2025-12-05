@@ -4,8 +4,7 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.UserServices.AppUserServ
 
 public interface IAppUserValidation
 {
-    Task<AppUser> ValidateAdminOwnsUser(Guid userId, Guid adminUserId); //done
-    Task<ApplicationUser> ValidateIdentityUserExists(Guid userId); //done
-    Task<AppUser> ValidateAppUserExists(Guid userId); //done
-    //Task<AppUser?> GetAppUserByIdentityUserId(Guid identityUserId);
+    Task<AppUser> ValidateAdminOwnsUser(Guid userId, Guid adminUserId);
+    Task<ApplicationUser> ValidateIdentityUserExists(Guid userId);
+    Task<AppUser> ValidateAppUserExists(Guid userId);
 }

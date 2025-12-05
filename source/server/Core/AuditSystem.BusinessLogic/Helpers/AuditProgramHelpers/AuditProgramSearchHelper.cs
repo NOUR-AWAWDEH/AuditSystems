@@ -143,9 +143,10 @@ public sealed class AuditProgramSearchHelper : IAuditProgramSearch
                 UpdatedAt = ap.UpdatedAt,
                 ActionOwner = ap.ActionOwner == null ? null : new UserModel(
                     ap.ActionOwner.Id,
+                    ap.ActionOwner.IdentityUser.UserName ?? string.Empty,
                     ap.ActionOwner.FirstName,
                     ap.ActionOwner.LastName,
-                    ap.ActionOwner.Email,
+                    ap.ActionOwner.IdentityUser.Email ?? string.Empty,
                     Role.ActionOwner,
                     ap.ActionOwner.SubDepartment == null ? null : new SubDepartmentModel
                     {

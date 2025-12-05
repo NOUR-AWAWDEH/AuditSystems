@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AuditSystem.Contract.Interfaces;
 
-namespace AuditSystem.Auth.Dtos.Register;
+namespace AuditSystem.Contract.Dtos.Register;
 
 public class RegisterDto : IUserAwareRequest
 {
@@ -48,6 +48,8 @@ public class RegisterDto : IUserAwareRequest
 
     [Required] // ✅ REQUIRED BY AppUser
     public Guid JobTitleId { get; set; }
+
+    public Guid? SubDepartmentId { get; set; } // Optional - nullable
 
     // ========================= AUTO-INJECTED =========================
     public Guid UserId { get; set; }

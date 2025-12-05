@@ -29,8 +29,7 @@ internal sealed class AuditProgramService(
         _logger,
         CacheKeys.AuditProgram,
         AuditProgramConstants.AuditProgramTags,
-        AuditProgramConstants.ListTags,
-        "Description"  // AuditProgram uses Description field, not Name
+        AuditProgramConstants.ListTags
     ),
     IAuditProgramService
 {

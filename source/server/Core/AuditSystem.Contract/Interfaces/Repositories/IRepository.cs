@@ -1,4 +1,5 @@
 using AuditSystem.Domain.Entities.Common;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
 namespace AuditSystem.Contract.Interfaces.Repositories;
@@ -25,4 +26,8 @@ public interface IRepository<TId, TEntity>
     Task<ICollection<TResponse>> ProjectToAsync<TResponse>(IQueryable<TEntity> query);
     IQueryable<TEntity> Query();
     Task<ICollection<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null);
+
+
+    // ✅ TRANSACTION SUPPORT
+    Task<IDbContextTransaction> BeginTransactionAsync();
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AuditSystem.Contract.Interfaces;
 
-namespace AuditSystem.Auth.Dtos.Register;
+namespace AuditSystem.Contract.Dtos.Register;
 
 public class RegisterDto : IUserAwareRequest
 {

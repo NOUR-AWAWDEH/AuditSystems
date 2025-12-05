@@ -1,4 +1,4 @@
-﻿using AuditSystem.Auth.Dtos.Register;
+﻿using AuditSystem.Contract.Dtos.Register;
 using AuditSystem.Auth.Services.Registration;
 using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;

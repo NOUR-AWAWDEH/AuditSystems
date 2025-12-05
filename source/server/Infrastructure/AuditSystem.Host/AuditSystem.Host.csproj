@@ -39,6 +39,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\AuditSystem.Application\AuditSystem.Application.csproj" />
+    <ProjectReference Include="..\..\Core\AuditSystem.BusinessLogic\AuditSystem.BusinessLogic.csproj" />
+    <ProjectReference Include="..\..\Core\AuditSystem.Contract\AuditSystem.Contract.csproj" />
     <ProjectReference Include="..\..\Core\AuditSystem.Domain\AuditSystem.Domain.csproj" />
     <ProjectReference Include="..\AuditSystem.DataAccess\AuditSystem.DataAccess.csproj" />
     <ProjectReference Include="..\AuditSystem.Auth\AuditSystem.Auth.csproj" />

@@ -13,6 +13,7 @@ using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelp
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
+using AuditSystem.BusinessLogic.Helpers.UserHelpers.AppUserHelpers;
 using AuditSystem.BusinessLogic.Mappings;
 using AuditSystem.BusinessLogic.Services.DownloadFile;
 using AuditSystem.BusinessLogic.Services.EntityServices.AuditServices;
@@ -26,6 +27,7 @@ using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.UserServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.AppUserServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.UserServices.UserSessionManager;
 using AuditSystem.BusinessLogic.Services.FileStorageServices;
 using AuditSystem.BusinessLogic.Services.Transaction;
@@ -51,6 +53,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ControlDesignS
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices.ExitControlServices;
 using AuditSystem.Contract.Interfaces.ModelServices.SupportingDocsServices;
 using AuditSystem.Contract.Interfaces.ModelServices.UserServices;
+using AuditSystem.Contract.Interfaces.ModelServices.UserServices.AppUserServices;
 using AuditSystem.Contract.Interfaces.Transaction;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Common;
@@ -212,7 +215,9 @@ public static class BusinessLogicDependencies
             .AddScoped<IDecodeDownloadService, DecodeDownloadService>()
 
             // User Service
-            .AddScoped<IUserService, UserService>()
+            .AddScoped<IAppUserSearch, AppUserSearchHelper>()
+            .AddScoped<IAppUserValidation, AppUserValidationHelper>()
+            .AddScoped<IAppUserService, AppUserService>()
             .AddScoped<IUserSessionManager, UserSessionManager>();
 
 

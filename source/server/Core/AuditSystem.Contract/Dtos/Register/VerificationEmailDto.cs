@@ -1,4 +1,4 @@
-﻿namespace AuditSystem.Auth.Dtos.Register;
+﻿namespace AuditSystem.Contract.Dtos.Register;
 
 public class VerificationEmailDto
 {

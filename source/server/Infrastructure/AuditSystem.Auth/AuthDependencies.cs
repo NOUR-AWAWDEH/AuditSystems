@@ -1,5 +1,5 @@
 using AuditSystem.Auth.Authentication;
-using AuditSystem.Auth.Dtos.Register;
+using AuditSystem.Contract.Dtos.Register;
 using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Authentication;
 using AuditSystem.Auth.Services.Email;

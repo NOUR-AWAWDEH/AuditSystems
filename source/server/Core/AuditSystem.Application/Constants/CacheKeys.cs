@@ -13,6 +13,7 @@ public static class CacheKeys
 
     //Common
     public const string Rate = "rate";
+    public const string AppUser = "appuser";
 
     public const string Company = "company";
     public const string JobTitle = "jobtitle";

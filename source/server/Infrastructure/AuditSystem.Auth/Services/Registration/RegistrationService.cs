@@ -1,4 +1,4 @@
-using AuditSystem.Auth.Dtos.Register;
+using AuditSystem.Contract.Dtos.Register;
 using AuditSystem.Auth.Services.Email;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Auth;
@@ -12,30 +12,20 @@ using System.Text;
 
 namespace AuditSystem.Auth.Services.Registration;
 
-public class RegistrationService : IRegistrationService
+public class RegistrationService(
+    UserManager<ApplicationUser> userManager,
+    RoleManager<Role> roleManager,
+    ILogger<RegistrationService> logger,
+    IEmailService emailService,
+    IConfiguration configuration,
+    ApplicationDbContext dbContext) : IRegistrationService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<Role> _roleManager;
-    private readonly IEmailService _emailService;
-    private readonly ILogger<RegistrationService> _logger;
-    private readonly IConfiguration _configuration;
-    private readonly ApplicationDbContext _dbContext;
-
-    public RegistrationService(
-        UserManager<ApplicationUser> userManager,
-        RoleManager<Role> roleManager,
-        ILogger<RegistrationService> logger,
-        IEmailService emailService,
-        IConfiguration configuration,
-        ApplicationDbContext dbContext)
-    {
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _logger = logger;
-        _emailService = emailService;
-        _configuration = configuration;
-        _dbContext = dbContext;
-    }
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly RoleManager<Role> _roleManager = roleManager;
+    private readonly IEmailService _emailService = emailService;
+    private readonly ILogger<RegistrationService> _logger = logger;
+    private readonly IConfiguration _configuration = configuration;
+    private readonly ApplicationDbContext _dbContext = dbContext;
 
     // ========================= REGISTER =========================
 
@@ -51,10 +41,8 @@ public class RegistrationService : IRegistrationService
 
             // Get the admin's AppUser ID from their ApplicationUser ID (from JWT token)
             var adminAppUser = await _dbContext.AppUsers
-                .FirstOrDefaultAsync(u => u.IdentityUserId == adminUserId);
-
-            if (adminAppUser == null)
-                throw new InvalidOperationException($"Admin user with Identity ID '{adminUserId}' not found");
+                .FirstOrDefaultAsync(u => u.IdentityUserId == adminUserId) ??
+                    throw new InvalidOperationException($"Admin user with Identity ID '{adminUserId}' not found");
 
             var identityUser = await CreateIdentityUserAsync(request);
             await AssignRoleAsync(identityUser, role.Name!);

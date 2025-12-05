@@ -16,5 +16,5 @@ public interface IAppUserService
     Task<PaginationResult<UserModel>> SearchByAdminIdAsync(Guid adminUserId, string? searchTerm, Page page);
 
     //ActionOwner
-    Task<List<UserModel>> GetActionOwnersByUserIdAsync(Guid adminUserId);
+    Task<List<UserModel>> GetActionOwnersByAdminIdAsync(Guid adminUserId);
 }

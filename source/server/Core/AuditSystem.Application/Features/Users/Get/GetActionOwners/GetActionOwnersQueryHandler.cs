@@ -14,8 +14,8 @@ internal sealed class GetActionOwnersQueryHandler(
         GetActionOwnersQuery request,
         CancellationToken cancellationToken)
     {
-        var actionOwners = await userService.GetActionOwnersByUserIdAsync(request.UserId);
+        var actionOwners = await userService.GetActionOwnersByAdminIdAsync(request.UserId);
         logger.LogInformation("Action owners retrieved successfully");
-        return Result<GetActionOwnersQueryResponse>.Success(new(actionOwners));
+        return Result<GetActionOwnersQueryResponse>.Success(new(actionOwners), "Action owners retrieved successfully");
     }
 }

@@ -4,6 +4,7 @@ using AuditSystem.Domain.Entities.Common;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 
 namespace AuditSystem.DataAccess.Repositories;
@@ -137,5 +138,10 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
             query = query.Where(predicate);
 
         return await query.ToListAsync();
+    }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        return await context.Database.BeginTransactionAsync();
     }
 }

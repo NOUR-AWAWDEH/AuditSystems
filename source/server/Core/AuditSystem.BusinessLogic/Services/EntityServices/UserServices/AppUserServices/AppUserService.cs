@@ -9,7 +9,6 @@ using AuditSystem.Contract.Interfaces.ModelServices.UserServices.AppUserServices
 using AuditSystem.Contract.Dtos.Register;
 using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Organization;
-using System.Collections.Generic;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.UserServices.AppUserServices;
 
@@ -22,6 +21,8 @@ internal sealed class AppUserService(
     ILogger<AppUserService> appLogger) :
     IAppUserService
 {
+    private static readonly List<UserModel> EmptyUserList = [];
+
     public IAppUserSearch AppUserSearch => appUserSearch;
     public IAppUserValidation AppUserValidation => appUserValidation;
     public IRegistrationService RegistrationService => registrationService;
@@ -38,20 +39,38 @@ internal sealed class AppUserService(
     {
         appLogger.LogInformation("Deleting user {UserId} by admin {AdminId}", userId, adminUserId);
 
+        //  1. Validate admin owns the user  and bring the user 
         var appUser = await appUserValidation.ValidateAdminOwnsUser(userId, adminUserId);
 
-        var identityUser = await userManager.FindByIdAsync(appUser.IdentityUserId.ToString());
-        if (identityUser == null)
-            throw new InvalidOperationException("Identity user not found");
+        //  2. Validate identity user exists
+        var identityUser = await appUserValidation.ValidateIdentityUserExists(appUser.IdentityUserId);
 
-        var identityResult = await userManager.DeleteAsync(identityUser);
-        if (!identityResult.Succeeded)
-            throw new InvalidOperationException(
-                string.Join(", ", identityResult.Errors.Select(e => e.Description)));
+        //  4. Begin transaction ONLY after all validation passes
+        await using var transaction = await appUserRepository.BeginTransactionAsync();
 
-        await appUserRepository.DeleteAsync(appUser.Id);
+        try
+        {
+            //  4. Delete identity user first
+            var identityResult = await userManager.DeleteAsync(identityUser);
+            if (!identityResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    string.Join(", ", identityResult.Errors.Select(e => e.Description)));
+            }
 
-        appLogger.LogInformation("User {UserId} deleted successfully", userId);
+            //  5. Delete AppUser
+            await appUserRepository.DeleteAsync(appUser.Id);
+
+            //  6. Commit transaction
+            await transaction.CommitAsync();
+
+            appLogger.LogInformation("User {UserId} deleted successfully", userId);
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public Task UpdateUserAsync(UserModel user, Guid adminUserId)
@@ -59,18 +78,17 @@ internal sealed class AppUserService(
         throw new NotImplementedException();
     }
 
-    public async Task<List<UserModel>> GetActionOwnersByUserIdAsync(Guid userId)
+    public async Task<List<UserModel>> GetActionOwnersByAdminIdAsync(Guid adminUserId)
     {
-        appLogger.LogDebug("Fetching ActionOwners for User {UserId}", userId);
+        appLogger.LogDebug("Fetching ActionOwners for Admin {AdminId}", adminUserId);
 
-        // 1. Find the current AppUser corresponding to the Identity User ID
-        var currentAppUser = await appUserRepository.Query()
-            .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
+        // 1. Find the current admin at the appUserRepository 
+        var adminAppUser = await appUserValidation.ValidateAppUserExists(adminUserId);
 
-        if (currentAppUser == null)
+        if (adminAppUser == null)
         {
-            appLogger.LogWarning("AppUser with IdentityUserId {UserId} not found", userId);
-            return [];
+            appLogger.LogWarning("AppUser with IdentityUserId {UserId} not found", adminUserId);
+            return EmptyUserList;
         }
 
         // 2. Get all Identity Users in the "ActionOwner" role
@@ -79,13 +97,13 @@ internal sealed class AppUserService(
 
         if (actionOwnerIdentityIds.Count == 0)
         {
-            return [];
+            return EmptyUserList;
         }
 
         // 3. Query AppUsers that are in the role AND created by the current user
         var userModels = await appUserRepository.Query()
             .Where(u => actionOwnerIdentityIds.Contains(u.IdentityUserId))
-            .Where(u => u.CreatedByUserId == currentAppUser.Id)
+            .Where(u => u.CreatedByUserId == adminAppUser.Id)
             .Select(u => new UserModel(
                 u.Id,
                 u.FirstName,
@@ -106,7 +124,7 @@ internal sealed class AppUserService(
                 }))
             .ToListAsync();
 
-        appLogger.LogInformation("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, currentAppUser.Id);
+        appLogger.LogInformation("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, adminAppUser.Id);
         return userModels;
     }
 

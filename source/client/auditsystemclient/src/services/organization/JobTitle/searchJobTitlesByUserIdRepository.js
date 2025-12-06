@@ -14,6 +14,8 @@ export const searchJobTitlesByUserIdRepository = {
         throw new Error("Authentication token not found");
       }
 
+      const companyId = authService.getLocalCompanyId();
+
       const queryParams = new URLSearchParams();
 
       if (searchParams.searchTerm) {
@@ -33,6 +35,8 @@ export const searchJobTitlesByUserIdRepository = {
       // Backend SearchJobTitleQuery supports CompanyId if provided
       if (searchParams.companyId) {
         queryParams.append("companyId", searchParams.companyId);
+      } else if (companyId) {
+        queryParams.append("companyId", companyId);
       }
 
       const queryString = queryParams.toString();

@@ -74,12 +74,18 @@ public class CustomAuthenticationService(
         {
             await _userSessionManager.StartSessionAsync(appUser);
         }
+        else
+        {
+            _logger.LogWarning("AppUser not found for IdentityUser {IdentityUserId}", user.Id);
+            return ApiResponse<LoginResponseDto>.BadRequest("Invalid username, password, or company.");
+        }
 
         return ApiResponse<LoginResponseDto>.Ok(new LoginResponseDto
         {
             JwtToken = jwtToken,
             RefreshToken = refreshToken,
-            IsEmailVerified = true
+            IsEmailVerified = appUser.IsActive,
+            CompanyId = appUser.CompanyId,
         }, "Login successful.");
     }
 
@@ -113,7 +119,7 @@ public class CustomAuthenticationService(
                 .FirstOrDefaultAsync(au => au.IdentityUserId == identityUserId);
 
             if (appUser != null)
-            {   
+            {
                 await _userSessionManager.EndSessionAsync(appUser);
             }
 

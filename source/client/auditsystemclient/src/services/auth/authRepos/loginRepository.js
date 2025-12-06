@@ -18,6 +18,7 @@ export const loginRepository = {
           jwtToken: responseData.result.jwtToken,
           refreshToken: responseData.result.refreshToken,
           isEmailVerified: responseData.result.isEmailVerified,
+          companyId: responseData.result.companyId,
         };
         
         this.setAuthHeader(result.jwtToken);

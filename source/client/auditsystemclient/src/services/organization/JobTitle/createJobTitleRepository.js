@@ -9,10 +9,11 @@ export const createJobTitleRepository = {
   async createJobTitle(jobTitleData) {
     try {
       const token = authService.getLocalToken();
+      const companyId = authService.getLocalCompanyId();
 
       const payload = {
         name: jobTitleData.name,
-        companyId: jobTitleData.companyId,
+        companyId: companyId,
       };
 
       const response = await api.post(

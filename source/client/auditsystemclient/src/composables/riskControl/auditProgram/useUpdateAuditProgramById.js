@@ -8,7 +8,6 @@ export function useUpdateAuditProgramById() {
 
     const handleUpdateSuccess = (response) => {
         updatedAuditProgram.value = response.result;
-        const message = response?.successMessage || 'Audit Program updated successfully';
         return { success: true, data: response.result };
     };
 

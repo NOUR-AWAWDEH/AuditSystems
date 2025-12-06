@@ -8,7 +8,6 @@ export function useUpdateObservationById() {
 
     const handleUpdateSuccess = (response) => {
         updatedObservation.value = response.result;
-        const message = response?.successMessage || 'Observation updated successfully';
         return { success: true, data: response.result };
     };
 

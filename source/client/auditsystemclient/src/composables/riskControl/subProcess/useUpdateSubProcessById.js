@@ -8,7 +8,6 @@ export function useUpdateSubProcessById() {
 
     const handleUpdateSuccess = (response) => {
         updatedSubProcess.value = response.result;
-        const message = response?.successMessage || 'SubProcess updated successfully';
         return { success: true, data: response.result };
     };
 

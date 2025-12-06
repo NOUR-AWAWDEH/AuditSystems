@@ -8,7 +8,6 @@ export function useUpdateRiskById() {
 
   const handleUpdateSuccess = (response) => {
     updatedRisk.value = response.result;
-    const message = response?.successMessage || "Risk updated successfully";
     return { success: true, data: response.result };
   };
 

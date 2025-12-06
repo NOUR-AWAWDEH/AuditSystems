@@ -99,7 +99,7 @@ import ActionOwnersSelector from "./ActionOwnersSelector.vue";
 import { useUpdateAuditProgramById } from "@/composables/riskControl/auditProgram/useUpdateAuditProgramById";
 import { useNotification } from "@/composables/notification/useNotification";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
-import { useGetActionOwnersByAdminId } from "@/composables/userManagement/actionOwner/useGetActionOwnersByAdminId";
+import { useGetActionOwnersByAdminId } from "@/composables/userManagement/users/useGetActionOwnersByAdminId";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 
 const props = defineProps({
@@ -117,11 +117,7 @@ const emit = defineEmits(["close", "audit-program-updated"]);
 const { showNotification } = useNotification();
 const { isUpdating, error, updateAuditProgram, resetState } = useUpdateAuditProgramById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
-const {
-  actionOwners,
-  isLoading: isLoadingActionOwners,
-  getActionOwnersByAdminId,
-} = useGetActionOwnersByAdminId();
+const { actionOwners, getActionOwnersByAdminId } = useGetActionOwnersByAdminId();
 
 const formData = ref({
   description: "",

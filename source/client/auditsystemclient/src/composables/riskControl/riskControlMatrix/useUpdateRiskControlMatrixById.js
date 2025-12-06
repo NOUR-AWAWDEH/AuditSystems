@@ -8,7 +8,6 @@ export function useUpdateRiskControlMatrixById() {
 
     const handleUpdateSuccess = (response) => {
         updatedRiskControlMatrix.value = response.result;
-        const message = response?.successMessage || 'Risk control matrix updated successfully';
         return { success: true, data: response.result };
     };
 

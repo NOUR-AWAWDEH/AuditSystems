@@ -7,4 +7,5 @@ public interface IAppUserValidation
     Task<AppUser> ValidateAdminOwnsUser(Guid userId, Guid adminUserId);
     Task<ApplicationUser> ValidateIdentityUserExists(Guid userId);
     Task<AppUser> ValidateAppUserExists(Guid userId);
+    Task ValidateRoleNotAdmin(string roleName);
 }

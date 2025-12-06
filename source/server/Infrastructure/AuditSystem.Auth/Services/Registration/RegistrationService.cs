@@ -31,8 +31,11 @@ public class RegistrationService(
 
     public async Task RegisterAsync(RegisterDto request, string scheme, Guid adminUserId)
     {
-        // Use transaction to ensure all-or-nothing: if AppUser creation fails, rollback Identity user too
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        // Check if a transaction is already in progress (e.g., from CommandTransactionBehavior)
+        var currentTransaction = _dbContext.Database.CurrentTransaction;
+        var localTransaction = currentTransaction == null
+            ? await _dbContext.Database.BeginTransactionAsync()
+            : null;
 
         try
         {
@@ -52,17 +55,31 @@ public class RegistrationService(
             var confirmationLink = await GenerateConfirmationLinkAsync(identityUser, scheme);
             await SendConfirmationEmailAsync(identityUser, confirmationLink);
 
-            // Commit transaction - all steps succeeded
-            await transaction.CommitAsync();
+            // Only commit if we started the transaction
+            if (localTransaction != null)
+            {
+                await localTransaction.CommitAsync();
+            }
 
             _logger.LogInformation("User registered and confirmation email sent: {Email}", identityUser.Email);
         }
         catch (Exception ex)
         {
-            // Rollback transaction - cleanup all changes including Identity user
-            await transaction.RollbackAsync();
+            // Only rollback if we started the transaction
+            if (localTransaction != null)
+            {
+                await localTransaction.RollbackAsync();
+            }
             _logger.LogError(ex, "Registration failed for {Username}", request.UserName);
             throw;
+        }
+        finally
+        {
+            // Only dispose if we started the transaction
+            if (localTransaction != null)
+            {
+                await localTransaction.DisposeAsync();
+            }
         }
     }
 

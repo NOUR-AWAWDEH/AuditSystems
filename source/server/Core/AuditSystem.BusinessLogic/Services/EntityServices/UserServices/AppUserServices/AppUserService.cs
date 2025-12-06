@@ -30,6 +30,8 @@ internal sealed class AppUserService(
 
     public async Task CreateUserAsync(RegisterDto request, Guid adminUserId, string scheme)
     {
+        await appUserValidation.ValidateRoleNotAdmin(request.RoleName);
+
         appLogger.LogInformation("Registering user {UserName} starting...", request.UserName);
         await registrationService.RegisterAsync(request, scheme, adminUserId);
         appLogger.LogInformation("user has been registered successfully");
@@ -45,32 +47,18 @@ internal sealed class AppUserService(
         //  2. Validate identity user exists
         var identityUser = await appUserValidation.ValidateIdentityUserExists(appUser.IdentityUserId);
 
-        //  4. Begin transaction ONLY after all validation passes
-        await using var transaction = await appUserRepository.BeginTransactionAsync();
+        //  4. Delete AppUser first (Dependent)
+        await appUserRepository.DeleteAsync(appUser.Id);
 
-        try
+        //  5. Delete identity user (Principal)
+        var identityResult = await userManager.DeleteAsync(identityUser);
+        if (!identityResult.Succeeded)
         {
-            //  4. Delete identity user first
-            var identityResult = await userManager.DeleteAsync(identityUser);
-            if (!identityResult.Succeeded)
-            {
-                throw new InvalidOperationException(
-                    string.Join(", ", identityResult.Errors.Select(e => e.Description)));
-            }
-
-            //  5. Delete AppUser
-            await appUserRepository.DeleteAsync(appUser.Id);
-
-            //  6. Commit transaction
-            await transaction.CommitAsync();
-
-            appLogger.LogInformation("User {UserId} deleted successfully", userId);
+            throw new InvalidOperationException(
+                string.Join(", ", identityResult.Errors.Select(e => e.Description)));
         }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+
+        appLogger.LogInformation("User {UserId} deleted successfully", userId);
     }
 
     public async Task UpdateUserAsync(UserModel user, Guid adminUserId)
@@ -83,48 +71,37 @@ internal sealed class AppUserService(
         // 2. Validate identity user exists
         var identityUser = await appUserValidation.ValidateIdentityUserExists(appUser.IdentityUserId);
 
-        // 3. Begin transaction to ensure consistency between both entities
-        await using var transaction = await appUserRepository.BeginTransactionAsync();
+        // 3. Validate role is not admin 
+        await appUserValidation.ValidateRoleNotAdmin(user.Role);
 
-        try
+        // 4. Update AppUser properties
+        appUser.FirstName = user.FirstName;
+        appUser.LastName = user.LastName;
+        appUser.Email = user.Email;
+        appUser.UserName = user.UserName;
+        appUser.Role = user.Role;
+        appUser.SubDepartmentId = user.SubDepartment?.Id;
+        appUser.JobTitleId = user.JobTitle?.Id ?? appUser.JobTitleId;
+        appUser.UpdatedAt = DateTime.UtcNow;
+
+        // 5. Update ApplicationUser (Identity) properties
+        identityUser.Email = user.Email;
+        identityUser.NormalizedEmail = user.Email.ToUpperInvariant();
+        identityUser.UserName = user.UserName;
+        identityUser.NormalizedUserName = user.UserName.ToUpperInvariant();
+
+        // 6. Save ApplicationUser changes
+        var identityResult = await userManager.UpdateAsync(identityUser);
+        if (!identityResult.Succeeded)
         {
-            // 4. Update AppUser properties
-            appUser.FirstName = user.FirstName;
-            appUser.LastName = user.LastName;
-            appUser.Email = user.Email;
-            appUser.UserName = user.UserName;
-            appUser.Role = user.Role;
-            appUser.SubDepartmentId = user.SubDepartment?.Id;
-            appUser.JobTitleId = user.JobTitle?.Id ?? appUser.JobTitleId;
-            appUser.UpdatedAt = DateTime.UtcNow;
-
-            // 5. Update ApplicationUser (Identity) properties
-            identityUser.Email = user.Email;
-            identityUser.NormalizedEmail = user.Email.ToUpperInvariant();
-            identityUser.UserName = user.UserName;
-            identityUser.NormalizedUserName = user.UserName.ToUpperInvariant();
-
-            // 6. Save ApplicationUser changes
-            var identityResult = await userManager.UpdateAsync(identityUser);
-            if (!identityResult.Succeeded)
-            {
-                throw new InvalidOperationException(
-                    string.Join(", ", identityResult.Errors.Select(e => e.Description)));
-            }
-
-            // 7. Save AppUser changes
-            await appUserRepository.UpdateAsync(appUser);
-
-            // 8. Commit transaction
-            await transaction.CommitAsync();
-
-            appLogger.LogInformation("User {UserId} updated successfully", user.Id);
+            throw new InvalidOperationException(
+                string.Join(", ", identityResult.Errors.Select(e => e.Description)));
         }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+
+        // 7. Save AppUser changes
+        await appUserRepository.UpdateAsync(appUser);
+
+        appLogger.LogInformation("User {UserId} updated successfully", user.Id);
     }
 
     public async Task<List<UserModel>> GetActionOwnersByAdminIdAsync(Guid adminUserId)
@@ -159,7 +136,7 @@ internal sealed class AppUserService(
                 u.FirstName,
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
-                Role.ActionOwner,
+                u.Role,
                 u.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = u.SubDepartment.Id,
@@ -193,19 +170,14 @@ internal sealed class AppUserService(
             .FirstOrDefaultAsync(u => u.Id == id)
             ?? throw new KeyNotFoundException("User not found");
 
-        // 3. Get user role from Identity
-        var identityUser = await userManager.FindByIdAsync(userWithRelations.IdentityUserId.ToString());
-        var roles = identityUser != null ? await userManager.GetRolesAsync(identityUser) : new List<string>();
-        var role = roles.FirstOrDefault() ?? string.Empty;
-
-        // 4. Map to UserModel
+        // 3. Map to UserModel
         var userModel = new UserModel(
             userWithRelations.Id,
             userWithRelations.IdentityUser.UserName ?? string.Empty,
             userWithRelations.FirstName,
             userWithRelations.LastName,
             userWithRelations.IdentityUser.Email ?? string.Empty,
-            role,
+            userWithRelations.Role,
             userWithRelations.SubDepartment == null ? null : new SubDepartmentModel
             {
                 Id = userWithRelations.SubDepartment.Id,
@@ -243,17 +215,13 @@ internal sealed class AppUserService(
         var userModels = new List<UserModel>();
         foreach (var user in users)
         {
-            var identityUser = await userManager.FindByIdAsync(user.IdentityUserId.ToString());
-            var roles = identityUser != null ? await userManager.GetRolesAsync(identityUser) : new List<string>();
-            var role = roles.FirstOrDefault() ?? string.Empty;
-
             var userModel = new UserModel(
                 user.Id,
                 user.IdentityUser.UserName ?? string.Empty,
                 user.FirstName,
                 user.LastName,
                 user.IdentityUser.Email ?? string.Empty,
-                role,
+                user.Role,
                 user.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = user.SubDepartment.Id,

@@ -1,13 +1,8 @@
 ﻿using AuditSystem.Application.Features.Audit.AuditProgram.Create;
 using AuditSystem.Application.Features.Audit.AuditProgram.Update;
 using AuditSystem.Contract.Models.Audit;
-using AuditSystem.Contract.Models.Users;
 using AuditSystem.Domain.Entities.Audit;
-using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Contract.Models.Organization;
-using AuditSystem.Domain.Entities.Organization;
 using AutoMapper;
-
 namespace AuditSystem.BusinessLogic.Mappings;
 
 public sealed class AuditMappingProfile : Profile
@@ -23,9 +18,5 @@ public sealed class AuditMappingProfile : Profile
 
         CreateMap<CreateAuditProgramCommand, AuditProgramModel>();
         CreateMap<UpdateAuditProgramCommand, AuditProgramModel>();
-
-        CreateMap<AppUser, UserModel>()
-            .ForCtorParam("Role", opt => opt.MapFrom(src => "ActionOwner"));
-        CreateMap<JobTitle, JobTitleModel>();
     }
 }

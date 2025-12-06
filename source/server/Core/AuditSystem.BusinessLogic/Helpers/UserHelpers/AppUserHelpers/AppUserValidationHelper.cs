@@ -20,7 +20,7 @@ public class AppUserValidationHelper(
         var appUser = await _appUserRepository.Query()
             .FirstOrDefaultAsync(u => u.Id == userId)
             ?? throw new KeyNotFoundException("User not found");
-        
+
         if (appUser.CreatedByUserId != adminUserId)
             throw new UnauthorizedAccessException("You are not allowed to manage this user.");
 
@@ -42,5 +42,15 @@ public class AppUserValidationHelper(
             ?? throw new KeyNotFoundException("User not found");
 
         return appUser;
+    }
+
+    public Task ValidateRoleNotAdmin(string roleName)
+    {
+        if (roleName == Role.Admin)
+        {
+            throw new InvalidOperationException("Nice try 😎 — but spawning Admins is disabled in this universe.");
+        }
+
+        return Task.CompletedTask;
     }
 }

@@ -46,7 +46,7 @@ public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(m
         await ProcessRequestToActionResultAsync(query);
 
     //Get JobTitle By User Id
-    [HttpGet("get-jobtitle-by-user-id")]
+    [HttpGet("get-jobtitles-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<List<GetJobTitlesByUserIdQueryResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]

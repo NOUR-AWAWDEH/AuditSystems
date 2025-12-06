@@ -47,9 +47,9 @@ public class AppUserValidationHelper(
     public Task ValidateRoleNotAdmin(string roleName)
     {
         if (roleName == Role.Admin)
-        {
-            throw new InvalidOperationException("Nice try 😎 — but spawning Admins is disabled in this universe.");
-        }
+            throw new InvalidOperationException(
+                "🐔🚫 Admin creation detected! Nice try 😎, Admin spawning 🐥 is forbidden in this universe 🚫 🪐"
+            );
 
         return Task.CompletedTask;
     }

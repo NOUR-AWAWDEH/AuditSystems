@@ -11,7 +11,7 @@ public sealed record CreateUserCommand(
     string LastName,
     string RoleName,
     Guid CompanyId,
-    Guid JobTitleId,
+    Guid? JobTitleId,
     Guid? SubDepartmentId,
-    string Scheme
+    string Scheme = "https"
 ) : UserAwareCommand<Result<CreateUserCommandResponse>>;

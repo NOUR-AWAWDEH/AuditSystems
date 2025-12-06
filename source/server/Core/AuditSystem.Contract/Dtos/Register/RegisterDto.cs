@@ -46,11 +46,11 @@ public class RegisterDto : IUserAwareRequest
     [Required]
     public Guid CompanyId { get; set; }
 
-    [Required] // ✅ REQUIRED BY AppUser
-    public Guid JobTitleId { get; set; }
+    public Guid? JobTitleId { get; set; } // Optional - nullable
 
     public Guid? SubDepartmentId { get; set; } // Optional - nullable
 
     // ========================= AUTO-INJECTED =========================
     public Guid UserId { get; set; }
+    public string Scheme { get; set; } = string.Empty;
 }

@@ -1,43 +1,51 @@
 // src/composables/useLogin.js
-import { ref } from 'vue';
-import { loginRepository } from '@/services/auth/authRepos/loginRepository';
-import authService from '@/services/auth/authRepos/authService';
+import { ref } from "vue";
+import { loginRepository } from "@/services/auth/authRepos/loginRepository";
+import authService from "@/services/auth/authRepos/authService";
 
 // Persistent refs
 const isAuthenticated = ref(!!authService.getLocalToken());
 const user = ref(null);
 const error = ref(null);
 const token = ref(authService.getLocalToken() || null);
-const refreshToken = ref(authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null);
+const refreshToken = ref(
+  authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null
+);
+const companyId = ref(authService.getLocalCompanyId ? authService.getLocalCompanyId() : null);
 
 export function useLogin() {
-  const setAuthData = (newToken, newRefreshToken, username) => {
+  const setAuthData = (newToken, newRefreshToken, username, newCompanyId) => {
     token.value = newToken;
     refreshToken.value = newRefreshToken;
     user.value = { username };
+    companyId.value = newCompanyId;
     isAuthenticated.value = true;
 
     authService.setLocalToken(token.value);
     authService.setLocalRefreshToken(refreshToken.value);
+
+    if (newCompanyId) {
+      authService.setLocalCompanyId(newCompanyId);
+    }
   };
 
   const extractBackendError = (response, statusCode, axiosError) => {
-    const fallback = 'An unexpected error occurred';
+    const fallback = "An unexpected error occurred";
 
     // Handle rate limiting (429 Too Many Requests) - HIGHEST PRIORITY
     if (statusCode === 429) {
-      return 'Too many login attempts. Please try again later.';
+      return "Too many login attempts. Please try again later.";
     }
 
     // If response is an ApiResponseT object (from loginRepository)
-    if (response && typeof response === 'object') {
+    if (response && typeof response === "object") {
       // Check for errors array in ApiResponseT
       if (response.errors && Array.isArray(response.errors) && response.errors.length > 0) {
         const firstError = response.errors[0];
         if (firstError && firstError.message) {
           return firstError.message;
         }
-        if (firstError && typeof firstError === 'string') {
+        if (firstError && typeof firstError === "string") {
           return firstError;
         }
       }
@@ -56,7 +64,7 @@ export function useLogin() {
     // Handle Axios error response data structure
     if (axiosError?.response?.data) {
       const errorData = axiosError.response.data;
-      
+
       // Check backend error structure
       if (errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
         const firstError = errorData.errors[0];
@@ -64,7 +72,7 @@ export function useLogin() {
           return firstError.message;
         }
       }
-      
+
       if (errorData.successMessage) {
         return errorData.successMessage;
       }
@@ -72,16 +80,16 @@ export function useLogin() {
 
     // Handle Axios error message directly (for network errors)
     if (axiosError && axiosError.message) {
-      if (axiosError.message.includes('Network Error')) {
-        return 'Network error. Please check your connection.';
+      if (axiosError.message.includes("Network Error")) {
+        return "Network error. Please check your connection.";
       }
-      if (axiosError.message.includes('timeout')) {
-        return 'Request timeout. Please try again.';
+      if (axiosError.message.includes("timeout")) {
+        return "Request timeout. Please try again.";
       }
     }
 
     // Handle case where response might be a string
-    if (typeof response === 'string') {
+    if (typeof response === "string") {
       return response;
     }
 
@@ -89,8 +97,13 @@ export function useLogin() {
   };
 
   const handleLoginSuccess = (response, username) => {
-    // response.result now contains { jwtToken, refreshToken, isEmailVerified }
-    setAuthData(response.result.jwtToken, response.result.refreshToken, username);
+    // response.result now contains { jwtToken, refreshToken, isEmailVerified, companyId }
+    setAuthData(
+      response.result.jwtToken,
+      response.result.refreshToken,
+      username,
+      response.result.companyId
+    );
     error.value = null; // Clear any previous errors
     return { success: true };
   };
@@ -102,7 +115,7 @@ export function useLogin() {
     return {
       success: false,
       message: errorMessage,
-      errors: response?.errors || [{ message: errorMessage }]
+      errors: response?.errors || [{ message: errorMessage }],
     };
   };
 
@@ -119,12 +132,12 @@ export function useLogin() {
         return handleLoginFailure(response, response.statusCode);
       }
     } catch (err) {
-      console.error('💥 [USE LOGIN] Caught error during login:', {
+      console.error("💥 [USE LOGIN] Caught error during login:", {
         err,
         message: err?.message,
         statusCode: err?.response?.status,
         responseData: err?.response?.data,
-        stack: err?.stack
+        stack: err?.stack,
       });
 
       // Extract status code and pass the actual error object
@@ -132,7 +145,7 @@ export function useLogin() {
       return handleLoginFailure(
         err.response?.data || err,
         statusCode,
-        err  // Pass the actual axios error
+        err // Pass the actual axios error
       );
     }
   };
@@ -142,6 +155,7 @@ export function useLogin() {
     user.value = null;
     token.value = null;
     refreshToken.value = null;
+    companyId.value = null;
     error.value = null; // Clear error on logout
     authService.removeLocalTokens();
   };
@@ -152,6 +166,7 @@ export function useLogin() {
     error,
     token,
     refreshToken,
+    companyId,
     login,
     logout,
   };

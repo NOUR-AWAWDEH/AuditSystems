@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { createUserRepository } from "@/services/userManagement/userRegistration/createUserRepository";
+import { createUserRepository } from "@/services/userManagement/users/createUserRepository";
 
 export const useCreateUser = () => {
   const isCreating = ref(false);

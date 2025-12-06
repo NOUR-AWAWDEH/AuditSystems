@@ -10,5 +10,5 @@ public interface IJobTitleService
     Task DeleteJobTitleAsync(Guid id, Guid userId);
     Task<JobTitleModel> GetJobTitleByIdAsync(Guid id, Guid userId);
     Task<IReadOnlyList<JobTitleModel>> GetJobTitlesByUserIdAsync(Guid userId);
-    Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId);
+    Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId, Guid? companyId);
 }

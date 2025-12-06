@@ -1,17 +1,17 @@
 import { ref } from "vue";
-import { getJobTitlesRepository } from "@/services/organization/getJobTitlesRepository";
+import { getJobTitlesByUserIdRepository } from "@/services/organization/JobTitle/getJobTitlesByUserIdRepository";
 
-export function useJobTitles() {
+export function useGetJobTitlesByUserId() {
   const jobTitles = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
 
-  const fetchJobTitles = async (companyId = null, searchTerm = "") => {
+  const fetchJobTitles = async () => {
     isLoading.value = true;
     error.value = null;
 
     try {
-      const result = await getJobTitlesRepository.getJobTitles(companyId, searchTerm);
+      const result = await getJobTitlesByUserIdRepository.getJobTitlesByUserId();
 
       if (result.success) {
         jobTitles.value = result.result?.items || [];

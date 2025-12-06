@@ -36,10 +36,6 @@ public sealed class CreateUserValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.JobTitleId)
             .NotEmpty().WithMessage("Job Title ID is required.");
 
-        RuleFor(x => x.Scheme)
-            .NotEmpty().WithMessage("Scheme is required.")
-            .Must(s => s == "http" || s == "https").WithMessage("Scheme must be 'http' or 'https'.");
-        
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("User ID is required.")
             .Must(BeAValidGuid).WithMessage("Invalid user ID.");

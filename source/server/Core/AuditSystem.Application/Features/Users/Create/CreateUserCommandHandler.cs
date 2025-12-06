@@ -25,7 +25,6 @@ internal sealed class CreateUserCommandHandler(
             request.UserName, request.UserId);
 
         return Result<CreateUserCommandResponse>.Created(
-            new("User created successfully and confirmation email sent."),
-            "User created successfully.");
+            new("User created successfully and confirmation email sent."));
     }
 }

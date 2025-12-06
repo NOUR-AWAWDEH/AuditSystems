@@ -38,7 +38,7 @@ public class AppUserSearchHelper(
 
         var cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey,
-            "AppUser",
+            CacheKeys.AppUser,
             userId,
             normalizedSearchTerm,
             page.Number,
@@ -46,7 +46,7 @@ public class AppUserSearchHelper(
 
         var countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey,
-            "AppUser",
+            CacheKeys.AppUser,
             userId,
             normalizedSearchTerm);
 

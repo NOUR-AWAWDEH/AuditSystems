@@ -8,7 +8,6 @@ export function useGetRiskById() {
 
     const handleFetchSuccess = (response) => {
         risk.value = response.result;
-        const message = response?.successMessage || 'Risk fetched successfully!';
         return { success: true, data: response.result };
     };
 

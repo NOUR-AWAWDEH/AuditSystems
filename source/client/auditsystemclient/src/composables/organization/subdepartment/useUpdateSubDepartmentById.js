@@ -8,7 +8,6 @@ export function useUpdateSubDepartmentById() {
 
   const handleUpdateSuccess = (response) => {
     updatedSubDepartment.value = response.result;
-    const message = response?.successMessage || 'SubDepartment updated successfully!';
     return { success: true, data: response.result };
   };
   

@@ -8,7 +8,6 @@ export function useGetControlDesignById() {
 
     const handleFetchSuccess = (response) => {
         controlDesign.value = response.result;
-        const message = response?.successMessage || 'Control Design fetched successfully!';
         return { success: true, data: controlDesign.value };
     };
 
@@ -18,7 +17,6 @@ export function useGetControlDesignById() {
             : response?.message || defaultErrorMessage;
 
         error.value = errorMessage;
-        showNotification(errorMessage, 'error');
 
         return {
             success: false,

@@ -8,7 +8,6 @@ export function useGetRiskControlMatrixById() {
 
     const handleFetchSuccess = (response) => {
         riskControlMatrix.value = response.result;
-        const message = response?.successMessage || 'Risk Control Matrix fetched successfully!';
         return { success: true, data: response.result };
     };
 

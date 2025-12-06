@@ -8,7 +8,6 @@ export function useGetAuditProcessById() {
 
     const handleFetchSuccess = (response) => {
         auditProcess.value = response.result;
-        const message = response?.successMessage || 'Process fetched successfully!';
         return { success: true, data: response.result };
     };
 

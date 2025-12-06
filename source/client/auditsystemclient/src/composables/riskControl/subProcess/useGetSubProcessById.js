@@ -9,7 +9,6 @@ export function useGetSubProcessById() {
 
     const handleFetchSuccess = (response) => {
         subProcess.value = response.result;
-        const message = response?.successMessage || 'SubProcess fetched successfully!';
         return { success: true, data: response.result };
     };
 

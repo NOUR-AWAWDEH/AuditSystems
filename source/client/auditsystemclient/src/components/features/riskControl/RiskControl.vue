@@ -142,7 +142,7 @@
         </div>
 
         <div v-if="activeTab === 'observations'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
-          <Observation
+          <ObservationVue
             :audit-programs="auditPrograms"
             :selected-audit-program-id="selectedAuditProgramId"
             @observation-selected="handleObservationSelected"
@@ -179,7 +179,7 @@ import RiskVue from "./risk/RiskVue.vue";
 import ExitControlVue from "./exitControl/ExitControlVue.vue";
 import AuditProgramVue from "./auditProgram/AuditProgramVue.vue";
 import ControlDesignVue from "./controlDesign/ControlDesignVue.vue";
-import Observation from "./observation/Observation.vue";
+import ObservationVue from "./observation/ObservationVue.vue";
 
 import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 import { useGetAuditProcessesByUserId } from "@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId";

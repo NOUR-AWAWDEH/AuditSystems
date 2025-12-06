@@ -49,7 +49,6 @@ export function useUpdateExitControlById() {
             
             const validationError = validateUpdateExitControl(exitControlData);
             if (validationError) {
-                showNotification(validationError, 'error');
                 return handleUpdateFailure({ message: validationError });
             }
 

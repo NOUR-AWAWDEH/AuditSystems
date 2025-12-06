@@ -99,7 +99,7 @@ import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import ActionOwnersSelector from "./ActionOwnersSelector.vue";
 import { useCreateAuditProgram } from "@/composables/riskControl/auditProgram/useCreateAuditProgram.js";
 import { useNotification } from "@/composables/notification/useNotification";
-import { useGetActionOwnersByAdminId } from "@/composables/userManagement/actionOwner/useGetActionOwnersByAdminId";
+import { useGetActionOwnersByAdminId } from "@/composables/userManagement/users/useGetActionOwnersByAdminId";
 
 const props = defineProps({
   isVisible: {
@@ -120,11 +120,7 @@ const emit = defineEmits(["close", "audit-program-added"]);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createAuditProgram, resetState } = useCreateAuditProgram();
-const {
-  actionOwners,
-  isLoading: isLoadingActionOwners,
-  getActionOwnersByAdminId,
-} = useGetActionOwnersByAdminId();
+const { actionOwners, getActionOwnersByAdminId } = useGetActionOwnersByAdminId();
 
 const formData = ref({
   description: "",

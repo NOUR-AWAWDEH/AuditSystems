@@ -1,7 +1,7 @@
 import { ref } from "vue";
-import { getActionOwnersRepository } from "@/services/userManagement/users/getActionOwnersRepository";
+import { getActionOwnersByAdminIdRepository } from "@/services/userManagement/users/getActionOwnersByAdminIdRepository";
 
-export const useGetActionOwners = () => {
+export const useGetActionOwnersByAdminId = () => {
   const isLoading = ref(false);
   const error = ref(null);
   const actionOwners = ref([]);
@@ -28,13 +28,13 @@ export const useGetActionOwners = () => {
     };
   };
 
-  const fetchActionOwners = async () => {
+  const getActionOwnersByAdminId = async () => {
     isLoading.value = true;
     error.value = null;
     actionOwners.value = [];
 
     try {
-      const response = await getActionOwnersRepository.getActionOwners();
+      const response = await getActionOwnersByAdminIdRepository.getActionOwnersByAdminId();
       if (response.success) {
         return handleSuccess(response);
       } else {
@@ -51,6 +51,6 @@ export const useGetActionOwners = () => {
     isLoading,
     error,
     actionOwners,
-    fetchActionOwners,
+    getActionOwnersByAdminId,
   };
 };

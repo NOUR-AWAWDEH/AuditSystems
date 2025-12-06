@@ -1,5 +1,5 @@
 <template>
-  <!--Observation.vue-->
+  <!--ObservationVue.vue-->
   <div class="space-y-6">
     <!-- Add Observation Modal -->
     <AddObservationModal

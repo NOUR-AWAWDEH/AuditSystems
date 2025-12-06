@@ -16,7 +16,7 @@ public class AppUser : AuditableEntity<Guid>
     // ✅ REQUIRED FOREIGN KEYS
     public required Guid IdentityUserId { get; set; }
     public required Guid CompanyId { get; set; }
-    public required Guid JobTitleId { get; set; }
+    public Guid? JobTitleId { get; set; }
 
     public Guid? SubDepartmentId { get; set; }
     public bool IsActive { get; set; }

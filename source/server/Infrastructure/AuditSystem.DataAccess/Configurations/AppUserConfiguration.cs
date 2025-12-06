@@ -22,7 +22,7 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
               builder.Property(u => u.UserName).IsRequired();
               builder.Property(u => u.IdentityUserId).IsRequired();
               builder.Property(u => u.CompanyId).IsRequired();
-              builder.Property(u => u.JobTitleId).IsRequired();
+              builder.Property(u => u.JobTitleId).IsRequired(false);
               builder.Property(u => u.IsActive).IsRequired();
 
               // Optional

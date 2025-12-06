@@ -147,19 +147,19 @@ internal sealed class JobTitleService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId)
+    public async Task<PaginationResult<JobTitleModel>> SearchByUserIdAsync(string? searchTerm, Page page, Guid userId, Guid? companyId)
     {
         JobTitleValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
         var user = await _validationHelper.ValidateUserAsync(userId);
 
-        var companyId = user.CompanyId;
+        var targetCompanyId = companyId ?? user.CompanyId;
 
-        _logger.LogDebug("Searching job titles for user {UserId} with term: {SearchTerm} and location: {LocationId}",
-            userId, searchTerm ?? "(none)", companyId.ToString() ?? "(none)");
+        _logger.LogDebug("Searching job titles for user {UserId} with term: {SearchTerm} and company: {CompanyId}",
+            userId, searchTerm ?? "(none)", targetCompanyId.ToString() ?? "(none)");
 
-        var (cacheKey, countCacheKey) = _searchHelper.GetCompanySearchCacheKeys(companyId, searchTerm, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetCompanySearchCacheKeys(targetCompanyId, searchTerm, page);
 
         var cachedResult = await GetFromCacheAsync<JobTitleModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
@@ -167,7 +167,7 @@ internal sealed class JobTitleService(
             _logger.LogDebug(JobTitleConstants.RetrievedJobTitleSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetCompanySearchFromRepositoryAsync(companyId, searchTerm, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetCompanySearchFromRepositoryAsync(targetCompanyId, searchTerm, page, cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<JobTitleModel>> SearchAsync(string? name, Page page)

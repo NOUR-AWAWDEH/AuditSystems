@@ -11,7 +11,7 @@ export function useJobTitles() {
     error.value = null;
 
     try {
-      const result = await getJobTitlesRepository.getJobTitles(companyId, searchTerm);
+      const result = await getJobTitlesRepository.getJobTitles({ companyId, searchTerm });
 
       if (result.success) {
         jobTitles.value = result.result?.items || [];

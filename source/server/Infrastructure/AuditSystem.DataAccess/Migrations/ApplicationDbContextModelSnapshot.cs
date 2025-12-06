@@ -753,7 +753,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid>("JobTitleId")
+                    b.Property<Guid?>("JobTitleId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("LastName")
@@ -1362,8 +1362,7 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasOne("AuditSystem.Domain.Entities.Organization.JobTitle", "JobTitle")
                         .WithMany("Users")
                         .HasForeignKey("JobTitleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("AuditSystem.Domain.Entities.Users.Role", null)
                         .WithMany("Users")

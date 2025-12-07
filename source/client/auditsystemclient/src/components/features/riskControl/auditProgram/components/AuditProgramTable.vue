@@ -76,6 +76,24 @@
               </span>
             </template>
 
+            <template #cell-actionOwnerEmail="{ item }">
+              <span class="text-sm text-gray-700">
+                {{ item.actionOwner?.email || "N/A" }}
+              </span>
+            </template>
+
+            <template #cell-actionOwnerJobTitle="{ item }">
+              <span class="text-sm text-gray-700">
+                {{ item.actionOwner?.jobTitle?.name || "N/A" }}
+              </span>
+            </template>
+
+            <template #cell-actionOwnerSubDepartment="{ item }">
+              <span class="text-sm text-gray-700">
+                {{ item.actionOwner?.subDepartment?.name || "N/A" }}
+              </span>
+            </template>
+
             <template #cell-actions="{ item }">
               <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
@@ -138,6 +156,33 @@
                 </div>
                 <div class="text-gray-900 text-sm font-medium">
                   {{ item.actionOwner?.firstName }} {{ item.actionOwner?.lastName }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Email
+                </div>
+                <div class="text-gray-900 text-sm font-medium">
+                  {{ item.actionOwner?.email || "N/A" }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Job Title
+                </div>
+                <div class="text-gray-900 text-sm font-medium">
+                  {{ item.actionOwner?.jobTitle?.name || "N/A" }}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Sub Department
+                </div>
+                <div class="text-gray-900 text-sm font-medium">
+                  {{ item.actionOwner?.subDepartment?.name || "N/A" }}
                 </div>
               </div>
 
@@ -306,6 +351,9 @@ const handleSelectAuditProgram = (auditProgram) => {
 const auditProgramColumns = [
   { key: "description", label: "Description" },
   { key: "actionOwner", label: "Action Owner" },
+  { key: "actionOwnerEmail", label: "Email" },
+  { key: "actionOwnerJobTitle", label: "Job Title" },
+  { key: "actionOwnerSubDepartment", label: "Sub Department" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
 

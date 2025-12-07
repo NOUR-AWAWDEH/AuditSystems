@@ -10,7 +10,7 @@
 
         <!-- Modal -->
         <div
-          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+          class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 transform transition-all"
         >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
@@ -32,7 +32,7 @@
               <div>
                 <label
                   for="audit-program-description"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-sm font-medium text-secondary-shade mb-1"
                 >
                   Audit Program Description *
                 </label>
@@ -134,6 +134,7 @@ const errors = ref({
 
 onMounted(async () => {
   await getActionOwnersByAdminId();
+  console.table(actionOwners.value);
 });
 
 watch(
@@ -199,6 +200,8 @@ const handleSubmit = async () => {
               firstName: selectedActionOwner.firstName,
               lastName: selectedActionOwner.lastName,
               email: selectedActionOwner.email,
+              jobTitle: selectedActionOwner.jobTitle,
+              subDepartment: selectedActionOwner.subDepartment,
             }
           : null,
       };

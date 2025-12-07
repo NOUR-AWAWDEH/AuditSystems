@@ -3,7 +3,7 @@
     <!-- Desktop Table View -->
     <div class="hidden md:block">
       <div class="overflow-x-auto shadow-md rounded-lg border border-gray-200">
-        <table class="w-full text-sm text-left text-gray-base table-fixed">
+        <table class="w-full text-sm text-left text-gray-base table-auto">
           <thead class="text-xs text-white uppercase bg-secondary-base">
             <tr>
               <th v-if="showSrNo" class="px-6 py-4 w-16 border-r border-gray-300">#</th>
@@ -14,7 +14,7 @@
               >
                 {{ column.label }}
               </th>
-              <th v-if="actions.length > 0" class="px-6 py-4">Actions</th>
+              <th v-if="actions.length > 0" class="px-6 py-4 min-w-1">Actions</th>
             </tr>
           </thead>
 

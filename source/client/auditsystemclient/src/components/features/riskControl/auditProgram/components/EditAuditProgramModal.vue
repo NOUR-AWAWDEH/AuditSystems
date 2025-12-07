@@ -11,7 +11,7 @@
 
         <!-- Modal -->
         <div
-          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+          class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 transform transition-all"
         >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">

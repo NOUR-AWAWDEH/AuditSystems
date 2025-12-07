@@ -5,12 +5,12 @@
       <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
-          @click="$emit('close')"
+          @click="emit('close')"
         ></div>
 
         <!-- Modal -->
         <div
-          class="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all"
+          class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 transform transition-all"
         >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
@@ -18,7 +18,7 @@
               Add Audit Program
             </h3>
             <button
-              @click="$emit('close')"
+              @click="emit('close')"
               class="text-gray-base hover:text-gray-shade focus:outline-none"
             >
               <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
@@ -32,7 +32,7 @@
               <div>
                 <label
                   for="audit-program-description"
-                  class="block text-sm font-medium text-gray-700"
+                  class="block text-sm font-medium text-secondary-shade mb-1"
                 >
                   Audit Program Description *
                 </label>
@@ -199,6 +199,8 @@ const handleSubmit = async () => {
               firstName: selectedActionOwner.firstName,
               lastName: selectedActionOwner.lastName,
               email: selectedActionOwner.email,
+              jobTitle: selectedActionOwner.jobTitle,
+              subDepartment: selectedActionOwner.subDepartment,
             }
           : null,
       };

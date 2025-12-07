@@ -2,8 +2,18 @@
   <!--CustomSelect.vue-->
   <div class="custom-select" :class="{ 'is-open': isOpen }">
     <label v-if="label" :for="id" class="block text-sm font-semibold text-secondary-base mb-2">
-      <svg class="inline w-4 h-4 mr-1 text-secondary-base" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+      <svg
+        class="inline w-4 h-4 mr-1 text-secondary-base"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 9l4-4 4 4m0 6l-4 4-4-4"
+        ></path>
       </svg>
       {{ label }}
     </label>
@@ -18,8 +28,9 @@
         @focus="handleFocus"
         @blur="handleBlur"
         class="w-full px-4 py-3 pr-10 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 appearance-none bg-white text-gray-900 text-sm font-medium cursor-pointer"
+        :class="selectClass"
       >
-        <option v-if="placeholder" value="" disabled class="text-gray-500">
+        <option v-if="placeholder" value="" disabled class="text-secondary-base">
           {{ placeholder }}
         </option>
         <option
@@ -40,14 +51,24 @@
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
         </svg>
       </div>
     </div>
 
     <div v-if="error" class="flex items-center mt-2 text-sm text-red-600">
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
       </svg>
       {{ error }}
     </div>
@@ -55,74 +76,80 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object],
-    default: ''
+    default: "",
   },
   options: {
     type: Array,
-    required: true
+    required: true,
   },
   label: {
     type: String,
-    default: ''
+    default: "",
   },
   placeholder: {
     type: String,
-    default: 'Select an option'
+    default: "Select an option",
   },
   disabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   required: {
     type: Boolean,
-    default: false
+    default: false,
   },
   error: {
     type: String,
-    default: ''
+    default: "",
   },
   valueKey: {
     type: String,
-    default: 'value'
+    default: "value",
   },
   labelKey: {
     type: String,
-    default: 'label'
-  }
+    default: "label",
+  },
+  selectClass: {
+    type: String,
+    default: "",
+  },
 });
 
-const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur']);
+const emit = defineEmits(["update:modelValue", "change", "focus", "blur"]);
 
 const id = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`);
 const isOpen = ref(false);
 
 const getOptionValue = (option) => {
-  return typeof option === 'object' ? option[props.valueKey] : option;
+  return typeof option === "object" ? option[props.valueKey] : option;
 };
 
 const getOptionLabel = (option) => {
-  return typeof option === 'object' ? option[props.labelKey] : option;
+  return typeof option === "object" ? option[props.labelKey] : option;
 };
 
 const handleChange = (event) => {
-  const value = getOptionValue(props.options.find(opt => getOptionValue(opt).toString() === event.target.value));
-  emit('update:modelValue', value);
-  emit('change', value);
+  const value = getOptionValue(
+    props.options.find((opt) => getOptionValue(opt).toString() === event.target.value)
+  );
+  emit("update:modelValue", value);
+  emit("change", value);
 };
 
 const handleFocus = () => {
   isOpen.value = true;
-  emit('focus');
+  emit("focus");
 };
 
 const handleBlur = () => {
   isOpen.value = false;
-  emit('blur');
+  emit("blur");
 };
 </script>
 

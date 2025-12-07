@@ -5,7 +5,7 @@
       <div v-if="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           class="absolute inset-0 bg-gray-500 bg-opacity-80 transition-opacity"
-          @click="$emit('close')"
+          @click="emit('close')"
         ></div>
 
         <!-- Modal -->
@@ -18,7 +18,7 @@
               Add Audit Program
             </h3>
             <button
-              @click="$emit('close')"
+              @click="emit('close')"
               class="text-gray-base hover:text-gray-shade focus:outline-none"
             >
               <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
@@ -134,7 +134,6 @@ const errors = ref({
 
 onMounted(async () => {
   await getActionOwnersByAdminId();
-  console.table(actionOwners.value);
 });
 
 watch(

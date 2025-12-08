@@ -13,8 +13,8 @@ export const deleteJobTitleByIdRepository = {
       const response = await api.delete(`${JOB_TITLE_BASE_ENDPOINT}${DELETE_JOB_TITLE_ENDPOINT}`, {
         data: { id: jobTitleId },
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -44,13 +44,11 @@ export const deleteJobTitleByIdRepository = {
       }
 
       if (error.response?.status === 400) {
-        // Extract server error message properly
         const serverMessage = responseData?.message || responseData?.title || responseData?.detail || "Bad request";
         const errors = responseData?.errors || [{ message: serverMessage }];
         return ApiResponseT.badRequest(errors, serverMessage);
       }
 
-      // Handle other server errors
       const serverMessage = responseData?.message || responseData?.title || error.message || "An unexpected error occurred while deleting location.";
       return ApiResponseT.serverError(
         [{ message: serverMessage }],

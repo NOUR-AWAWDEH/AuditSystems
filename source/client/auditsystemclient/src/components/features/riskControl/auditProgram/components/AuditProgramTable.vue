@@ -78,19 +78,19 @@
 
             <template #cell-actionOwnerEmail="{ item }">
               <span class="text-sm text-gray-700">
-                {{ item.actionOwner?.email || "N/A" }}
+                {{ item.actionOwner?.email || "Not Assigned yet" }}
               </span>
             </template>
 
             <template #cell-actionOwnerJobTitle="{ item }">
               <span class="text-sm text-gray-700">
-                {{ item.actionOwner?.jobTitle?.name || "N/A" }}
+                {{ item.actionOwner?.jobTitle?.name || "Not Assigned yet" }}
               </span>
             </template>
 
             <template #cell-actionOwnerSubDepartment="{ item }">
               <span class="text-sm text-gray-700">
-                {{ item.actionOwner?.subDepartment?.name || "N/A" }}
+                {{ item.actionOwner?.subDepartment?.name || "Not Assigned yet" }}
               </span>
             </template>
 
@@ -164,7 +164,7 @@
                   Email
                 </div>
                 <div class="text-gray-900 text-sm font-medium">
-                  {{ item.actionOwner?.email || "N/A" }}
+                  {{ item.actionOwner?.email || "Not Assigned yet" }}
                 </div>
               </div>
 
@@ -173,7 +173,7 @@
                   Job Title
                 </div>
                 <div class="text-gray-900 text-sm font-medium">
-                  {{ item.actionOwner?.jobTitle?.name || "N/A" }}
+                  {{ item.actionOwner?.jobTitle?.name || "Not Assigned yet" }}
                 </div>
               </div>
 
@@ -182,7 +182,7 @@
                   Sub Department
                 </div>
                 <div class="text-gray-900 text-sm font-medium">
-                  {{ item.actionOwner?.subDepartment?.name || "N/A" }}
+                  {{ item.actionOwner?.subDepartment?.name || "Not Assigned yet" }}
                 </div>
               </div>
 

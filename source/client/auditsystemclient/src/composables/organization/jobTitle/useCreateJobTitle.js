@@ -4,34 +4,73 @@ import { createJobTitleRepository } from "@/services/organization/JobTitle/creat
 export function useCreateJobTitle() {
   const isCreating = ref(false);
   const error = ref(null);
+  const createdJobTitle = ref(null);
+
+  const handleCreateSuccess = (response) => {
+    createdJobTitle.value = response;
+    return { success: true, data: response };
+  };
+
+    const handleCreateFailure = (response, defaultErrorMessage = "Failed to create location") => {
+      const errorMessage = response?.errors?.length
+        ? response.errors[0].message
+        : response?.message || defaultErrorMessage;
+
+      error.value = errorMessage;
+
+      return {
+        success: false,
+        message: errorMessage,
+        errors: response?.errors || [{ message: errorMessage }],
+      };
+    };
+
+    const validateJobTitleData = (jobTitleData) => {
+      if (!jobTitleData.name?.trim()) {
+        return "job-Title name is required";
+      }
+      if (!jobTitleData.companyId) {
+        return "Company ID is required";
+      }
+      return null;
+    };
 
   const createJobTitle = async (jobTitleData) => {
-    isCreating.value = true;
-    error.value = null;
-
     try {
+      isCreating.value = true;
+      error.value = null;
+      createdJobTitle.value = null;
+
+      // Validate input data
+      const validationError = validateJobTitleData(jobTitleData);
+      if (validationError) {
+        return handleCreateFailure({ message: validationError });
+      }
+
       const result = await createJobTitleRepository.createJobTitle(jobTitleData);
 
       if (result.success) {
-        return { success: true, data: result.result };
+        return handleCreateSuccess(result);
       } else {
-        const errorMsg = result.message || "Failed to create job title";
-        error.value = errorMsg;
-        return { success: false, message: errorMsg, errors: result.errors };
+        return handleCreateFailure(result);
       }
     } catch (err) {
-      const errorMsg = err.message || "An error occurred while creating job title";
-      error.value = errorMsg;
-      console.error("Error creating job title:", err);
-      return { success: false, message: errorMsg };
+      return handleCreateFailure(err, err.message || "Create failed");
     } finally {
       isCreating.value = false;
     }
   };
 
+  const clearState = () => {
+    error.value = null;
+    createdJobTitle.value = null;
+  };
+
   return {
     isCreating,
     error,
+    createdJobTitle,
     createJobTitle,
+    clearState,
   };
 }

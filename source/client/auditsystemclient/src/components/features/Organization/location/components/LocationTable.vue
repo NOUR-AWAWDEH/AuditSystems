@@ -99,7 +99,6 @@
             </div>
           </template>
 
-          <!-- Card Actions (Now at bottom) -->
           <template #card-actions="{ item }">
             <div class="flex w-full justify-start gap-2 mt-2 flex-wrap">
               <!-- Select -->

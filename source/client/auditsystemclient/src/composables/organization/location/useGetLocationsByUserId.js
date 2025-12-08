@@ -12,16 +12,16 @@ export function useGetLocationsByUserId() {
     error.value = null;
 
     try {
-      
+
       const result = await getLocationsByUserIdRepository.getLocationsByUserId();
-      
+
       if (result.success) {
         locations.value = result.result || [];
       } else {
         const errorMsg = result.message || 'Failed to fetch locations';
         error.value = errorMsg;
         console.error('Failed to fetch locations:', errorMsg);
-        console.error('Full error result:', result); // Add this line
+        console.error('Full error result:', result);
       }
     } catch (err) {
       error.value = err.message || 'An error occurred while fetching locations';

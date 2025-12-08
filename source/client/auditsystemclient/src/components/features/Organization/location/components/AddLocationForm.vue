@@ -149,33 +149,18 @@ const handleAddLocation = async () => {
   const result = await createLocation(locationData);
 
   if (result.success) {
-    // Merge the returned data with the original data to ensure full object
     const fullLocation = {
       id: result.data.result.locationId,
       ...locationData,
     };
+
     showNotification(`Location "${fullLocation.name}" has been added successfully!`, "success");
-    emit("location-added", fullLocation); // emit the full location object
+    emit("location-added", fullLocation);
     resetForm();
     showAddForm.value = false;
   } else {
-    error.value = result?.message || "Failed to create location";
+    showNotification(`Failed to add Location. ${result.message || ""}`, "error");
+    error.value =result?.message || "Failed to create location";
   }
 };
 </script>
-
-<style scoped>
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.3s ease;
-  max-height: 500px;
-  overflow: hidden;
-}
-
-.slide-down-enter-from,
-.slide-down-leave-to {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>

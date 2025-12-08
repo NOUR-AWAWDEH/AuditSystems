@@ -29,6 +29,7 @@ namespace AuditSystem.DataAccess.Configurations
                 {
                     Id = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
                     Name = "FUTURE-LINKS",
+                    CreatedAt = new DateTime(2026, 1, 1, 1, 1, 1)
                 }
             );
 

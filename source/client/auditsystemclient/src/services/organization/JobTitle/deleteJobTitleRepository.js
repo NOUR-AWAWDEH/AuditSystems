@@ -3,7 +3,7 @@ import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
 const JOB_TITLE_BASE_ENDPOINT = "/api/JobTitle";
-const DELETE_JOB_TITLE_ENDPOINT = "/delete-jobtitle-by-id";
+const DELETE_JOB_TITLE_ENDPOINT = "/delete-job-title-by-id";
 
 export const deleteJobTitleByIdRepository = {
   async deleteJobTitleById(jobTitleId) {
@@ -13,20 +13,25 @@ export const deleteJobTitleByIdRepository = {
       const response = await api.delete(`${JOB_TITLE_BASE_ENDPOINT}${DELETE_JOB_TITLE_ENDPOINT}`, {
         data: { id: jobTitleId },
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
-      if (response.status === 204 || response?.success !== false) {
-        return ApiResponseT.ok(null, "Job title deleted successfully");
+      const { data, status } = response;
+
+      if (status === 204 || (status === 200 && data?.success !== false)) {
+        return ApiResponseT.ok(null, data?.successMessage || "Job title deleted successfully");
       }
 
-      const errors = Array.isArray(response.errors)
-        ? response.errors
-        : [{ message: response.successMessage || "Delete failed" }];
-      return ApiResponseT.badRequest(errors, response.successMessage);
+      const errors = data?.errors || [{ message: data?.message || "Delete failed" }];
+      return ApiResponseT.badRequest(errors, data?.message || "Delete failed");
+
     } catch (error) {
+      console.error("Error deleting location:", error);
+
+      const responseData = error.response?.data;
+
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: "Authentication required. Please log in again." }],
@@ -34,28 +39,21 @@ export const deleteJobTitleByIdRepository = {
         );
       }
 
+      if (error.response?.status === 404) {
+        return ApiResponseT.notFound([{ message: "Location not found" }], "Location not found");
+      }
+
       if (error.response?.status === 400) {
-        // Extract server error message properly
-        const responseData = error.response?.data;
-        const serverMessage =
-          responseData?.message || responseData?.title || responseData?.detail || "Bad request";
+        const serverMessage = responseData?.message || responseData?.title || responseData?.detail || "Bad request";
         const errors = responseData?.errors || [{ message: serverMessage }];
         return ApiResponseT.badRequest(errors, serverMessage);
       }
 
-      if (error.response?.status === 404) {
-        return ApiResponseT.notFound([{ message: "Job title not found" }], "Job title not found");
-      }
-
-      // Handle other server errors
-      const responseData = error.response?.data;
-      const serverMessage =
-        responseData?.message ||
-        responseData?.title ||
-        error.message ||
-        "An unexpected error occurred while deleting job title.";
-
-      return ApiResponseT.serverError([{ message: serverMessage }], "Server error");
+      const serverMessage = responseData?.message || responseData?.title || error.message || "An unexpected error occurred while deleting location.";
+      return ApiResponseT.serverError(
+        [{ message: serverMessage }],
+        "Server error"
+      );
     }
   },
 };

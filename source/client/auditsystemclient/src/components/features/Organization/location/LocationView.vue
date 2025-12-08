@@ -1,10 +1,10 @@
 <template>
   <!--LocationView.vue-->
   <div class="space-y-6">
-    <!-- Add Location Modal -->
+    <!-- Add Location Form -->
     <AddLocationForm
       :is-visible="showAddLocationModal"
-      :companyId="companyId"
+      :company-id="companyId"
       @close="handleCloseAddLocationModal"
       @location-added="handleLocationAdded"
     />
@@ -93,9 +93,3 @@ defineExpose({
   refreshData,
 });
 </script>
-
-<style scoped>
-.location-table .table-row {
-  transition: all 0.2s ease;
-}
-</style>

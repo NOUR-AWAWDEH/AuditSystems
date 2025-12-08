@@ -233,6 +233,7 @@ namespace AuditSystem.DataAccess.Migrations
                         new
                         {
                             Id = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2026, 1, 1, 1, 1, 1, 0, DateTimeKind.Unspecified),
                             Name = "FUTURE-LINKS"
                         });
                 });
@@ -303,36 +304,42 @@ namespace AuditSystem.DataAccess.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "System Administrator"
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "Audit Manager"
                         },
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "Senior Auditor"
                         },
                         new
                         {
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "Auditor"
                         },
                         new
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "Risk Manager"
                         },
                         new
                         {
                             Id = new Guid("66666666-6666-6666-6666-666666666666"),
                             CompanyId = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
+                            CreatedAt = new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc),
                             Name = "Compliance Officer"
                         });
                 });

@@ -7,20 +7,13 @@ const UPDATE_JOB_TITLE_ENDPOINT = "/update-job-title";
 
 export const updateJobTitleByIdRepository = {
   async updateJobTitle(jobTitleData) {
-    let responseData = null;
     try {
       const token = authService.getLocalToken();
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
 
       const payload = {
         id: jobTitleData.id,
         name: jobTitleData.name,
-        companyId:
-          typeof jobTitleData.companyId === "object"
-            ? jobTitleData.companyId.value || jobTitleData.companyId.id
-            : jobTitleData.companyId,
+        companyId: jobTitleData.companyId,
       };
 
       const response = await api.put(
@@ -34,21 +27,28 @@ export const updateJobTitleByIdRepository = {
         }
       );
 
-      const { data, status } = response;
-      responseData = data;
-
-      if (status === 200 && data?.success !== false) {
-        return ApiResponseT.ok(null, data?.successMessage || "Job title updated successfully.");
+      if (response.data && response.status === 200) {
+        if (response.data.success) {
+          return ApiResponseT.ok(
+            null,
+            response.data.successMessage || "Job-Title updated successfully."
+          );
+        } else {
+          return ApiResponseT.badRequest(
+            response.data.errors || [
+              { message: response.data.successMessage || "Failed to update Job-Title." },
+            ],
+            response.data.successMessage || "Failed to update Job-Title."
+          );
+        }
       }
 
-      const errors = Array.isArray(data?.errors)
-        ? data.errors
-        : [{ message: data?.successMessage || "Update failed" }];
-      console.error("Update job title failed with errors:", errors);
-      return ApiResponseT.badRequest(errors, data?.successMessage || "Failed to update job title.");
+      return ApiResponseT.badRequest(
+        [{ message: "Unexpected response format" }],
+        "Failed to update Job-Title"
+      );
     } catch (error) {
-      responseData = error.response?.data;
-      console.error("Error updating job title:", error);
+      console.error("Update Job-Title error:", error);
 
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
@@ -58,18 +58,18 @@ export const updateJobTitleByIdRepository = {
       }
 
       if (error.response?.status === 400) {
-        const errors = responseData?.errors || [
-          { message: responseData?.message || "Bad request" },
+        const errors = error.response?.errors || [
+          { message: error.response?.message || "Bad request" },
         ];
-        return ApiResponseT.badRequest(errors, responseData?.message || "Bad request");
+        return ApiResponseT.badRequest(errors, error.response?.message || "Bad request");
       }
 
       if (error.response?.status === 404) {
-        return ApiResponseT.notFound([{ message: "Job title not found" }], "Job title not found");
+        return ApiResponseT.notFound([{ message: "Job-Title not found" }], "Job-Title not found");
       }
 
       return ApiResponseT.serverError(
-        [{ message: error.message || "An unexpected error occurred while updating job title." }],
+        [{ message: error.message || "An unexpected error occurred while updating Job-Title." }],
         "Server error"
       );
     }

@@ -21,6 +21,9 @@ export const authStorage = {
   hasToken() {
     return !!this.getToken();
   },
+  getCompanyId() {
+    return localStorage.getItem("companyId");
+  },
 };
 
 // 🔧 SINGLETON: Create shared reactive state outside the function
@@ -72,7 +75,7 @@ export function useAuthStatus() {
   };
 
   // Computed property to extract companyId from authStatus
-  const companyId = computed(() => authStatus.value?.companyId);
+  const companyId = computed(() => authStatus.value?.companyId || authStorage.getCompanyId());
 
   return {
     authStatus,

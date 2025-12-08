@@ -62,7 +62,7 @@
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Job Title Name
+                  {{ jobTitleColumns[0].label }}
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
                   {{ item.name }}
@@ -71,7 +71,7 @@
 
               <div>
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Created At
+                  {{ jobTitleColumns[1].label }}
                 </div>
                 <div class="text-gray-400 text-xs font-medium">
                   {{ formatDateSimple(item.createdAt) }}
@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed} from "vue";
 import JobTitleHeader from "./JobTitleHeader.vue"
 import ReusableTable from "@/components/common/ReusableTable.vue";
 import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";

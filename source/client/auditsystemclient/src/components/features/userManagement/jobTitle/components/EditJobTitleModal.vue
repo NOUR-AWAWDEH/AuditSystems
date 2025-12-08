@@ -31,7 +31,7 @@
           </BaseButton>
           <BaseButton
             @click="handleSubmit"
-            :disabled="isUpdating || !formData.name.trim() || !jobTitle?.companyId"
+            :disabled="isUpdating || !formData.name.trim() || (!jobTitle?.companyId && !companyId)"
             :is-loading="isUpdating"
             class="px-4 py-2 bg-primary-base text-white rounded-md hover:bg-primary-shade disabled:opacity-50"
           >
@@ -58,6 +58,10 @@ const props = defineProps({
   jobTitle: {
     type: Object,
     default: null,
+  },
+  companyId: {
+    type: String,
+    default: "",
   },
 });
 
@@ -87,7 +91,7 @@ const handleSubmit = async () => {
   const result = await updateJobTitle({
     id: props.jobTitle.id,
     name: formData.value.name.trim(),
-    companyId: props.jobTitle.companyId,
+    companyId: props.jobTitle.companyId || props.companyId,
   });
 
   if (result.success) {

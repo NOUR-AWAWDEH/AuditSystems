@@ -17,7 +17,7 @@ export function useJobTitleActions(jobTitles, emit) {
 
   // Add job title actions
   const handleAddJobTitle = async () => {
-    showAddJobTitleModal.value = false;
+    showAddJobTitleModal.value = true;
   };
 
   const handleCloseAddJobTitleModal = () => {

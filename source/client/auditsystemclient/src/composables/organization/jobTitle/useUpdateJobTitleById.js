@@ -17,9 +17,7 @@ export function useUpdateJobTitleById() {
 
     try {
       // Note: userId is automatically injected due to UserAware pattern
-      const result = await updateJobTitleByIdRepository.updateJobTitleById(
-        jobTitleData
-      );
+      const result = await updateJobTitleByIdRepository.updateJobTitle(jobTitleData);
 
       if (result.success) {
         return {
@@ -33,8 +31,7 @@ export function useUpdateJobTitleById() {
         return { success: false, message: errorMsg, errors: result.errors };
       }
     } catch (err) {
-      const errorMsg =
-        err.message || "An error occurred while updating Job Title";
+      const errorMsg = err.message || "An error occurred while updating Job Title";
       error.value = errorMsg;
       return { success: false, message: errorMsg };
     } finally {

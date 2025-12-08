@@ -8,6 +8,9 @@
       <h2 class="text-xl font-semibold mb-4 text-secondary-shade">Edit Job Title</h2>
 
       <form @submit.prevent="handleSubmit">
+        <div v-if="updateError" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+          {{ updateError }}
+        </div>
         <div class="mb-4">
           <label for="edit-name" class="block text-sm font-medium text-secondary-base mb-2">
             Job Title Name
@@ -31,7 +34,7 @@
           </BaseButton>
           <BaseButton
             @click="handleSubmit"
-            :disabled="isUpdating || !formData.name.trim() || (!jobTitle?.companyId && !companyId)"
+            :disabled="isButtonDisabled"
             :is-loading="isUpdating"
             class="px-4 py-2 bg-primary-base text-white rounded-md hover:bg-primary-shade disabled:opacity-50"
           >
@@ -45,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import BaseInput from "@/components/base/BaseInput.vue";
 import BaseButton from "@/components/base/BaseButton.vue";
 import { useUpdateJobTitleById } from "@/composables/organization/jobTitle/useUpdateJobTitleById";
@@ -67,7 +70,7 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "job-title-updated"]);
 
-const { isUpdating, updateJobTitle } = useUpdateJobTitleById();
+const { isUpdating, updateJobTitle, error: updateError } = useUpdateJobTitleById();
 
 const formData = ref({
   name: "",
@@ -84,6 +87,12 @@ watch(
   },
   { immediate: true }
 );
+
+const isButtonDisabled = computed(() => {
+  const isNameEmpty = !formData.value.name.trim();
+  const isCompanyIdMissing = !props.jobTitle?.companyId && !props.companyId;
+  return isUpdating.value || isNameEmpty || isCompanyIdMissing;
+});
 
 const handleSubmit = async () => {
   if (!props.jobTitle?.id) return;

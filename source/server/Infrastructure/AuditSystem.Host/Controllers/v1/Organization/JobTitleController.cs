@@ -23,14 +23,14 @@ namespace AuditSystem.Host.Controllers.v1.Organization;
 public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create JobTitle
-    [HttpPost("create-jobtitle")]
+    [HttpPost("create-job-title")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<CreateJobTitleCommandResponse>), StatusCodes.Status201Created)]
     public async Task<IActionResult> CreateJobTitle([FromBody] CreateJobTitleCommand command) =>
         await ProcessRequestToActionResultAsync(command);
 
     //Update JobTitle
-    [HttpPut("update-jobtitle")]
+    [HttpPut("update-job-title")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -38,7 +38,7 @@ public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(m
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Get JobTitle By Id
-    [HttpGet("get-jobtitle-by-id")]
+    [HttpGet("get-job-title-by-id")]
     [ProducesResponseType(typeof(ApiResponse<List<GetJobTitleByIdQueryResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -46,7 +46,7 @@ public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(m
         await ProcessRequestToActionResultAsync(query);
 
     //Get JobTitle By User Id
-    [HttpGet("get-jobtitles-by-user-id")]
+    [HttpGet("get-job-titles-by-user-id")]
     [ProducesResponseType(typeof(ApiResponse<List<GetJobTitlesByUserIdQueryResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -54,7 +54,7 @@ public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(m
         await ProcessRequestToActionResultAsync(query);
 
     //Delete JobTitle
-    [HttpDelete("delete-jobtitle-by-id")]
+    [HttpDelete("delete-job-title-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -62,7 +62,7 @@ public sealed class JobTitleController(IMediator mediator) : ApiControllerBase(m
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
 
     //Search JobTitle
-    [HttpGet("search-jobtitles-by-user-id")]
+    [HttpGet("search-job-titles-by-user-id")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<JobTitleModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchJobTitle([FromQuery] SearchJobTitleQuery query) =>

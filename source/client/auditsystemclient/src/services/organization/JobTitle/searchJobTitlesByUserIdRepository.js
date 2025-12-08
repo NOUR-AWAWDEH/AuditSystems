@@ -3,7 +3,7 @@ import authService from "@/services/auth/authRepos/authService";
 import api from "@/services/api/api";
 
 const JOB_TITLE_BASE_ENDPOINT = "/api/JobTitle";
-const SEARCH_JOB_TITLE_BY_USER_ID_ENDPOINT = "/search-jobtitles-by-user-id";
+const SEARCH_JOB_TITLE_BY_USER_ID_ENDPOINT = "/search-job-titles-by-user-id";
 
 export const searchJobTitlesByUserIdRepository = {
   async searchJobTitlesByUserId(searchParams = {}) {

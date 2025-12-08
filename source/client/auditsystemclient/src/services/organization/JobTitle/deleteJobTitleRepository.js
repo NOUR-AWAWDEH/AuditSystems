@@ -3,7 +3,7 @@ import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
 const JOB_TITLE_BASE_ENDPOINT = "/api/JobTitle";
-const DELETE_JOB_TITLE_ENDPOINT = "/delete-jobtitle-by-id";
+const DELETE_JOB_TITLE_ENDPOINT = "/delete-job-title-by-id";
 
 export const deleteJobTitleByIdRepository = {
   async deleteJobTitleById(jobTitleId) {

@@ -8,6 +8,7 @@ const SupportingDocManager = () =>
   import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
 const Organization = () => import("@/components/features/Organization/OrganizationView.vue");
 const RiskControl = () => import("@/components/features/riskControl/RiskControl.vue");
+const UserManagement = () => import("@/components/features/userManagement/UserManagementVue.vue");
 
 const routes = [
   {
@@ -67,6 +68,12 @@ const routes = [
     path: "/supporting-docs",
     name: "SupportingDocs",
     component: SupportingDocManager,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/user-management",
+    name: "UserManagement",
+    component: UserManagement,
     meta: { requiresAuth: true },
   },
 ];

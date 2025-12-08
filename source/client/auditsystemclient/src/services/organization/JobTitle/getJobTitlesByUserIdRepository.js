@@ -3,7 +3,7 @@ import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
 const JOB_TITLE_BASE_ENDPOINT = "/api/JobTitle";
-const GET_JOB_TITLES_BY_USER_ID_ENDPOINT = "/get-jobtitles-by-user-id";
+const GET_JOB_TITLES_BY_USER_ID_ENDPOINT = "/get-job-titles-by-user-id";
 
 export const getJobTitlesByUserIdRepository = {
   async getJobTitlesByUserId() {

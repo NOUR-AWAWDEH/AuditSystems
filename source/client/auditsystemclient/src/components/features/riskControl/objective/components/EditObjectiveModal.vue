@@ -97,12 +97,27 @@ watch([() => props.isVisible, () => props.objective], ([newVisible, newObjective
   }
 });
 
+const validateForm = () => {
+  errors.value = {
+    description: "",
+  };
+
+  let isValid = true;
+
+  if (!formData.value.description.trim()) {
+    errors.value.description = "Objective description is required";
+    isValid = false;
+  }
+
+  return isValid;
+};
+
 const resetForm = () => {
   formData.value = {
-    description: ''
+    description: "",
   };
   errors.value = {
-    description: ''
+    description: "",
   };
 
   resetState();
@@ -124,69 +139,59 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
-  // Check if user is authenticated
   if (!authStatus.value) {
-    console.error('Authentication status not loaded');
-    showNotification('Authentication required. Please refresh the page and try again.', 'error');
+    console.error("Authentication status not loaded");
+    showNotification("Authentication required. Please refresh the page and try again.", "error");
     return;
   }
 
   if (!props.objective?.id) {
-    console.error('Missing objective ID:', props.objective);
-    showNotification('Objective ID is required', 'error');
+    console.error("Missing objective ID:", props.objective);
+    showNotification("Objective ID is required", "error");
     return;
   }
 
   if (!validateForm()) {
-    console.error('Form validation failed:', errors.value);
+    console.error("Form validation failed:", errors.value);
     return;
   }
 
   try {
     const objectiveData = {
-        id: props.objective?.id,
-        riskControlMatrixId: props.objective?.riskControlMatrixId,
-        description: formData.value.description.trim(),
-        createdAt: props.objective?.createdAt,
-        updatedAt: new Date().toISOString()
-      };
-
+      id: props.objective?.id,
+      riskControlMatrixId: props.objective?.riskControlMatrixId,
+      description: formData.value.description.trim(),
+      createdAt: props.objective?.createdAt,
+      updatedAt: new Date().toISOString(),
+    };
 
     const result = await updateObjective(objectiveData);
 
     if (result?.success) {
       const updatedObjectiveData = {
         ...objectiveData,
-        ...result.data
+        ...result.data,
       };
 
-      showNotification(`Objective "${updatedObjectiveData.description}" has been updated successfully!`, 'success');
-      emit('objective-updated', updatedObjectiveData);
-      emit('close');
+      showNotification(
+        `Objective "${updatedObjectiveData.description}" has been updated successfully!`,
+        "success"
+      );
+      emit("objective-updated", updatedObjectiveData);
+      emit("close");
     } else {
-      const errorMessage = result?.message || error.value || 'Failed to update objective. Please try again.';
-      showNotification(errorMessage, 'error');
+      const errorMessage =
+        result?.message || error.value || "Failed to update objective. Please try again.";
+      showNotification(errorMessage, "error");
     }
   } catch (err) {
-    console.error('Error in handleSubmit:', err);
-    const errorMessage = err.response?.data?.message || err.message || 'Failed to update objective. Please try again.';
-    showNotification(errorMessage, 'error');
+    console.error("Error in handleSubmit:", err);
+    const errorMessage =
+      err.response?.data?.message ||
+      err.message ||
+      "Failed to update objective. Please try again.";
+    showNotification(errorMessage, "error");
   }
-};
-
-const validateForm = () => {
-  errors.value = {
-    description: ''
-  };
-
-  let isValid = true;
-
-  if (!formData.value.description.trim()) {
-    errors.value.description = 'Objective description is required';
-    isValid = false;
-  }
-
-  return isValid;
 };
 
 </script>

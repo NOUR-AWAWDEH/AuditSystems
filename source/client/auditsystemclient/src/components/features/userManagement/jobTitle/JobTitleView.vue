@@ -1,12 +1,10 @@
 <template>
-  <!-- JobTitle.vue -->
-  <div>
-    <JobTitleHeader />
-
     <!-- Add Job Title Form -->
-    <AddJobTitle
+    <AddJobTitleForm
+      :is-visible="showAddJobTitleModal"
       :company-id="companyId"
-      @jobtitle-added="handleJobTitleAdded"
+      @close="handleCloseAddJobTitleModal"
+      @job-title-added="handleJobTitleAdded"
     />
 
     <!-- Job Title Table -->
@@ -14,18 +12,18 @@
       :job-titles="jobTitles"
       :is-loading="isLoading"
       :search-query="searchQuery"
-      @search="handleSearch"
+      :handle-search="handleSearch"
       @edit-job-title="handleEditJobTitle"
       @delete-job-title="handleDeleteJobTitle"
     />
 
     <!-- Edit Job Title Modal -->
-    <EditJobTitle
+    <EditJobTitleModal
       v-if="showEditJobTitleModal"
       :is-visible="showEditJobTitleModal"
       :job-title="jobTitleToEdit"
       @close="handleCloseEditJobTitleModal"
-      @jobtitle-updated="handleJobTitleUpdated"
+      @job-title-updated="handleJobTitleUpdated"
     />
 
     <!-- Confirmation Dialog -->
@@ -39,20 +37,18 @@
       @confirm="confirmDelete"
       @cancel="cancelDelete"
     />
-  </div>
 </template>
 
 <script setup>
 import JobTitleTable from "./components/JobTitleTable.vue";
-import AddJobTitle from "./components/AddJobTitle.vue";
-import EditJobTitle from "./components/EditJobTitle.vue";
+import AddJobTitleForm from "./components/AddJobTitleForm.vue";
+import EditJobTitleModal from "./components/EditJobTitleModal.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
-import JobTitleHeader from "./components/JobTitleHeader.vue";
 import { useJobTitleTable } from "./composables/useJobTitleTable";
 import { useJobTitleActions } from "./composables/useJobTitleActions";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
 
-const {companyId } = useAuthStatus();
+const {companyId} = useAuthStatus();
 
 const emit = defineEmits([
   "job-title-added",
@@ -60,15 +56,18 @@ const emit = defineEmits([
   "job-title-deleted"
 ]);
 
-const { jobTitles, isLoading, searchQuery, handleSearch, resetToDefaultView, refreshData } = useJobTitleTable();
+const { jobTitles, isLoading, searchQuery, handleSearch, resetToDefaultView, refreshData } =
+  useJobTitleTable();
 
 const {
+  showAddJobTitleModal,
   showEditJobTitleModal,
   jobTitleToEdit,
   showDeleteDialog,
   deleteDialogTitle,
   deleteDialogMessage,
   itemToDelete,
+  handleCloseAddJobTitleModal,
   handleJobTitleAdded,
   handleEditJobTitle,
   handleCloseEditJobTitleModal,

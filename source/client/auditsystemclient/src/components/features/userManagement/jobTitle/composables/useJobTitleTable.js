@@ -1,5 +1,5 @@
 import { watch, onMounted } from "vue";
-import { useSearchJobTitles } from "@/composables/organization/jobTitle/useSearchJobTitles";
+import { useSearchJobTitlesByUserId } from "@/composables/organization/jobTitle/useSearchJobTitlesByUserId";
 import { useGetJobTitlesByUserId } from "@/composables/organization/jobTitle/useGetJobTitlesByUserId";
 import { useSearchAndPagination } from "@/composables/common/pagination/useSearchAndPagination";
 
@@ -9,11 +9,19 @@ export function useJobTitleTable() {
     isLoading,
     totalCount,
     searchJobTitles,
-  } = useSearchJobTitles();
+  } = useSearchJobTitlesByUserId();
 
-  const { jobTitles: allJobTitles, fetchJobTitles } = useGetJobTitlesByUserId();
+  const {
+    jobTitles: allJobTitles,
+    getJobTitlesByUserId
+  } = useGetJobTitlesByUserId();
 
-  const { searchQuery, currentPage, pageSize, handleSearch } = useSearchAndPagination();
+  const {
+    searchQuery,
+    currentPage,
+    pageSize,
+    handleSearch
+  } = useSearchAndPagination();
 
   const refreshData = async () => {
     if (searchQuery.value.trim()) {
@@ -23,7 +31,7 @@ export function useJobTitleTable() {
         pageSize: pageSize.value
       });
     } else {
-      await fetchJobTitles();
+      await getJobTitlesByUserId();
       jobTitles.value = allJobTitles.value || [];
     }
   };
@@ -44,6 +52,6 @@ export function useJobTitleTable() {
     pageSize,
     totalCount,
     handleSearch,
-    refreshData,
+    refreshData
   };
 }

@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { searchJobTitlesByUserIdRepository } from "@/services/organization/JobTitle/searchJobTitlesByUserIdRepository";
 
-export function useSearchJobTitles() {
+export function useSearchJobTitlesByUserId() {
   const jobTitles = ref([]);
   const isLoading = ref(false);
   const error = ref(null);

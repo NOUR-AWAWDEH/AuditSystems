@@ -1,7 +1,7 @@
 <template>
   <!--LocationView.vue-->
   <div class="space-y-6">
-    <!-- Add Location Modal -->
+    <!-- Add Location Form -->
     <AddLocationForm
       :is-visible="showAddLocationModal"
       :company-id="companyId"

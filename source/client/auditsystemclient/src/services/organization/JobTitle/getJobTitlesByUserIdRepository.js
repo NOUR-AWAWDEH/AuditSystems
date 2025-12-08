@@ -16,22 +16,35 @@ export const getJobTitlesByUserIdRepository = {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
-          }
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
         }
       );
 
-      if (response.data?.success && response.data?.result) {
+      if (response.status === 200) {
+        const jobTitles = response.data?.result?.jobTitles || [];
+
         return ApiResponseT.ok(
-          response.data.result,
-          response.data.successMessage || "Job titles retrieved successfully."
+          jobTitles,
+          response.data?.successMessage || "JobTitles fetched successfully."
         );
       }
 
       return ApiResponseT.badRequest(
-        response.data?.errors || [{ message: "Failed to retrieve job titles." }],
-        response.data?.successMessage || "Failed to retrieve job titles."
+        response?.errors || [{ message: response?.data?.successMessage || "Failed to fetch job-titles." }],
+        response?.data?.successMessage || "Failed to fetch locations."
       );
+
     } catch (error) {
+      if (error.response?.status === 400) {
+        return ApiResponseT.badRequest(
+          error.response?.data?.errors || [{ message: error.response?.data?.successMessage || "Bad request" },],
+          error.response?.data?.successMessage || "Bad request"
+        );
+      }
+
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: "Authentication required. Please log in again." }],
@@ -39,20 +52,12 @@ export const getJobTitlesByUserIdRepository = {
         );
       }
 
-      if (error.response?.status === 400) {
-        const errors = error.response?.data?.errors || [
-          {
-            message: error.response?.data?.successMessage || "Bad request",
-          },
-        ];
-        return ApiResponseT.badRequest(
-          errors,
-          error.response?.data?.successMessage || "Bad request"
-        );
+      if (error.response?.status === 404) {
+        return ApiResponseT.ok([], "No locations found");
       }
 
       return ApiResponseT.serverError(
-        [{ message: error.message || "An unexpected error occurred while retrieving job titles." }],
+        [{ message: error.message || "An unexpected error occurred while fetching job-titles." }],
         "Server error"
       );
     }

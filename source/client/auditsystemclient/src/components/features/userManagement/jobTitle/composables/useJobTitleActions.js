@@ -1,12 +1,13 @@
 import { ref } from "vue";
-import { useDeleteJobTitle } from "@/composables/organization/jobTitle/useDeleteJobTitle";
+import { useDeleteJobTitleById } from "@/composables/organization/jobTitle/useDeleteJobTitleById";
 import { useNotification } from "@/composables/notification/useNotification";
 
 export function useJobTitleActions(jobTitles, emit) {
-  const { deleteJobTitleById } = useDeleteJobTitle();
+  const { deleteJobTitle } = useDeleteJobTitleById();
   const { showNotification } = useNotification();
 
   // Modal states
+  const showAddJobTitleModal = ref(false);
   const showEditJobTitleModal = ref(false);
   const jobTitleToEdit = ref(null);
   const showDeleteDialog = ref(false);
@@ -15,12 +16,20 @@ export function useJobTitleActions(jobTitles, emit) {
   const itemToDelete = ref(null);
 
   // Add job title actions
+  const handleAddJobTitle = async () => {
+    showAddJobTitleModal.value = false;
+  };
+
+  const handleCloseAddJobTitleModal = () => {
+    showAddJobTitleModal.value = false;
+  };
+
   const handleJobTitleAdded = async (newJobTitle) => {
     jobTitles.value.push(newJobTitle);
     emit("job-title-added", newJobTitle);
+    handleCloseAddJobTitleModal();
   };
 
-  // Job title actions
   const handleEditJobTitle = (jobTitle) => {
     jobTitleToEdit.value = jobTitle;
     showEditJobTitleModal.value = true;
@@ -41,7 +50,6 @@ export function useJobTitleActions(jobTitles, emit) {
       }
 
       emit("job-title-updated", updatedJobTitle);
-
       showNotification(
         `Job title "${updatedJobTitle.name}" has been updated successfully!`,
         "success"
@@ -66,7 +74,7 @@ export function useJobTitleActions(jobTitles, emit) {
     if (!itemToDelete.value) return;
 
     const deletedJobTitle = { ...itemToDelete.value };
-    const result = await deleteJobTitleById(deletedJobTitle.id);
+    const result = await deleteJobTitle(deletedJobTitle.id);
 
     if (result.success) {
       // Remove the deleted job title from the local list
@@ -79,7 +87,6 @@ export function useJobTitleActions(jobTitles, emit) {
         `Job title "${deletedJobTitle.name}" has been deleted successfully!`,
         "success"
       );
-
 
       emit("job-title-deleted", deletedJobTitle.id);
     } else {
@@ -97,6 +104,7 @@ export function useJobTitleActions(jobTitles, emit) {
 
   return {
     // Modal states
+    showAddJobTitleModal,
     showEditJobTitleModal,
     jobTitleToEdit,
     showDeleteDialog,
@@ -105,6 +113,8 @@ export function useJobTitleActions(jobTitles, emit) {
     itemToDelete,
 
     // Action handlers
+    handleAddJobTitle,
+    handleCloseAddJobTitleModal,
     handleJobTitleAdded,
     handleEditJobTitle,
     handleCloseEditJobTitleModal,

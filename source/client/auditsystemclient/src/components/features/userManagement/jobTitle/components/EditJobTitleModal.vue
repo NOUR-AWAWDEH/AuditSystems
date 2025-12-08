@@ -48,7 +48,7 @@
 import { ref, watch } from "vue";
 import BaseInput from "@/components/base/BaseInput.vue";
 import BaseButton from "@/components/base/BaseButton.vue";
-import { useUpdateJobTitle } from "@/composables/organization/jobTitle/useUpdateJobTitle";
+import { useUpdateJobTitleById } from "@/composables/organization/jobTitle/useUpdateJobTitleById";
 
 const props = defineProps({
   isVisible: {
@@ -63,7 +63,7 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "job-title-updated"]);
 
-const { isUpdating, updateJobTitle } = useUpdateJobTitle();
+const { isUpdating, updateJobTitle } = useUpdateJobTitleById();
 
 const formData = ref({
   name: "",

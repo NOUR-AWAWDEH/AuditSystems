@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { updateJobTitleByIdRepository } from "@/services/organization/JobTitle/updateJobTitleByIdRepository";
 
-export function useUpdateJobTitle() {
+export function useUpdateJobTitleById() {
   const isUpdating = ref(false);
   const error = ref(null);
   const updatedJobTitle = ref(null);
@@ -12,13 +12,13 @@ export function useUpdateJobTitle() {
   };
 
   const handleUpdateFailure = (response, defaultErrorMessage = 'Failed to update job title') => {
-        const errorMessage = response?.errors?.length > 0 
+        const errorMessage = response?.errors?.length > 0
             ? response.errors[0]?.message
             : response?.successMessage || defaultErrorMessage;
 
         error.value = errorMessage;
 
-        return { 
+        return {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
@@ -29,7 +29,7 @@ export function useUpdateJobTitle() {
         if (!jobTitleData.id) {
             return 'Job Title ID is required';
         }
-        
+
         if (!jobTitleData.name) {
             return 'Job Title name is required';
         }
@@ -46,14 +46,14 @@ export function useUpdateJobTitle() {
             isUpdating.value = true;
             error.value = null;
             updateJobTitle.value = null;
-            
+
             const validationError = validateUpdateJobTitle(jobTitleData);
             if (validationError) {
                 return handleUpdateFailure({ message: validationError });
             }
 
             const response = await updateJobTitleByIdRepository.updateJobTitleById(jobTitleData);
-            
+
             if (response?.success) {
                 return handleUpdateSuccess(response);
             } else {

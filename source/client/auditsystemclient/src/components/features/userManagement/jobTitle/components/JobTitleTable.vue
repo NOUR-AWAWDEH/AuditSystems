@@ -1,27 +1,23 @@
 <template>
+  <!--JobTitleTable.vue-->
   <div>
     <!-- Job Title Container -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
       <div class="p-3 sm:p-4 md:p-6">
-        <!-- Header -->
+        <!-- Header with title and Filters -->
         <div class="flex flex-col gap-4 mb-6">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xl font-semibold text-secondary-base">Job Titles</h3>
-          </div>
+          <JobTitleHeader />
 
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="w-full sm:w-auto">
+          <div class="flex flex-col sm:flex-row sm:items-end gap-3">
               <SearchFilter
-                :search="searchQueryInternal"
-                :search-placeholder="'Search job titles...'"
-                @update:search="handleSearchInternal"
-                class="w-full sm:w-auto"
+                :search="searchQuery"
+                :searchPlaceholder="'Search job titles...'"
+                @update:search="handleSearch"
+                class="w-full sm:w-auto md:w-1/2"
               />
-            </div>
           </div>
         </div>
 
-        <!-- Desktop Table -->
         <div class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="jobTitles"
@@ -31,14 +27,9 @@
             :no-data-message="noDataMessage"
             class="job-title-table min-w-full"
           >
-            <template #cell-name="{ item }">
-              <span class="text-sm font-medium text-secondary-shade">
-                {{ item.name }}
-              </span>
-            </template>
-
             <template #cell-actions="{ item }">
               <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
+
                 <button
                   @click.stop="$emit('edit-job-title', item)"
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
@@ -52,7 +43,7 @@
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
                   <DeleteIcon size="sm" custom-class="mr-1" />
-                  Delete
+                  <span>Delete</span>
                 </button>
               </div>
             </template>
@@ -95,8 +86,7 @@
                 @click.stop="$emit('edit-job-title', item)"
                 class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
               >
-                <EditIcon size="sm" class="mr-1" />
-                Edit
+                <EditIcon size="sm" class="mr-1" /> Edit
               </button>
 
               <button
@@ -109,36 +99,30 @@
             </div>
           </template>
         </ReusableMobileCardList>
+      </div>
 
-        <!-- No results while searching -->
-        <div
-          v-if="searchQuery && jobTitles.length === 0 && !isLoading"
-          class="text-center py-4 border-t border-gray-200"
-        >
-          <button
-            @click="handleSearch('')"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-all duration-200"
-          >
-            <CloseIcon size="sm" stroke-width="3" class="mr-1" />
-            Clear Search
-          </button>
-        </div>
+        <!-- Loading -->
+        <div v-if="isLoading" class="text-center py-8">
+          <div
+            class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-base">
+          </div>
+        <p class="mt-2 text-gray-600 text-sm">Loading data...</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
+import JobTitleHeader from "./JobTitleHeader.vue"
 import ReusableTable from "@/components/common/ReusableTable.vue";
 import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import EditIcon from "@/components/common/icons/EditIcon.vue";
 import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
-import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 
-defineProps({
+const props = defineProps({
   jobTitles: {
     type: Array,
     default: () => [],
@@ -157,7 +141,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["add-job-title", "edit-job-title", "delete-job-title", "search"]);
+defineEmits(["add-job-title", "edit-job-title", "delete-job-title"]);
 
 const jobTitleColumns = [
   { key: "name", label: "Job Title Name" },
@@ -168,17 +152,35 @@ const enhancedColumns = computed(() => {
   return [...jobTitleColumns, { key: "actions", label: "Actions" }];
 });
 
-const searchQueryInternal = ref("");
+const noDataMessage = computed(() =>
+ props.searchQuery
+    ? `No Locations found for "${props.searchQuery}".`
+    : "No Locations found yet. Please add a location."
+);
 
-const handleSearchInternal = (query) => {
-  searchQueryInternal.value = query;
-  emit("search", query);
-};
-
-const noDataMessage = computed(() => {
-  if (searchQueryInternal.value) {
-    return `No Job Titles found for "${searchQueryInternal.value}".`;
-  }
-  return "No Job Titles found. Create one to get started.";
-});
 </script>
+
+<style scoped>
+.job-title-table .table-row {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.job-title-table .table-row:hover {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.job-title-table .table-row.selected {
+  background-color: #eff6ff;
+  border-left: 4px solid #3b82f6;
+}
+
+@media (max-width: 767px) {
+  .job-title-table .table-row:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+</style>

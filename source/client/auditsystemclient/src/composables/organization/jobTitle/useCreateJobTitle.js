@@ -54,6 +54,7 @@ export function useCreateJobTitle() {
       } else {
         return handleCreateFailure(result);
       }
+      
     } catch (err) {
       return handleCreateFailure(err, err.message || "Create failed");
     } finally {

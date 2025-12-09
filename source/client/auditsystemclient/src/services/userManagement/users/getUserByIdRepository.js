@@ -10,27 +10,30 @@ export const getUserByIdRepository = {
       const token = authService.getLocalToken();
 
       const response = await api.get(API_ENDPOINT, {
+        params: { id: userId },
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-        },
-        params: {
-          id: userId,
-        },
+        }
       });
 
       const { data, status } = response;
 
-      if (status === 200 && data?.success) {
-        return ApiResponseT.ok(data.result, data.successMessage || "User retrieved successfully");
+      if (status === 200 && data?.success && data?.result) {
+        return ApiResponseT.ok(
+          data.result,
+          data.successMessage || "User retrieved successfully"
+        );
       }
 
       return ApiResponseT.badRequest(
-        data?.errors || [{ message: data?.successMessage || "Failed to retrieve user" }],
-        data?.successMessage || "Failed to retrieve user."
+        data?.errors || [{ message: data?.message || "Failed to retrieve user" }],
+        data?.message || "Failed to retrieve user."
       );
+
     } catch (error) {
       console.error("Get user by id error:", error);
+      
       const responseData = error.response?.data;
 
       if (error.response?.status === 401) {
@@ -40,13 +43,13 @@ export const getUserByIdRepository = {
         );
       }
 
-      if (error.response?.status === 400 || error.response?.status === 404) {
+      if (error.response?.status === 400) {
         const errors = responseData?.errors || [
-          { message: responseData?.successMessage || "Failed to retrieve user" },
+          { message: responseData?.message || "Bad request" },
         ];
         return ApiResponseT.badRequest(
           errors,
-          responseData?.successMessage || "Failed to retrieve user"
+          responseData?.message || "Bad request"
         );
       }
 

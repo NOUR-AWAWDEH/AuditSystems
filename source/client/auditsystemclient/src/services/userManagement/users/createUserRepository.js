@@ -9,6 +9,7 @@ export const createUserRepository = {
   async createUser(userData) {
     try {
       const token = authService.getLocalToken();
+      const companyId = authService.getLocalCompanyId();
 
       const payload = {
         userName: userData.userName,
@@ -18,7 +19,7 @@ export const createUserRepository = {
         firstName: userData.firstName,
         lastName: userData.lastName,
         roleName: userData.roleName,
-        companyId: userData.companyId,
+        companyId: companyId,
         jobTitleId: userData.jobTitleId || null,
         subDepartmentId: userData.subDepartmentId || null,
       };
@@ -37,13 +38,17 @@ export const createUserRepository = {
       const { data, status } = response;
 
       if (status === 201 && data?.success) {
-        return ApiResponseT.ok(data.result, data.successMessage || "User created successfully");
+        return ApiResponseT.ok(
+          data.result,
+          data.successMessage || "User created successfully"
+        );
       }
 
       return ApiResponseT.badRequest(
         data?.errors || [{ message: data?.successMessage || "Failed to create user" }],
         data?.successMessage || "Failed to create user."
       );
+      
     } catch (error) {
       console.error("Create user error:", error);
       const responseData = error.response?.data;

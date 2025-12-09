@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuditSystem.Domain.Entities.Users;
+using AuditSystem.Application.Features.Users.Search;
 
 namespace AuditSystem.Host.Controllers.v1.Users;
 
@@ -30,7 +31,7 @@ public sealed class UsersController(IMediator mediator) : ApiControllerBase(medi
         await ProcessRequestToActionResultAsync(command);
 
     //Delete User
-    [HttpDelete("delete-user")]
+    [HttpDelete("delete-user-by-id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
@@ -69,4 +70,11 @@ public sealed class UsersController(IMediator mediator) : ApiControllerBase(medi
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command) =>
         await ProcessRequestToActionNoContentResultAsync<Result>(command);
+
+    //Search Users by Admin Id
+    [HttpGet("search-users-by-admin-id")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SearchUsersByAdminId([FromQuery] SearchUsersQuery query) =>
+        await ProcessRequestToActionResultAsync(query);
 }

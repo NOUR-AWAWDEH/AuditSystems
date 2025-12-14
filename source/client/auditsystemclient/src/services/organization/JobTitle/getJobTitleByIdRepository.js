@@ -18,7 +18,6 @@ export const getJobTitleByIdRepository = {
         },
       });
 
-      // Fix: Access response.data and response.status correctly
       const { data, status } = response;
 
       if (status === 200 && data?.success && data?.result) {
@@ -32,6 +31,7 @@ export const getJobTitleByIdRepository = {
         data?.errors || [{ message: data?.message || "Failed to retrieve job title." }],
         data?.message || "Failed to retrieve job title."
       );
+      
     } catch (error) {
       console.error("Error fetching job title:", error);
 

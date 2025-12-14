@@ -16,7 +16,7 @@ bld/
 
 # ignore uplode folder
 uploads/
-Test/
+#Test/
 # Visual Studio files
 .vs/
 *.user

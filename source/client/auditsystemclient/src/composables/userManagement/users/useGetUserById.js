@@ -8,38 +8,52 @@ export const useGetUserById = () => {
 
   const handleSuccess = (response) => {
     user.value = response.result;
-    return {
-      success: true,
-      data: response.result,
-      message: response.successMessage || "User retrieved successfully.",
-    };
+    const message = response?.successMessage || "User retrieved successfully.";
+    return { success: true, data: response.result, message };
   };
 
   const handleFailure = (response, defaultErrorMessage = "Failed to retrieve user") => {
-    const errorMessage = response?.errors?.length
-      ? response.errors[0].message
-      : response?.message || defaultErrorMessage;
+    const errorMessage = response?.errors?.length > 0
+        ? response.errors[0].message
+        : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    return {
+
+    const failureResult = {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
     };
+
+    return failureResult;
   };
 
-  const fetchUserById = async (userId) => {
-    isLoading.value = true;
-    error.value = null;
-    user.value = null;
+  const validateGetUser = (userId) => {
+    if (!userId) {
+      return "User ID is required";
+    }
+    return null;
+  };
 
+  const getUserById = async (userId) => {
     try {
+      isLoading.value = true;
+      error.value = null;
+      user.value = null;
+
+      const validationError = validateGetUser(userId);
+      if (validationError) {
+        return handleFailure({ message: validationError });
+      }
+
       const response = await getUserByIdRepository.getUserById(userId);
+      
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
+
     } catch (err) {
       return handleFailure(err, err.message || "Failed to retrieve user");
     } finally {
@@ -47,10 +61,17 @@ export const useGetUserById = () => {
     }
   };
 
+  const resetState = () => {
+    isLoading.value = false;
+    error.value = null;
+    user.value = null;
+  }
+
   return {
     isLoading,
     error,
     user,
-    fetchUserById,
+    getUserById,
+    resetState,
   };
 };

@@ -33,6 +33,7 @@ export const updateJobTitleByIdRepository = {
             null,
             response.data.successMessage || "Job-Title updated successfully."
           );
+          
         } else {
           return ApiResponseT.badRequest(
             response.data.errors || [

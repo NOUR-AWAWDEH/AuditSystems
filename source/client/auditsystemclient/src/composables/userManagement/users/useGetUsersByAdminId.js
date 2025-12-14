@@ -8,17 +8,15 @@ export const useGetUsersByAdminId = () => {
 
   const handleSuccess = (response) => {
     users.value = response.result;
-    return {
-      success: true,
-      data: response.result,
-      message: response.successMessage || "Users retrieved successfully.",
-    };
+    const message = response.successMessage || "Users retrieved successfully.";
+    
+    return { success: true, data: response.result, message };
   };
 
   const handleFailure = (response, defaultErrorMessage = "Failed to retrieve users") => {
-    const errorMessage = response?.errors?.length
-      ? response.errors[0].message
-      : response?.message || defaultErrorMessage;
+    const errorMessage = response?.errors?.length > 0
+        ? response.errors[0].message
+        : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
     return {
@@ -28,18 +26,20 @@ export const useGetUsersByAdminId = () => {
     };
   };
 
-  const fetchUsers = async () => {
+  const getUsers = async () => {
     isLoading.value = true;
     error.value = null;
     users.value = [];
 
     try {
       const response = await getUsersByAdminIdRepository.getAllUsers();
+      
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
+
     } catch (err) {
       return handleFailure(err, err.message || "Failed to retrieve users");
     } finally {
@@ -51,6 +51,6 @@ export const useGetUsersByAdminId = () => {
     isLoading,
     error,
     users,
-    fetchUsers,
+    getUsers,
   };
 };

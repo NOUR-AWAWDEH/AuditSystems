@@ -2,37 +2,57 @@ import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
-const API_ENDPOINT = "/api/Users/get-users-by-admin-id";
+const USER_BASE_API_ENDPOINT = "/api/Users";
+const GET_USERS_BY_ADMIN_ID_ENDPOINT = "/get-users-by-admin-id";
 
 export const getUsersByAdminIdRepository = {
-  async getAllUsers() {
+  async getUsersByAdminId() {
     try {
       const token = authService.getLocalToken();
 
-      const response = await api.get(API_ENDPOINT, {
+      const response = await api.get(`${USER_BASE_API_ENDPOINT}${GET_USERS_BY_ADMIN_ID_ENDPOINT}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
 
-      const { data, status } = response;
+      if (response.status === 200) {
+        const users = response.data?.result?.users || [];
 
-      if (status === 200 && data?.success) {
-        return ApiResponseT.ok(data.result, data.successMessage || "Users retrieved successfully");
+        return ApiResponseT.ok(
+          users,
+          response.data?.successMessage || "Users retrieved successfully"
+        );
       }
 
       return ApiResponseT.badRequest(
-        data?.errors || [{ message: data?.successMessage || "Failed to retrieve users" }],
-        data?.successMessage || "Failed to retrieve users."
+        response?.data?.errors || [{ message: response?.data?.successMessage || "Failed to retrieve users" }],
+        response?.data?.successMessage || "Failed to retrieve users."
       );
+
     } catch (error) {
-      console.error("Get users by admin id error:", error);
+      if (error.response?.status === 400) {
+        return ApiResponseT.badRequest(
+          error.response?.data?.errors || [{ message: error.response?.data?.successMessage || "Bad request" }],
+          error.response?.data?.successMessage || "Bad request"
+        );
+      }
 
       if (error.response?.status === 401) {
         return ApiResponseT.unauthorized(
           [{ message: "Authentication required. Please log in again." }],
           "Authentication required"
+        );
+      }
+
+      if (error.response?.status === 404) {
+        return ApiResponseT.ok(
+          [],
+          "No users found"
         );
       }
 

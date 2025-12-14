@@ -16,7 +16,7 @@ export function useUpdateJobTitleById() {
     error.value = null;
 
     try {
-      // Note: userId is automatically injected due to UserAware pattern
+      
       const result = await updateJobTitleByIdRepository.updateJobTitle(jobTitleData);
 
       if (result.success) {

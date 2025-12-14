@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import validatePassword from '@/services/validations/passwordValidation';
+import validatePassword from '@/services/validations/validatePassword';
 import BaseButton from '@/components/base/BaseButton.vue';
 import PasswordInput from '@/components/base/PasswordInput.vue';
 import H2Heading from '@/components/base/H2Heading.vue';

@@ -48,9 +48,8 @@ import BaseParagraph from '@/components/base/BaseParagraph.vue';
 import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
 import SuccessDisplay from '@/components/common/SuccessDisplay.vue';
 import BaseLink from '@/components/base/BaseLink.vue';
-
 import { ref, computed } from 'vue';
-import { validateEmail } from '@/services/validations/emailValidation';
+import { validateEmail } from '@/services/validations/validateEmail';
 import { useForgetPassword } from '@/composables/password/useForgetPassword';
 import { useVerifyResetCode } from '@/composables/password/useVerifyResetCode';
 import { useRouter } from 'vue-router';

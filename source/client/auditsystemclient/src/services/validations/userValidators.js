@@ -1,9 +1,8 @@
 // userValidators.js
-
-import validatePassword from "./passwordValidation";
-import { validateEmail } from "./emailValidation";
-import { validateUsername } from "./userValidation";
-import { isNotAdmin } from "./roleValidation";
+import validatePassword from "./validatePassword";
+import { validateEmail } from "./validateEmail";
+import { validateUsername } from "./validateUsername";
+import { isNotAdmin } from "./validateRole";
 
 const isValidGuid = (guid) => {
   const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

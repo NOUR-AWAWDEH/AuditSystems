@@ -1,38 +1,41 @@
 using AuditSystem.BusinessLogic.Helpers.UserHelpers.AppUserHelpers;
 using AuditSystem.Contract.Interfaces.Repositories;
 using AuditSystem.Domain.Entities.Users;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
+using Xunit;
 
 namespace AuditSystem.UnitTests.Helpers.UserHelpers.AppUserHelpers;
 
 public class AppUserValidationHelperTests
 {
-    private readonly Mock<IRepository<Guid, AppUser>> _mockRepo;
-    private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
+    private readonly IRepository<Guid, AppUser> _mockRepo;
+    private readonly UserManager<ApplicationUser> _mockUserManager;
     private readonly AppUserValidationHelper _helper;
 
     public AppUserValidationHelperTests()
     {
-        _mockRepo = new Mock<IRepository<Guid, AppUser>>();
+        _mockRepo = A.Fake<IRepository<Guid, AppUser>>();
 
-        var store = new Mock<IUserStore<ApplicationUser>>();
-        _mockUserManager = new Mock<UserManager<ApplicationUser>>(
-            store.Object,
-            new Mock<IOptions<IdentityOptions>>().Object,
-            new Mock<IPasswordHasher<ApplicationUser>>().Object,
+
+        // UserManager requires a lot of dependencies in its constructor.
+        // We can pass fakes/nulls for them using WithArgumentsForConstructor.
+        _mockUserManager = A.Fake<UserManager<ApplicationUser>>(options => options.WithArgumentsForConstructor(new object?[] {
+            A.Fake<IUserStore<ApplicationUser>>(),
+            A.Fake<IOptions<IdentityOptions>>(),
+            A.Fake<IPasswordHasher<ApplicationUser>>(),
             new List<IUserValidator<ApplicationUser>>(),
             new List<IPasswordValidator<ApplicationUser>>(),
-            new Mock<ILookupNormalizer>().Object,
+            A.Fake<ILookupNormalizer>(),
             new IdentityErrorDescriber(),
-            new Mock<IServiceProvider>().Object,
-            new Mock<ILogger<UserManager<ApplicationUser>>>().Object
-        );
+            A.Fake<IServiceProvider>(),
+            A.Fake<ILogger<UserManager<ApplicationUser>>>()
+        }));
 
-        _helper = new AppUserValidationHelper(_mockRepo.Object, _mockUserManager.Object);
+        _helper = new AppUserValidationHelper(_mockRepo, _mockUserManager);
     }
 
     [Fact]
@@ -82,9 +85,8 @@ public class AppUserValidationHelperTests
     {
         var userId = Guid.NewGuid();
 
-        _mockRepo
-            .Setup(r => r.GetByIdAsync(userId))
-            .ReturnsAsync((AppUser?)null);
+        A.CallTo(() => _mockRepo.GetByIdAsync(userId))
+            .Returns((AppUser?)null);
 
         var act = async () => await _helper.ValidateAppUserExists(userId);
 
@@ -97,26 +99,14 @@ public class AppUserValidationHelperTests
     [Fact]
     public async Task ValidateAppUserExists_ShouldNotThrow_WhenUserExists()
     {
+        var user = A.Fake<AppUser>();
         var userId = Guid.NewGuid();
-
-        var user = new AppUser
-        {
-            Id = userId,
-            FirstName = "Test",
-            LastName = "User",
-            Email = "test@test.com",
-            Role = "User",
-            IdentityUserId = Guid.NewGuid(),
-            CompanyId = Guid.NewGuid()
-        };
-
-        _mockRepo
-            .Setup(r => r.GetByIdAsync(userId))
-            .ReturnsAsync(user);
+        
+        A.CallTo(() => _mockRepo.GetByIdAsync(userId))
+            .Returns(user);
 
         var act = async () => await _helper.ValidateAppUserExists(userId);
 
         await act.Should().NotThrowAsync();
     }
-
 }

@@ -47,10 +47,11 @@ export const getUserByIdRepository = {
         const errors = responseData?.errors || [
           { message: responseData?.message || "Bad request" },
         ];
-        return ApiResponseT.badRequest(
-          errors,
-          responseData?.message || "Bad request"
-        );
+        return ApiResponseT.badRequest(errors, responseData?.message || "Bad request");
+      }
+
+      if (error.response?.status === 404) {
+        return ApiResponseT.notFound([{ message: "User not found." }], "User not found.");
       }
 
       return ApiResponseT.serverError(

@@ -2,18 +2,18 @@ using AuditSystem.BusinessLogic.Helpers;
 using AuditSystem.Contract.Models.RateLimiting;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moq;
+using FakeItEasy;
 using Xunit;
 
 namespace AuditSystem.UnitTests.Helpers;
 
 public class RateLimitHelperTests
 {
-    private readonly Mock<ILogger> _mockLogger;
+    private readonly ILogger _mockLogger;
 
     public RateLimitHelperTests()
     {
-        _mockLogger = new Mock<ILogger>();
+        _mockLogger = A.Fake<ILogger>();
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class RateLimitHelperTests
         };
 
         // Act
-        var result = RateLimitHelper.IsBlocked(entry, _mockLogger.Object, "127.0.0.1");
+        var result = RateLimitHelper.IsBlocked(entry, _mockLogger, "127.0.0.1");
 
         // Assert
         result.Should().BeTrue();
@@ -42,7 +42,7 @@ public class RateLimitHelperTests
         };
 
         // Act
-        var result = RateLimitHelper.IsBlocked(entry, _mockLogger.Object, "127.0.0.1");
+        var result = RateLimitHelper.IsBlocked(entry, _mockLogger, "127.0.0.1");
 
         // Assert
         result.Should().BeFalse();

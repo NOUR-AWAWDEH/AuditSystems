@@ -11,29 +11,29 @@ export function useCreateJobTitle() {
     return { success: true, data: response };
   };
 
-    const handleCreateFailure = (response, defaultErrorMessage = "Failed to create location") => {
-      const errorMessage = response?.errors?.length
-        ? response.errors[0].message
-        : response?.message || defaultErrorMessage;
+  const handleCreateFailure = (response, defaultErrorMessage = "Failed to create location") => {
+    const errorMessage = response?.errors?.length
+      ? response.errors[0].message
+      : response?.message || defaultErrorMessage;
 
-      error.value = errorMessage;
+    error.value = errorMessage;
 
-      return {
-        success: false,
-        message: errorMessage,
-        errors: response?.errors || [{ message: errorMessage }],
-      };
+    return {
+      success: false,
+      message: errorMessage,
+      errors: response?.errors || [{ message: errorMessage }],
     };
+  };
 
-    const validateJobTitleData = (jobTitleData) => {
-      if (!jobTitleData.name?.trim()) {
-        return "job-Title name is required";
-      }
-      if (!jobTitleData.companyId) {
-        return "Company ID is required";
-      }
-      return null;
-    };
+  const validateJobTitleData = (jobTitleData) => {
+    if (!jobTitleData.name?.trim()) {
+      return "job-Title name is required";
+    }
+    if (!jobTitleData.companyId) {
+      return "Company ID is required";
+    }
+    return null;
+  };
 
   const createJobTitle = async (jobTitleData) => {
     try {
@@ -54,7 +54,7 @@ export function useCreateJobTitle() {
       } else {
         return handleCreateFailure(result);
       }
-      
+
     } catch (err) {
       return handleCreateFailure(err, err.message || "Create failed");
     } finally {
@@ -63,6 +63,7 @@ export function useCreateJobTitle() {
   };
 
   const clearState = () => {
+    isCreating.value = false;
     error.value = null;
     createdJobTitle.value = null;
   };

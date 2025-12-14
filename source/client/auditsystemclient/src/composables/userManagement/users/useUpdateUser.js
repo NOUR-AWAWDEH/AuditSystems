@@ -1,44 +1,56 @@
 import { ref } from "vue";
 import { updateUserRepository } from "@/services/userManagement/users/updateUserRepository";
+import { validateUserData } from "@/services/validations/validateUpdateUserData";
 
 export const useUpdateUser = () => {
   const isUpdating = ref(false);
   const error = ref(null);
-  const updateUserSuccess = ref(null);
+  const updatedUser = ref(null);
 
   const handleSuccess = (response) => {
-    updateUserSuccess.value = true;
-    return {
-      success: true,
-      message: response.successMessage || "User updated successfully.",
-    };
+    updatedUser.value = true;
+    const message = response.message || "User updated successfully.";
+    const data = response.result;
+
+    return { success: true, data ,message};
   };
 
   const handleFailure = (response, defaultErrorMessage = "Failed to update user") => {
-    const errorMessage = response?.errors?.length
-      ? response.errors[0].message
-      : response?.message || defaultErrorMessage;
+    const errorMessage = response?.errors?.length > 0
+        ? response.errors[0].message
+        : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    return {
+    
+    const failureResult = {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
     };
+
+    return failureResult;
   };
 
   const updateUser = async (userData) => {
-    isUpdating.value = true;
-    error.value = null;
-    updateUserSuccess.value = null;
-
     try {
+      isUpdating.value = true;
+      error.value = null;
+      updatedUser.value = null;
+
+      // Validate input data
+      const validationError = validateUserData(userData);
+      if (validationError) {
+        return handleFailure({ message: validationError });
+      }
+
       const response = await updateUserRepository.updateUser(userData);
+
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
+
     } catch (err) {
       return handleFailure(err, err.message || "Failed to update user");
     } finally {
@@ -46,10 +58,17 @@ export const useUpdateUser = () => {
     }
   };
 
+  const clearState = () => {
+    isUpdating.value = false;
+    error.value = null;
+    updatedUser.value = null;
+  };
+
   return {
     isUpdating,
     error,
-    updateUserSuccess,
+    updatedUser,
     updateUser,
+    clearState
   };
 };

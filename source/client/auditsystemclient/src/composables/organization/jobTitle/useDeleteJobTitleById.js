@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { deleteJobTitleByIdRepository } from "@/services/organization/JobTitle/deleteJobTitleRepository";
+import { deleteJobTitleByIdRepository } from "@/services/organization/JobTitle/deleteJobTitleByIdRepository";
 
 export function useDeleteJobTitleById() {
   const isDeleting = ref(false);
@@ -54,6 +54,7 @@ export function useDeleteJobTitleById() {
       } else {
         return handleDeleteFailure(response);
       }
+      
     } catch (error) {
       return handleDeleteFailure(error, error.message || "Failed to delete JobTitle");
     } finally {

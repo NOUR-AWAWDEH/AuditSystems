@@ -1,7 +1,5 @@
 // Object for error responses
-const ApiErrorResponse = {
-  message: ''
-};
+const ApiErrorResponse = { message: '' };
 
 // Non-generic ApiResponse for responses without a result
 class ApiResponse {
@@ -12,43 +10,32 @@ class ApiResponse {
     this.errors = errors;
   }
 
-  // Static factory methods for common responses
   static ok(successMessage = '') {
     return new ApiResponse(true, 200, successMessage);
   }
 
   static badRequest(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponse(false, 400, undefined, errors);
   }
 
   static unauthorized(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponse(false, 401, undefined, errors);
   }
 
   static forbidden(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponse(false, 403, undefined, errors);
   }
 
   static notFound(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponse(false, 404, undefined, errors);
   }
 
   static internalServerError(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponse(false, 500, undefined, errors);
   }
 }
@@ -60,7 +47,7 @@ class ApiResponseT extends ApiResponse {
     this.result = result;
   }
 
-  // Static factory methods for common responses
+  // Success responses
   static ok(result, successMessage = '') {
     return new ApiResponseT(true, 200, result, successMessage);
   }
@@ -69,46 +56,34 @@ class ApiResponseT extends ApiResponse {
     return new ApiResponseT(true, 201, result, successMessage);
   }
 
+  // Error responses
   static badRequest(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponseT(false, 400, undefined, undefined, errors);
   }
 
   static unauthorized(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponseT(false, 401, undefined, undefined, errors);
   }
 
   static forbidden(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponseT(false, 403, undefined, undefined, errors);
   }
 
   static notFound(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponseT(false, 404, undefined, undefined, errors);
   }
 
   static internalServerError(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
+    const errors = Array.isArray(errorMessage) ? errorMessage : [{ message: errorMessage }];
     return new ApiResponseT(false, 500, undefined, undefined, errors);
   }
 
   static serverError(errorMessage) {
-    const errors = Array.isArray(errorMessage)
-      ? errorMessage
-      : [{ message: errorMessage }];
-    return new ApiResponseT(false, 500, undefined, undefined, errors);
+    return super.internalServerError(errorMessage);
   }
 }
 

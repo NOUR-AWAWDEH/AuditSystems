@@ -63,8 +63,8 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { validateUsername } from '@/services/validations/userValidation';
-import validatePassword from '@/services/validations/passwordValidation';
+import { validateUsername } from '@/services/validations/validateUsername';
+import validatePassword from '@/services/validations/validatePassword';
 import { useLogin } from '@/composables/auth/useLogin';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';

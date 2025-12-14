@@ -5,12 +5,8 @@
       Organization Management
     </h1>
     <p class="text-sm text-gray-500 mt-1">
-      Manage your organizational structure including Locations,  and Departments 
+      Manage your organizational structure including Locations,  and Departments
       in a clear hierarchical view.<br/> This helps maintain accurate organizational data and streamlines management.
     </p>
   </div>
 </template>
-
-<script setup>
-// This is a presentational header component for the organization module
-</script>

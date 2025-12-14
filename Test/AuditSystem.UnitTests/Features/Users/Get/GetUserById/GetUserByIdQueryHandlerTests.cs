@@ -4,22 +4,22 @@ using AuditSystem.Contract.Interfaces.ModelServices.UserServices.AppUserServices
 using AuditSystem.Contract.Models.Users;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Moq;
+using FakeItEasy;
 using Xunit;
 
 namespace AuditSystem.UnitTests.Features.Users.Get.GetUserById;
 
 public class GetUserByIdQueryHandlerTests
 {
-    private readonly Mock<IAppUserService> _mockUserService;
-    private readonly Mock<ILogger<GetUserByIdQueryHandler>> _mockLogger;
+    private readonly IAppUserService _mockUserService;
+    private readonly ILogger<GetUserByIdQueryHandler> _mockLogger;
     private readonly GetUserByIdQueryHandler _handler;
 
     public GetUserByIdQueryHandlerTests()
     {
-        _mockUserService = new Mock<IAppUserService>();
-        _mockLogger = new Mock<ILogger<GetUserByIdQueryHandler>>();
-        _handler = new GetUserByIdQueryHandler(_mockUserService.Object, _mockLogger.Object);
+        _mockUserService = A.Fake<IAppUserService>();
+        _mockLogger = A.Fake<ILogger<GetUserByIdQueryHandler>>();
+        _handler = new GetUserByIdQueryHandler(_mockUserService, _mockLogger);
     }
 
     [Fact]
@@ -32,8 +32,8 @@ public class GetUserByIdQueryHandlerTests
 
         var query = new GetUserByIdQuery(userId) { UserId = adminId };
 
-        _mockUserService.Setup(x => x.GetUserByIdAsync(userId, adminId))
-            .ReturnsAsync(expectedUser);
+        A.CallTo(() => _mockUserService.GetUserByIdAsync(userId, adminId))
+            .Returns(expectedUser);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -42,6 +42,6 @@ public class GetUserByIdQueryHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.User.Should().BeEquivalentTo(expectedUser);
 
-        _mockUserService.Verify(x => x.GetUserByIdAsync(userId, adminId), Times.Once);
+        A.CallTo(() => _mockUserService.GetUserByIdAsync(userId, adminId)).MustHaveHappenedOnceExactly();
     }
 }

@@ -2,32 +2,32 @@ import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
-const JOB_TITLE_BASE_ENDPOINT = "/api/JobTitle";
-const DELETE_JOB_TITLE_ENDPOINT = "/delete-job-title-by-id";
+const USER_BASE_API_ENDPOINT = "/api/Users";
+const DELETE_USER_BY_ID_API_ENDPOINT = "/delete-user-by-id";
 
-export const deleteJobTitleByIdRepository = {
-  async deleteJobTitleById(jobTitleId) {
+export const deleteUserByIdRepository = {
+  async deleteUserById(userId) {
     try {
       const token = authService.getLocalToken();
 
-      const response = await api.delete(`${JOB_TITLE_BASE_ENDPOINT}${DELETE_JOB_TITLE_ENDPOINT}`, {
-        data: { id: jobTitleId },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await api.delete(`${USER_BASE_API_ENDPOINT}${DELETE_USER_BY_ID_API_ENDPOINT}`, {
+          data: { id: userId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
       const { data, status } = response;
 
       if (status === 204 || (status === 200 && data?.success !== false)) {
-        return ApiResponseT.ok(null, data?.successMessage || "Job title deleted successfully");
+        return ApiResponseT.ok(null, data?.successMessage || "User deleted successfully");
       }
 
-      const errors = data?.errors || [{ message: data?.message || "Delete failed" }];
-      return ApiResponseT.badRequest(errors, data?.message || "Delete failed");
+      const error = data?.errors || [{ message: data?.successMessage || "Failed to delete user" }];
+      return ApiResponseT.badRequest(error, data?.message || "Delete user failed.");
     } catch (error) {
-      console.error("Error deleting location:", error);
+      console.error("Error deleting user:", error);
 
       const responseData = error.response?.data;
 
@@ -39,7 +39,7 @@ export const deleteJobTitleByIdRepository = {
       }
 
       if (error.response?.status === 404) {
-        return ApiResponseT.notFound([{ message: "Location not found" }], "Location not found");
+        return ApiResponseT.notFound([{ message: "User not found" }], "User not found");
       }
 
       if (error.response?.status === 400) {
@@ -53,7 +53,7 @@ export const deleteJobTitleByIdRepository = {
         responseData?.message ||
         responseData?.title ||
         error.message ||
-        "An unexpected error occurred while deleting location.";
+        "An unexpected error occurred while deleting user.";
       return ApiResponseT.serverError([{ message: serverMessage }], "Server error");
     }
   },

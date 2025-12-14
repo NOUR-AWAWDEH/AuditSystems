@@ -35,11 +35,13 @@ export const useGetActionOwnersByAdminId = () => {
 
     try {
       const response = await getActionOwnersByAdminIdRepository.getActionOwnersByAdminId();
+      
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
+      
     } catch (err) {
       return handleFailure(err, err.message || "Failed to retrieve action owners");
     } finally {

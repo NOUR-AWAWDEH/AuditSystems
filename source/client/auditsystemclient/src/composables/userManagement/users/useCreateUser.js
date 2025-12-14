@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { createUserRepository } from "@/services/userManagement/users/createUserRepository";
-import { userValidators } from "@/services/validations/userValidators";
+import { validateUserData } from "@/services/validations/userValidators";
 
 export const useCreateUser = () => {
   const isCreating = ref(false);
@@ -9,11 +9,12 @@ export const useCreateUser = () => {
 
 
   const handleCreateSuccess = (response) => {
-    createdUser.value = response.success;
-    return {
-      success: true,
-      data: response
-    };
+    createdUser.value = response;
+    const message = response.message || "User created successfully.";
+    const data = response.result;
+    console.log(response);
+    
+    return { success: true, data, message };
   };
 
   const handleCreateFailure = (response, defaultErrorMessage = "Failed to create user") => {
@@ -22,23 +23,26 @@ export const useCreateUser = () => {
       : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
-    return {
+
+    const failureResult = {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
     };
+
+    return failureResult;
   };
 
   const createUser = async (userData) => {
-    isCreating.value = true;
-    error.value = null;
-    createdUser.value = null;
-
     try {
+      isCreating.value = true;
+      error.value = null;
+      createdUser.value = null;
 
-      const validationError = userValidators.validateUserData(userData);
-      if (validationError !== null) {
-        return handleCreateFailure(null, validationError);
+      // Validate input data
+      const validationError = validateUserData(userData);
+      if (validationError) {
+        return handleCreateFailure({ message: validationError });
       }
 
       const response = await createUserRepository.createUser(userData);

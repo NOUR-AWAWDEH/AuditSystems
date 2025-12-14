@@ -2,7 +2,7 @@ using System.Net;
 using AuditSystem.BusinessLogic.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using Moq;
+
 using Xunit;
 
 namespace AuditSystem.UnitTests.Helpers;

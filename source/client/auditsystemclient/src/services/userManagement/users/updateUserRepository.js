@@ -36,6 +36,7 @@ export const updateUserRepository = {
             null,
             response.data.successMessage || "User updated successfully."
           );
+          
         } else {
           return ApiResponseT.badRequest(
             response.data.errors || [

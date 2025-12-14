@@ -29,14 +29,16 @@ export const getActionOwnersByAdminIdRepository = {
         );
       }
 
-      // Handle non-200 responses
+      
       return ApiResponseT.badRequest(
         response?.errors || [
           { message: response?.data?.successMessage || "Failed to fetch action-owners." },
         ],
         response?.data?.successMessage || "Failed to fetch action-owners."
       );
+
     } catch (error) {
+      
       if (error.response?.status === 400) {
         return ApiResponseT.badRequest(
           error.response?.data?.errors || [
@@ -58,9 +60,14 @@ export const getActionOwnersByAdminIdRepository = {
       }
 
       return ApiResponseT.serverError(
-        [{ message: error.message || "An unexpected error occurred while fetching action-owners." }],
+        [
+          {
+            message: error.message || "An unexpected error occurred while fetching action-owners.",
+          },
+        ],
         "Server error"
       );
+
     }
   },
 };

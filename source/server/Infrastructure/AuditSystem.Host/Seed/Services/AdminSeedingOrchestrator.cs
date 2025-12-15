@@ -155,6 +155,11 @@ public class AdminSeedingOrchestrator(
         // Check if ApplicationUser already exists
         var existingIdentityUser = await _userManager.FindByEmailAsync(config.Email);
 
+        if (existingIdentityUser is null)
+        {
+            existingIdentityUser = await _userManager.FindByNameAsync(config.Username);
+        }
+
         if (existingIdentityUser is not null)
         {
             _logger.LogInformation("Admin User is already exists nothing to do!");

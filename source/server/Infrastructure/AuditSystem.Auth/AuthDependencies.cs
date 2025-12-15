@@ -110,6 +110,7 @@ namespace AuditSystem.Auth
             services.AddScoped<IPasswordResetService, PasswordResetService>();
             services.AddScoped<IPasswordTokenService, PasswordTokenService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ISmtpClientFactory, SmtpClientFactory>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAccountService, AccountService>();
 

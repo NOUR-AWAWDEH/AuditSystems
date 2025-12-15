@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\source\server\Core\AuditSystem.Application\AuditSystem.Application.csproj" />
     <ProjectReference Include="..\..\source\server\Core\AuditSystem.BusinessLogic\AuditSystem.BusinessLogic.csproj" />
+    <ProjectReference Include="..\..\source\server\Infrastructure\AuditSystem.Auth\AuditSystem.Auth.csproj" />
   </ItemGroup>
 
 </Project>

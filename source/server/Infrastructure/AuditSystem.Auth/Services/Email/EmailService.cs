@@ -11,11 +11,17 @@ public class EmailService : IEmailService
 {
     private readonly SmtpSettings _config;
     private readonly ILogger<EmailService> _logger;
+    private readonly ISmtpClientFactory _smtpClientFactory;
 
-    public EmailService(IOptions<SmtpSettings> smtpConfig, ILogger<EmailService> logger)
+    public EmailService(
+        IOptions<SmtpSettings> smtpConfig,
+        ILogger<EmailService> logger,
+        ISmtpClientFactory smtpClientFactory)
     {
+        if (smtpConfig == null) throw new ArgumentNullException(nameof(smtpConfig));
         _config = smtpConfig.Value ?? throw new ArgumentNullException(nameof(smtpConfig));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _smtpClientFactory = smtpClientFactory ?? throw new ArgumentNullException(nameof(smtpClientFactory));
     }
 
     public async Task SendEmailAsync(EmailRequest emailRequest)
@@ -80,19 +86,11 @@ public class EmailService : IEmailService
         if (mailMessage.To.Count == 0)
             throw new ArgumentException("No valid email addresses provided.", nameof(recipients));
 
-        using var smtpClient = new SmtpClient
-        {
-            Host = _config.Host,
-            Port = _config.Port,
-            EnableSsl = _config.EnableSsl,
-            UseDefaultCredentials = false,
-            Credentials = new NetworkCredential(_config.SenderAddress, _config.Password),
-            DeliveryMethod = SmtpDeliveryMethod.Network
-        };
+        using var client = _smtpClientFactory.CreateClient();
 
         try
         {
-            await smtpClient.SendMailAsync(mailMessage);
+            await client.SendMailAsync(mailMessage);
             _logger.LogInformation("Email sent successfully to {Recipients}", string.Join(", ", recipients));
         }
         catch (SmtpException ex)
@@ -126,11 +124,11 @@ public class EmailService : IEmailService
                 : WebUtility.HtmlEncode(placeholder.Value.Value ?? string.Empty);
 
             template = template.Replace($"{{{{{placeholder.Key}}}}}", value);
+        }
 
-            if (template.Contains("{{") && template.Contains("}}"))
-            {
-                _logger.LogWarning("Unreplaced placeholders found in email template: {TemplateName}", templateName);
-            }
+        if (template.Contains("{{") && template.Contains("}}"))
+        {
+            _logger.LogWarning("Unreplaced placeholders found in email template: {TemplateName}", templateName);
         }
 
         return template;
@@ -167,41 +165,7 @@ public class EmailService : IEmailService
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty", nameof(email));
 
-        const string subject = "Your Password Has Been Changed";
-        const string body = @"
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                    .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-                    .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 5px 5px; }
-                    .alert { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-                    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
-                </style>
-            </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <h2>Password Changed Successfully</h2>
-                    </div>
-                    <div class='content'>
-                        <p>Hello,</p>
-                        <p>This is a confirmation that your password has been successfully changed.</p>
-                        <div class='alert'>
-                            <strong>⚠️ Security Notice:</strong><br>
-                            If you did not make this change, please contact our support team immediately at support@AuditSystem.com
-                        </div>
-                        <p>For your security, all active sessions have been logged out. Please log in again with your new password.</p>
-                        <p>Best regards,<br>The Audit System Team</p>
-                    </div>
-                    <div class='footer'>
-                        <p>&copy; 2025 Audit System. All rights reserved.</p>
-                    </div>
-                </div>
-            </body>
-            </html>";
-
-        await SendEmailAsync(email, subject, body, isHtml: true);
+        var request = new PasswordChangedEmailRequest(email, "support@AuditSystem.online");
+        await SendEmailAsync(request);
     }
 }

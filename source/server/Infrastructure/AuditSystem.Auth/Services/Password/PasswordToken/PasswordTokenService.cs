@@ -31,4 +31,25 @@ public class PasswordTokenService : IPasswordTokenService
 
         return await _userManager.GeneratePasswordResetTokenAsync(user);
     }
+
+    /// <summary>
+    /// Verifies if a password reset token is valid for the specified user.
+    /// </summary>
+    /// <param name="user">The user to verify the token for.</param>
+    /// <param name="token">The token to verify.</param>
+    /// <returns>True if the token is valid; otherwise, false.</returns>
+    public async Task<bool> VerifyPasswordResetTokenAsync(ApplicationUser user, string token)
+    {
+        if (user == null)
+            throw new ArgumentNullException(nameof(user));
+
+        if (string.IsNullOrWhiteSpace(token))
+            return false;
+
+        return await _userManager.VerifyUserTokenAsync(
+            user,
+            _userManager.Options.Tokens.PasswordResetTokenProvider,
+            UserManager<ApplicationUser>.ResetPasswordTokenPurpose,
+            token);
+    }
 }

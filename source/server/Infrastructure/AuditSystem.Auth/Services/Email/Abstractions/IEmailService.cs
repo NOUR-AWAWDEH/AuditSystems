@@ -1,4 +1,6 @@
-﻿namespace AuditSystem.Auth.Services.Email;
+﻿using AuditSystem.Auth.Services.Email.Models;
+
+namespace AuditSystem.Auth.Services.Email.Abstractions;
 
 public interface IEmailService
 {

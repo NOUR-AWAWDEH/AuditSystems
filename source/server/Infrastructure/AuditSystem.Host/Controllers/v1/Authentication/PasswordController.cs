@@ -1,6 +1,7 @@
 ﻿﻿using AuditSystem.Auth.Dtos.Password;
 using AuditSystem.Auth.Services.Account;
-using AuditSystem.Auth.Services.Email;
+using AuditSystem.Auth.Services.Email.Abstractions;
+using AuditSystem.Auth.Services.Email.Models;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.BusinessLogic.Attributes;
@@ -19,6 +20,7 @@ public sealed class PasswordController(
         IEmailService _emailService,
         IPasswordResetService _passwordResetService,
         IPasswordTokenService _passwordTokenService,
+        IConfiguration _configuration,
         ILogger<PasswordController> _logger) :
         ControllerBase
 {
@@ -54,8 +56,25 @@ public sealed class PasswordController(
             var token = await _passwordTokenService.GeneratePasswordResetTokenAsync(user);
 
             // Build reset URL with encoded token
-            // TODO: Replace with your actual frontend URL
-            var resetUrl = $"{Request.Scheme}://{Request.Host}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
+            // Build reset URL with encoded token
+            var corsOrigins = _configuration["CORS_ALLOWED_ORIGIN"];
+            var clientUrl = corsOrigins?.Split(',', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+
+            // Fallback to ClientUrl in appsettings if CORS_ALLOWED_ORIGIN is not set
+            if (string.IsNullOrEmpty(clientUrl))
+            {
+                clientUrl = _configuration["ClientUrl"];
+            }
+
+            // Fallback to Request.Host
+            if (string.IsNullOrEmpty(clientUrl))
+            {
+                _logger.LogWarning("ClientUrl not configured. Falling back to Request.Host.");
+                clientUrl = $"{Request.Scheme}://{Request.Host}";
+            }
+
+            var resetUrl = $"{clientUrl.TrimEnd('/')}/reset-password?token={token}&email={user.Email!}";
+
 
             // Send password reset email with the secure token link
             await _emailService.SendPasswordResetEmailAsync(user.Email!, resetUrl);
@@ -68,8 +87,62 @@ public sealed class PasswordController(
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occurred during password reset request for email: {Email}", request.Email);
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 ApiResponse.InternalServerError("An unexpected error occurred. Please try again later."));
+        }
+    }
+
+    /// <summary>
+    /// Step 1.5: User verifies the code (token) before setting a new password.
+    /// This is useful for UI feedback before the actual reset call.
+    /// </summary>
+    [HttpPost("verify-reset-code")]
+    [PreventBruteForce]
+    public async Task<ActionResult<ApiResponse<VerifyResetCodeResponseDto>>> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
+    {
+        // Input validation
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Email is required."));
+
+        if (string.IsNullOrWhiteSpace(request.Code))
+            return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Reset code is required."));
+
+        try
+        {
+            // Find user by email
+            var user = await _accountService.FindByEmailAsync(request.Email);
+
+            if (user == null)
+            {
+                // To prevent enumeration, we might want to return false or generic invalid
+                // However, returning "Invalid code" is usually safe enough if rate limited
+                return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid verification code."));
+            }
+
+            // Verify the token
+            var isValid = await _passwordTokenService.VerifyPasswordResetTokenAsync(user, request.Code);
+
+            if (!isValid)
+            {
+                return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid or expired verification code."));
+            }
+
+            // Return success result
+            var resultDto = new VerifyResetCodeResponseDto
+            {
+                Success = true,
+                SuccessMessage = "Code verified successfully.",
+                StatusCode = 200,
+                ResetToken = request.Code // Pass it back if needed, or just boolean
+            };
+
+            return Ok(ApiResponse<VerifyResetCodeResponseDto>.Ok(resultDto, "Code verified successfully."));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred during reset code verification for email: {Email}", request.Email);
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ApiResponse<VerifyResetCodeResponseDto>.InternalServerError("An unexpected error occurred. Please try again later."));
         }
     }
 
@@ -110,12 +183,12 @@ public sealed class PasswordController(
             // - Token hasn't been used before (one-time use)
             // - Token hasn't been tampered with (cryptographic validation)
             var result = await _passwordResetService.ResetPasswordAsync(user, request.Token, request.NewPassword);
-
+            Console.WriteLine(request.Token);
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => new ApiErrorResponse(e.Description));
-                _logger.LogWarning("Password reset failed for user {Email}: {Errors}", 
-                    request.Email, 
+                _logger.LogWarning("Password reset failed for user {Email}: {Errors}",
+                    request.Email,
                     string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BadRequest(ApiResponse.BadRequest(errors));
             }
@@ -133,7 +206,7 @@ public sealed class PasswordController(
         catch (Exception ex)
         {
             _logger.LogError(ex, "An unexpected error occurred during password reset for email: {Email}", request.Email);
-            return StatusCode(StatusCodes.Status500InternalServerError, 
+            return StatusCode(StatusCodes.Status500InternalServerError,
                 ApiResponse.InternalServerError("An unexpected error occurred. Please try again later."));
         }
     }

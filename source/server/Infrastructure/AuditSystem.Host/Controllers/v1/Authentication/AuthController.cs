@@ -16,8 +16,7 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 [Route("api/[controller]")]
 [ApiController]
 public sealed class AuthController(
-        ICustomAuthenticationService _authService,
-        ApplicationDbContext _context) :
+        ICustomAuthenticationService _authService) :
         ControllerBase
 {
 
@@ -76,17 +75,4 @@ public sealed class AuthController(
 
         return Ok(result);
     }
-
-    [HttpGet("db-test")]
-    public async Task<IActionResult> DbTest()
-    {
-        var users = await _context.AppUsers
-            .AsNoTracking()
-            .OrderBy(x => Guid.NewGuid())
-            .Take(50)
-            .ToListAsync();
-
-        return Ok(users.Count);
-    }
-
 }

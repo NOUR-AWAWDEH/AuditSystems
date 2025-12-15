@@ -1,4 +1,4 @@
-﻿namespace AuditSystem.Auth.Services.Email;
+﻿namespace AuditSystem.Auth.Services.Email.Models;
 
 public class EmailRequest
 {

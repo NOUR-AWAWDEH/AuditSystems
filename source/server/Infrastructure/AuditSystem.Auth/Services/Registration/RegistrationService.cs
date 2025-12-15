@@ -1,8 +1,10 @@
 using AuditSystem.Contract.Dtos.Register;
-using AuditSystem.Auth.Services.Email;
+using AuditSystem.Auth.Services.Email.Abstractions;
+using AuditSystem.Auth.Services.Email.Models;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Users;
+using AuditSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -1,4 +1,4 @@
-namespace AuditSystem.Auth.Services.Email;
+namespace AuditSystem.Auth.Services.Email.Abstractions;
 
 public interface ISmtpClientFactory
 {

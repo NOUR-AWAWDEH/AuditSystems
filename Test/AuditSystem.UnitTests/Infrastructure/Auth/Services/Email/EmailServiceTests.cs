@@ -1,106 +1,143 @@
-using AuditSystem.Auth.Services.Email;
+using AuditSystem.Auth.Services.Email.Abstractions;
+using AuditSystem.Auth.Services.Email.Models;
+using AuditSystem.Auth.Services.Email.Services;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Net.Mail;
 using Xunit;
 
 namespace AuditSystem.UnitTests.Infrastructure.Auth.Services.Email;
 
 public class EmailServiceTests
 {
-    private readonly IOptions<SmtpSettings> _smtpSettings;
-    private readonly ILogger<EmailService> _logger;
-    private readonly ISmtpClientFactory _smtpClientFactory;
-    private readonly ISmtpClient _smtpClient;
+    private readonly IEmailTemplateRenderer _renderer;
+    private readonly IEmailSender _sender;
     private readonly EmailService _emailService;
 
     public EmailServiceTests()
     {
-        _smtpSettings = A.Fake<IOptions<SmtpSettings>>();
-        _logger = A.Fake<ILogger<EmailService>>();
-        _smtpClientFactory = A.Fake<ISmtpClientFactory>();
-        _smtpClient = A.Fake<ISmtpClient>();
-
-        var settings = new SmtpSettings
-        {
-            Host = "localhost",
-            Port = 587,
-            SenderAddress = "test@example.com",
-            SenderName = "Test Sender",
-            Password = "password",
-            EnableSsl = true
-        };
-
-        A.CallTo(() => _smtpSettings.Value).Returns(settings);
-        A.CallTo(() => _smtpClientFactory.CreateClient()).Returns(_smtpClient);
-
-        _emailService = new EmailService(_smtpSettings, _logger, _smtpClientFactory);
+        _renderer = A.Fake<IEmailTemplateRenderer>();
+        _sender = A.Fake<IEmailSender>();
+        _emailService = new EmailService(_renderer, _sender);
     }
 
     [Fact]
     public void Constructor_ShouldThrowArgumentNullException_WhenDependenciesAreNull()
     {
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new EmailService(null!, _logger, _smtpClientFactory));
-        Assert.Throws<ArgumentNullException>(() => new EmailService(_smtpSettings, null!, _smtpClientFactory));
-        Assert.Throws<ArgumentNullException>(() => new EmailService(_smtpSettings, _logger, null!));
+        FluentActions.Invoking(() => new EmailService(null!, _sender))
+            .Should().Throw<ArgumentNullException>();
+
+        FluentActions.Invoking(() => new EmailService(_renderer, null!))
+            .Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
-    public async Task SendEmailAsync_ShouldThrowArgumentNullException_WhenRequestIsNull()
+    public async Task SendEmailAsync_Request_ShouldThrowArgumentNullException_WhenRequestIsNull()
     {
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _emailService.SendEmailAsync((EmailRequest)null!));
+        await FluentActions.Awaiting(() => _emailService.SendEmailAsync((EmailRequest)null!))
+            .Should().ThrowAsync<ArgumentNullException>();
     }
 
     [Fact]
-    public async Task SendEmailAsync_ShouldSendEmail_WhenRequestIsValid()
+    public async Task SendEmailAsync_Request_ShouldValidateFields()
+    {
+        var request = new EmailRequest { TemplateName = "", Subject = "S", ToEmails = new() { "a@b.c" } };
+        await FluentActions.Awaiting(() => _emailService.SendEmailAsync(request))
+            .Should().ThrowAsync<ArgumentException>().WithMessage("*Template name*");
+
+        request = new EmailRequest { TemplateName = "T", Subject = "", ToEmails = new() { "a@b.c" } };
+        await FluentActions.Awaiting(() => _emailService.SendEmailAsync(request))
+            .Should().ThrowAsync<ArgumentException>().WithMessage("*Subject*");
+
+        request = new EmailRequest { TemplateName = "T", Subject = "S", ToEmails = null! };
+        await FluentActions.Awaiting(() => _emailService.SendEmailAsync(request))
+            .Should().ThrowAsync<ArgumentException>().WithMessage("*recipient*");
+    }
+
+    [Fact]
+    public async Task SendEmailAsync_Request_ShouldRenderAndSend()
     {
         // Arrange
         var request = new EmailRequest
         {
-            TemplateName = "PasswordChanged", // Use a known template or mock file system if possible. 
-                                              // Assuming template exists as Embedded Resource for test simplicity or integration test.
-                                              // Ideally, we'd mock the template loading if it wasn't embedded resource based.
-                                              // Since it is embedded resource, we must use a real template name.
-            ToEmails = new List<string> { "recipient@example.com" },
+            TemplateName = "TestTemplate",
             Subject = "Test Subject",
-            Placeholders = new Dictionary<string, PlaceholderValue>
-            {
-                { "UserName", new PlaceholderValue { Value = "TestUser", IsHtmlContent = false } },
-                { "SupportEmail", new PlaceholderValue { Value = "support@example.com", IsHtmlContent = false } }
-            }
+            ToEmails = new List<string> { "test@example.com" },
+            Placeholders = new Dictionary<string, PlaceholderValue>()
         };
+
+        A.CallTo(() => _renderer.Render("TestTemplate", request.Placeholders))
+            .Returns("Rendered Body");
 
         // Act
         await _emailService.SendEmailAsync(request);
 
         // Assert
-        A.CallTo(() => _smtpClientFactory.CreateClient()).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _smtpClient.SendMailAsync(A<MailMessage>.That.Matches(m =>
+        A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
             m.Subject == "Test Subject" &&
-            m.To[0].Address == "recipient@example.com" &&
-            m.From!.Address == "test@example.com"
+            m.Body == "Rendered Body" &&
+            m.To.Count == 1 &&
+            m.To[0] == "test@example.com"
         ))).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task SendPasswordChangedConfirmationAsync_ShouldSendEmailWithCorrectDetails()
+    public async Task SendEmailAsync_Direct_ShouldSend()
     {
-        // Arrange
-        var email = "user@example.com";
-
         // Act
-        await _emailService.SendPasswordChangedConfirmationAsync(email);
+        await _emailService.SendEmailAsync("test@example.com", "Subject", "Body", isHtml: false);
 
         // Assert
-        A.CallTo(() => _smtpClient.SendMailAsync(A<MailMessage>.That.Matches(m =>
+        A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
+            m.Subject == "Subject" &&
+            m.Body == "Body" &&
+            m.IsHtml == false &&
             m.To.Count == 1 &&
-            m.To[0].Address == email &&
-            m.Subject == "Your Password Has Been Changed" &&
-            m.Body.Contains("support@AuditSystem.online") // Verify the specific change made by user
+            m.To[0] == "test@example.com"
+        ))).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task SendPasswordResetEmailAsync_ShouldRenderAndSend()
+    {
+        // Arrange
+        A.CallTo(() => _renderer.Render("PasswordReset", A<Dictionary<string, PlaceholderValue>>._))
+            .Returns("Reset Body");
+
+        // Act
+        await _emailService.SendPasswordResetEmailAsync("user@example.com", "http://reset.link");
+
+        // Assert
+        A.CallTo(() => _renderer.Render("PasswordReset", A<Dictionary<string, PlaceholderValue>>.That.Matches(p =>
+            p["ResetUrl"].Value == "http://reset.link" &&
+            p["UserName"].Value == "user"
+        ))).MustHaveHappenedOnceExactly();
+
+        A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
+            m.Subject == "Reset Your Password" && // Assumed based on logic or implementation detail
+            m.Body == "Reset Body" &&
+            m.To[0] == "user@example.com"
+        ))).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task SendPasswordChangedConfirmationAsync_ShouldRenderAndSend()
+    {
+        // Arrange
+        A.CallTo(() => _renderer.Render("PasswordChanged", A<Dictionary<string, PlaceholderValue>>._))
+            .Returns("Changed Body");
+
+        // Act
+        await _emailService.SendPasswordChangedConfirmationAsync("user@example.com");
+
+        // Assert
+        A.CallTo(() => _renderer.Render("PasswordChanged", A<Dictionary<string, PlaceholderValue>>.That.Matches(p =>
+            p.ContainsKey("SupportEmail")
+        ))).MustHaveHappenedOnceExactly();
+
+        A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
+            m.Body == "Changed Body" &&
+            m.To[0] == "user@example.com"
         ))).MustHaveHappenedOnceExactly();
     }
 }

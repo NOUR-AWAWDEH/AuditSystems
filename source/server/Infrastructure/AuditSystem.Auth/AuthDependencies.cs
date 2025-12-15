@@ -2,7 +2,10 @@ using AuditSystem.Auth.Authentication;
 using AuditSystem.Contract.Dtos.Register;
 using AuditSystem.Auth.Services.Account;
 using AuditSystem.Auth.Services.Authentication;
-using AuditSystem.Auth.Services.Email;
+using AuditSystem.Auth.Services.Email.Abstractions;
+using AuditSystem.Auth.Services.Email.Services;
+using AuditSystem.Auth.Services.Email.Services.Renderers;
+using AuditSystem.Auth.Services.Email.Services.Smtp;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
@@ -14,6 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using AuditSystem.Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
+using AuditSystem.Auth.Services.Email.Models;
 
 namespace AuditSystem.Auth
 {
@@ -111,6 +115,8 @@ namespace AuditSystem.Auth
             services.AddScoped<IPasswordTokenService, PasswordTokenService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ISmtpClientFactory, SmtpClientFactory>();
+            services.AddScoped<IEmailTemplateRenderer, EmbeddedEmailTemplateRenderer>();
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAccountService, AccountService>();
 

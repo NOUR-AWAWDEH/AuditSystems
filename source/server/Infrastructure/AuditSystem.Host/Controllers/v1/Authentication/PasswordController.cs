@@ -1,6 +1,7 @@
 ﻿﻿using AuditSystem.Auth.Dtos.Password;
 using AuditSystem.Auth.Services.Account;
-using AuditSystem.Auth.Services.Email;
+using AuditSystem.Auth.Services.Email.Abstractions;
+using AuditSystem.Auth.Services.Email.Models;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.BusinessLogic.Attributes;
@@ -21,7 +22,6 @@ public sealed class PasswordController(
         IPasswordTokenService _passwordTokenService,
         IConfiguration _configuration,
         ILogger<PasswordController> _logger) :
-
         ControllerBase
 {
     /// <summary>

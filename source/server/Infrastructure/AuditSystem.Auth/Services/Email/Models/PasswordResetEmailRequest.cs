@@ -1,4 +1,4 @@
-﻿namespace AuditSystem.Auth.Services.Email;
+﻿namespace AuditSystem.Auth.Services.Email.Models;
 
 /// <summary>
 /// Email request for password reset containing a secure reset link.

@@ -16,8 +16,7 @@ namespace AuditSystem.Host.Controllers.v1.Authentication;
 [Route("api/[controller]")]
 [ApiController]
 public sealed class AuthController(
-        ICustomAuthenticationService _authService,
-        ApplicationDbContext _context) :
+        ICustomAuthenticationService _authService) :
         ControllerBase
 {
 

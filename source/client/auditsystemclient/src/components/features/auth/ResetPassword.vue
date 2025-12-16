@@ -1,32 +1,34 @@
 <template>
-  <!--ResetPassword.vue-->
+  <!--ResetPassword.vu-->
   <div
     class="flex flex-col items-center justify-center max-w-xs sm:max-w-sm md:max-w-md mt-1 sm:my-2 mx-auto py-8"
   >
     <AuditLogo />
     <H2Heading class="mt-5">Reset Password</H2Heading>
-    <BaseParagraph>Please enter your new password.</BaseParagraph>
-    <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible" />
-    <SuccessDisplay :messages="[successMessage]" :isVisible="isSuccessVisible" />
+    <BaseParagraph>Enter your new password below.</BaseParagraph>
+
     <PasswordInput
-      id="newPassword"
-      placeholder="Enter new password"
+      id="new-password"
+      placeholder="New Password"
       class="mb-4 w-full"
       v-model="newPassword"
     />
+
     <PasswordInput
-      id="confirmPassword"
-      placeholder="Confirm new password"
-      class="mb-4 w-full"
+      id="confirm-password"
+      placeholder="Confirm Password"
+      class="mb-6 w-full"
       v-model="confirmPassword"
     />
+
     <div class="flex items-center gap-25 w-full">
       <BaseButton
         class="self-start py-2 px-4 rounded-md hover:bg-secondary-shade bg-secondary-base"
         @click="handleResetPassword"
-        >Reset Password</BaseButton
+        :disabled="isLoading"
       >
-      <BaseLink class="whitespace-nowrap" to="/login">Back To Login</BaseLink>
+        {{ isLoading ? "Resetting..." : "Reset Password" }}
+      </BaseButton>
     </div>
   </div>
 </template>
@@ -38,128 +40,77 @@ import PasswordInput from "@/components/base/PasswordInput.vue";
 import H2Heading from "@/components/base/H2Heading.vue";
 import AuditLogo from "@/components/common/AuditLogo.vue";
 import BaseParagraph from "@/components/base/BaseParagraph.vue";
-import ErrorDisplay from "@/components/common/ErrorDisplay.vue";
-import SuccessDisplay from "@/components/common/SuccessDisplay.vue";
-import BaseLink from "@/components/base/BaseLink.vue";
 import { ref, onMounted } from "vue";
-import { useRouter, useRoute } from "vue-router"; // Import useRoute
+import { useRouter, useRoute } from "vue-router";
 import { useResetPassword } from "@/composables/password/useResetPassword";
+import { useNotification } from "@/composables/notification/useNotification";
 
 const router = useRouter();
-const route = useRoute(); // Initialize route
+const route = useRoute();
 const newPassword = ref("");
 const confirmPassword = ref("");
-const validationErrors = ref([]);
-const isValidationErrorVisible = ref(false);
-const isSuccessVisible = ref(false);
-const successMessage = ref("");
+const isLoading = ref(false);
 
-const { error, isVerified, verifyToken, resetPassword: resetPasswordAction } = useResetPassword();
+const { resetPassword: resetPasswordAction } = useResetPassword();
+const { showNotification } = useNotification();
 
 // Store email and token for submission
 const emailParam = ref("");
 const tokenParam = ref("");
 
-onMounted(async () => {
-  // 1. Try to get from URL first
+onMounted(() => {
   const urlToken = route.query.token;
   const urlEmail = route.query.email;
 
   if (urlToken && urlEmail) {
     emailParam.value = urlEmail;
     tokenParam.value = urlToken;
-
-    // Verify the token immediately
-    const result = await verifyToken(urlEmail, urlToken);
-    if (!result.success) {
-      validationErrors.value.push(result.message || "Invalid or expired reset link.");
-      isValidationErrorVisible.value = true;
-      // Optional: Disable form or redirect after delay
-    }
   } else {
-    // 2. Fallback to localStorage (for development or specific flows)
-    const storageToken = localStorage.getItem("resetToken");
-    const storageEmail = localStorage.getItem("resetEmail");
-
-    if (storageToken && storageEmail) {
-      emailParam.value = storageEmail;
-      tokenParam.value = storageToken;
-    } else {
-      // Missing credentials entirely
-      validationErrors.value.push("Missing reset token or email. Please request a password reset.");
-      isValidationErrorVisible.value = true;
-      // alert('Missing reset token or email. Please request a password reset.');
-      // router.push('/login');
-    }
+    showNotification("Missing reset token or email. Please request a password reset.", "error");
   }
 });
 
 const handleResetPassword = async () => {
-  validationErrors.value = [];
-  isValidationErrorVisible.value = false;
-  isSuccessVisible.value = false;
-
-  if (!emailParam.value || !tokenParam.value) {
-    validationErrors.value.push(
-      "Missing reset information. Please click the link in your email again."
-    );
-    isValidationErrorVisible.value = true;
-    return;
-  }
-
-  const newPasswordError = validatePassword(newPassword.value);
-  if (newPasswordError) {
-    validationErrors.value.push(newPasswordError);
-    isValidationErrorVisible.value = true;
-    setTimeout(() => {
-      isValidationErrorVisible.value = false;
-    }, 6000);
-    return;
-  }
-
-  const confirmPasswordError = validatePassword(confirmPassword.value);
-  if (confirmPasswordError) {
-    validationErrors.value.push(confirmPasswordError);
-    isValidationErrorVisible.value = true;
-    setTimeout(() => {
-      isValidationErrorVisible.value = false;
-    }, 6000);
+  if (!newPassword.value || !confirmPassword.value) {
+    showNotification("Please fill in all fields.", "error");
     return;
   }
 
   if (newPassword.value !== confirmPassword.value) {
-    validationErrors.value.push("Passwords do not match.");
-    isValidationErrorVisible.value = true;
-    setTimeout(() => {
-      isValidationErrorVisible.value = false;
-    }, 6000);
+    showNotification("Passwords do not match.", "error");
     return;
   }
 
-  const response = await resetPasswordAction(
-    emailParam.value,
-    tokenParam.value,
-    newPassword.value,
-    confirmPassword.value
-  );
+  const passwordError = validatePassword(newPassword.value);
+  if (passwordError) {
+    showNotification(passwordError, "error");
+    return;
+  }
 
-  if (response?.success) {
-    successMessage.value = response?.successMessage || "Password reset successfully!";
-    isSuccessVisible.value = true;
-    // Clear any local storage if we set it
-    localStorage.removeItem("resetToken");
-    localStorage.removeItem("resetEmail");
+  isLoading.value = true;
+  try {
+    const response = await resetPasswordAction({
+      email: emailParam.value,
+      token: tokenParam.value,
+      newPassword: newPassword.value,
+      confirmNewPassword: confirmPassword.value,
+    });
 
-    setTimeout(() => {
-      isSuccessVisible.value = false;
-      router.push("/login");
-    }, 5000);
-  } else {
-    validationErrors.value.push(error.value || "Password reset failed.");
-    isValidationErrorVisible.value = true;
-    setTimeout(() => {
-      isValidationErrorVisible.value = false;
-    }, 6000);
+    isLoading.value = false;
+
+    if (response?.success) {
+      showNotification(response.successMessage || "Password reset successfully.", "success");
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } else {
+      showNotification(response.message || "Failed to reset password. Please try again.", "error");
+    }
+  } catch (err) {
+    isLoading.value = false;
+    console.error("Reset Password error:", err);
+    showNotification(err.message || "An unexpected error occurred.", "error");
   }
 };
 </script>

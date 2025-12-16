@@ -1,11 +1,5 @@
 ﻿using AuditSystem.Auth.Services.Email.Abstractions;
 using AuditSystem.Auth.Services.Email.Models;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Mail;
-using System.Reflection;
-using System.Text;
 
 namespace AuditSystem.Auth.Services.Email.Services;
 
@@ -79,7 +73,7 @@ public class EmailService : IEmailService
             email: email,
             userName: email.Split('@')[0],
             resetUrl: resetLink,
-            supportEmail: "support@AuditSystem.com"
+            supportEmail: "support@auditsystem.online"
         );
 
         await SendEmailAsync(request);
@@ -90,7 +84,7 @@ public class EmailService : IEmailService
         if (string.IsNullOrWhiteSpace(email))
             throw new ArgumentException("Email cannot be empty", nameof(email));
 
-        var request = new PasswordChangedEmailRequest(email, "support@AuditSystem.online");
+        var request = new PasswordChangedEmailRequest(email, "support@auditsystem.online");
         await SendEmailAsync(request);
     }
 }

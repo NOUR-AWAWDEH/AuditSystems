@@ -1,6 +1,6 @@
 // src/composables/password/useResetPassword.js
 import { ref } from "vue";
-import resetPasswordRepository from "@/services/auth/passwordRepos/resetPasswordRepository";
+import { resetPasswordRepository } from "@/services/auth/passwordRepos/resetPasswordRepository";
 import { validateResetPasswordData } from "@/services/validations/validateResetPasswordData";
 
 export function useResetPassword() {
@@ -37,7 +37,7 @@ export function useResetPassword() {
         return handleResetPasswordFailure({ message: validationError });
       }
 
-      const response = await resetPasswordRepository(resetPasswordData);
+      const response = await resetPasswordRepository.resetPasswordRequest(resetPasswordData);
 
       if (response?.success) {
         return handleResetPasswordSuccess(response);

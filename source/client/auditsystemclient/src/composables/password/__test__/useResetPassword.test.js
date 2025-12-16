@@ -1,12 +1,13 @@
-// useResetPassword.test.js
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useResetPassword } from "@/composables/password/useResetPassword";
-import resetPasswordRepository from "@/services/auth/passwordRepos/resetPasswordRepository";
+import { resetPasswordRepository } from "@/services/auth/passwordRepos/resetPasswordRepository";
 import { validateResetPasswordData } from "@/services/validations/validateResetPasswordData";
 
 // Mock repository
 vi.mock("@/services/auth/passwordRepos/resetPasswordRepository", () => ({
-  default: vi.fn(),
+  resetPasswordRepository: {
+    resetPasswordRequest: vi.fn(),
+  },
 }));
 
 // Mock validation
@@ -29,7 +30,7 @@ describe("useResetPassword", () => {
   });
 
   it("should successfully reset password", async () => {
-    resetPasswordRepository.mockResolvedValue({
+    resetPasswordRepository.resetPasswordRequest.mockResolvedValue({
       success: true,
       successMessage: "Password reset successfully",
     });
@@ -47,11 +48,11 @@ describe("useResetPassword", () => {
 
     expect(result.success).toBe(true);
     expect(result.message).toBe("Password reset successfully");
-    expect(resetPasswordRepository).toHaveBeenCalledWith(payload);
+    expect(resetPasswordRepository.resetPasswordRequest).toHaveBeenCalledWith(payload);
   });
 
   it("should handle reset failure with errors array", async () => {
-    resetPasswordRepository.mockResolvedValue({
+    resetPasswordRepository.resetPasswordRequest.mockResolvedValue({
       success: false,
       errors: [{ message: "Invalid token" }],
     });
@@ -88,7 +89,7 @@ describe("useResetPassword", () => {
   });
 
   it("should handle network errors", async () => {
-    resetPasswordRepository.mockRejectedValue(new Error("Connection timeout"));
+    resetPasswordRepository.resetPasswordRequest.mockRejectedValue(new Error("Connection timeout"));
 
     const { resetPassword } = useResetPassword();
 
@@ -104,7 +105,7 @@ describe("useResetPassword", () => {
   });
 
   it("should use default error message when none provided", async () => {
-    resetPasswordRepository.mockResolvedValue({ success: false });
+    resetPasswordRepository.resetPasswordRequest.mockResolvedValue({ success: false });
 
     const { resetPassword } = useResetPassword();
 
@@ -119,7 +120,7 @@ describe("useResetPassword", () => {
   });
 
   it("should reset error before request", async () => {
-    resetPasswordRepository.mockResolvedValue({ success: true });
+    resetPasswordRepository.resetPasswordRequest.mockResolvedValue({ success: true });
 
     const { error, resetPassword } = useResetPassword();
     error.value = "Old error";
@@ -135,7 +136,7 @@ describe("useResetPassword", () => {
   });
 
   it("should prioritize errors[0].message over successMessage", async () => {
-    resetPasswordRepository.mockResolvedValue({
+    resetPasswordRepository.resetPasswordRequest.mockResolvedValue({
       success: false,
       errors: [{ message: "From errors array" }],
       successMessage: "Ignored",

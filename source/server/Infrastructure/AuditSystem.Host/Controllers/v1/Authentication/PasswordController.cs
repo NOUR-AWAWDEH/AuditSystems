@@ -73,7 +73,7 @@ public sealed class PasswordController(
                 clientUrl = $"{Request.Scheme}://{Request.Host}";
             }
 
-            var resetUrl = $"{clientUrl.TrimEnd('/')}/reset-password?token={token}&email={user.Email!}";
+            var resetUrl = $"{clientUrl.TrimEnd('/')}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
 
 
             // Send password reset email with the secure token link

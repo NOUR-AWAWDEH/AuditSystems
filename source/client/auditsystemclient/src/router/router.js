@@ -97,8 +97,11 @@ router.beforeEach((to, from, next) => {
   if (isAuthenticated && isTokenExpired(token)) {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
-    next("/login");
-    return;
+
+    if (requiresAuth) {
+      next("/login");
+      return;
+    }
   }
 
   if (to.path === "/" && !isAuthenticated) {

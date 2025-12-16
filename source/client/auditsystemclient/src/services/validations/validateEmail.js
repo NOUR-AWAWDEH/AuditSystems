@@ -1,14 +1,23 @@
 // validateEmail.js
-const HTML_TAG_REGEX = /(<([^>]+)>)/gi;
 
-const EMAIL_REGEX =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+const HTML_TAG_REGEX = /<[^>]*>/g;
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+function sanitizeEmail(value) {
+  return value.replace(HTML_TAG_REGEX, "").trim();
+}
 
 export function validateEmail(email) {
-  if (typeof email !== "string") return false;
+  if (typeof email !== "string") {
+    return false;
+  }
 
-  const sanitized = email.replace(HTML_TAG_REGEX, "");
-  const trimmed = sanitized.trim();
+  const cleanedEmail = sanitizeEmail(email);
 
-  return EMAIL_REGEX.test(trimmed);
+  if (cleanedEmail.length === 0) {
+    return false;
+  }
+
+  return EMAIL_REGEX.test(cleanedEmail);
 }

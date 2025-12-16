@@ -1,6 +1,6 @@
 // useVerifyResetCode.js
-import { ref } from 'vue';
-import verifyResetCode from '@/services/auth/passwordRepos/verifyResetCodeRepository';
+import { ref } from "vue";
+import verifyResetCode from "@/services/auth/passwordRepos/verifyResetCodeRepository";
 
 export function useVerifyResetCode() {
   const isVerified = ref(false);
@@ -11,11 +11,13 @@ export function useVerifyResetCode() {
     return {
       success: true,
       data: response.result,
-      message: response.successMessage || response.result.successMessage || 'Verification successful',
+      message:
+        response.successMessage || response.result?.successMessage || "Verification successful",
     };
   };
 
-  const handleVerificationFailure = (response, defaultErrorMessage = 'Verification failed') => {
+  const handleVerificationFailure = (response, defaultErrorMessage = "Verification failed") => {
+    isVerified.value = false;
     const errorMessage = response?.errors?.length
       ? response.errors[0].message
       : defaultErrorMessage;
@@ -24,6 +26,25 @@ export function useVerifyResetCode() {
       success: false,
       message: errorMessage,
       errors: response?.errors || [{ message: errorMessage }],
+    };
+  };
+
+  const handleTokenVerificationSuccess = () => {
+    isVerified.value = true;
+    return { success: true };
+  };
+
+  const handleTokenVerificationFailure = (
+    response,
+    defaultErrorMessage = "Token verification failed"
+  ) => {
+    isVerified.value = false;
+    const errorMessage =
+      response?.errors?.[0]?.message || response?.successMessage || defaultErrorMessage;
+    error.value = errorMessage;
+    return {
+      success: false,
+      message: errorMessage,
     };
   };
 
@@ -38,8 +59,24 @@ export function useVerifyResetCode() {
         return handleVerificationFailure(response);
       }
     } catch (err) {
-      console.error('useVerifyResetCode: Verification error:', err);
-      return handleVerificationFailure(err, err.message || 'Verification failed');
+      console.error("useVerifyResetCode: Verification error:", err);
+      return handleVerificationFailure(err, err.message || "Verification failed");
+    }
+  };
+
+  const verifyToken = async (email, token) => {
+    try {
+      error.value = null;
+      const response = await verifyResetCode(email, token);
+
+      if (response?.success) {
+        return handleTokenVerificationSuccess();
+      } else {
+        return handleTokenVerificationFailure(response, "Invalid verification token");
+      }
+    } catch (err) {
+      console.error("Token verification error:", err);
+      return handleTokenVerificationFailure(err, err.message || "Token verification failed");
     }
   };
 
@@ -47,5 +84,6 @@ export function useVerifyResetCode() {
     isVerified,
     error,
     verifyCode,
+    verifyToken,
   };
 }

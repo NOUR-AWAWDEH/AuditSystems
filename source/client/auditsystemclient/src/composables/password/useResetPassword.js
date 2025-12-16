@@ -1,65 +1,62 @@
 // src/composables/password/useResetPassword.js
 import { ref } from "vue";
-import verifyResetCodeRepository from "@/services/auth/passwordRepos/verifyResetCodeRepository";
+import resetPasswordRepository from "@/services/auth/passwordRepos/resetPasswordRepository";
+import { validateResetPasswordData } from "@/services/validations/validateResetPasswordData";
 
 export function useResetPassword() {
   const error = ref(null);
-  const successMessage = ref(null);
-  const isVerified = ref(false);
 
-  const verifyToken = async (email, code) => {
-    try {
-      error.value = null;
-      const response = await verifyResetCodeRepository(email, code);
+  const handleResetPasswordSuccess = (response) => ({
+    success: true,
+    message: response?.successMessage || "Password reset successfully",
+  });
 
-      if (response?.success) {
-        isVerified.value = true;
-        return { success: true };
-      } else {
-        isVerified.value = false;
-        error.value =
-          response?.errors?.[0]?.message ||
-          response?.successMessage ||
-          "Invalid verification code.";
-        return { success: false, message: error.value };
-      }
-    } catch (err) {
-      console.error("Token verification error:", err);
-      isVerified.value = false;
-      error.value = err.message || "Token verification failed.";
-      return { success: false, message: error.value };
-    }
+  const handleResetPasswordFailure = (response, defaultErrorMessage = "Password reset failed") => {
+    const errorMessage =
+      response?.errors?.length > 0
+        ? response.errors[0].message
+        : response?.message || response?.successMessage || defaultErrorMessage;
+
+    error.value = errorMessage;
+
+    const falureResult = {
+      success: false,
+      message: errorMessage,
+      errors: response?.errors || [{ message: errorMessage }],
+    };
+
+    return falureResult;
   };
 
-  const resetPassword = async (email, token, newPassword, confirmNewPassword) => {
+  const resetPassword = async (resetPasswordData) => {
     try {
-      error.value = null;
-      const response = await resetPasswordRepository(email, token, newPassword, confirmNewPassword);
+      resetState();
+
+      const validationError = validateResetPasswordData(resetPasswordData);
+      if (validationError) {
+        return handleResetPasswordFailure({ message: validationError });
+      }
+
+      const response = await resetPasswordRepository(resetPasswordData);
 
       if (response?.success) {
-        successMessage.value = response?.successMessage || "Password reset successfully";
-        return { success: true };
+        return handleResetPasswordSuccess(response);
       } else {
-        error.value =
-          response?.errors?.[0]?.message || response?.successMessage || "Password reset failed";
-        return {
-          success: false,
-          message: error.value,
-          errors: response?.errors || [{ message: error.value }],
-        };
+        return handleResetPasswordFailure(response);
       }
     } catch (err) {
       console.error("Password reset error:", err);
-      error.value = err.message || "Password reset failed";
-      return { success: false, message: error.value, errors: [{ message: error.value }] };
+      return handleResetPasswordFailure(err, err.message || "Password reset failed");
     }
+  };
+
+  const resetState = () => {
+    error.value = null;
   };
 
   return {
     error,
-    successMessage,
-    isVerified,
-    verifyToken,
     resetPassword,
+    resetState,
   };
 }

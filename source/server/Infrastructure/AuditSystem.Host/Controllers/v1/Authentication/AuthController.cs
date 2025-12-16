@@ -8,8 +8,6 @@ using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
 using AuditSystem.Auth.Dtos.RefreshToken;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using AuditSystem.DataAccess.Contexts;
-using Microsoft.EntityFrameworkCore;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 

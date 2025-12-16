@@ -27,7 +27,7 @@
         @change="handleChange"
         @focus="handleFocus"
         @blur="handleBlur"
-        class="w-full px-4 py-3 pr-10 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 appearance-none bg-white text-gray-900 text-sm font-medium cursor-pointer"
+        class="w-full px-4 py-3 pr-10 border border-secondary-base rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400 appearance-none bg-white text-secondary-base text-sm font-medium cursor-pointer"
         :class="selectClass"
       >
         <option v-if="placeholder" value="" disabled class="text-secondary-base">

@@ -13,27 +13,27 @@
 </template>
 
 <script setup>
-import CustomSelect from '@/components/common/CustomSelect.vue';
+import CustomSelect from "@/components/common/CustomSelect.vue";
 
 defineProps({
   departments: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
-  selectedDepartmentId: { 
+  selectedDepartmentId: {
     type: String,
-    default: ''
+    default: "",
   },
   departmentError: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
-const emit = defineEmits(['update:selectedDepartment', 'department-changed']);
+const emit = defineEmits(["update:selectedDepartment", "department-changed"]);
 
-const handleDepartmentChange = (value) => {  
-    emit('update:selectedDepartment', value);
-    emit('department-changed', value);
+const handleDepartmentChange = (value) => {
+  emit("update:selectedDepartment", value);
+  emit("department-changed", value);
 };
 </script>

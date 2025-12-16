@@ -7,20 +7,18 @@ export const useCreateUser = () => {
   const error = ref(null);
   const createdUser = ref(null);
 
-
   const handleCreateSuccess = (response) => {
     createdUser.value = response;
     const message = response.message || "User created successfully.";
     const data = response.result;
-    console.log(response);
     
     return { success: true, data, message };
   };
 
   const handleCreateFailure = (response, defaultErrorMessage = "Failed to create user") => {
-    const errorMessage = response?.errors?.length
-      ? response.errors[0].message
-      : response?.message || defaultErrorMessage;
+    const errorMessage = response?.errors?.length > 0
+        ? response.errors[0].message
+        : response?.message || defaultErrorMessage;
 
     error.value = errorMessage;
 

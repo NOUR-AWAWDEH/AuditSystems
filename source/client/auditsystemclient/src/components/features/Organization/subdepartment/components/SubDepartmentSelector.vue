@@ -1,39 +1,49 @@
 <template>
-    <!--SubDepartmentSelector.vue-->
   <CustomSelect
-    :model-value="selectedSubDepartmentId"
+    :model-value="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
     :options="subDepartments"
-    label="Select Sub Department"
-    placeholder="Choose a sub department"
+    :label="label"
+    :placeholder="placeholder"
+    :required="required"
+    :error="error"
+    :disabled="isLoading"
     value-key="id"
     label-key="name"
-    :error="subDepartmentError"
-    @update:modelValue="handleSubDepartmentChange"
+    class="mt-4"
   />
 </template>
 
 <script setup>
-import CustomSelect from '@/components/common/CustomSelect.vue';
+import { onMounted } from "vue";
+import CustomSelect from "@/components/common/CustomSelect.vue";
+import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 
 defineProps({
-  subDepartments: {
-    type: Array,
-    default: () => []
+  modelValue: {
+    type: [String, Number, Object],
+    required: true,
   },
-  selectedSubDepartmentId: {
+  label: {
     type: String,
-    default: ''
+    default: "Sub Department",
   },
-  subDepartmentError: {
+  placeholder: {
     type: String,
-    default: ''
-  }
+    default: "Select Sub Department",
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(['update:selected-sub-department', 'sub-department-changed']);
+defineEmits(["update:modelValue"]);
 
-const handleSubDepartmentChange = (value) => {
-    emit('update:selected-sub-department', value);
-    emit('sub-department-changed', value);
-};
+const { subDepartments, getSubDepartmentsByUserId, isLoading, error } =
+  useGetSubDepartmentsByUserId();
+
+onMounted(() => {
+  getSubDepartmentsByUserId();
+});
 </script>

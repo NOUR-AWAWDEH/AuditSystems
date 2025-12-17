@@ -14,8 +14,7 @@ export const confirmEmailRepository = {
       const { data, status } = response;
 
       if (status === 200) {
-        // Backend returns "Email confirmed successfully" string or an object
-        // Based on controller: return Ok("Email confirmed successfully"); -> it's a string
+        
         const successMessage =
           typeof data === "string" ? data : data?.successMessage || "Email confirmed successfully";
 
@@ -32,7 +31,7 @@ export const confirmEmailRepository = {
       const status = error.response?.status;
 
       if (status === 400 || status === 500) {
-        // Handle plain string responses from backend (e.g. "Invalid token", "Invalid user")
+
         const errorMessage =
           typeof responseData === "string"
             ? responseData

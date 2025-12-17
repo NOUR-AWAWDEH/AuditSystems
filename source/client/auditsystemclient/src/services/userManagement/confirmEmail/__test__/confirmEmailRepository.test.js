@@ -27,7 +27,7 @@ describe("confirmEmailRepository", () => {
         successMessage: "Email confirmed successfully",
         result: { someData: true },
       },
-      data: "Email confirmed successfully", // Backend returns just a string
+      data: "Email confirmed successfully",
     };
 
     api.get.mockResolvedValue(mockResponse);
@@ -53,14 +53,6 @@ describe("confirmEmailRepository", () => {
     api.get.mockResolvedValue(mockResponse);
 
     const result = await confirmEmailRepository.confirmEmailRepository(uid, token);
-
-    // With new logic, if 200 OK, it treats data as success unless it has specific structure check which we removed for 200
-    // Actually our new logic: if 200, returns OK.
-    // If backend returns 200 with success: false data, it will be treated as success because we assume 200 = OK.
-    // However, the backend controller ONLY returns 200 for success.
-    // For failure it returns 400.
-    // So we can remove or adapt this test.
-    // Adapting it to what our code does now: it returns OK with the data object.
     expect(result).toEqual(ApiResponseT.ok({}, "Failed to confirm email"));
   });
 

@@ -38,9 +38,7 @@ export const useConfirmEmail = () => {
   };
 
   const confirmEmail = async (uid, token) => {
-    isLoading.value = true;
-    error.value = null;
-    success.value = null;
+    resetState();
 
     try {
       const validationError = validateConfirmEmail(uid, token);
@@ -50,7 +48,7 @@ export const useConfirmEmail = () => {
       }
 
       const response = await confirmEmailRepository.confirmEmailRepository(uid, token);
-      console.log(response);
+      
       if (response.success) {
         return handleSuccess(response);
       } else {
@@ -65,6 +63,12 @@ export const useConfirmEmail = () => {
     }
   };
 
+  const resetState = () => {
+    isLoading.value = true;
+    error.value = null;
+    success.value = null;
+  };
+  
   return {
     isLoading,
     error,

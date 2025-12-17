@@ -47,6 +47,12 @@ const routes = [
     meta: { requiresAuth: false },
   },
   {
+    path: "/resend-verification-email",
+    name: "ResendVerificationEmail",
+    component: () => import("@/components/features/auth/ResendVerificationEmailPage.vue"),
+    meta: { requiresAuth: false },
+  },
+  {
     path: "/logout",
     name: "Logout",
     beforeEnter: (to, from, next) => {

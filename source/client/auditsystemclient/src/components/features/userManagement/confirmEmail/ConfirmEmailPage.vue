@@ -51,7 +51,6 @@ const goToLogin = () => {
 
 onMounted(async () => {
   const { uid, token } = route.query;
-  console.log(uid, token);
   // Even if params are missing, call confirmEmail so it can handle the error state consistent with the composable's logic
   const result = await confirmEmail(uid, token);
 

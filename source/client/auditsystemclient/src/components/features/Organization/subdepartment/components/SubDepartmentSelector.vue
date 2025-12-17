@@ -2,7 +2,7 @@
   <CustomSelect
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    :options="subDepartments"
+    :options="options"
     :label="label"
     :placeholder="placeholder"
     :required="required"
@@ -15,11 +15,11 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, computed, watch } from "vue";
 import CustomSelect from "@/components/common/CustomSelect.vue";
 import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 
-defineProps({
+const props = defineProps({
   modelValue: {
     type: [String, Number, Object],
     required: true,
@@ -36,14 +36,52 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  // New props for reusability
+  subDepartments: {
+    type: Array,
+    default: null, // If null, we'll try to fetch internal data
+  },
+  autoFetch: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 defineEmits(["update:modelValue"]);
 
-const { subDepartments, getSubDepartmentsByUserId, isLoading, error } =
-  useGetSubDepartmentsByUserId();
+const {
+  subDepartments: internalSubDepartments,
+  getSubDepartmentsByUserId,
+  isLoading: isInternalLoading,
+  error: internalError,
+} = useGetSubDepartmentsByUserId();
+
+// If external options are provided, use them. Otherwise use internal state.
+const options = computed(() => {
+  if (props.subDepartments !== null) {
+    return props.subDepartments;
+  }
+  return internalSubDepartments.value;
+});
+
+const isLoading = computed(() => {
+  if (props.subDepartments !== null) {
+    return false; // Or passed prop if we want to support external loading state
+  }
+  return isInternalLoading.value;
+});
+
+const error = computed(() => {
+  if (props.subDepartments !== null) {
+    return null; // External error handling not implemented here yet
+  }
+  return internalError.value;
+});
 
 onMounted(() => {
-  getSubDepartmentsByUserId();
+  // Only fetch if no external data provided AND autoFetch is true
+  if (props.subDepartments === null && props.autoFetch) {
+    getSubDepartmentsByUserId();
+  }
 });
 </script>

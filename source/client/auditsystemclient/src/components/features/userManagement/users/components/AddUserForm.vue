@@ -37,8 +37,8 @@
       <div v-if="showAddForm" class="mt-4">
         <form @submit.prevent="handleAddUser" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
             <div>
-              <!--FirstName-->
               <label
                 for="user-first-name"
                 class="block text-sm font-semibold text-secondary-base mb-2"
@@ -50,12 +50,15 @@
                 v-model="newUser.firstName"
                 placeholder="e.g. John"
                 required
+                class="shadow-sm"
               />
+            </div>
 
-              <!--LastName-->
+            <!-- Last Name -->
+            <div>
               <label
                 for="user-last-name"
-                class="block text-sm font-semibold text-secondary-base mb-2 mt-4"
+                class="block text-sm font-semibold text-secondary-base mb-2"
               >
                 Last Name
               </label>
@@ -64,13 +67,13 @@
                 v-model="newUser.lastName"
                 placeholder="e.g. Doe"
                 required
+                class="shadow-sm"
               />
+            </div>
 
-              <!-- UserName -->
-              <label
-                for="user-name"
-                class="block text-sm font-semibold text-secondary-base mb-2 mt-4"
-              >
+            <!-- User Name -->
+            <div>
+              <label for="user-name" class="block text-sm font-semibold text-secondary-base mb-2">
                 User Name
               </label>
               <BaseInput
@@ -78,13 +81,13 @@
                 v-model="newUser.userName"
                 placeholder="e.g. johndoe"
                 required
+                class="shadow-sm"
               />
+            </div>
 
-              <!-- Email -->
-              <label
-                for="user-email"
-                class="block text-sm font-semibold text-secondary-base mb-2 mt-4"
-              >
+            <!-- Email -->
+            <div>
+              <label for="user-email" class="block text-sm font-semibold text-secondary-base mb-2">
                 Email
               </label>
               <BaseInput
@@ -92,21 +95,26 @@
                 v-model="newUser.email"
                 placeholder="e.g. johndoe@example.com"
                 required
+                class="shadow-sm"
               />
+            </div>
 
-              <!-- Password -->
-              <!-- Password -->
+            <!-- Password -->
+            <div>
               <label
                 for="user-password"
-                class="block text-sm font-semibold text-secondary-base mb-2 mt-4"
+                class="block text-sm font-semibold text-secondary-base mb-2"
               >
                 Password
               </label>
-              <PasswordInput id="user-password" v-model="newUser.password" required />
+              <PasswordInput id="user-password" v-model="newUser.password" required class="shadow-sm" />
+            </div>
 
+            <!-- Confirm Password -->
+            <div>
               <label
                 for="user-confirm-password"
-                class="block text-sm font-semibold text-secondary-base mb-2 mt-4"
+                class="block text-sm font-semibold text-secondary-base mb-2"
               >
                 Confirm Password
               </label>
@@ -114,18 +122,30 @@
                 id="user-confirm-password"
                 v-model="newUser.confirmPassword"
                 required
+                class="shadow-sm"
               />
+            </div>
 
-              <!-- Role-->
+            <!-- Role -->
+            <div>
               <RoleVue v-model="newUser.roleName" />
+            </div>
 
-              <!-- Job Title -->
-              <JobTitleSelector v-model="newUser.jobTitleId" placeholder="e.g. Select Job Title" />
+            <!-- Job Title -->
+            <div>
+              <JobTitleSelector
+                v-model="newUser.jobTitleId"
+                placeholder="e.g. Select Job Title"
+                class="mt-0"
+              />
+            </div>
 
-              <!-- Sub Department -->
+            <!-- Sub Department -->
+            <div>
               <SubDepartmentSelector
                 v-model="newUser.subDepartmentId"
                 placeholder="e.g. Select Sub Department"
+                class="mt-0"
               />
             </div>
           </div>
@@ -136,7 +156,7 @@
               type="submit"
               :loading="isCreating"
               :disabled="!newUser.userName.trim()"
-              class="w-full sm:w-auto px-6 py-2 bg-secondary-base hover:bg-secondary-shade rounded"
+              class="w-full sm:w-auto px-6 py-2 bg-secondary-base hover:bg-secondary-shade rounded shadow-sm"
             >
               {{ isCreating ? "Adding..." : "Add User" }}
             </BaseButton>

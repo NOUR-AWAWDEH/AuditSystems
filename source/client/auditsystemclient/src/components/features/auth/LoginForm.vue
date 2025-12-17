@@ -1,13 +1,15 @@
 <template>
   <!--LoginForm.vue-->
-  <div class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg">
+  <div
+    class="bg-white text-secondary-base p-6 rounded-lg w-full max-w-sm mx-auto h-auto md:max-w-md lg:max-w-lg"
+  >
     <div class="flex justify-center mb-6 w-full">
       <Logo />
     </div>
     <h2 class="text-2xl font-bold mb-6 text-center text-secondary-shade">Login</h2>
 
     <form @submit.prevent="handleLogin">
-      <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible"/>
+      <ErrorDisplay :errors="validationErrors" :isVisible="isValidationErrorVisible" />
 
       <transition name="fade">
         <div
@@ -41,7 +43,6 @@
         />
       </div>
 
-
       <BaseButton
         type="submit"
         :disabled="isLoading"
@@ -53,39 +54,38 @@
       </BaseButton>
     </form>
 
-    <div class="text-center mt-4">
-      <BaseLink @click="clearLocalStorage" to="/forgot-password">
-        Forgot Password?
-      </BaseLink>
+    <div class="text-center mt-4 space-y-2 flex flex-col items-center">
+      <BaseLink @click="clearLocalStorage" to="/forgot-password"> Forgot Password? </BaseLink>
+      <BaseLink @click="clearLocalStorage" to="/resend-verification-email"> Resend Verification Email </BaseLink>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { validateUsername } from '@/services/validations/validateUsername';
-import validatePassword from '@/services/validations/validatePassword';
-import { useLogin } from '@/composables/auth/useLogin';
-import BaseButton from '@/components/base/BaseButton.vue';
-import BaseInput from '@/components/base/BaseInput.vue';
-import BaseLink from '@/components/base/BaseLink.vue';
-import PasswordInput from '@/components/base/PasswordInput.vue';
-import ErrorDisplay from '@/components/common/ErrorDisplay.vue';
-import { useRouter } from 'vue-router';
-import Logo from '@/components/common/AuditLogo.vue';
+import { ref, watch } from "vue";
+import { validateUsername } from "@/services/validations/validateUsername";
+import validatePassword from "@/services/validations/validatePassword";
+import { useLogin } from "@/composables/auth/useLogin";
+import BaseButton from "@/components/base/BaseButton.vue";
+import BaseInput from "@/components/base/BaseInput.vue";
+import BaseLink from "@/components/base/BaseLink.vue";
+import PasswordInput from "@/components/base/PasswordInput.vue";
+import ErrorDisplay from "@/components/common/ErrorDisplay.vue";
+import { useRouter } from "vue-router";
+import Logo from "@/components/common/AuditLogo.vue";
 
 // Composables
 const { login, error } = useLogin();
 const router = useRouter();
 
 // Refs
-const username = ref('');
-const password = ref('');
+const username = ref("");
+const password = ref("");
 const isLoading = ref(false);
 const validationErrors = ref([]);
 const isValidationErrorVisible = ref(false);
 
-const errorMessage = ref('')
+const errorMessage = ref("");
 const isErrorVisible = ref(false);
 
 // Constants
@@ -104,7 +104,7 @@ watch(error, (newError) => {
       }
     }, ERROR_DISPLAY_DURATION);
   } else {
-    errorMessage.value = '';
+    errorMessage.value = "";
     isErrorVisible.value = false;
     clearTimeout(errorTimeout);
   }
@@ -134,24 +134,24 @@ const handleLogin = async () => {
   }
 
   isLoading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = "";
   isErrorVisible.value = false;
 
   try {
     const response = await login(username.value, password.value);
 
     if (response?.success) {
-      router.replace('/dashboard');
+      router.replace("/dashboard");
     } else {
       // Error is already set in the composable and will be picked up by the watcher
     }
   } catch (err) {
-    console.error('💥 [LOGIN FORM] Unexpected error during login:', {
+    console.error("💥 [LOGIN FORM] Unexpected error during login:", {
       err,
       message: err?.message,
-      stack: err?.stack
+      stack: err?.stack,
     });
-    errorMessage.value = 'An unexpected error occurred. Please try again.';
+    errorMessage.value = "An unexpected error occurred. Please try again.";
     isErrorVisible.value = true;
   } finally {
     isLoading.value = false;

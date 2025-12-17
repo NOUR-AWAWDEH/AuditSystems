@@ -16,10 +16,6 @@ describe("BaseButton", () => {
     const wrapper = mount(BaseButton);
 
     await wrapper.find("button").trigger("click");
-
-    // Debugging
-    // console.log(wrapper.emitted())
-
     expect(wrapper.emitted()).toHaveProperty("click");
     expect(wrapper.emitted("click")).toHaveLength(1);
   });

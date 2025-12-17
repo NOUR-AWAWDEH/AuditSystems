@@ -19,7 +19,7 @@ internal sealed class CreateUserCommandHandler(
     {
         var registerDto = mapper.Map<RegisterDto>(request);
 
-        await userService.CreateUserAsync(registerDto, request.UserId, request.Scheme);
+        await userService.CreateUserAsync(registerDto, request.UserId);
 
         logger.LogInformation("User {UserName} created successfully by admin {AdminId}",
             request.UserName, request.UserId);

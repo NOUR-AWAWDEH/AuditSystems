@@ -4,7 +4,6 @@ using AuditSystem.Auth.Services.Email.Models;
 using AuditSystem.DataAccess.Contexts;
 using AuditSystem.Domain.Entities.Auth;
 using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +30,7 @@ public class RegistrationService(
 
     // ========================= REGISTER =========================
 
-    public async Task RegisterAsync(RegisterDto request, string scheme, Guid adminUserId)
+    public async Task RegisterAsync(RegisterDto request, Guid adminUserId)
     {
         // Check if a transaction is already in progress (e.g., from CommandTransactionBehavior)
         var currentTransaction = _dbContext.Database.CurrentTransaction;
@@ -54,7 +53,7 @@ public class RegistrationService(
             await CreateBusinessProfileAsync(identityUser, request, adminAppUser.Id);
             await CreateInitialRefreshTokenAsync(identityUser);
 
-            var confirmationLink = await GenerateConfirmationLinkAsync(identityUser, scheme);
+            var confirmationLink = await GenerateConfirmationLinkAsync(identityUser);
             await SendConfirmationEmailAsync(identityUser, confirmationLink);
 
             // Only commit if we started the transaction
@@ -87,12 +86,12 @@ public class RegistrationService(
 
     // ========================= VERIFY EMAIL =========================
 
-    public async Task VerificationEmailAsync(VerificationEmailDto request, string scheme)
+    public async Task VerificationEmailAsync(VerificationEmailDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email)
             ?? throw new InvalidOperationException($"User with email '{request.Email}' does not exist");
 
-        var confirmationLink = await GenerateConfirmationLinkAsync(user, scheme);
+        var confirmationLink = await GenerateConfirmationLinkAsync(user);
         await SendConfirmationEmailAsync(user, confirmationLink);
     }
 
@@ -146,7 +145,7 @@ public class RegistrationService(
             JobTitleId = request.JobTitleId,
             SubDepartmentId = request.SubDepartmentId,
             IsActive = true,
-            CreatedByUserId = adminAppUserId // Admin who created this user
+            CreatedByUserId = adminAppUserId
         };
 
         _dbContext.AppUsers.Add(appUser);
@@ -168,17 +167,17 @@ public class RegistrationService(
         await _dbContext.SaveChangesAsync();
     }
 
-    private async Task<string> GenerateConfirmationLinkAsync(ApplicationUser user, string scheme)
+    private async Task<string> GenerateConfirmationLinkAsync(ApplicationUser user)
     {
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-        var domain = _configuration["APP_DOMAIN"]
-            ?? throw new InvalidOperationException("APP_DOMAIN is not configured.");
+        var domain = _configuration["CORS_ALLOWED_ORIGIN"]
+            ?? throw new InvalidOperationException("CORS_ALLOWED_ORIGIN is not configured.");
 
         var encodedToken = WebUtility.UrlEncode(
             Convert.ToBase64String(Encoding.UTF8.GetBytes(token)));
 
-        return $"{scheme}://{domain}/confirm-email?uid={user.Id}&token={encodedToken}";
+        return $"{domain}/confirm-email?uid={user.Id}&token={encodedToken}";
     }
 
     private async Task SendConfirmationEmailAsync(ApplicationUser user, string confirmationLink)

@@ -10,7 +10,7 @@ describe("validateUserData", () => {
 
   it("should return error for invalid username", () => {
     const userData = {
-      username: "",
+      userName: "",
       email: "test@test.com",
       password: "Password1!",
       confirmPassword: "Password1!",
@@ -24,7 +24,7 @@ describe("validateUserData", () => {
 
   it("should return error for invalid email", () => {
     const userData = {
-      username: "john_doe",
+      userName: "john_doe",
       email: "",
       password: "Password1!",
       confirmPassword: "Password1!",
@@ -41,7 +41,7 @@ describe("validateUserData", () => {
 
   it("should return error for invalid password", () => {
     const userData = {
-      username: "john_doe",
+      userName: "john_doe",
       email: "test@test.com",
       password: "",
       confirmPassword: "",
@@ -63,7 +63,7 @@ describe("validateUserData", () => {
 
   it("should return error for missing firstName, lastName, roleName, companyId", () => {
     const baseData = {
-      username: "john_doe",
+      userName: "john_doe",
       email: "test@test.com",
       password: "Password1!",
       confirmPassword: "Password1!",
@@ -99,7 +99,7 @@ describe("validateUserData", () => {
 
   it("should return null for fully valid data", () => {
     const validData = {
-      username: "john_doe",
+      userName: "john_doe",
       email: "test@test.com",
       password: "Password1!",
       confirmPassword: "Password1!",
@@ -113,7 +113,7 @@ describe("validateUserData", () => {
 
   it("should validate companyId as a valid GUID", () => {
     const userData = {
-      username: "john_doe",
+      userName: "john_doe",
       email: "test@test.com",
       password: "Password1!",
       confirmPassword: "Password1!",

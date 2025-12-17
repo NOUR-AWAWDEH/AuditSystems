@@ -48,13 +48,15 @@ export const useConfirmEmail = () => {
         error.value = validationError;
         return;
       }
-      const response = await confirmEmailRepository.confirmEmailRepository(uid, token);
 
+      const response = await confirmEmailRepository.confirmEmailRepository(uid, token);
+      console.log(response);
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
+
     } catch (err) {
       console.error("Confirm email error:", err);
       return handleFailure(err, err.message || "Failed to confirm email");

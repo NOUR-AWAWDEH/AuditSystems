@@ -16,6 +16,13 @@ const routes = [
     redirect: "/login",
   },
   {
+    path: "/confirm-email",
+    name: "ConfirmEmail",
+    component: () =>
+      import("@/components/features/userManagement/confirmEmail/ConfirmEmailPage.vue"),
+    meta: { requiresAuth: false },
+  },
+  {
     path: "/login",
     name: "Login",
     component: Login,

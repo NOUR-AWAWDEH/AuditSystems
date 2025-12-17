@@ -10,9 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuditSystem.Host.Controllers.v1.Authentication;
 
-/// <summary>
-/// Controller for secure password reset operations using ASP.NET Identity tokens.
-/// </summary>
+
 [Route("api/[controller]")]
 [ApiController]
 public sealed class PasswordController(
@@ -24,10 +22,7 @@ public sealed class PasswordController(
         ILogger<PasswordController> _logger) :
         ControllerBase
 {
-    /// <summary>
-    /// Step 1: User requests password reset by providing their email.
-    /// Generates a secure token and sends it via email.
-    /// </summary>
+    
     [HttpPost("forgot-password")]
     [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
@@ -92,64 +87,57 @@ public sealed class PasswordController(
         }
     }
 
-    /// <summary>
-    /// Step 1.5: User verifies the code (token) before setting a new password.
-    /// This is useful for UI feedback before the actual reset call.
-    /// </summary>
-    [HttpPost("verify-reset-code")]
-    [PreventBruteForce]
-    public async Task<ActionResult<ApiResponse<VerifyResetCodeResponseDto>>> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
-    {
-        // Input validation
-        if (string.IsNullOrWhiteSpace(request.Email))
-            return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Email is required."));
+    
+    // [HttpPost("verify-reset-code")]
+    // [PreventBruteForce]
+    // public async Task<ActionResult<ApiResponse<VerifyResetCodeResponseDto>>> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
+    // {
+    //     // Input validation
+    //     if (string.IsNullOrWhiteSpace(request.Email))
+    //         return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Email is required."));
 
-        if (string.IsNullOrWhiteSpace(request.Code))
-            return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Reset code is required."));
+    //     if (string.IsNullOrWhiteSpace(request.Code))
+    //         return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Reset code is required."));
 
-        try
-        {
-            // Find user by email
-            var user = await _accountService.FindByEmailAsync(request.Email);
+    //     try
+    //     {
+    //         // Find user by email
+    //         var user = await _accountService.FindByEmailAsync(request.Email);
 
-            if (user == null)
-            {
-                // To prevent enumeration, we might want to return false or generic invalid
-                // However, returning "Invalid code" is usually safe enough if rate limited
-                return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid verification code."));
-            }
+    //         if (user == null)
+    //         {
+    //             // To prevent enumeration, we might want to return false or generic invalid
+    //             // However, returning "Invalid code" is usually safe enough if rate limited
+    //             return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid verification code."));
+    //         }
 
-            // Verify the token
-            var isValid = await _passwordTokenService.VerifyPasswordResetTokenAsync(user, request.Code);
+    //         // Verify the token
+    //         var isValid = await _passwordTokenService.VerifyPasswordResetTokenAsync(user, request.Code);
 
-            if (!isValid)
-            {
-                return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid or expired verification code."));
-            }
+    //         if (!isValid)
+    //         {
+    //             return BadRequest(ApiResponse<VerifyResetCodeResponseDto>.BadRequest("Invalid or expired verification code."));
+    //         }
 
-            // Return success result
-            var resultDto = new VerifyResetCodeResponseDto
-            {
-                Success = true,
-                SuccessMessage = "Code verified successfully.",
-                StatusCode = 200,
-                ResetToken = request.Code // Pass it back if needed, or just boolean
-            };
+    //         // Return success result
+    //         var resultDto = new VerifyResetCodeResponseDto
+    //         {
+    //             Success = true,
+    //             SuccessMessage = "Code verified successfully.",
+    //             StatusCode = 200,
+    //             ResetToken = request.Code
+    //         };
 
-            return Ok(ApiResponse<VerifyResetCodeResponseDto>.Ok(resultDto, "Code verified successfully."));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An unexpected error occurred during reset code verification for email: {Email}", request.Email);
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ApiResponse<VerifyResetCodeResponseDto>.InternalServerError("An unexpected error occurred. Please try again later."));
-        }
-    }
+    //         return Ok(ApiResponse<VerifyResetCodeResponseDto>.Ok(resultDto, "Code verified successfully."));
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError(ex, "An unexpected error occurred during reset code verification for email: {Email}", request.Email);
+    //         return StatusCode(StatusCodes.Status500InternalServerError,
+    //             ApiResponse<VerifyResetCodeResponseDto>.InternalServerError("An unexpected error occurred. Please try again later."));
+    //     }
+    // }
 
-    /// <summary>
-    /// Step 2: User submits new password with the token from their email.
-    /// Validates the token and resets the password.
-    /// </summary>
     [HttpPost("reset-password")]
     [PreventBruteForce]
     public async Task<ActionResult<ApiResponse>> ResetPassword([FromBody] ResetPasswordDto request)
@@ -177,13 +165,8 @@ public sealed class PasswordController(
                 return BadRequest(ApiResponse.BadRequest("Invalid reset request."));
             }
 
-            // Reset password using the secure token
-            // Identity automatically validates:
-            // - Token hasn't expired (default: 1 day, configurable)
-            // - Token hasn't been used before (one-time use)
-            // - Token hasn't been tampered with (cryptographic validation)
             var result = await _passwordResetService.ResetPasswordAsync(user, request.Token, request.NewPassword);
-            Console.WriteLine(request.Token);
+
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => new ApiErrorResponse(e.Description));

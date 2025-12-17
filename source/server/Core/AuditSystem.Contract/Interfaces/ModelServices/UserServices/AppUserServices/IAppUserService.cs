@@ -6,7 +6,7 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.UserServices.AppUserServ
 
 public interface IAppUserService
 {
-    Task CreateUserAsync(RegisterDto request, Guid adminUserId, string scheme);
+    Task CreateUserAsync(RegisterDto request, Guid adminUserId);
     Task UpdateUserAsync(UserModel user, Guid adminUserId);
     Task DeleteUserAsync(Guid userId, Guid adminUserId);
     Task<UserModel> GetUserByIdAsync(Guid id, Guid adminUserId);

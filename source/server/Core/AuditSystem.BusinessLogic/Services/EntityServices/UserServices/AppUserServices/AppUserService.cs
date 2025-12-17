@@ -28,12 +28,12 @@ internal sealed class AppUserService(
     public IRegistrationService RegistrationService => registrationService;
     public UserManager<ApplicationUser> UserManager => userManager;
 
-    public async Task CreateUserAsync(RegisterDto request, Guid adminUserId, string scheme)
+    public async Task CreateUserAsync(RegisterDto request, Guid adminUserId)
     {
         await appUserValidation.ValidateRoleNotAdmin(request.RoleName);
 
         appLogger.LogInformation("Registering user {UserName} starting...", request.UserName);
-        await registrationService.RegisterAsync(request, scheme, adminUserId);
+        await registrationService.RegisterAsync(request, adminUserId);
         appLogger.LogInformation("user has been registered successfully");
     }
 

@@ -13,7 +13,7 @@ export const validateUserData = (userData) => {
   if (!userData) return "User data is required";
 
   // Username
-  const usernameError = validateUsername(userData.username || "");
+  const usernameError = validateUsername(userData.userName || "");
   if (usernameError) return usernameError;
 
   // Email

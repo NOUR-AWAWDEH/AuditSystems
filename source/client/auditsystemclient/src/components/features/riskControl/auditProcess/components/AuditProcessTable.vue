@@ -10,12 +10,11 @@
           <div class="w-full sm:min-w-64 sm:max-w-xs">
             <SubDepartmentSelector
               :sub-departments="subDepartments"
-              :selected-sub-department-id="internalSelectedSubDepartmentId"
-              @update:selected-sub-department="(id) => (internalSelectedSubDepartmentId = id)"
-              @sub-department-changed="(id) => (internalSelectedSubDepartmentId = id)"
+              v-model="internalSelectedSubDepartmentId"
+              :auto-fetch="false"
             />
           </div>
-          <div class="w-full sm:w-auto">
+          <div class="w-full sm:w-auto mt-4">
             <SearchFilter
               :search="searchQuery"
               :search-placeholder="'Search  processes...'"

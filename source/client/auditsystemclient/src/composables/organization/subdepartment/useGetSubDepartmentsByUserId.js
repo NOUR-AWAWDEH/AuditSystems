@@ -40,6 +40,7 @@ export function useGetSubDepartmentsByUserId() {
       } else {
         return handleFetchFailure(response);
       }
+      
     } catch (err) {
       return handleFetchFailure(err, err.message || 'Failed to fetch subdepartments');
     } finally {
@@ -52,7 +53,6 @@ export function useGetSubDepartmentsByUserId() {
     subDepartments,
     isLoading,
     error,
-
     // Actions
     getSubDepartmentsByUserId,
   };

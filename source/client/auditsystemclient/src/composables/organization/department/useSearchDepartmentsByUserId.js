@@ -12,8 +12,8 @@ export function useSearchDepartmentsByUserId() {
     const locationId = ref(null);
 
     const handleSearchSuccess = (response) => {
-        const items = response.result?.result?.items || response.result?.items || [];
-        const extractedTotalCount = response.result?.result?.totalCount || response.result?.totalCount || 0;
+        const items = response.result?.items || [];
+        const extractedTotalCount = response.result?.totalCount || 0;
 
         const isValidArray = Array.isArray(items);
         

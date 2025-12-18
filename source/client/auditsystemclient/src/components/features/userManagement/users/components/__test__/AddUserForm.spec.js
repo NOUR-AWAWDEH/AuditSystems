@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
+
 import AddUserForm from "../AddUserForm.vue";
 import authService from "@/services/auth/authRepos/authService";
 
@@ -111,7 +112,7 @@ describe("AddUserForm.vue", () => {
   });
 
   it("populates companyId from authService on mount", () => {
-    const wrapper = mount(AddUserForm);
+    mount(AddUserForm);
     expect(authService.getLocalCompanyId).toHaveBeenCalled();
   });
 
@@ -173,11 +174,8 @@ describe("AddUserForm.vue", () => {
   it("does not close form on failed submission", async () => {
     mockCreateUser.mockResolvedValue({ success: false });
     const wrapper = mount(AddUserForm);
-
     // Open form
     await wrapper.findComponent({ name: "BaseButton" }).trigger("click");
-
-    // Submit
     await wrapper.find("form").trigger("submit.prevent");
 
     // Should stay open

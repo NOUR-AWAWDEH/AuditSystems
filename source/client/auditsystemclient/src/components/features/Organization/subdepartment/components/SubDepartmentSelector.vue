@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, watch } from "vue";
+import { computed, onMounted } from "vue";
 import CustomSelect from "@/components/common/CustomSelect.vue";
 import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 

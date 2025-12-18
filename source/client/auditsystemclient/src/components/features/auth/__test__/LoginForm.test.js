@@ -3,11 +3,7 @@ import { mount } from "@vue/test-utils";
 import LoginForm from "../LoginForm.vue";
 import { useLogin } from "@/composables/auth/useLogin";
 import { useRouter } from "vue-router";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
-import LoginForm from "../LoginForm.vue";
-import { useLogin } from "@/composables/auth/useLogin";
-import { useRouter } from "vue-router";
+
 import { ref } from "vue";
 import { validateUsername } from "@/services/validations/validateUsername";
 import validatePassword from "@/services/validations/validatePassword";

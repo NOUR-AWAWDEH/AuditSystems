@@ -25,9 +25,8 @@ describe("confirmEmailRepository", () => {
       data: {
         success: true,
         successMessage: "Email confirmed successfully",
-        result: { someData: true },
+        result: {},
       },
-      data: "Email confirmed successfully",
     };
 
     api.get.mockResolvedValue(mockResponse);

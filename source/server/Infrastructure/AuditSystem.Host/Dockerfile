@@ -24,6 +24,7 @@ WORKDIR /app
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:80
 
+
 # Create directory for data protection keys
 RUN mkdir -p /app/keys && chmod 777 /app/keys
 

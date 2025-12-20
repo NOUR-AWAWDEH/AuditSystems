@@ -10,6 +10,7 @@
     :disabled="isLoading"
     value-key="id"
     label-key="name"
+    :emit-object="emitObject"
     class="mt-4"
   />
 </template>
@@ -22,7 +23,7 @@ import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepa
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object],
-    required: true,
+    required: false,
   },
   label: {
     type: String,
@@ -44,6 +45,10 @@ const props = defineProps({
   autoFetch: {
     type: Boolean,
     default: true,
+  },
+  emitObject: {
+    type: Boolean,
+    default: false,
   },
 });
 

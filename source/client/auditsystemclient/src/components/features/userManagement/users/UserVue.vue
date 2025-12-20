@@ -17,7 +17,6 @@
       :handle-search="handleSearch"
       @edit-user="handleEditUser"
       @delete-user="handleDeleteUser"
-      @user-selected="handleUserSelected"
     />
 
     <!-- Edit User Modal -->
@@ -52,13 +51,9 @@ import { useUserTable } from "./composables/useUserTable";
 import { useUserActions } from "./composables/useUserActions";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
 
-const {companyId } = useAuthStatus();
+const { companyId } = useAuthStatus();
 
-const emit = defineEmits([
-  "user-added",
-  "user-updated",
-  "user-deleted",
-]);
+const emit = defineEmits(["user-added", "user-updated", "user-deleted"]);
 
 const { users, isLoading, searchQuery, handleSearch, resetToDefaultView, refreshData } =
   useUserTable();

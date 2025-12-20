@@ -192,7 +192,7 @@ import JobTitleSelector from "@/components/features/userManagement/jobTitle/comp
 import BaseButton from "@/components/base/BaseButton.vue";
 import PasswordInput from "@/components/base/PasswordInput.vue";
 import BaseInput from "@/components/base/BaseInput.vue";
-import RoleVue from "./RoleVue.vue";
+import RoleVue from "./RoleSelector.vue";
 import { ref, onMounted } from "vue";
 import authService from "@/services/auth/authRepos/authService";
 

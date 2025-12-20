@@ -54,8 +54,9 @@ describe("useUserTable", () => {
 
     // Mock useSearchUsersByAdminId
     useSearchUsersByAdminId.mockReturnValue({
-      users: mockUsers,
-      isLoading: mockIsLoading,
+      searchResults: mockUsers,
+      isSearching: mockIsLoading,
+      error: ref(null),
       totalCount: mockTotalCount,
       searchUsers: mockSearchUsers,
     });
@@ -64,6 +65,8 @@ describe("useUserTable", () => {
     useGetUsersByAdminId.mockReturnValue({
       users: mockAllUsers,
       getUsersByAdminId: mockGetUsersByAdminId,
+      isLoading: ref(false),
+      error: ref(null),
     });
 
     // Mock useSearchAndPagination
@@ -72,6 +75,7 @@ describe("useUserTable", () => {
       currentPage: mockCurrentPage,
       pageSize: mockPageSize,
       handleSearch: mockHandleSearch,
+      resetPagination: vi.fn(),
     });
   });
 

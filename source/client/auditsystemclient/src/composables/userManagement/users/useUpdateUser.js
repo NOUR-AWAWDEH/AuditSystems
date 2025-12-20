@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { updateUserRepository } from "@/services/userManagement/users/updateUserRepository";
-import { validateUserData } from "@/services/validations/validateUpdateUserData";
+import { validateUpdateUserData } from "@/services/validations/validateUpdateUserData";
 
 export const useUpdateUser = () => {
   const isUpdating = ref(false);
@@ -38,7 +38,7 @@ export const useUpdateUser = () => {
       updatedUser.value = null;
 
       // Validate input data
-      const validationError = validateUserData(userData);
+      const validationError = validateUpdateUserData(userData);
       if (validationError) {
         return handleFailure({ message: validationError });
       }

@@ -132,7 +132,7 @@ describe("AddUserForm.vue", () => {
     await wrapper.find("#user-confirm-password").setValue("password123");
 
     // For mocked selectors/role, we simulate change
-    await wrapper.findComponent({ name: "RoleVue" }).vm.$emit("update:modelValue", "Admin");
+    await wrapper.findComponent({ name: "RoleSelector" }).vm.$emit("update:modelValue", "Admin");
     await wrapper.findComponent({ name: "JobTitleSelector" }).vm.$emit("update:modelValue", "job1");
     await wrapper
       .findComponent({ name: "SubDepartmentSelector" })

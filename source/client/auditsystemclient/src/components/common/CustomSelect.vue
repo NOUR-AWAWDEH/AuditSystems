@@ -21,7 +21,7 @@
     <div class="select-wrapper relative">
       <select
         :id="id"
-        :value="modelValue?.toString()"
+        :value="selectValue"
         :disabled="disabled"
         :required="required"
         @change="handleChange"
@@ -115,6 +115,10 @@ const props = defineProps({
     type: String,
     default: "label",
   },
+  emitObject: {
+    type: Boolean,
+    default: false,
+  },
   selectClass: {
     type: String,
     default: "",
@@ -126,6 +130,17 @@ const emit = defineEmits(["update:modelValue", "change", "focus", "blur"]);
 const id = computed(() => `select-${Math.random().toString(36).substr(2, 9)}`);
 const isOpen = ref(false);
 
+// Compute the actual select value, handling object modelValue
+const selectValue = computed(() => {
+  if (props.modelValue === null || props.modelValue === undefined) {
+    return "";
+  }
+  if (typeof props.modelValue === "object") {
+    return props.modelValue[props.valueKey]?.toString() || "";
+  }
+  return props.modelValue.toString();
+});
+
 const getOptionValue = (option) => {
   return typeof option === "object" ? option[props.valueKey] : option;
 };
@@ -135,9 +150,10 @@ const getOptionLabel = (option) => {
 };
 
 const handleChange = (event) => {
-  const value = getOptionValue(
-    props.options.find((opt) => getOptionValue(opt).toString() === event.target.value)
+  const selectedOption = props.options.find(
+    (opt) => getOptionValue(opt).toString() === event.target.value
   );
+  const value = props.emitObject ? selectedOption : getOptionValue(selectedOption);
   emit("update:modelValue", value);
   emit("change", value);
 };

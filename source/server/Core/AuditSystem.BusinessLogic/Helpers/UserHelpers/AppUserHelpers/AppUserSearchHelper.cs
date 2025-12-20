@@ -27,7 +27,8 @@ public class AppUserSearchHelper(
                     (string.IsNullOrEmpty(searchTerm) ||
                      u.FirstName.Contains(searchTerm) ||
                      u.LastName.Contains(searchTerm) ||
-                     (u.IdentityUser.Email != null && u.IdentityUser.Email.Contains(searchTerm))) &&
+                     u.IdentityUser.UserName!.Contains(searchTerm) ||
+                     u.IdentityUser.Email!.Contains(searchTerm)) &&
                     (subDepartmentId == null || u.SubDepartmentId == subDepartmentId);
     }
 

@@ -11,6 +11,7 @@
         <div v-if="updateError" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
           {{ updateError }}
         </div>
+       
         <div class="mb-4">
           <label for="edit-name" class="block text-sm font-medium text-secondary-base mb-2">
             Job Title Name

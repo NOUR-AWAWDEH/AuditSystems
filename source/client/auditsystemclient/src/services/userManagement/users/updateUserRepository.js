@@ -2,14 +2,13 @@ import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from "@/services/auth/authRepos/authService";
 
-const USER_ENDPOINT = "/api/User";
-const UPDATE_JOB_TITLE_ENDPOINT = "/update-user-by-id";
+const USER_ENDPOINT = "/api/Users";
+const UPDATE_USER_ENDPOINT = "/update-user";
 
 export const updateUserRepository = {
   async updateUser(userData) {
     try {
       const token = authService.getLocalToken();
-      const companyId = authService.getCompanyIdFromToken();
 
       const payload = {
         id: userData.id,
@@ -20,10 +19,9 @@ export const updateUserRepository = {
         role: userData.role,
         subDepartment: userData.subDepartment || null,
         jobTitle: userData.jobTitle || null,
-        companyId: companyId,
       };
 
-      const response = await api.put(`${USER_ENDPOINT}${UPDATE_JOB_TITLE_ENDPOINT}`, payload, {
+      const response = await api.put(`${USER_ENDPOINT}${UPDATE_USER_ENDPOINT}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -36,7 +34,6 @@ export const updateUserRepository = {
             null,
             response.data.successMessage || "User updated successfully."
           );
-          
         } else {
           return ApiResponseT.badRequest(
             response.data.errors || [

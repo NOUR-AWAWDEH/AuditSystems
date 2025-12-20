@@ -10,19 +10,20 @@
     :disabled="isLoading"
     value-key="id"
     label-key="name"
+    :emit-object="emitObject"
     class="mt-4"
   />
 </template>
 
 <script setup>
-import { onMounted, computed, watch } from "vue";
+import { computed, onMounted } from "vue";
 import CustomSelect from "@/components/common/CustomSelect.vue";
 import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 
 const props = defineProps({
   modelValue: {
     type: [String, Number, Object],
-    required: true,
+    required: false,
   },
   label: {
     type: String,
@@ -44,6 +45,10 @@ const props = defineProps({
   autoFetch: {
     type: Boolean,
     default: true,
+  },
+  emitObject: {
+    type: Boolean,
+    default: false,
   },
 });
 

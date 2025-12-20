@@ -33,8 +33,7 @@ export const searchUsersByAdminIdRepository = {
 
             const queryString = queryParams.toString();
 
-            const url = `${USER_BASE_ENDPOINT}${SEARCH_USERS_BY_ADMIN_ID_ENDPOINT}
-                ${queryString ? `?${queryString}` : ""}`;
+            const url = `${USER_BASE_ENDPOINT}${SEARCH_USERS_BY_ADMIN_ID_ENDPOINT}${queryString ? `?${queryString}` : ""}`;
 
             const response = await api.get(url, {
                 headers: {
@@ -56,7 +55,7 @@ export const searchUsersByAdminIdRepository = {
                 data?.errors || [{ message: "Failed to retrieve users." }],
                 data?.message || "Failed to retrieve users."
             );
-            
+
         } catch (error) {
             console.error("Error searching users:", error);
 

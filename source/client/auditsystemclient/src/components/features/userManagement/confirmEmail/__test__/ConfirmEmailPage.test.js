@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import ConfirmEmailPage from "../ConfirmEmailPage.vue";
 import { useRoute, useRouter } from "vue-router";

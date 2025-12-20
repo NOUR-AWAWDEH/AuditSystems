@@ -10,6 +10,7 @@
     :disabled="isLoading"
     value-key="id"
     label-key="name"
+    :emit-object="emitObject"
     class="mt-4"
   />
 </template>
@@ -22,7 +23,7 @@ import { useGetJobTitlesByUserId } from "@/composables/organization/jobTitle/use
 defineProps({
   modelValue: {
     type: [String, Number, Object],
-    required: true,
+    required: false,
   },
   label: {
     type: String,
@@ -33,6 +34,10 @@ defineProps({
     default: "Select Job Title",
   },
   required: {
+    type: Boolean,
+    default: false,
+  },
+  emitObject: {
     type: Boolean,
     default: false,
   },

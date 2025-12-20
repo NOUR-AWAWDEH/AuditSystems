@@ -9,12 +9,13 @@ export const useGetUsersByAdminId = () => {
   const handleSuccess = (response) => {
     users.value = response.result;
     const message = response.successMessage || "Users retrieved successfully.";
-    
+
     return { success: true, data: response.result, message };
   };
 
   const handleFailure = (response, defaultErrorMessage = "Failed to retrieve users") => {
-    const errorMessage = response?.errors?.length > 0
+    const errorMessage =
+      response?.errors?.length > 0
         ? response.errors[0].message
         : response?.message || defaultErrorMessage;
 
@@ -26,20 +27,19 @@ export const useGetUsersByAdminId = () => {
     };
   };
 
-  const getUsers = async () => {
+  const getUsersByAdminId = async () => {
     isLoading.value = true;
     error.value = null;
     users.value = [];
 
     try {
-      const response = await getUsersByAdminIdRepository.getAllUsers();
-      
+      const response = await getUsersByAdminIdRepository.getUsersByAdminId();
+
       if (response.success) {
         return handleSuccess(response);
       } else {
         return handleFailure(response);
       }
-
     } catch (err) {
       return handleFailure(err, err.message || "Failed to retrieve users");
     } finally {
@@ -47,10 +47,28 @@ export const useGetUsersByAdminId = () => {
     }
   };
 
+  const addUser = (newUser) => {
+    users.value.push(newUser);
+  };
+
+  const removeUser = (userId) => {
+    users.value = users.value.filter((user) => user.id !== userId);
+  };
+
+  const updateUser = (updatedUser) => {
+    const index = users.value.findIndex((user) => user.id === updatedUser.id);
+    if (index !== -1) {
+      users.value[index] = updatedUser;
+    }
+  };
+
   return {
     isLoading,
     error,
     users,
-    getUsers,
+    getUsersByAdminId,
+    addUser,
+    removeUser,
+    updateUser,
   };
 };

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useUpdateUser } from "@/composables/userManagement/users/useUpdateUser";
 import { updateUserRepository } from "@/services/userManagement/users/updateUserRepository";
-import { validateUserData } from "@/services/validations/validateUpdateUserData";
+import { validateUpdateUserData } from "@/services/validations/validateUpdateUserData";
 
 // ✅ MOCKS — paths MUST match composable imports exactly
 vi.mock("@/services/userManagement/users/updateUserRepository", () => ({
@@ -11,7 +11,7 @@ vi.mock("@/services/userManagement/users/updateUserRepository", () => ({
 }));
 
 vi.mock("@/services/validations/validateUpdateUserData", () => ({
-    validateUserData: vi.fn(),
+    validateUpdateUserData: vi.fn(),
 }));
 
 describe("useUpdateUser", () => {
@@ -20,7 +20,7 @@ describe("useUpdateUser", () => {
     });
 
     it("updates user successfully", async () => {
-        validateUserData.mockReturnValue(null);
+        validateUpdateUserData.mockReturnValue(null);
 
         updateUserRepository.updateUser.mockResolvedValue({
             success: true,
@@ -44,7 +44,7 @@ describe("useUpdateUser", () => {
     });
 
     it("fails when validation fails", async () => {
-        validateUserData.mockReturnValue("Invalid data");
+        validateUpdateUserData.mockReturnValue("Invalid data");
 
         const { updateUser, error, updatedUser } = useUpdateUser();
 
@@ -59,7 +59,7 @@ describe("useUpdateUser", () => {
     });
 
     it("handles API failure response", async () => {
-        validateUserData.mockReturnValue(null);
+        validateUpdateUserData.mockReturnValue(null);
 
         updateUserRepository.updateUser.mockResolvedValue({
             success: false,
@@ -76,7 +76,7 @@ describe("useUpdateUser", () => {
     });
 
     it("handles thrown exception", async () => {
-        validateUserData.mockReturnValue(null);
+        validateUpdateUserData.mockReturnValue(null);
 
         updateUserRepository.updateUser.mockRejectedValue(
             new Error("Network error")

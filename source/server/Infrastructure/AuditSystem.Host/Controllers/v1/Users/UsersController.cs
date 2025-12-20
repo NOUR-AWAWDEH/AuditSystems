@@ -5,8 +5,10 @@ using AuditSystem.Application.Features.Users.Get.GetActionOwners;
 using AuditSystem.Application.Features.Users.Get.GetUserById;
 using AuditSystem.Application.Features.Users.Get.GetUsersByAdminId;
 using AuditSystem.Application.Features.Users.Update;
+using AuditSystem.Application.Features.Common.Pagination;
 using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
+using AuditSystem.Contract.Models.Users;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -73,6 +75,8 @@ public sealed class UsersController(IMediator mediator) : ApiControllerBase(medi
 
     //Search Users by Admin Id
     [HttpGet("search-users-by-admin-id")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<PaginationRequestResponse<UserModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SearchUsersByAdminId([FromQuery] SearchUsersQuery query) =>

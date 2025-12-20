@@ -88,7 +88,7 @@ describe("useConfirmEmail", () => {
   });
 
   it("should handle repository failure with default message", async () => {
-    const { confirmEmail, isLoading, error, success } = useConfirmEmail();
+    const { confirmEmail, isLoading, error } = useConfirmEmail();
 
     const mockResponse = {
       success: false,
@@ -118,7 +118,7 @@ describe("useConfirmEmail", () => {
   });
 
   it("should handle exceptions with fallback message", async () => {
-    const { confirmEmail, isLoading, error, success } = useConfirmEmail();
+    const { confirmEmail, isLoading, error } = useConfirmEmail();
 
     const mockError = {};
 

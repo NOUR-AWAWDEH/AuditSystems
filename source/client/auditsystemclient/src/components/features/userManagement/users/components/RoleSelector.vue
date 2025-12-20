@@ -17,13 +17,14 @@ import CustomSelect from "@/components/common/CustomSelect.vue";
 defineProps({
   modelValue: {
     type: String,
-    required: true,
+    required: false,
   },
 });
 
 defineEmits(["update:modelValue"]);
 
 const roleOptions = [
-  { label: "Action Owner", value: "ActionOwner" }
+  { label: "Action Owner", value: "ActionOwner" },
+  { label: "Admin", value: "Admin" },
 ];
 </script>

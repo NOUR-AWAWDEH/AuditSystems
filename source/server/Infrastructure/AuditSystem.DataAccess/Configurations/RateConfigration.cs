@@ -17,6 +17,11 @@ public class RateConfiguration : IEntityTypeConfiguration<Rate>
 
         builder.HasIndex(r => r.Level).IsUnique();
 
+        builder.HasMany(r => r.Observations)
+            .WithOne(o => o.Rate)
+            .HasForeignKey(o => o.RateId)
+            .IsRequired(true);
+
         // Seed 5 default ratings with fixed GUIDs and constant dates
         builder.HasData(
             new Rate

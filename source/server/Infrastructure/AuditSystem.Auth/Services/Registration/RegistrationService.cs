@@ -171,8 +171,20 @@ public class RegistrationService(
     {
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-        var domain = _configuration["CORS_ALLOWED_ORIGIN"]
-            ?? throw new InvalidOperationException("CORS_ALLOWED_ORIGIN is not configured.");
+        // Parse CORS_ALLOWED_ORIGIN - take first origin from comma-separated list
+        var corsOrigins = _configuration["CORS_ALLOWED_ORIGIN"];
+        var domain = corsOrigins?.Split(',', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+
+        // Fallback to ClientUrl in appsettings if CORS_ALLOWED_ORIGIN is not set
+        if (string.IsNullOrEmpty(domain))
+        {
+            domain = _configuration["ClientUrl"];
+        }
+
+        if (string.IsNullOrEmpty(domain))
+        {
+            throw new InvalidOperationException("CORS_ALLOWED_ORIGIN or ClientUrl is not configured.");
+        }
 
         var encodedToken = WebUtility.UrlEncode(
             Convert.ToBase64String(Encoding.UTF8.GetBytes(token)));

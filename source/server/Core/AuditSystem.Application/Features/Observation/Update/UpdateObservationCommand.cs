@@ -5,11 +5,10 @@ namespace AuditSystem.Application.Features.Observation.Update;
 
 public sealed record UpdateObservationCommand(
     Guid Id,
-    string Description,
-    string ActionOwner,
+    string Highlight,
     string Background,
-    string ActionPlan,
-    DateTime ActionDate,
+    bool IsActive,
     string? Note,
-    Guid AuditProgramId
+    Guid AuditProgramId,
+    Guid RateId
 ) : UserAwareCommand<Result>;

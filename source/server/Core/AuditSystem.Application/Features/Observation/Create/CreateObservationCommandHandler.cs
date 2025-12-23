@@ -18,7 +18,7 @@ internal sealed class CreateObservationCommandHandler(
         var observationModel = mapper.Map<ObservationModel>(request);
         var observationId = await observationService.CreateObservationAsync(observationModel, request.UserId);
         
-        logger.LogInformation("Observation with Description {ObservationDescription} has been created by user with id: {UserId}", request.Description, request.UserId);
-        return Result<CreateObservationCommandResponse>.Created(new(observationId), "Observation has been created.");
+        logger.LogInformation("Observation with Description {ObservationHighlight} has been created by user with id: {UserId}", request.Highlight, request.UserId);
+        return Result<CreateObservationCommandResponse>.Created(new CreateObservationCommandResponse(observationId), "Observation has been created.");
     }
 }

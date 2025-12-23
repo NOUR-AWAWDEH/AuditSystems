@@ -23,7 +23,7 @@ public class ObservationSearchHelper(
     public Expression<Func<Observation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProgramId)
     {
         return ap => ap.CreatedByUserId == userId &&
-                (string.IsNullOrEmpty(searchTerm) || ap.Description.Contains(searchTerm));
+                (string.IsNullOrEmpty(searchTerm) || ap.Highlight.Contains(searchTerm));
     }
 
     // Original method for backward compatibility
@@ -78,13 +78,12 @@ public class ObservationSearchHelper(
             .Select(ap => new ObservationModel
             {
                 Id = ap.Id,
-                Description = ap.Description,
-                ActionOwner = ap.ActionOwner,
                 Background = ap.Background,
-                ActionPlan = ap.ActionPlan,
-                ActionDate = ap.ActionDate,
+                Highlight = ap.Highlight,
+                IsActive =  ap.IsActive,
                 Note = ap.Note,
                 AuditProgramId = ap.AuditProgramId,
+                RateId =  ap.RateId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })

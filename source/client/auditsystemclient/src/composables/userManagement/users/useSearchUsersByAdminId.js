@@ -52,7 +52,7 @@ export function useSearchUsersByAdminId() {
       if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
       const response = await searchUsersByAdminIdRepository.searchUsersByAdminId(params);
-      console.log("search Users response", response);
+
       if (response?.success) {
         handleSearchSuccess(response);
       } else {

@@ -12,27 +12,85 @@
           <div class="flex items-center justify-between p-4 border-b border-gray-tint">
             <h3 class="text-base font-medium text-secondary-shade font-poppins">Edit Observation</h3>
             <button @click="$emit('close')" class="text-gray-base hover:text-gray-shade focus:outline-none">
-              <CloseIcon size="md" />
+              <CloseIcon size="md" custom-class="text-gray-400 hover:text-gray-600" />
             </button>
           </div>
 
           <!-- Content -->
           <div class="p-4">
-            <form @submit.prevent="handleSubmit" class="space-y-4">
-              <div v-for="field in fields" :key="field.key">
-                <label :for="field.id" class="block text-sm font-medium text-gray-700">
-                  {{ field.label }} *
+            <form @submit.prevent="handleSubmit" novalidate class="space-y-4">
+
+              <!--  Observation Highlight Field -->
+              <div>
+                <label for="observation-highlight" class="block text-sm font-medium text-gray-700 mb-3">
+                  Observation Highlight *
                 </label>
+                <BaseInput id="observation-highlight" v-model="formData.highlight" label="Observation Highlight"
+                  placeholder="Enter Observation Highlight"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.highlight ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                <p v-if="errors.highlight" class="text-error text-sm mt-1">{{ errors.highlight }}</p>
+              </div>
 
-                <component
-                  :is="field.component"
-                  v-model="formData[field.key]"
-                  :id="field.id"
-                  :placeholder="field.placeholder"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors[field.key] ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
-                />
+              <!--  Observation Background Field -->
+              <div>
+                <label for="observation-background" class="block text-sm font-medium text-gray-700 mb-3">
+                  Observation Background *
+                </label>
+                <BaseInput id="observation-background" v-model="formData.background" label="Observation Background"
+                  placeholder="Enter Observation Background"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.background ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                <p v-if="errors.background" class="text-error text-sm mt-1">{{ errors.background }}</p>
+              </div>
 
-                <p v-if="errors[field.key]" class="text-error text-sm mt-1">{{ errors[field.key] }}</p>
+              <!--  Observation Is Active Field -->
+              <div>
+                <label for="observation-is-avtive" class="block text-sm font-medium text-gray-700 mb-3">
+                  Observation Is Active *
+                </label>
+                <div class="flex gap-6">
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      id="is-active-yes"
+                      value="true"
+                      v-model="formData.isActive"
+                      class="w-4 h-4 text-primary-base border-gray-300 focus:ring-primary-base focus:ring-2"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">Yes</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      id="is-active-no"
+                      value="false"
+                      v-model="formData.isActive"
+                      class="w-4 h-4 text-primary-base border-gray-300 focus:ring-primary-base focus:ring-2"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">No</span>
+                  </label>
+                </div>
+                <p v-if="errors.isActive" class="text-error text-sm mt-1">{{ errors.isActive }}</p>
+              </div>
+
+              <!--  Observation Rate Field -->
+              <div>
+                <label for="observation-rate" class="block text-sm font-medium text-gray-700 mb-3">
+                  Observation Rate *
+                </label>
+                <RateSelector :rates="rates" :selectedRateId="formData.rateId"
+                  @update:selectedRateId="handleRateChange" />
+                <p v-if="errors.rateId" class="text-error text-sm mt-1">{{ errors.rateId }}</p>
+              </div>
+
+              <!--  Observation Note Field -->
+              <div>
+                <label for="observation-note" class="block text-sm font-medium text-gray-700 mb-3">
+                  Observation Note
+                </label>
+                <BaseInput id="observation-note" v-model="formData.note" label="Observation Note"
+                  placeholder="Enter Observation Note"
+                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.note ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`" />
+                <p v-if="errors.note" class="text-error text-sm mt-1">{{ errors.note }}</p>
               </div>
 
               <!--Error Display -->
@@ -64,11 +122,12 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import BaseDateInput from '@/components/base/BaseDateInput.vue';
+import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import { useUpdateObservationById } from '@/composables/riskControl/observation/useUpdateObservationById';
 import { useNotification } from '@/composables/notification/useNotification';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
-import CloseIcon from '@/components/common/icons/CloseIcon.vue';
+import RateSelector from '@/components/common/rate/RateSelector.vue';
+import { useSearchRates } from '@/composables/common/rate/useSearchRates';
 
 const props = defineProps({
   isVisible: { type: Boolean, default: false },
@@ -80,75 +139,107 @@ const emit = defineEmits(['close', 'observation-updated']);
 const { showNotification } = useNotification();
 const { isUpdating, error, updateObservation, resetState } = useUpdateObservationById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
+const { searchResults: rates, searchRates } = useSearchRates();
 
 const formData = ref({
-  description: '',
+  highlight: '',
   background: '',
-  actionOwner: '',
-  actionPlan: '',
-  actionDate: '',
+  isActive: '',
+  rateId: '',
   note: ''
 });
 
-const errors = ref({});
-
-const fields = [
-  { key: 'description', label: 'Observation Description', id: 'observation-description', placeholder: 'Enter Observation Description', component: BaseInput },
-  { key: 'background', label: 'Observation Background', id: 'observation-background', placeholder: 'Enter Observation Background', component: BaseInput },
-  { key: 'actionOwner', label: 'Observation Action Owner', id: 'observation-action-owner', placeholder: 'Enter Observation Action Owner', component: BaseInput },
-  { key: 'actionPlan', label: 'Observation Action Plan', id: 'observation-action-plan', placeholder: 'Enter Observation Action Plan', component: BaseInput },
-  { key: 'actionDate', label: 'Observation Action Date', id: 'observation-action-date', placeholder: 'Select Observation Action Date', component: BaseDateInput },
-  { key: 'note', label: 'Observation Note', id: 'observation-note', placeholder: 'Enter Observation Note', component: BaseInput }
-];
+const errors = ref({
+  highlight: '',
+  background: '',
+  isActive: '',
+  rateId: '',
+  note: ''
+});
 
 const resetForm = () => {
   formData.value = {
-    description: '',
+    highlight: '',
     background: '',
-    actionOwner: '',
-    actionPlan: '',
-    actionDate: '',
+    isActive: '',
+    rateId: '',
     note: ''
   };
-  errors.value = {};
+  errors.value = {
+    highlight: '',
+    background: '',
+    isActive: '',
+    rateId: '',
+    note: ''
+  };
   resetState();
 };
 
 const populateForm = () => {
   if (props.observation?.id) {
     formData.value = {
-      description: props.observation.description || '',
+      highlight: props.observation.highlight || '',
       background: props.observation.background || '',
-      actionOwner: props.observation.actionOwner || '',
-      actionPlan: props.observation.actionPlan || '',
-      actionDate: props.observation.actionDate || '',
+      isActive: props.observation.isActive !== undefined ? String(props.observation.isActive) : '',
+      rateId: props.observation.rateId || '',
       note: props.observation.note || ''
     };
   }
+};
+
+const handleRateChange = (value) => {
+  formData.value.rateId = value;
 };
 
 watch([() => props.isVisible, () => props.observation], ([visible, obs]) => {
   if (visible && obs?.id) {
     resetForm();
     populateForm();
+    // Load rates when modal opens
+    loadRates();
   }
 });
 
 onMounted(async () => {
   if (!authStatus.value) await checkAuthStatus();
+  await loadRates();
 });
 
+const loadRates = async () => {
+  try {
+    await searchRates({ searchTerm: '', pageNumber: 1, pageSize: 100 });
+  } catch (err) {
+    console.error('Error loading rates:', err);
+  }
+};
+
 const validateForm = () => {
-  errors.value = {};
+  errors.value = {
+    highlight: '',
+    background: '',
+    isActive: '',
+    rateId: '',
+    note: ''
+  };
+
   let isValid = true;
 
-  Object.keys(formData.value).forEach(key => {
-    if (key === 'note') return;
-    if (!formData.value[key] || !formData.value[key].toString().trim()) {
-      errors.value[key] = `${fields.find(f => f.key === key).label} is required`;
-      isValid = false;
-    }
-  });
+  if (!formData.value.highlight.trim()) {
+    errors.value.highlight = 'Observation highlight is required';
+    isValid = false;
+  }
+  if (!formData.value.background.trim()) {
+    errors.value.background = 'Observation background is required';
+    isValid = false;
+  }
+  if (formData.value.isActive === '' || formData.value.isActive === null || formData.value.isActive === undefined) {
+    errors.value.isActive = 'Observation is active is required';
+    isValid = false;
+  }
+  if (!formData.value.rateId) {
+    errors.value.rateId = 'Observation rate is required';
+    isValid = false;
+  }
 
   return isValid;
 };
@@ -169,38 +260,67 @@ const handleSubmit = async () => {
   try {
     const observationData = {
       id: props.observation.id,
-      description: formData.value.description.trim(),
+      highlight: formData.value.highlight.trim(),
       background: formData.value.background.trim(),
-      actionOwner: formData.value.actionOwner.trim(),
-      actionPlan: formData.value.actionPlan.trim(),
-      actionDate: new Date(formData.value.actionDate).toISOString(),
-      note: formData.value.note.trim(),
-      auditProgramId: props.observation.auditProgramId,
+      isActive: formData.value.isActive === 'true' || formData.value.isActive === true,
+      rateId: String(formData.value.rateId),
+      note: formData.value.note ? formData.value.note.trim() : null,
+      auditProgramId: String(props.observation.auditProgramId),
       createdAt: props.observation.createdAt
     };
-
+    
     const result = await updateObservation(observationData);
 
     if (result?.success) {
-      showNotification(`Observation "${observationData.description}" updated successfully!`, 'success');
+      showNotification(`Observation "${observationData.highlight}" updated successfully!`, 'success');
       emit('observation-updated', observationData);
       emit('close');
     } else {
-      showNotification(result?.message || error.value || 'Failed to update observation.', 'error');
+      const errorMessage = result?.message || result?.errors?.[0]?.message || error.value || 'Failed to update observation.';
+      console.error('Update observation failed:', result);
+      showNotification(errorMessage, 'error');
     }
   } catch (err) {
-    showNotification(err.response?.data?.message || err.message || 'Failed to update observation.', 'error');
+    console.error('Error updating observation:', err);
+    const errorMessage = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || err.message || 'Failed to update observation.';
+    showNotification(errorMessage, 'error');
   }
 };
 </script>
 
 <style scoped>
 .modal-enter-active,
-.modal-leave-active { transition: opacity 0.3s ease; }
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
 .modal-enter-from,
-.modal-leave-to { opacity: 0; }
+.modal-leave-to {
+  opacity: 0;
+}
+
 .modal-enter-active .relative,
-.modal-leave-active .relative { transition: transform 0.3s ease; }
+.modal-leave-active .relative {
+  transition: transform 0.3s ease;
+}
+
 .modal-enter-from .relative,
-.modal-leave-to .relative { transform: scale(0.95); }
+.modal-leave-to .relative {
+  transform: scale(0.95) translateY(-20px);
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 375px) {
+  .relative {
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+/* Improve button touch targets on mobile */
+@media (max-width: 640px) {
+  button {
+    min-height: 44px;
+  }
+}
 </style>

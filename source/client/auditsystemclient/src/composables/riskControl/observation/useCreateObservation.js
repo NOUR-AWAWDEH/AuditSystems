@@ -21,11 +21,33 @@ export function useCreateObservation() {
             : response?.message || defaultErrorMessage;
         
         error.value = errorMessage;
-        return {
+
+        const failureResult = {
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }]
         };
+
+        return failureResult;
+    };
+
+    const validateCreateObservation = (observationData) => {
+        if (!observationData.highlight) {
+            return 'Observation highlight is required';
+        }
+        if (!observationData.background) {
+            return 'Observation background is required';
+        }
+        if (observationData.isActive === null || observationData.isActive === undefined) {
+            return 'Observation is active is required';
+        }
+        if (!observationData.auditProgramId) {
+            return 'AuditProgram ID is required';
+        }
+        if (!observationData.rateId) {
+            return 'Rate ID is required';
+        }
+        return null;
     };
 
     const createObservation = async (observationData) => {
@@ -33,6 +55,11 @@ export function useCreateObservation() {
             isCreating.value = true;
             error.value = null;
             createdObservation.value = null;
+
+            const validationError = validateCreateObservation(observationData);
+            if (validationError) {
+                return handleCreateFailure(validationError);
+            }
 
             const response = await createObservationRepository.createObservation(observationData);
 

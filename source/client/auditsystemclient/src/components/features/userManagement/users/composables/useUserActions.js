@@ -59,7 +59,7 @@ export function useUserActions(users, emit, refreshData) {
       emit("user-updated", updatedUser);
 
       showNotification(
-        `User "${updatedUser.name}" has been updated successfully!`,
+        `User "${updatedUser.firstName}" has been updated successfully!`,
         "success"
       );
 
@@ -73,7 +73,7 @@ export function useUserActions(users, emit, refreshData) {
   const handleDeleteUser = (user) => {
     itemToDelete.value = user;
     deleteDialogTitle.value = "Delete User";
-    deleteDialogMessage.value = `Are you sure you want to delete "${user.FirstName} ${user.LastName}"? This action cannot be undone.`;
+    deleteDialogMessage.value = `Are you sure you want to delete "${user.userName}"? This action cannot be undone.`;
     showDeleteDialog.value = true;
   };
 
@@ -92,7 +92,7 @@ export function useUserActions(users, emit, refreshData) {
       }
 
       showNotification(
-        `User "${deletedUser.FirstName} ${deletedUser.LastName}" has been deleted successfully!`,
+        `User "${deletedUser.firstName}" has been deleted successfully!`,
         "success"
       );
 

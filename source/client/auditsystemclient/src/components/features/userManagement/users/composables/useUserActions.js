@@ -2,7 +2,7 @@ import { ref } from "vue";
 import { useDeleteUserById } from "@/composables/userManagement/users/useDeleteUserById";
 import { useNotification } from "@/composables/notification/useNotification";
 
-export function useUserActions(users, emit) {
+export function useUserActions(users, emit, refreshData) {
   const { deleteUser } = useDeleteUserById();
   const { showNotification } = useNotification();
 
@@ -25,7 +25,13 @@ export function useUserActions(users, emit) {
   };
 
   const handleUserAdded = async (newUser) => {
-    users.value.push(newUser);
+    // Refresh data from server to get the latest user list immediately
+    if (refreshData) {
+      await refreshData();
+    } else {
+      // Fallback: add to local array if refreshData is not provided
+      users.value.push(newUser);
+    }
     emit("user-added", newUser);
     handleCloseAddUserModal();
   };

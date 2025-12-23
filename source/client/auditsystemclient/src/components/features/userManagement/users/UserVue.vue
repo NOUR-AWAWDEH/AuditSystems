@@ -74,7 +74,7 @@ const {
   handleDeleteUser,
   confirmDelete,
   cancelDelete,
-} = useUserActions(users, emit);
+} = useUserActions(users, emit, refreshData);
 
 // Expose users for parent component
 defineExpose({

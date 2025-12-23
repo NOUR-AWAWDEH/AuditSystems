@@ -196,6 +196,8 @@ import RoleVue from "./RoleSelector.vue";
 import { ref, onMounted } from "vue";
 import authService from "@/services/auth/authRepos/authService";
 
+const emit = defineEmits(["user-added"]);
+
 const newUser = ref({
   firstName: "",
   lastName: "",
@@ -232,9 +234,8 @@ const handleAddUser = async () => {
 
   if (result.success) {
     showNotification("User created successfully", "success");
+    emit("user-added", result.data); // Emit the created user data immediately
     toggleAddForm(); // Will close form and reset it
-    // Optional: Emit event if parent needs to refresh list
-    // emit('user-created');
   } else {
     showNotification(result.message || "Failed to create user", "error");
   }

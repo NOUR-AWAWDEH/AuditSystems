@@ -5,7 +5,7 @@ namespace AuditSystem.Domain.Entities.Organization;
 
 public class Company : Entity<Guid>
 {
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 
     // Navigation properties
     public virtual ICollection<AppUser> Users { get; set; } = new List<AppUser>();

@@ -4,11 +4,10 @@ using AuditSystem.Application.Base;
 namespace AuditSystem.Application.Features.Observation.Create;
 
 public sealed record CreateObservationCommand(
-    string Description,
-    string ActionOwner,
+    string Highlight,
     string Background,
-    string ActionPlan,
-    DateTime ActionDate,
+    bool IsActive,
     string? Note,
-    Guid AuditProgramId
+    Guid AuditProgramId,
+    Guid RateId
 ) : UserAwareCommand<Result<CreateObservationCommandResponse>>;

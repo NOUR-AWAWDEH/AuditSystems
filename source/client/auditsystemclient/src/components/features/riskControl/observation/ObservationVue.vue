@@ -45,7 +45,7 @@
       v-model="showDeleteDialog"
       :title="deleteDialogTitle"
       :message="deleteDialogMessage"
-      :highlight-text="itemToDelete?.description || ''"
+      :highlight-text="itemToDelete?.highlight || ''"
       :confirm-text="'Delete'"
       :cancel-text="'Cancel'"
       @confirm="confirmDelete"

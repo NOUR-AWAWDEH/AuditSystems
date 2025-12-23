@@ -65,13 +65,28 @@
           class="hidden lg:block rounded-lg border border-gray-200"
         >
           <ReusableTable
-            :items="observations"
+            :items="enrichedObservations"
             :columns="enhancedColumns"
             :is-loading="isLoading"
             :actions="[]"
             :no-data-message="noDataMessage"
             class="observation-table min-w-full"
           >
+            <!-- Custom cell for IsActive -->
+            <template #cell-isActive="{ item }">
+              <span :class="item.isActive ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'">
+                {{ item.isActive ? 'Yes' : 'No' }}
+              </span>
+            </template>
+
+            <!-- Custom cell for Rate -->
+            <template #cell-rate="{ item }">
+              <span v-if="item.rate && item.rate.level" :class="getRateColorClasses(item.rate.level)">
+                {{ item.rate.level }}
+              </span>
+              <span v-else class="text-gray-400 italic">Not assigned</span>
+            </template>
+
             <template #cell-actions="{ item }">
               <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
                 <button
@@ -111,7 +126,7 @@
         <!-- Mobile Card View -->
         <ReusableMobileCardList
           v-if="selectedAuditProgramId"
-          :items="observations"
+          :items="enrichedObservations"
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
@@ -121,10 +136,10 @@
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Description
+                  Highlight
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
-                  {{ item.description }}
+                  {{ item.highlight }}
                 </div>
               </div>
 
@@ -139,28 +154,24 @@
 
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Action Owner
+                  Is Active
                 </div>
-                <div class="text-gray-700 text-sm leading-snug wrap-break-word">
-                  {{ item.actionOwner }}
-                </div>
-              </div>
-
-              <div class="border-b border-gray-100 pb-3">
-                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Action Plan
-                </div>
-                <div class="text-gray-700 text-sm leading-snug wrap-break-word">
-                  {{ item.actionPlan }}
+                <div class="text-sm leading-snug wrap-break-word">
+                  <span :class="item.isActive ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'">
+                    {{ item.isActive ? 'Yes' : 'No' }}
+                  </span>
                 </div>
               </div>
 
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Action Date
+                  Rate
                 </div>
-                <div class="text-gray-400 text-xs font-medium">
-                  {{ formatDateSimple(item.actionDate) }}
+                <div class="text-sm leading-snug wrap-break-word">
+                  <span v-if="item.rate && item.rate.level" :class="getRateColorClasses(item.rate.level)">
+                    {{ item.rate.level }}
+                  </span>
+                  <span v-else class="text-gray-400 italic">Not assigned</span>
                 </div>
               </div>
 
@@ -169,7 +180,7 @@
                   Note
                 </div>
                 <div class="text-gray-700 text-sm leading-snug wrap-break-word">
-                  {{ item.note }}
+                  {{ item.note || 'N/A' }}
                 </div>
               </div>
 
@@ -215,7 +226,7 @@
 
         <!-- No results while searching -->
         <div
-          v-if="searchQuery && observations.length === 0 && !isLoading"
+          v-if="searchQuery && enrichedObservations.length === 0 && !isLoading"
           class="text-center py-4 border-t border-gray-200"
         >
           <button
@@ -238,7 +249,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import ReusableTable from "@/components/common/ReusableTable.vue";
 import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
@@ -253,6 +264,7 @@ import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import SubProcessHeader from "./ObservationHeader.vue";
 import NoAuditProgramSelected from "./NoAuditProgramSelected.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
+import { useSearchRates } from "@/composables/common/rate/useSearchRates";
 
 const props = defineProps({
   auditPrograms: {
@@ -302,6 +314,38 @@ const props = defineProps({
 });
 
 const internalSelectedAuditProgramId = ref(props.selectedAuditProgramId);
+const { searchResults: rates, searchRates } = useSearchRates();
+
+// Load rates on mount
+onMounted(async () => {
+  try {
+    await searchRates({ searchTerm: '', pageNumber: 1, pageSize: 100 });
+  } catch (err) {
+    console.error('Error loading rates:', err);
+  }
+});
+
+// Enrich observations with rate data
+const enrichedObservations = computed(() => {
+  if (!rates.value || rates.value.length === 0) {
+    return props.observations;
+  }
+
+  return props.observations.map(observation => {
+    if (observation.rate) {
+      // Already has rate data
+      return observation;
+    }
+
+    // Find matching rate by rateId
+    const matchingRate = rates.value.find(rate => rate.id === observation.rateId);
+    
+    return {
+      ...observation,
+      rate: matchingRate ? { id: matchingRate.id, level: matchingRate.level } : null
+    };
+  });
+});
 
 watch(
   () => props.selectedAuditProgramId,
@@ -331,11 +375,10 @@ const handleSelectObservation = (observation) => {
 };
 
 const observationColumns = [
-  { key: "description", label: "Description" },
+  { key: "highlight", label: "Highlight" },
   { key: "background", label: "Background" },
-  { key: "actionOwner", label: "Action Owner" },
-  { key: "actionPlan", label: "Action Plan" },
-  { key: "actionDate", label: "Action Date", type: "date" },
+  { key: "isActive", label: "Is Active" },
+  { key: "rate", label: "Rate" },
   { key: "note", label: "Note" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
@@ -350,4 +393,20 @@ const noDataMessage = computed(() => {
   }
   return "No observations found for this audit program.";
 });
+
+// Rate color mapping based on level
+const getRateColorClasses = (level) => {
+  if (!level) {
+    return 'px-2 py-1 rounded-md font-semibold text-xs bg-gray-100 text-gray-800 border border-gray-200';
+  }
+  const levelStr = String(level).toLowerCase();
+  const colorMap = {
+    critical: 'px-2 py-1 rounded-md font-semibold text-xs bg-red-100 text-red-800 border border-red-200',
+    high: 'px-2 py-1 rounded-md font-semibold text-xs bg-orange-100 text-orange-800 border border-orange-200',
+    medium: 'px-2 py-1 rounded-md font-semibold text-xs bg-yellow-100 text-yellow-800 border border-yellow-200',
+    low: 'px-2 py-1 rounded-md font-semibold text-xs bg-blue-100 text-blue-800 border border-blue-200',
+    minimal: 'px-2 py-1 rounded-md font-semibold text-xs bg-green-100 text-green-800 border border-green-200'
+  };
+  return colorMap[levelStr] || 'px-2 py-1 rounded-md font-semibold text-xs bg-gray-100 text-gray-800 border border-gray-200';
+};
 </script>

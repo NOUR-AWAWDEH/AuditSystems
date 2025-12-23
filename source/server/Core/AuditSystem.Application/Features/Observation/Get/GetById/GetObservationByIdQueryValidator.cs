@@ -19,7 +19,7 @@ public sealed class GetObservationByIdQueryValidator : AbstractValidator<GetObse
             .WithMessage("User Id must be a valid GUID.");
     }
 
-    private bool BeAValidGuid(Guid id)
+    private static bool BeAValidGuid(Guid id)
     {
         return id != Guid.Empty;
     }

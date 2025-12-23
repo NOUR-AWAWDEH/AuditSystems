@@ -18,7 +18,7 @@ internal sealed class GetObservationsByUserIdQueryHandler(
         var observations = await observationService.GetObservationsByUserIdAsync(request.UserId);
         logger.LogDebug("Observations retrieved successfully for user {UserId}", request.UserId);
         return Result<GetObservationsByUserIdQueryResponse>.Success(
-            new(observations),
+            new GetObservationsByUserIdQueryResponse(observations),
             "Observations retrieved successfully");
     }
 }

@@ -33,7 +33,7 @@
       v-model="showDeleteDialog"
       :title="deleteDialogTitle"
       :message="deleteDialogMessage"
-      :highlight-text="itemToDelete?.firstName || ''"
+      :highlight-text="itemToDelete?.userName || ''"
       :confirm-text="'Delete'"
       :cancel-text="'Cancel'"
       @confirm="confirmDelete"
@@ -74,7 +74,7 @@ const {
   handleDeleteUser,
   confirmDelete,
   cancelDelete,
-} = useUserActions(users, emit);
+} = useUserActions(users, emit, refreshData);
 
 // Expose users for parent component
 defineExpose({

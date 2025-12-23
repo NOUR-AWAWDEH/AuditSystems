@@ -18,20 +18,7 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .Must(x => x != Guid.Empty)
             .WithMessage("User Id must be a valid GUID.");
 
-        RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required.")
-            .MaximumLength(500)
-            .WithMessage("Description must not exceed 500 characters.");
-
-        RuleFor(x => x.ActionOwner)
-            .NotEmpty()
-            .WithMessage("Action Owner is required.")
-            .MinimumLength(2)
-            .WithMessage("Action Owner must be at least 2 characters long.")
-            .MaximumLength(500)
-            .WithMessage("Action Owner must not exceed 500 characters.");
-            
+       
         RuleFor(x => x.Background)
             .NotEmpty()
             .WithMessage("Background is required.")
@@ -39,17 +26,19 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .WithMessage("Background must be at least 2 characters long.")
             .MaximumLength(500)
             .WithMessage("Background must not exceed 500 characters.");
-            
-        RuleFor(x => x.ActionPlan)
+      
+        RuleFor(x => x.Highlight)
             .NotEmpty()
-            .WithMessage("Action Plan is required.")
+            .WithMessage("Highlight is required.")
+            .MinimumLength(2)
+            .WithMessage("Highlight must be at least 2 characters long.")
             .MaximumLength(500)
-            .WithMessage("Action Plan must not exceed 500 characters.");
-            
-        RuleFor(x => x.ActionDate)
-            .NotEmpty()
-            .WithMessage("Action Date is required.");
-            
+            .WithMessage("Highlight must not exceed 500 characters.");
+        
+        RuleFor(x => x.IsActive)
+            .NotNull()
+            .WithMessage("IsActive is required.");
+        
         RuleFor(x => x.Note)
             .MaximumLength(500)
             .WithMessage("Note must not exceed 500 characters.");
@@ -59,6 +48,12 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .WithMessage("Audit Program Id is required.")
             .Must(BeAValidGuid)
             .WithMessage("Audit Program Id must not be empty.");
+        
+        RuleFor(x => x.RateId)
+            .NotEmpty()
+            .WithMessage("Rate Id is required.")
+            .Must(BeAValidGuid)
+            .WithMessage("Rate Id must be a valid GUID.");
     }
     
     private static bool BeAValidGuid(Guid id)

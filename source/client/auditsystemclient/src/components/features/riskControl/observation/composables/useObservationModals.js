@@ -57,7 +57,7 @@ export function useObservationModals(observations, emit) {
       emit("observation-updated", updatedObservation);
 
       showNotification(
-        `Observation "${updatedObservation.particular}" has been updated successfully!`,
+        `Observation "${updatedObservation.highlight}" has been updated successfully!`,
         "success"
       );
       handleCloseEditObservationModal();
@@ -70,7 +70,7 @@ export function useObservationModals(observations, emit) {
   const handleDeleteObservation = (observation) => {
     itemToDelete.value = observation;
     deleteDialogTitle.value = "Delete Observation";
-    deleteDialogMessage.value = `Are you sure you want to delete the observation "${observation.particular}"?`;
+    deleteDialogMessage.value = `Are you sure you want to delete the observation "${observation.highlight}"?`;
     showDeleteDialog.value = true;
   };
 
@@ -85,7 +85,7 @@ export function useObservationModals(observations, emit) {
           observations.value.splice(index, 1); // <-- reactive change
         }
         showNotification(
-          `Observation "${deletedObservation.particular}" has been deleted successfully!`,
+          `Observation "${deletedObservation.highlight}" has been deleted successfully!`,
           "success"
         );
         localStorage.removeItem("riskControlSelectedObservationId");

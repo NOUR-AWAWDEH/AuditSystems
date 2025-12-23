@@ -19,7 +19,7 @@ public sealed class DeleteObservationValidator : AbstractValidator<DeleteObserva
             .WithMessage("User Id must be a valid GUID.");
     }
 
-    private bool IsValidGuid(Guid id)
+    private static bool IsValidGuid(Guid id)
     {
         return id != Guid.Empty;
     }

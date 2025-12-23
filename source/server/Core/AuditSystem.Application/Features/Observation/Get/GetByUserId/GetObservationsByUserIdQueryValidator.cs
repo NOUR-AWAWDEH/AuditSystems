@@ -13,7 +13,7 @@ public sealed class GetObservationsByUserIdQueryValidator : AbstractValidator<Ge
             .WithMessage("User Id must be a valid Guid");
     }
 
-    private bool BeAValidGuid(Guid id)
+    private static bool BeAValidGuid(Guid id)
     {
         return id != Guid.Empty;
     }

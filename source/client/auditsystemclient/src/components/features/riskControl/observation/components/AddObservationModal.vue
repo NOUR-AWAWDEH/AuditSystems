@@ -19,25 +19,25 @@
 
                     <!-- Content -->
                     <div class="p-4">
-                        <form @submit.prevent="handleSubmit" class="space-y-4">
-                            <!--  Observation Description Field -->
+                        <form @submit.prevent="handleSubmit" novalidate class="space-y-4">
+                            <!--  Observation Highlight Field -->
                             <div>
-                                <label for="observation-description" class="block text-sm font-medium text-gray-700">
-                                    Observation Description *
+                                <label for="observation-highlight" class="block text-sm font-medium text-gray-700 mb-3">
+                                    Observation Highlight *
                                 </label>
                                 <BaseInput
-                                    id="observation-description"
-                                    v-model="formData.description"
-                                    label="Observation Description"
-                                    placeholder="Enter Observation Description"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.description ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
+                                    id="observation-highlight"
+                                    v-model="formData.highlight"
+                                    label="Observation Highlight"
+                                    placeholder="Enter Observation Highlight"
+                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.highlight ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
-                                <p v-if="errors.description" class="text-error text-sm mt-1">{{ errors.description }}</p>
+                                <p v-if="errors.highlight" class="text-error text-sm mt-1">{{ errors.highlight }}</p>
                             </div>
 
                             <!--  Observation Background Field -->
                             <div>
-                                <label for="observation-background" class="block text-sm font-medium text-gray-700">
+                                <label for="observation-background" class="block text-sm font-medium text-gray-700 mb-3">
                                     Observation Background *
                                 </label>
                                 <BaseInput
@@ -49,54 +49,53 @@
                                 />
                                 <p v-if="errors.background" class="text-error text-sm mt-1">{{ errors.background }}</p>
                             </div>
-                            <!--  Observation Action Owner Field -->
+                            <!--  Observation Is Active Field -->
                             <div>
-                                <label for="observation-action-owner" class="block text-sm font-medium text-gray-700">
-                                    Observation Action Owner *
+                                <label for="observation-is-active" class="block text-sm font-medium text-gray-700 mb-3">
+                                    Observation Is Active *
                                 </label>
-                                <BaseInput
-                                    id="observation-action-owner"
-                                    v-model="formData.actionOwner"
-                                    label="Observation Action Owner"
-                                    placeholder="Enter Observation Action Owner"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.actionOwner ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
-                                />
-                                <p v-if="errors.actionOwner" class="text-error text-sm mt-1">{{ errors.actionOwner }}</p>
+                                <div class="flex gap-6">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            id="is-active-yes"
+                                            value="true"
+                                            v-model="formData.isActive"
+                                            class="w-4 h-4 text-primary-base border-gray-300 focus:ring-primary-base focus:ring-2"
+                                        />
+                                        <span class="ml-2 text-sm text-gray-700">Yes</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            id="is-active-no"
+                                            value="false"
+                                            v-model="formData.isActive"
+                                            class="w-4 h-4 text-primary-base border-gray-300 focus:ring-primary-base focus:ring-2"
+                                        />
+                                        <span class="ml-2 text-sm text-gray-700">No</span>
+                                    </label>
+                                </div>
+                                <p v-if="errors.isActive" class="text-error text-sm mt-1">{{ errors.isActive }}</p>
                             </div>
 
-                            <!--  Observation Action plan Field -->
+                            <!--  Observation Rate Field -->
                             <div>
-                                <label for="observation-action-plan" class="block text-sm font-medium text-gray-700">
-                                    Observation Action Plan *
+                                <label for="observation-rate" class="block text-sm font-medium text-gray-700 mb-3">
+                                    Observation Rate *
                                 </label>
-                                <BaseInput
-                                    id="observation-action-plan"
-                                    v-model="formData.actionPlan"
-                                    label="Observation Action Plan"
-                                    placeholder="Enter Observation Action Plan"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.actionPlan ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
+                                <RateSelector
+                                    :rates="rates"
+                                    :selectedRateId="formData.rateId"
+                                    @update:selectedRateId="handleRateChange"
                                 />
-                                <p v-if="errors.actionPlan" class="text-error text-sm mt-1">{{ errors.actionPlan }}</p>
-                            </div>
-
-                            <!--  Observation Action date Field -->
-                            <div>
-                                 <label for="observation-action-date" class="block text-sm font-medium text-gray-700">
-                                    Observation Action Date *
-                                </label>
-                                <BaseDateInput
-                                    id="observation-action-date"
-                                    v-model="formData.actionDate"
-                                    placeholder="Select Observation Action Date"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.actionDate ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
-                                />
-                                <p v-if="errors.actionDate" class="text-error text-sm mt-1">{{ errors.actionDate }}</p>
+                                <p v-if="errors.rateId" class="text-error text-sm mt-1">{{ errors.rateId }}</p>
                             </div>
 
                             <!--  Observation Note Field -->
                             <div>
-                                 <label for="observation-note" class="block text-sm font-medium text-gray-700">
-                                    Observation Note *
+                                 <label for="observation-note" class="block text-sm font-medium text-gray-700 mb-3">
+                                    Observation Note
                                 </label>
                                 <BaseInput
                                     id="observation-note"
@@ -107,6 +106,7 @@
                                 />
                                 <p v-if="errors.note" class="text-error text-sm mt-1">{{ errors.note }}</p>
                             </div>
+
 
                             <!--Error Display -->
                             <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -125,7 +125,7 @@
 
                                 <button
                                     type="submit"
-                                    :disabled="!formData.description.trim() || isCreating"
+                                    :disabled="!isFormValid || isCreating"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50">
                                     <span v-if="isCreating">Adding...</span>
                                     <span v-else>Add Observation</span>
@@ -139,12 +139,14 @@
     </Teleport>
 </template>
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import BaseDateInput from '@/components/base/BaseDateInput.vue';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 import { useCreateObservation } from '@/composables/riskControl/observation/useCreateObservation';
 import { useNotification } from '@/composables/notification/useNotification';
+import RateSelector from '@/components/common/rate/RateSelector.vue';
+import { useAuthStatus } from '@/composables/auth/useAuthStatus';
+import { useSearchRates } from '@/composables/common/rate/useSearchRates';
 
 const props = defineProps({
     isVisible: {
@@ -161,46 +163,70 @@ const emit = defineEmits(['close', 'observation-added']);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createObservation, resetState } = useCreateObservation();
+const { authStatus, checkAuthStatus } = useAuthStatus();
+const { searchResults: rates, searchRates } = useSearchRates();
 
 const formData = ref({
-    description: '',
+    highlight: '',
     background: '',
-    actionOwner: '',
-    actionPlan: '',
-    actionDate: '',
+    isActive: '',
+    rateId: '',
     note: ''
 });
 
 const errors = ref({
-    description: '',
+    highlight: '',
     background: '',
-    actionOwner: '',
-    actionPlan: '',
-    actionDate: '',
+    isActive: '',
+    rateId: '',
     note: ''
 });
+
+// Computed property to check if form is valid
+const isFormValid = computed(() => {
+    return formData.value.highlight.trim() &&
+           formData.value.background.trim() &&
+           (formData.value.isActive === 'true' || formData.value.isActive === 'false' || formData.value.isActive === true || formData.value.isActive === false) &&
+           formData.value.rateId;
+});
+
+const handleRateChange = (value) => {
+    formData.value.rateId = value;
+};
 
 watch(() => props.isVisible, (newValue) => {
     if (newValue) {
         resetForm();
+        loadRates();
     }
 });
 
+onMounted(async () => {
+    if (!authStatus.value) await checkAuthStatus();
+    await loadRates();
+});
+
+const loadRates = async () => {
+    try {
+        await searchRates({ searchTerm: '', pageNumber: 1, pageSize: 100 });
+    } catch (err) {
+        console.error('Error loading rates:', err);
+    }
+};
+
 const resetForm = () => {
     formData.value = {
-        description: '',
+        highlight: '',
         background: '',
-        actionOwner: '',
-        actionPlan: '',
-        actionDate: '',
+        isActive: '',
+        rateId: '',
         note: ''
     };
     errors.value = {
-        description: '',
+        highlight: '',
         background: '',
-        actionOwner: '',
-        actionPlan: '',
-        actionDate: '',
+        isActive: '',
+        rateId: '',
         note: ''
     };
 
@@ -209,34 +235,29 @@ const resetForm = () => {
 
 const validateForm = () => {
     errors.value = {
-        description: '',
+        highlight: '',
         background: '',
-        actionOwner: '',
-        actionPlan: '',
-        actionDate: '',
+        isActive: '',
+        rateId: '',
         note: ''
     };
 
     let isValid = true;
 
-    if (!formData.value.description.trim()) {
-        errors.value.description = 'Observation description is required';
+    if (!formData.value.highlight.trim()) {
+        errors.value.highlight = 'Observation highlight is required';
         isValid = false;
     }
     if (!formData.value.background.trim()) {
         errors.value.background = 'Observation background is required';
         isValid = false;
     }
-    if (!formData.value.actionOwner.trim()) {
-        errors.value.actionOwner = 'Observation action owner is required';
+    if (formData.value.isActive === '' || formData.value.isActive === null || formData.value.isActive === undefined) {
+        errors.value.isActive = 'Observation is active is required';
         isValid = false;
     }
-    if (!formData.value.actionPlan.trim()) {
-        errors.value.actionPlan = 'Observation action plan is required';
-        isValid = false;
-    }
-    if (!formData.value.actionDate) {
-        errors.value.actionDate = 'Observation action date is required';
+    if (!formData.value.rateId) {
+        errors.value.rateId = 'Observation rate is required';
         isValid = false;
     }
 
@@ -245,7 +266,7 @@ const validateForm = () => {
 
 const handleSubmit = async () => {
     if (!props.auditProgramId) {
-        showNotification('audit program is required', 'error');
+        showNotification('Audit program is required', 'error');
         return;
     }
 
@@ -255,13 +276,12 @@ const handleSubmit = async () => {
 
     try {
         const observationData = {
-            description: formData.value.description.trim(),
+            highlight: formData.value.highlight.trim(),
             background: formData.value.background.trim(),
-            actionOwner: formData.value.actionOwner.trim(),
-            actionPlan: formData.value.actionPlan.trim(),
-            actionDate: new Date(formData.value.actionDate).toISOString(),
+            isActive: formData.value.isActive === 'true' || formData.value.isActive === true,
+            rateId: String(formData.value.rateId),
             note: formData.value.note ? formData.value.note.trim() : null,
-            auditProgramId: props.auditProgramId
+            auditProgramId: String(props.auditProgramId)
         };
 
         const result = await createObservation(observationData);
@@ -274,16 +294,19 @@ const handleSubmit = async () => {
                 createdAt: new Date().toISOString()
             };
 
-            showNotification(`Observation "${newObservation.description}" has been added successfully!`, 'success');
+            showNotification(`Observation "${newObservation.highlight}" has been added successfully!`, 'success');
             emit('observation-added', newObservation);
             emit('close');
         } else {
-             showNotification(result?.message || 'Failed to create observation', 'error');
+            const errorMessage = result?.message || result?.errors?.[0]?.message || error.value || 'Failed to create observation';
+            console.error('Create observation failed:', result);
+            showNotification(errorMessage, 'error');
         }
 
-    } catch (error) {
-        console.error('Error creating observation:', error);
-        showNotification('Failed to create observation. Please try again.', 'error');
+    } catch (err) {
+        console.error('Error creating observation:', err);
+        const errorMessage = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || err.message || 'Failed to create observation. Please try again.';
+        showNotification(errorMessage, 'error');
     }
 };
 

@@ -18,11 +18,13 @@ export function useUpdateObservationById() {
 
         error.value = errorMessage;
 
-        return { 
+        const failureResult = { 
             success: false,
             message: errorMessage,
             errors: response?.errors || [{ message: errorMessage }],
         };
+
+        return failureResult;
     };
 
     const validateUpdateObservation = (observationData) => {
@@ -30,24 +32,15 @@ export function useUpdateObservationById() {
             return 'Observation ID is required';
         }
         
-        if (!observationData.description) {
-            return 'Observation description is required';
+        if (!observationData.highlight) {
+            return 'Observation highlight is required';
         }
-        
         if (!observationData.background) {
             return 'Observation background is required';
         }
 
-        if (!observationData.actionOwner) {
-            return 'Observation action owner is required';
-        }
-
-        if (!observationData.actionPlan) {
-            return 'Observation action plan is required';
-        }
-
-        if (!observationData.actionDate) {
-            return 'Observation action date is required';
+        if (observationData.isActive === null || observationData.isActive === undefined) {
+            return 'Observation is active is required';
         }
 
         if (!observationData.auditProgramId) {

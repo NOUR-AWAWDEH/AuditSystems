@@ -11,12 +11,11 @@ export const createObservationRepository = {
             const token = authService.getLocalToken();
 
             const payload = {
-                description: observationData.description,
+                highlight: observationData.highlight,
                 background: observationData.background,
-                actionOwner: observationData.actionOwner,
-                actionPlan: observationData.actionPlan,
-                actionDate: observationData.actionDate,
+                isActive: observationData.isActive,
                 auditProgramId: observationData.auditProgramId,
+                rateId: observationData.rateId,
                 ...( observationData.note ? { note: observationData.note } : {} )
             };
 

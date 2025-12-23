@@ -157,26 +157,13 @@ namespace AuditSystem.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("ActionDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ActionOwner")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ActionPlan")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
                     b.Property<Guid>("AuditProgramId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Background")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -184,14 +171,20 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Highlight")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Note")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("RateId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -201,6 +194,8 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("AuditProgramId");
 
                     b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("RateId");
 
                     b.ToTable("Observations", (string)null);
                 });
@@ -1110,9 +1105,17 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AuditSystem.Domain.Entities.Common.Rate", "Rate")
+                        .WithMany("Observations")
+                        .HasForeignKey("RateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AuditProgram");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Rate");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Organization.Department", b =>
@@ -1454,6 +1457,11 @@ namespace AuditSystem.DataAccess.Migrations
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Audit.AuditProgram", b =>
+                {
+                    b.Navigation("Observations");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Common.Rate", b =>
                 {
                     b.Navigation("Observations");
                 });

@@ -56,7 +56,11 @@ export function useAuthStatus() {
       } else {
         authStorage.removeToken();
         authStatus.value = null;
-        throw new Error(response?.errors?.[0]?.message);
+        const msg =
+          response?.errors?.[0]?.message || response?.successMessage || 'Invalid auth status response';
+        console.error('Auth status repository returned unexpected response:', response);
+        error.value = msg;
+        return null;
       }
     } catch (err) {
       console.error("Auth status check failed:", err);

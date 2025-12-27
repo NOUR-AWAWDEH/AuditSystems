@@ -16,8 +16,8 @@ describe("useUserActions", () => {
 
   beforeEach(() => {
     users = ref([
-      { id: 1, name: "User 1", FirstName: "John", LastName: "Doe" },
-      { id: 2, name: "User 2", FirstName: "Jane", LastName: "Doe" },
+      { id: 1, userName: "johndoe", firstName: "John", lastName: "Doe" },
+      { id: 2, userName: "janedoe", firstName: "Jane", lastName: "Doe" },
     ]);
     emit = vi.fn();
 

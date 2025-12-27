@@ -25,7 +25,3 @@ export default {
   emits: ['click'],
 };
 </script>
-
-<style scoped>
-/* Add any component-specific styling here */
-</style>

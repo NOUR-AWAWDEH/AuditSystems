@@ -73,7 +73,7 @@ export function useUserActions(users, emit, refreshData) {
   const handleDeleteUser = (user) => {
     itemToDelete.value = user;
     deleteDialogTitle.value = "Delete User";
-    deleteDialogMessage.value = `Are you sure you want to delete "${user.userName}"? This action cannot be undone.`;
+    deleteDialogMessage.value = `Are you sure you want to delete "${user.firstName} ${user.lastName}"? This action cannot be undone.`;
     showDeleteDialog.value = true;
   };
 

@@ -6,7 +6,7 @@ const TOKEN_KEY = 'token';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 
 export function useLogout() {
-  const isAuthenticated = ref(!!localStorage.getItem(TOKEN_KEY)); // Initialize based on existing token
+  const isAuthenticated = ref(!!localStorage.getItem(TOKEN_KEY));
   const user = ref(null);
   const error = ref(null);
   const token = ref(localStorage.getItem(TOKEN_KEY) || null);
@@ -31,7 +31,7 @@ export function useLogout() {
       ? response.errors[0].message
       : defaultErrorMessage;
     error.value = errorMessage;
-    clearAuthData(); // Clear auth data even on failure to ensure clean state
+    clearAuthData();
     return {
       success: false,
       message: errorMessage,

@@ -66,6 +66,7 @@ import { ref, watch } from "vue";
 import { validateUsername } from "@/services/validations/validateUsername";
 import validatePassword from "@/services/validations/validatePassword";
 import { useLogin } from "@/composables/auth/useLogin";
+import { useAuthStatus } from "@/composables/auth/useAuthStatus";
 import BaseButton from "@/components/base/BaseButton.vue";
 import BaseInput from "@/components/base/BaseInput.vue";
 import BaseLink from "@/components/base/BaseLink.vue";
@@ -76,6 +77,7 @@ import Logo from "@/components/common/AuditLogo.vue";
 
 // Composables
 const { login, error } = useLogin();
+const { checkAuthStatus, authStatus } = useAuthStatus();
 const router = useRouter();
 
 // Refs
@@ -141,7 +143,16 @@ const handleLogin = async () => {
     const response = await login(username.value, password.value);
 
     if (response?.success) {
-      router.replace("/dashboard");
+      // Check auth status to determine redirect
+      await checkAuthStatus();
+      
+      if (authStatus.value?.roles?.includes("ActionOwner")) {
+        router.replace("/action-owner");
+      } else {
+        router.replace("/dashboard");
+      }
+      return;
+
     } else {
       // Error is already set in the composable and will be picked up by the watcher
     }

@@ -26,7 +26,6 @@ export const authStorage = {
   },
 };
 
-// 🔧 SINGLETON: Create shared reactive state outside the function
 const authStatus = ref(null);
 const isChecking = ref(false);
 const error = ref(null);
@@ -52,12 +51,12 @@ export function useAuthStatus() {
           expiresAt: response.result.expiresAt,
           isEmailVerified: response.result.isEmailVerified,
         };
+
         return authStatus.value;
       } else {
         authStorage.removeToken();
         authStatus.value = null;
-        const msg =
-          response?.errors?.[0]?.message || response?.successMessage || 'Invalid auth status response';
+        const msg = response?.errors?.[0]?.message || response?.successMessage || 'Invalid auth status response';
         console.error('Auth status repository returned unexpected response:', response);
         error.value = msg;
         return null;
@@ -78,7 +77,6 @@ export function useAuthStatus() {
     }
   };
 
-  // Computed property to extract companyId from authStatus
   const companyId = computed(() => authStatus.value?.companyId || authStorage.getCompanyId());
 
   return {

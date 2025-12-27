@@ -8,9 +8,7 @@ const isAuthenticated = ref(!!authService.getLocalToken());
 const user = ref(null);
 const error = ref(null);
 const token = ref(authService.getLocalToken() || null);
-const refreshToken = ref(
-  authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null
-);
+const refreshToken = ref(authService.getLocalRefreshToken ? authService.getLocalRefreshToken() : null);
 const companyId = ref(authService.getLocalCompanyId ? authService.getLocalCompanyId() : null);
 
 export function useLogin() {
@@ -32,14 +30,12 @@ export function useLogin() {
   const extractBackendError = (response, statusCode, axiosError) => {
     const fallback = "An unexpected error occurred";
 
-    // Handle rate limiting (429 Too Many Requests) - HIGHEST PRIORITY
     if (statusCode === 429) {
       return "Too many login attempts. Please try again later.";
     }
 
-    // If response is an ApiResponseT object (from loginRepository)
     if (response && typeof response === "object") {
-      // Check for errors array in ApiResponseT
+      
       if (response.errors && Array.isArray(response.errors) && response.errors.length > 0) {
         const firstError = response.errors[0];
         if (firstError && firstError.message) {
@@ -50,22 +46,21 @@ export function useLogin() {
         }
       }
 
-      // Check for successMessage in ApiResponseT (this contains the error message when success is false)
+      
       if (response.successMessage) {
         return response.successMessage;
       }
 
-      // Check for message property directly on response
+      
       if (response.message) {
         return response.message;
       }
     }
 
-    // Handle Axios error response data structure
+    
     if (axiosError?.response?.data) {
       const errorData = axiosError.response.data;
 
-      // Check backend error structure
       if (errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
         const firstError = errorData.errors[0];
         if (firstError && firstError.message) {
@@ -78,7 +73,6 @@ export function useLogin() {
       }
     }
 
-    // Handle Axios error message directly (for network errors)
     if (axiosError && axiosError.message) {
       if (axiosError.message.includes("Network Error")) {
         return "Network error. Please check your connection.";
@@ -88,7 +82,6 @@ export function useLogin() {
       }
     }
 
-    // Handle case where response might be a string
     if (typeof response === "string") {
       return response;
     }
@@ -97,14 +90,14 @@ export function useLogin() {
   };
 
   const handleLoginSuccess = (response, username) => {
-    // response.result now contains { jwtToken, refreshToken, isEmailVerified, companyId }
+    
     setAuthData(
       response.result.jwtToken,
       response.result.refreshToken,
       username,
       response.result.companyId
     );
-    error.value = null; // Clear any previous errors
+    error.value = null; 
     return { success: true };
   };
 
@@ -121,16 +114,15 @@ export function useLogin() {
 
   const login = async (username, password) => {
     try {
-      error.value = null; // Clear previous errors
-
+      error.value = null;
       const response = await loginRepository.loginRequest(username, password);
-
-      // Check if response is successful based on the success property
+      
       if (response?.success === true) {
         return handleLoginSuccess(response, username);
       } else {
         return handleLoginFailure(response, response.statusCode);
       }
+
     } catch (err) {
       console.error("💥 [USE LOGIN] Caught error during login:", {
         err,
@@ -140,12 +132,11 @@ export function useLogin() {
         stack: err?.stack,
       });
 
-      // Extract status code and pass the actual error object
       const statusCode = err?.response?.status;
       return handleLoginFailure(
         err.response?.data || err,
         statusCode,
-        err // Pass the actual axios error
+        err
       );
     }
   };
@@ -156,7 +147,7 @@ export function useLogin() {
     token.value = null;
     refreshToken.value = null;
     companyId.value = null;
-    error.value = null; // Clear error on logout
+    error.value = null;
     authService.removeLocalTokens();
   };
 

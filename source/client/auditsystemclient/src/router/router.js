@@ -4,11 +4,12 @@ const Dashboard = () => import("@/components/features/dashboard/DashboardPage.vu
 const ForgotPassword = () => import("@/components/features/auth/ForgotPassword.vue");
 const ResetPassword = () => import("@/components/features/auth/ResetPassword.vue");
 const Login = () => import("@/components/features/auth/LoginForm.vue");
-const SupportingDocManager = () =>
-  import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
+const SupportingDocManager = () => import("@/components/features/supportingDoc/SupportingDocumentsView.vue");
 const Organization = () => import("@/components/features/Organization/OrganizationView.vue");
 const RiskControl = () => import("@/components/features/riskControl/RiskControl.vue");
 const UserManagement = () => import("@/components/features/userManagement/UserManagementVue.vue");
+const ActionOwner = () => import("@/components/features/actionOwner/ActionOwnerView.vue");
+const AccessDenied = () => import("@/components/features/errors/AccessDeniedPage.vue");
 
 const routes = [
   {
@@ -32,7 +33,7 @@ const routes = [
     path: "/dashboard",
     name: "Dashboard",
     component: Dashboard,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, denyRoles: ["ActionOwner"] },
   },
   {
     path: "/forgot-password",
@@ -65,13 +66,13 @@ const routes = [
     path: "/risk-control",
     name: "RiskControl",
     component: RiskControl,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, denyRoles: ["ActionOwner"] },
   },
   {
     path: "/organization",
     name: "Organization",
     component: Organization,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, denyRoles: ["ActionOwner"] },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -81,12 +82,24 @@ const routes = [
     path: "/supporting-docs",
     name: "SupportingDocs",
     component: SupportingDocManager,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, denyRoles: ["ActionOwner"] },
   },
   {
     path: "/user-management",
     name: "UserManagement",
     component: UserManagement,
+    meta: { requiresAuth: true, denyRoles: ["ActionOwner"] },
+  },
+  {
+    path: "/action-owner",
+    name: "ActionOwner",
+    component: ActionOwner,
+    meta: { requiresAuth: true, roles: ["ActionOwner"] },
+  },
+  {
+    path: "/access-denied",
+    name: "AccessDenied",
+    component: AccessDenied,
     meta: { requiresAuth: true },
   },
 ];
@@ -100,11 +113,14 @@ const router = createRouter({
 });
 
 import { isTokenExpired } from "@/utils/jwtUtils";
+import { useAuthStatus } from "@/composables/auth/useAuthStatus";
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem("token");
   const isAuthenticated = !!token;
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiredRoles = to.matched.find((record) => record.meta.roles)?.meta.roles;
+  const deniedRoles = to.matched.find((record) => record.meta.denyRoles)?.meta.denyRoles;
 
   // Check if token is expired
   if (isAuthenticated && isTokenExpired(token)) {
@@ -123,8 +139,50 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.name === "Login" && isAuthenticated) {
-    next("/dashboard");
+    // Check user role and redirect appropriately
+    const { checkAuthStatus, authStatus } = useAuthStatus();
+    await checkAuthStatus(token);
+    
+    if (authStatus.value?.roles?.includes("ActionOwner")) {
+      next("/action-owner");
+    } else {
+      next("/dashboard");
+    }
     return;
+  }
+
+  // Check role-based access (required roles)
+  if (requiredRoles && isAuthenticated) {
+    const { checkAuthStatus, authStatus } = useAuthStatus();
+    
+    if (!authStatus.value?.roles) {
+      await checkAuthStatus(token);
+    }
+    
+    const hasRequiredRole = requiredRoles.some((role) => authStatus.value?.roles?.includes(role));
+    
+    if (!hasRequiredRole) {
+      console.warn(`Access denied: User does not have required roles [${requiredRoles.join(', ')}]`);
+      next("/access-denied");
+      return;
+    }
+  }
+
+  // Check denied roles (denyRoles)
+  if (deniedRoles && isAuthenticated) {
+    const { checkAuthStatus, authStatus } = useAuthStatus();
+    
+    if (!authStatus.value?.roles) {
+      await checkAuthStatus(token);
+    }
+    
+    const hasDisallowedRole = deniedRoles.some((role) => authStatus.value?.roles?.includes(role));
+    
+    if (hasDisallowedRole) {
+      console.warn(`Access denied: User has disallowed roles [${deniedRoles.join(', ')}]`);
+      next("/access-denied");
+      return;
+    }
   }
 
   if (requiresAuth && !isAuthenticated) {

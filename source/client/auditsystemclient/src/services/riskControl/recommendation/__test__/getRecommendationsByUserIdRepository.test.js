@@ -9,8 +9,7 @@ vi.mock('@/services/auth/authRepos/authService', () => ({
 }));
 
 import {
-  getRecommendationByUserIdRepository,
-  getRecommendationsByUserIdRepository
+  getRecommendationsByUserIdRepository,
 } from '@/services/riskControl/recommendation/getRecommendationsByUserIdRepository';
 
 import api from '@/services/api/api';

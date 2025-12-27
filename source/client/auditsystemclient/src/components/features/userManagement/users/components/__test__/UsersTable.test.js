@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount, flushPromises } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import UsersTable from "../UsersTable.vue";
 
 // Mock child components
@@ -263,7 +263,6 @@ describe("UsersTable.vue", () => {
   describe("Columns Configuration", () => {
     it("includes all expected columns", () => {
       const wrapper = mount(UsersTable, { props: defaultProps });
-      const vm = wrapper.vm;
 
       // Access the columns through the component
       const expectedColumns = [

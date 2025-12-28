@@ -151,7 +151,6 @@ const handleObjectiveSelected = (objectiveId) => {
 
 const handleAddRisks = (objective) => {
     internalSelectedObjectiveId.value = objective.id;
-
     emit('objective-selected', objective.id);
     emit('add-risks', objective.id);
 };

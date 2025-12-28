@@ -44,7 +44,3 @@ import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 
 const { authStatus } = useAuthStatus();
 </script>
-
-<style scoped>
-/* Component-specific styles can be added here */
-</style>

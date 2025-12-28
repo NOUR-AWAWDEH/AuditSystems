@@ -48,14 +48,6 @@
                 </p>
               </div>
             </div>
-
-            <button
-              @click="$emit('add-observation')"
-              class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
-            >
-              <PlusIcon :stroke-width="3" class="w-5 h-5" />
-              Add Observation
-            </button>
           </div>
         </div>
 
@@ -220,7 +212,13 @@
               >
                 <DeleteIcon size="sm" class="mr-1" /> Delete
               </button>
-            </div>
+              <button
+                @click.stop="$emit('recommendation-add', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <AddIcon size="sm" class="mr-1" /> Add Recommendations
+              </button>
+              </div>
           </template>
         </ReusableMobileCardList>
 
@@ -255,12 +253,12 @@ import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.v
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import AuditProgramIcon from "@/components/common/icons/AuditProgramIcon.vue";
 import AuditProgramSelector from "@/components/features/riskControl/auditProgram/components/AuditProgramSelector.vue";
-import PlusIcon from "@/components/common/icons/PlusIcon.vue";
 import EditIcon from "@/components/common/icons/EditIcon.vue";
 import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
+import AddIcon from "@/components/common/icons/AddIcon.vue";
 import SubProcessHeader from "./ObservationHeader.vue";
 import NoAuditProgramSelected from "./NoAuditProgramSelected.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
@@ -363,7 +361,7 @@ const emit = defineEmits([
   "add-observation",
   "edit-observation",
   "delete-observation",
-  "observation-selected",
+  "observation-selected"
 ]);
 
 // Observation selection state

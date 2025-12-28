@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { watch } from "vue";
+import { watch, computed } from "vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import ObservationTable from "./components/ObservationTable.vue";
 import AddObservationModal from "./components/AddObservationModal.vue";
@@ -73,6 +73,10 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+    selectedObservationId: {
+    type: [String, Number],
+    default: null,
+  },
 });
 
 const emit = defineEmits([
@@ -80,7 +84,13 @@ const emit = defineEmits([
   "observation-added",
   "observation-updated",
   "observation-deleted",
+  "update:selectedObservationId",
 ]);
+
+const internalSelectedObservationId = computed({
+  get: () => props.selectedObservationId,
+  set: (value) => emit("update:selectedObservationId", value)
+});
 
 // Use composables - now with integrated backend search
 const {
@@ -129,6 +139,7 @@ const {
 
 // Handle observation selection and forward to parent
 const handleObservationSelected = (observationId) => {
+  internalSelectedObservationId.value = observationId;
   emit("observation-selected", observationId);
 };
 
@@ -136,5 +147,6 @@ defineExpose({
   observations,
   selectedAuditProgramId: internalSelectedAuditProgramId,
   resetToDefaultView,
+  selectedObservationId: internalSelectedObservationId,
 });
 </script>

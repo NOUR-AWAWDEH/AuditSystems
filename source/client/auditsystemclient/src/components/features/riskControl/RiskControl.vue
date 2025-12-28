@@ -147,6 +147,7 @@
             :selected-audit-program-id="selectedAuditProgramId"
             @observation-selected="handleObservationSelected"
             @observation-deleted="handleObservationDeleted"
+            @recommendation-add="handleAddRecommendations"
           />
         </div>
         <!-- Recommendations -->
@@ -154,12 +155,11 @@
           v-if="activeTab === 'recommendations'"
           class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto"
         >
-          <h2 class="text-lg font-bold text-gray-800 mb-4">Recommendations Coming Soon</h2>
-          <!-- <Recommendation
+          <RecommendationVue
             :observations="observations"
             :selected-observation-id="selectedObservationId"
             @recommendation-deleted="handleRecommendationDeleted"
-          /> -->
+          />
         </div>
       </div>
     </section>
@@ -180,6 +180,7 @@ import ExitControlVue from "./exitControl/ExitControlVue.vue";
 import AuditProgramVue from "./auditProgram/AuditProgramVue.vue";
 import ControlDesignVue from "./controlDesign/ControlDesignVue.vue";
 import ObservationVue from "./observation/ObservationVue.vue";
+import RecommendationVue from "./recommendation/RecommendationVue.vue";
 
 import { useGetSubDepartmentsByUserId } from "@/composables/organization/subdepartment/useGetSubDepartmentsByUserId";
 import { useGetAuditProcessesByUserId } from "@/composables/riskControl/auditProcess/useGetAuditProcessesByUserId";
@@ -197,24 +198,14 @@ const router = useRouter();
 const activeTab = ref("processes");
 
 // Selected IDs
-const selectedSubDepartmentId = ref(
-  localStorage.getItem("organizationSelectedSubDepartmentId") || null
-);
-const selectedAuditProcessId = ref(
-  localStorage.getItem("riskControlSelectedAuditProcessId") || null
-);
+const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || null);
+const selectedAuditProcessId = ref(localStorage.getItem("riskControlSelectedAuditProcessId") || null);
 const selectedSubProcessId = ref(localStorage.getItem("riskControlSelectedSubProcessId") || null);
-const selectedRiskControlMatrixId = ref(
-  localStorage.getItem("riskControlSelectedRiskControlMatrixId") || null
-);
+const selectedRiskControlMatrixId = ref(localStorage.getItem("riskControlSelectedRiskControlMatrixId") || null);
 const selectedObjectiveId = ref(localStorage.getItem("riskControlSelectedObjectiveId") || null);
 const selectedExitControlId = ref(localStorage.getItem("riskControlSelectedExitControlId") || null);
-const selectedControlDesignId = ref(
-  localStorage.getItem("riskControlSelectedControlDesignId") || null
-);
-const selectedAuditProgramId = ref(
-  localStorage.getItem("riskControlSelectedAuditProgramId") || null
-);
+const selectedControlDesignId = ref(localStorage.getItem("riskControlSelectedControlDesignId") || null);
+const selectedAuditProgramId = ref(localStorage.getItem("riskControlSelectedAuditProgramId") || null);
 const selectedObservationId = ref(localStorage.getItem("riskControlSelectedObservationId") || null);
 
 // Composables
@@ -263,7 +254,7 @@ const selectionOrder = [
   "exitcontrols",
   "controldesigns",
   "auditprograms",
-  "observations",
+  "observations"
 ];
 
 const clearSelectionCascade = (fromKey) => {
@@ -299,7 +290,7 @@ const setSelectedId = (key, value) => {
       selectedObservationId.value = value;
       break;
     default:
-      return; // unknown key, nothing to store
+      return;
   }
 
   const storageKey = storageKeys[key];
@@ -410,6 +401,11 @@ const handleAddRisks = (objectiveId) => {
   setActiveTab("risks");
 };
 
+const handleAddRecommendations = (observationId) => {
+  selectedObservationId.value = observationId;
+  setActiveTab("recommendations");
+};
+
 // Deleted
 
 const handleAuditProcessDeleted = async (deletedId) => {
@@ -472,7 +468,7 @@ const handleObservationDeleted = async (deletedId) => {
   await getObservationsByUserId();
 };
 
-//const handleRecommendationDeleted = async () => { await getObservationsByUserId() };
+const handleRecommendationDeleted = async () => { await getObservationsByUserId() };
 
 const handleRouteQueries = async () => {
   const {

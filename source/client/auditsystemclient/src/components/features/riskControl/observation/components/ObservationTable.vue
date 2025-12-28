@@ -48,6 +48,14 @@
                 </p>
               </div>
             </div>
+
+              <button
+                @click="$emit('add-observation')"
+                class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
+              >
+                <AddIcon size="sm" class="mr-2" />
+                Add Observation
+              </button>
           </div>
         </div>
 

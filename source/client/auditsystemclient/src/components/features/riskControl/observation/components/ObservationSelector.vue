@@ -6,7 +6,7 @@
     label="Select Observation"
     placeholder="Choose an observation"
     value-key="id"
-    label-key="particular"
+    label-key="highlight"
     :error="observationError"
     @update:modelValue="handleObservationChange"
   />

@@ -48,14 +48,6 @@
                 </p>
               </div>
             </div>
-
-            <button
-              @click="$emit('add-observation')"
-              class="flex items-center justify-center gap-1 px-4 py-2 text-sm rounded-md bg-secondary-base hover:bg-secondary-shade text-white transition-all whitespace-nowrap"
-            >
-              <PlusIcon :stroke-width="3" class="w-5 h-5" />
-              Add Observation
-            </button>
           </div>
         </div>
 
@@ -117,14 +109,6 @@
                 >
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
-                </button>
-
-                <button
-                  @click.stop="$emit('recommendation-add', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <AddIcon size="sm" custom-class="mr-1" />
-                  Add Recommendations
                 </button>
               </div>
             </template>
@@ -378,8 +362,7 @@ const emit = defineEmits([
   "add-observation",
   "edit-observation",
   "delete-observation",
-  "observation-selected",
-  "recommendation-add",
+  "observation-selected"
 ]);
 
 // Observation selection state

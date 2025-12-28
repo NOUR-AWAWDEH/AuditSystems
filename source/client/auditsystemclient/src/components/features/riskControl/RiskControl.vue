@@ -147,7 +147,6 @@
             :selected-audit-program-id="selectedAuditProgramId"
             @observation-selected="handleObservationSelected"
             @observation-deleted="handleObservationDeleted"
-            @recommendation-add="handleAddRecommendations"
           />
         </div>
         <!-- Recommendations -->
@@ -216,7 +215,7 @@ const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskContro
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getExitControlsByUserId, exitControls } = useGetExitControlsByUserId();
 const { getAuditProgramsByUserId, auditPrograms } = useGetAuditProgramsByUserId();
-const { getObservationsByUserId } = useGetObservationsByUserId();
+const { getObservationsByUserId, observations } = useGetObservationsByUserId();
 
 const isLoading = ref(false);
 const errorMessage = ref(null);
@@ -390,8 +389,9 @@ const handleAuditProgramSelected = (id) => {
   setActiveTab("observations");
 };
 
-const handleObservationSelected = (id) => {
+const handleObservationSelected = async (id) => {
   selectedObservationId.value = id;
+  await getObservationsByUserId();
   setActiveTab("recommendations");
 };
 

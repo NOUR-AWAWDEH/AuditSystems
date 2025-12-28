@@ -8,8 +8,8 @@ export function useGetObservationsByUserId() {
 
     const handleFetchSuccess = (response) => {
         const observationsData =  Array.isArray(response.result)
-    ? response.result
-    : response.result?.observations || [];
+        ? response.result
+        : response.result?.observations || [];
 
         observations.value = observationsData;
         return { success: true, data: observationsData };

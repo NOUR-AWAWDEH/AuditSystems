@@ -50,8 +50,15 @@ export function useObservationManagement(observations) {
   });
 
   const currentObservation = computed(() => {
-    const observation = fetchObservation?.value || selectedObservation?.value;
-    return observation?.observationModel || observation || null;
+    // fetchObservation is already a ref, so check it directly
+    let observation = fetchObservation.value || selectedObservation.value;
+    
+    // Handle wrapped response from backend (has observationModel property)
+    if (observation && observation.observationModel) {
+      observation = observation.observationModel;
+    }
+    
+    return observation || null;
   });
 
   return {

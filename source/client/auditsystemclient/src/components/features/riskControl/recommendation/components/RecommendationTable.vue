@@ -40,7 +40,7 @@
                   <span>Showing Recommendations for Observation:</span>
                   <span class="ml-1 font-semibold text-primary-shade">
                     <span v-if="isObservationLoading">Loading Observation...</span>
-                    <span v-else>{{ currentObservation?.description || "Loading..." }}</span>
+                    <span v-else>{{ currentObservation?.highlight || "Loading..." }}</span>
                   </span>
                   <span v-if="searchQuery" class="ml-2 text-blue-600">
                     | Search: "{{ searchQuery }}"
@@ -104,7 +104,7 @@
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{columns[0].label}}
+                  {{ enhancedColumns[0].label }}
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
                   {{ item.title }}
@@ -113,7 +113,7 @@
 
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{columns[1].label}}
+                  {{ enhancedColumns[1].label }}
                 </div>
                 <div class="text-gray-700 text-sm leading-snug wrap-break-word">
                   {{ item.description }}
@@ -122,7 +122,7 @@
 
               <div>
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{columns[2].label}}
+                  {{ enhancedColumns[2].label }}
                 </div>
                 <div class="text-gray-400 text-xs font-medium">
                   {{ formatDateSimple(item.createdAt) }}

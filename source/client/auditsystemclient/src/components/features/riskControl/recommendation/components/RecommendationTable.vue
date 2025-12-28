@@ -259,7 +259,7 @@ watch(internalSelectedObservationId, (newVal) => {
 defineEmits(["add-recommendation", "edit-recommendation", "delete-recommendation"]);
 
 const recommendationColumns = [
-  { key: "title", label: "Name" },
+  { key: "title", label: "Title" },
   { key: "description", label: "Description" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];

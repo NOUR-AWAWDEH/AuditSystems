@@ -401,11 +401,6 @@ const handleAddRisks = (objectiveId) => {
   setActiveTab("risks");
 };
 
-const handleAddRecommendations = (observationId) => {
-  selectedObservationId.value = observationId;
-  setActiveTab("recommendations");
-};
-
 // Deleted
 
 const handleAuditProcessDeleted = async (deletedId) => {

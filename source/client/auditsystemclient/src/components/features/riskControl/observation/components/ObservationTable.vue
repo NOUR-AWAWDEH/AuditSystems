@@ -253,7 +253,6 @@ import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.v
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import AuditProgramIcon from "@/components/common/icons/AuditProgramIcon.vue";
 import AuditProgramSelector from "@/components/features/riskControl/auditProgram/components/AuditProgramSelector.vue";
-import PlusIcon from "@/components/common/icons/PlusIcon.vue";
 import EditIcon from "@/components/common/icons/EditIcon.vue";
 import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";

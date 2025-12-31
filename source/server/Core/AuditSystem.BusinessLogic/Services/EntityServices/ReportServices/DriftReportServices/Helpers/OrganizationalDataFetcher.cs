@@ -29,12 +29,13 @@ public sealed class OrganizationalDataFetcher(
         var subDepartmentTask = subDepartmentService.GetSubDepartmentByIdAsync(request.SubDepartmentId, request.UserId);
 
         await Task.WhenAll(companyTask, locationTask, departmentTask, subDepartmentTask);
+        
         logger.LogDebug("Organizational data fetched successfully");
         return new OrganizationalData(
-            await companyTask,
-            await locationTask,
-            await departmentTask,
-            await subDepartmentTask
+            companyTask.Result,
+            locationTask.Result,
+            departmentTask.Result,
+            subDepartmentTask.Result
         );
     }
 }

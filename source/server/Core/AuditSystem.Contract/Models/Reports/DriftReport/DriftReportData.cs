@@ -1,59 +1,28 @@
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Recommendation;
 using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Contract.Models.Risks;
 
 namespace AuditSystem.Contract.Models.Reports.DriftReport;
 
-/// <summary>
-/// Represents the complete data structure for a Drift Report
-/// </summary>
-public class DriftReportData
+public sealed class DriftReportData
 {
-    /// <summary>
-    /// Company information
-    /// </summary>
-    public CompanyModel? Company { get; set; }
+    public CompanyModel? Company { get; init; }
+    public LocationModel? Location { get; init; }
+    public DepartmentModel? Department { get; init; }
+    public SubDepartmentModel? SubDepartment { get; init; }
+    public ObjectiveModel? Objective { get; init; }
 
-    /// <summary>
-    /// Location information
-    /// </summary>
-    public LocationModel? Location { get; set; }
+    public AuditProgramModel? AuditProgram { get; init; }
 
-    /// <summary>
-    /// Department information
-    /// </summary>
-    public DepartmentModel? Department { get; set; }
+    public PaginationResult<RiskModel> Risks { get; init; }
+        = PaginationResult<RiskModel>.Empty;
 
-    /// <summary>
-    /// Sub-Department information
-    /// </summary>
-    public SubDepartmentModel? SubDepartment { get; set; }
+    public PaginationResult<ObservationModel> Observations { get; init; }
+        = PaginationResult<ObservationModel>.Empty;
 
-    /// <summary>
-    /// Objectives information
-    /// </summary>
-    public ObjectiveModel? Objective { get; set; }
-
-    /// <summary>
-    /// Collection of risks
-    /// </summary>
-    public IEnumerable<RiskModel> Risks { get; set; } = new List<RiskModel>();
-
-    /// <summary>
-    /// Audit program information
-    /// </summary>
-    public AuditProgramModel? AuditProgram { get; set; }
-
-    /// <summary>
-    /// Collection of observations with their recommendations
-    /// </summary>
-    public IEnumerable<ObservationModel> Observations { get; set; } = new List<ObservationModel>();
-
-    /// <summary>
-    /// Collection of recommendations associated with observations
-    /// </summary>
-    public IEnumerable<RecommendationModel> Recommendations { get; set; } = new List<RecommendationModel>();
+    public List<RecommendationModel> Recommendations { get; init; } = [];     
 }

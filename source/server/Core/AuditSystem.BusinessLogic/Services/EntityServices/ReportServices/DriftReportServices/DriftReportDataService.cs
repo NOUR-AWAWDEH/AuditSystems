@@ -1,9 +1,8 @@
-using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
-using AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Organization;
+using AuditSystem.Contract.Models.Pagination;
 using AuditSystem.Contract.Models.Recommendation;
 using AuditSystem.Contract.Models.Reports.DriftReport;
 using AuditSystem.Contract.Models.RiskControls;
@@ -13,9 +12,6 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices;
 
-/// <summary>
-/// Refactored service for generating drift report data
-/// </summary>
 public sealed class DriftReportDataService(
     IOrganizationalDataFetcher organizationalDataFetcher,
     IControlDataFetcher controlDataFetcher,
@@ -30,9 +26,6 @@ public sealed class DriftReportDataService(
     private readonly IMapper _mapper = mapper;
     private readonly ILogger<DriftReportDataService> _logger = logger;
     
-    /// <summary>
-    /// Generates complete drift report data by orchestrating fetchers
-    /// </summary>
     public async Task<DriftReportData> GenerateReportData(GenerateDriftReportRequest request)
     {
         _logger.LogInformation("Starting drift report data generation for CompanyId: {CompanyId}", request.CompanyId);
@@ -53,9 +46,7 @@ public sealed class DriftReportDataService(
         return reportData;
     }
 
-    /// <summary>
-    /// Maps fetched data to DriftReportData model
-    /// </summary>
+    
     private DriftReportData BuildDriftReportData(
         OrganizationalData orgData,
         ControlData controlData,
@@ -70,9 +61,9 @@ public sealed class DriftReportDataService(
             Department = _mapper.Map<DepartmentModel>(orgData.Department),
             SubDepartment = _mapper.Map<SubDepartmentModel>(orgData.SubDepartment),
             Objective = _mapper.Map<ObjectiveModel>(controlData.Objective),
-            Risks = _mapper.Map<IEnumerable<RiskModel>>(controlData.Risks),
+            Risks = _mapper.Map<PaginationResult<RiskModel>>(controlData.Risks),
             AuditProgram = _mapper.Map<AuditProgramModel>(controlData.AuditProgram),
-            Observations = _mapper.Map<IEnumerable<ObservationModel>>(controlData.Observations.Items),
+            Observations = _mapper.Map<PaginationResult<ObservationModel>>(controlData.Observations),
             Recommendations = recommendations
         };
     }

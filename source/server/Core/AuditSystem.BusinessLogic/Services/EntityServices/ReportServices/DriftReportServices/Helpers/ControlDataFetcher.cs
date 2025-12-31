@@ -29,14 +29,13 @@ public sealed class ControlDataFetcher(
         var observationsTask = observationService.SearchByUserIdAsync(request.UserId, "", request.AuditProgramId, null);
 
         await Task.WhenAll(objectiveTask, risksTask, auditProgramTask, observationsTask);
-        
-        logger.LogDebug("Control data fetched successfully");
-        
+
+        logger.LogDebug("Fetching control data succeeded");
         return new ControlData(
-            await objectiveTask,
-            await risksTask,
-            await auditProgramTask,
-            await observationsTask
+            objectiveTask.Result,
+            risksTask.Result,
+            auditProgramTask.Result,
+            observationsTask.Result
         );
     }
 }

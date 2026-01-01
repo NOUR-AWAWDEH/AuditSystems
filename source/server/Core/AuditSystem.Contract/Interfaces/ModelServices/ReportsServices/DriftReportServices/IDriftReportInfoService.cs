@@ -2,7 +2,7 @@ using AuditSystem.Contract.Models.Reports.DriftReport;
 
 namespace AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 
-public interface IDriftReport
+public interface IDriftReportInfoService
 {
-    Task<DriftReportData>GenerateReportData(GenerateDriftReportRequest request);
+    Task<DriftReportInfoModel>GenerateReportData(GenerateDriftReportRequest request);
 }

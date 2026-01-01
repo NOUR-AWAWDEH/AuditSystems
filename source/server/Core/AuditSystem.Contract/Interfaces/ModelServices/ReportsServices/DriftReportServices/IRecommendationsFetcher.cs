@@ -6,5 +6,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftRep
 
 public interface IRecommendationsFetcher
 {
-    Task<List<RecommendationModel>> FetchAsync(GenerateDriftReportRequest request, IReadOnlyList<ObservationModel> observations);
+    Task<IReadOnlyList<RecommendationModel>> FetchAsync(GenerateDriftReportRequest request, IReadOnlyList<ObservationModel> observations);
 }

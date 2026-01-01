@@ -8,9 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
 
-/// <summary>
-/// Fetches organizational data in parallel()
-/// </summary>
 public sealed class OrganizationalDataFetcher(
     ICompanyService companyService,
     ILocationService locationService,
@@ -31,6 +28,7 @@ public sealed class OrganizationalDataFetcher(
         await Task.WhenAll(companyTask, locationTask, departmentTask, subDepartmentTask);
         
         logger.LogDebug("Organizational data fetched successfully");
+        
         return new OrganizationalData(
             companyTask.Result,
             locationTask.Result,

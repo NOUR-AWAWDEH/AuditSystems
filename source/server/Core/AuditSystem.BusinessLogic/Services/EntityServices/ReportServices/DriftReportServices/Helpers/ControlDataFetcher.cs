@@ -13,9 +13,9 @@ namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.Drift
 /// </summary>
 public sealed class ControlDataFetcher(
     IObjectiveService objectiveService,
-    IRiskService riskService,
+    IRisksFetcher risksFetcher,
     IAuditProgramService auditProgramService,
-    IObservationService observationService,
+    IObservationsFetcher observationsFetcher,
     ILogger<ControlDataFetcher> logger
 ) : IControlDataFetcher
 {
@@ -24,18 +24,19 @@ public sealed class ControlDataFetcher(
         logger.LogDebug("Fetching control data");
         
         var objectiveTask = objectiveService.GetObjectiveByIdAsync(request.ObjectiveId, request.UserId);
-        var risksTask = riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, null);
+        var risks = risksFetcher.FetchAsync(request);
         var auditProgramTask = auditProgramService.GetAuditProgramByIdAsync(request.AuditProgramId, request.UserId);
-        var observationsTask = observationService.SearchByUserIdAsync(request.UserId, "", request.AuditProgramId, null);
+        var observations = observationsFetcher.FetchAsync(request);
 
-        await Task.WhenAll(objectiveTask, risksTask, auditProgramTask, observationsTask);
+        await Task.WhenAll(objectiveTask, risks, auditProgramTask, observations);
 
         logger.LogDebug("Fetching control data succeeded");
+        
         return new ControlData(
             objectiveTask.Result,
-            risksTask.Result,
+            risks.Result,
             auditProgramTask.Result,
-            observationsTask.Result
+            observations.Result
         );
     }
 }

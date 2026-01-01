@@ -7,15 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
 
-/// <summary>
-/// Fetches recommendations for given observations
-/// </summary>
 public sealed class RecommendationsFetcher(
     IRecommendationService recommendationService,
     ILogger<RecommendationsFetcher> logger
 ) : IRecommendationsFetcher
 {
-    public async Task<List<RecommendationModel>> FetchAsync(GenerateDriftReportRequest request, IReadOnlyList<ObservationModel> observations)
+    public async Task<IReadOnlyList<RecommendationModel>> FetchAsync(GenerateDriftReportRequest request, IReadOnlyList<ObservationModel> observations)
     {
         if (observations.Count == 0)
         {
@@ -29,8 +26,7 @@ public sealed class RecommendationsFetcher(
 
         foreach (var observation in observations)
         {
-            var result = await recommendationService.SearchByUserIdAsync(
-                request.UserId, "", observation.Id, null);
+            var result = await recommendationService.SearchByUserIdAsync(request.UserId, "", observation.Id, null);
             recommendations.AddRange(result.Items);
         }
 

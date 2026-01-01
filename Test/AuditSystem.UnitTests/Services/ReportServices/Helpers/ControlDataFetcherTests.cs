@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramSe
 using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Reports.DriftReport;
 using FakeItEasy;
@@ -12,15 +13,16 @@ using AuditSystem.Contract.Models.RiskControls;
 using AuditSystem.Contract.Models.Risks;
 using AuditSystem.Contract.Models.Audit;
 using AuditSystem.Contract.Models.Pagination;
+using Xunit;
 
 namespace AuditSystem.UnitTests.Services.ReportServices.Helpers;
 
 public class ControlDataFetcherTests
 {
     private readonly IObjectiveService _objectiveService;
-    private readonly IRiskService _riskService;
+    private readonly IRisksFetcher _risksFetcher;
     private readonly IAuditProgramService _auditProgramService;
-    private readonly IObservationService _observationService;
+    private readonly IObservationsFetcher _observationsFetcher;
     private readonly ILogger<ControlDataFetcher> _logger;
 
     private readonly ControlDataFetcher _sut;
@@ -28,16 +30,16 @@ public class ControlDataFetcherTests
     public ControlDataFetcherTests()
     {
         _objectiveService = A.Fake<IObjectiveService>();
-        _riskService = A.Fake<IRiskService>();
+        _risksFetcher = A.Fake<IRisksFetcher>();
         _auditProgramService = A.Fake<IAuditProgramService>();
-        _observationService = A.Fake<IObservationService>();
+        _observationsFetcher = A.Fake<IObservationsFetcher>();
         _logger = A.Fake<ILogger<ControlDataFetcher>>();
 
         _sut = new ControlDataFetcher(
             _objectiveService,
-            _riskService,
+            _risksFetcher,
             _auditProgramService,
-            _observationService,
+            _observationsFetcher,
             _logger
         );
     }
@@ -64,24 +66,15 @@ public class ControlDataFetcherTests
             Description = "Test Description"
         };
 
-        var risksPage = new PaginationResult<RiskModel>
+        var risks = new List<RiskModel>
         {
-            PageNumber = 1,
-            PageSize = 10,
-            Items = new List<RiskModel>
+            new RiskModel
             {
-                new RiskModel
-                {
-                    Id = Guid.NewGuid(),
-                    ObjectiveId = objectiveId,
-                    RiskName = "Test Risk"
-                }
-            },
-
-            TotalCount = 1
+                Id = Guid.NewGuid(),
+                ObjectiveId = objectiveId,
+                RiskName = "Test Risk"
+            }
         };
-
-
 
         var auditProgram = new AuditProgramModel
         {
@@ -91,70 +84,45 @@ public class ControlDataFetcherTests
             ActionOwnerId = Guid.NewGuid()
         };
 
-        var observationsPage = new PaginationResult<ObservationModel>
+        var observations = new List<ObservationModel>
         {
-            PageNumber = 1,
-            PageSize = 10,
-            Items = new List<ObservationModel>
+            new ObservationModel
             {
-                new ObservationModel
-                {
-                    Id = Guid.NewGuid(),
-                    AuditProgramId = auditProgramId,
-                    Highlight = "Test Highlight",
-                    Background = "Test Background",
-                    IsActive = true,
-                    RateId = Guid.NewGuid()
-                }
-            },
-
-            TotalCount = 1
+                Id = Guid.NewGuid(),
+                AuditProgramId = auditProgramId,
+                Highlight = "Test Highlight",
+                Background = "Test Background",
+                IsActive = true,
+                RateId = Guid.NewGuid()
+            }
         };
 
+        A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
+            .Returns(objective);
 
-        A.CallTo(() =>
-                _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
-            .Returns(Task.FromResult(objective));
+        A.CallTo(() => _risksFetcher.FetchAsync(request))
+            .Returns(risks);
 
-        A.CallTo(() =>
-                _riskService.SearchByUserIdAsync(userId, "", objectiveId, A<Page?>._))
-            .Returns(Task.FromResult(risksPage));
+        A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))
+            .Returns(auditProgram);
 
-
-        A.CallTo(() =>
-                _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))
-            .Returns(Task.FromResult(auditProgram));
-
-        A.CallTo(() =>
-                _observationService.SearchByUserIdAsync(userId, "", auditProgramId, A<Page?>._))
-            .Returns(Task.FromResult(observationsPage));
+        A.CallTo(() => _observationsFetcher.FetchAsync(request))
+            .Returns(observations);
 
         // Act
         var result = await _sut.FetchAsync(request);
 
         // Assert
         result.Should().NotBeNull();
+        result.Objective.Should().Be(objective);
+        result.Risks.Should().BeEquivalentTo(risks);
+        result.AuditProgram.Should().Be(auditProgram);
+        result.Observations.Should().BeEquivalentTo(observations);
 
-        result.Objective.Should().BeSameAs(objective);
-        result.Risks.Should().BeSameAs(risksPage);
-        result.AuditProgram.Should().BeSameAs(auditProgram);
-        result.Observations.Should().BeSameAs(observationsPage);
-
-        A.CallTo(() =>
-                _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
-            .MustHaveHappenedOnceExactly();
-
-        A.CallTo(() =>
-                _riskService.SearchByUserIdAsync(userId, "", objectiveId, null))
-            .MustHaveHappenedOnceExactly();
-
-        A.CallTo(() =>
-                _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))
-            .MustHaveHappenedOnceExactly();
-
-        A.CallTo(() =>
-                _observationService.SearchByUserIdAsync(userId, "", auditProgramId, null))
-            .MustHaveHappenedOnceExactly();
+        A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _risksFetcher.FetchAsync(request)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _observationsFetcher.FetchAsync(request)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -179,22 +147,6 @@ public class ControlDataFetcherTests
             Description = "Empty test"
         };
 
-        var emptyRisks = new PaginationResult<RiskModel>
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            Items = new List<RiskModel>(),
-            TotalCount = 0
-        };
-
-        var emptyObservations = new PaginationResult<ObservationModel>
-        {
-            PageNumber = 1,
-            PageSize = 10,
-            Items = new List<ObservationModel>(),
-            TotalCount = 0
-        };
-
         var auditProgram = new AuditProgramModel
         {
             Id = auditProgramId,
@@ -205,25 +157,25 @@ public class ControlDataFetcherTests
 
         // Fake the service calls
         A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
-            .Returns(Task.FromResult(objective));
+            .Returns(objective);
 
-        A.CallTo(() => _riskService.SearchByUserIdAsync(userId, "", objectiveId, A<Page?>._))
-            .Returns(Task.FromResult(emptyRisks));
+        A.CallTo(() => _risksFetcher.FetchAsync(request))
+            .Returns(new List<RiskModel>());
 
         A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))
-            .Returns(Task.FromResult(auditProgram));
+            .Returns(auditProgram);
 
-        A.CallTo(() => _observationService.SearchByUserIdAsync(userId, "", auditProgramId, A<Page?>._))
-            .Returns(Task.FromResult(emptyObservations));
+        A.CallTo(() => _observationsFetcher.FetchAsync(request))
+            .Returns(new List<ObservationModel>());
 
         // Act
         ControlData result = await _sut.FetchAsync(request);
 
         // Assert
         result.Should().NotBeNull();
-        result.Objective.Should().BeSameAs(objective);
-        result.Risks.Items.Should().BeEmpty();
-        result.Observations.Items.Should().BeEmpty();
+        result.Objective.Should().Be(objective);
+        result.Risks.Should().BeEmpty();
+        result.Observations.Should().BeEmpty();
     }
 
 

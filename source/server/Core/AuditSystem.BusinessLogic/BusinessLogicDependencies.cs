@@ -23,6 +23,8 @@ using AuditSystem.BusinessLogic.Services.EntityServices.ObservationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RecommendationServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
@@ -46,6 +48,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepa
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RecommendationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
@@ -207,6 +210,15 @@ public static class BusinessLogicDependencies
             // File Path Builder
             .AddSingleton<IFilePathBuilder, FilePathBuilder>()
 
+            // report
+            .AddScoped<IDriftReportInfoService, DriftReportInfoService>()
+            .AddScoped<IOrganizationalDataFetcher, OrganizationalDataFetcher>()
+            .AddScoped<IControlDataFetcher, ControlDataFetcher>()
+            .AddScoped<IRisksFetcher, RisksFetcher>()
+            .AddScoped<IObservationsFetcher, ObservationsFetcher>()
+            .AddScoped<IRecommendationsFetcher, RecommendationsFetcher>()
+
+            
             // Url
             .AddSingleton<ISignedUrlService, SignedUrlService>()
             .AddScoped<IURLService, URLService>()

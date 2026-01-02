@@ -516,6 +516,62 @@ namespace AuditSystem.DataAccess.Migrations
                     b.ToTable("Recommendations", (string)null);
                 });
 
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.DriftReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ActionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ActionPlan")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("AuditProgramId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAgreed")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ObjectiveId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubDepartmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("DriftReports");
+                });
+
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1241,6 +1297,17 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Observation");
+                });
+
+            modelBuilder.Entity("AuditSystem.Domain.Entities.Reports.DriftReport", b =>
+                {
+                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>

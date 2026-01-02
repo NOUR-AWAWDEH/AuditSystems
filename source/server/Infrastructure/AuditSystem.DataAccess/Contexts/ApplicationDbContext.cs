@@ -5,6 +5,7 @@ using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Recommendations;
+using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
@@ -60,6 +61,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<AppUser> AppUsers { get; set; } = null!;
     public virtual DbSet<UserSessionInfo> UserSessions { get; set; } = null!;
 
+    // -------------------
+    // Reports
+    // -------------------
+    public virtual DbSet<DriftReport> DriftReports { get; set; } = null!;
 
     // -------------------
     // Auth

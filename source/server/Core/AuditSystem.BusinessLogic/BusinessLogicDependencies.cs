@@ -211,7 +211,7 @@ public static class BusinessLogicDependencies
             .AddSingleton<IFilePathBuilder, FilePathBuilder>()
 
             // report
-            .AddScoped<IDriftReportInfoService, DriftReportInfoService>()
+            .AddScoped<IDriftReportService, DriftReportService>()
             .AddScoped<IOrganizationalDataFetcher, OrganizationalDataFetcher>()
             .AddScoped<IControlDataFetcher, ControlDataFetcher>()
             .AddScoped<IRisksFetcher, RisksFetcher>()

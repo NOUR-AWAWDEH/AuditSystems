@@ -1,9 +1,6 @@
-using AuditSystem.Contract.Interfaces;
-using AuditSystem.Domain.Entities.Common;
-
 namespace AuditSystem.Contract.Models.Reports.DriftReport;
-   
-public class GenerateDriftReportRequest  : IUserAwareRequest
+
+public class GenerateDriftReportRequest
 {
     public Guid UserId { get; set; } = Guid.Empty;
     public Guid CompanyId { get; set; } = Guid.Empty;
@@ -12,4 +9,9 @@ public class GenerateDriftReportRequest  : IUserAwareRequest
     public Guid SubDepartmentId { get; set; } = Guid.Empty;
     public Guid ObjectiveId { get; set; }  = Guid.Empty;
     public Guid AuditProgramId { get; set; } = Guid.Empty;
+
+    public DateTime ActionDate { get; set; } = DateTime.UtcNow;
+    public string? ActionPlan { get; set; } = string.Empty;
+    public bool IsActive { get; set;} = true;
+    public bool IsAgreed { get; set;} = false;
 }

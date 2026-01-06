@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuditSystem.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddActionOwnerAtAuditProgram : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +44,9 @@ namespace AuditSystem.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -56,7 +58,9 @@ namespace AuditSystem.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Level = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                    Level = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -146,7 +150,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Token = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false)
+                    IsRevoked = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -165,7 +171,9 @@ namespace AuditSystem.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false)
+                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -233,14 +241,13 @@ namespace AuditSystem.DataAccess.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     UserName = table.Column<string>(type: "text", nullable: false),
                     IdentityUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    JobTitleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    JobTitleId = table.Column<Guid>(type: "uuid", nullable: true),
                     SubDepartmentId = table.Column<Guid>(type: "uuid", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -258,12 +265,6 @@ namespace AuditSystem.DataAccess.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_AppUsers_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_AppUsers_JobTitles_JobTitleId",
                         column: x => x.JobTitleId,
                         principalTable: "JobTitles",
@@ -277,6 +278,78 @@ namespace AuditSystem.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CompanyUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AppUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompanyUsers_AppUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompanyUsers_AppUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompanyUsers_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CompanyUsers_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DriftReports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubDepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ObjectiveId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AuditProgramId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ActionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ActionPlan = table.Column<string>(type: "text", nullable: false),
+                    IsAgreed = table.Column<bool>(type: "boolean", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DriftReports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DriftReports_AppUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Locations",
                 columns: table => new
                 {
@@ -284,9 +357,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Name = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     Address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CompanyId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -313,9 +386,9 @@ namespace AuditSystem.DataAccess.Migrations
                     FileName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     DriveFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -337,7 +410,9 @@ namespace AuditSystem.DataAccess.Migrations
                     CurrentSessionStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     TotalSessionTime = table.Column<TimeSpan>(type: "interval", nullable: false, defaultValue: new TimeSpan(0, 0, 0, 0, 0)),
                     LastLogin = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -357,9 +432,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     LocationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -385,9 +460,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     DepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -413,9 +488,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ProcessName = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     SubDepartmentId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -441,9 +516,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Particular = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     AuditProcessId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -469,9 +544,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SubProcessId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -497,9 +572,10 @@ namespace AuditSystem.DataAccess.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     RiskControlMatrixId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AuditProcessId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -510,6 +586,11 @@ namespace AuditSystem.DataAccess.Migrations
                         principalTable: "AppUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Objectives_AuditProcesses_AuditProcessId",
+                        column: x => x.AuditProcessId,
+                        principalTable: "AuditProcesses",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Objectives_RiskControlMatrices_RiskControlMatrixId",
                         column: x => x.RiskControlMatrixId,
@@ -526,9 +607,9 @@ namespace AuditSystem.DataAccess.Migrations
                     ObjectiveId = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Inadequate = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -548,44 +629,15 @@ namespace AuditSystem.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Risks",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ObjectiveId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RiskName = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Risks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Risks_AppUsers_CreatedByUserId",
-                        column: x => x.CreatedByUserId,
-                        principalTable: "AppUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Risks_Objectives_ObjectiveId",
-                        column: x => x.ObjectiveId,
-                        principalTable: "Objectives",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ControlDesigns",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ExitControlId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -613,9 +665,9 @@ namespace AuditSystem.DataAccess.Migrations
                     ExitControlId = table.Column<Guid>(type: "uuid", nullable: false),
                     ActionOwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     ControlDesignId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -651,16 +703,16 @@ namespace AuditSystem.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    ActionOwner = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    Background = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    ActionPlan = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    ActionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Highlight = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Background = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     Note = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     AuditProgramId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RateId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Classification = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -677,6 +729,12 @@ namespace AuditSystem.DataAccess.Migrations
                         principalTable: "AuditPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Observations_Rates_RateId",
+                        column: x => x.RateId,
+                        principalTable: "Rates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -687,9 +745,9 @@ namespace AuditSystem.DataAccess.Migrations
                     Title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ObservationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -708,21 +766,59 @@ namespace AuditSystem.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Risks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ObservationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Factor = table.Column<string>(type: "text", nullable: false),
+                    Impact = table.Column<string>(type: "text", nullable: false),
+                    RiskName = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
+                    Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    ObjectiveId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Risks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Risks_AppUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Risks_Objectives_ObjectiveId",
+                        column: x => x.ObjectiveId,
+                        principalTable: "Objectives",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Risks_Observations_ObservationId",
+                        column: x => x.ObservationId,
+                        principalTable: "Observations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Companies",
-                columns: new[] { "Id", "Name" },
-                values: new object[] { new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "FUTURE-LINKS" });
+                columns: new[] { "Id", "CreatedAt", "Name", "UpdatedAt" },
+                values: new object[] { new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2026, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "FUTURE-LINKS", null });
 
             migrationBuilder.InsertData(
                 table: "Rates",
-                columns: new[] { "Id", "Level" },
+                columns: new[] { "Id", "CreatedAt", "Level", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), "Critical" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), "High" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), "Medium" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), "Low" },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), "Minimal" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), null, "Critical", null },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), null, "High", null },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), null, "Medium", null },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), null, "Low", null },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), null, "Minimal", null }
                 });
 
             migrationBuilder.InsertData(
@@ -736,21 +832,16 @@ namespace AuditSystem.DataAccess.Migrations
 
             migrationBuilder.InsertData(
                 table: "JobTitles",
-                columns: new[] { "Id", "CompanyId", "Name" },
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "System Administrator" },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "Audit Manager" },
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "Senior Auditor" },
-                    { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "Auditor" },
-                    { new Guid("55555555-5555-5555-5555-555555555555"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "Risk Manager" },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), "Compliance Officer" }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "System Administrator", null },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "Audit Manager", null },
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "Senior Auditor", null },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "Auditor", null },
+                    { new Guid("55555555-5555-5555-5555-555555555555"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "Risk Manager", null },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"), new DateTime(2025, 1, 1, 1, 1, 1, 0, DateTimeKind.Utc), "Compliance Officer", null }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppUsers_CompanyId",
-                table: "AppUsers",
-                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppUsers_CreatedByUserId",
@@ -861,6 +952,26 @@ namespace AuditSystem.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyUsers_AppUserId",
+                table: "CompanyUsers",
+                column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompanyUsers_CompanyId",
+                table: "CompanyUsers",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompanyUsers_CreatedByUserId",
+                table: "CompanyUsers",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompanyUsers_RoleId",
+                table: "CompanyUsers",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ControlDesigns_CreatedByUserId",
                 table: "ControlDesigns",
                 column: "CreatedByUserId");
@@ -884,6 +995,11 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "IX_Departments_Name",
                 table: "Departments",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DriftReports_CreatedByUserId",
+                table: "DriftReports",
+                column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExitControls_CreatedByUserId",
@@ -922,6 +1038,11 @@ namespace AuditSystem.DataAccess.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Objectives_AuditProcessId",
+                table: "Objectives",
+                column: "AuditProcessId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Objectives_CreatedByUserId",
                 table: "Objectives",
                 column: "CreatedByUserId");
@@ -945,6 +1066,11 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "IX_Observations_CreatedByUserId",
                 table: "Observations",
                 column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Observations_RateId",
+                table: "Observations",
+                column: "RateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rates_Level",
@@ -996,6 +1122,11 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "IX_Risks_ObjectiveId",
                 table: "Risks",
                 column: "ObjectiveId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Risks_ObservationId",
+                table: "Risks",
+                column: "ObservationId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
@@ -1065,18 +1196,6 @@ namespace AuditSystem.DataAccess.Migrations
                 table: "AppUsers");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_AppUsers_Companies_CompanyId",
-                table: "AppUsers");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_JobTitles_Companies_CompanyId",
-                table: "JobTitles");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Locations_Companies_CompanyId",
-                table: "Locations");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_AppUsers_JobTitles_JobTitleId",
                 table: "AppUsers");
 
@@ -1104,7 +1223,10 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Rates");
+                name: "CompanyUsers");
+
+            migrationBuilder.DropTable(
+                name: "DriftReports");
 
             migrationBuilder.DropTable(
                 name: "Recommendations");
@@ -1128,6 +1250,9 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "AuditPrograms");
 
             migrationBuilder.DropTable(
+                name: "Rates");
+
+            migrationBuilder.DropTable(
                 name: "ControlDesigns");
 
             migrationBuilder.DropTable(
@@ -1149,9 +1274,6 @@ namespace AuditSystem.DataAccess.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Companies");
-
-            migrationBuilder.DropTable(
                 name: "JobTitles");
 
             migrationBuilder.DropTable(
@@ -1168,6 +1290,9 @@ namespace AuditSystem.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "AppUsers");
+
+            migrationBuilder.DropTable(
+                name: "Companies");
         }
     }
 }

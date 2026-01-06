@@ -10,5 +10,6 @@ public class AuditProcess : AuditableEntity<Guid>
 
     // Navigation property
     public virtual SubDepartment SubDepartment { get; set; } = null!;
-    public virtual ICollection<SubProcess> SubProcesses { get; set; } = new HashSet<SubProcess>();
+    public virtual ICollection<AuditSystem.Domain.Entities.RiskControls.Objective> Objectives { get; set; } = [];
+    public virtual ICollection<SubProcess> SubProcesses { get; set; } = [];
 }

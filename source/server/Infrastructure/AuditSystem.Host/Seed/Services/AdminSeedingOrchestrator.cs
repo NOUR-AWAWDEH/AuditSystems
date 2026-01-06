@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using AuditSystem.Host.Seed.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AuditSystem.Domain.Entities.Organization;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Host.Seed.Services;
 
@@ -230,8 +231,6 @@ public class AdminSeedingOrchestrator(
             LastName = config.LastName,
             Email = config.Email,
             UserName = config.Username,
-            Role = Role.Admin,
-            CompanyId = config.CompanyId,
             JobTitleId = config.JobTitleId,
             IsActive = true,
             SubDepartmentId = null,
@@ -240,6 +239,19 @@ public class AdminSeedingOrchestrator(
         };
 
         _dbContext.AppUsers.Add(appUser);
+
+        var adminRole = await _roleManager.FindByNameAsync(Role.Admin);
+        var companyUser = new CompanyUser
+        {
+            Id = Guid.NewGuid(),
+            CompanyId = config.CompanyId,
+            AppUserId = appUser.Id,
+            RoleId = adminRole!.Id,
+            IsActive = true,
+            CreatedByUserId = identityUserId
+        };
+
+        _dbContext.Set<CompanyUser>().Add(companyUser);
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation("AppUser created and linked to ApplicationUser: {Email}", config.Email);

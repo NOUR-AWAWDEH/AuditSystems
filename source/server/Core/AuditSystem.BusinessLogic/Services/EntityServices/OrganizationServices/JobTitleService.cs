@@ -132,9 +132,10 @@ internal sealed class JobTitleService(
         _logger.LogDebug("Retrieving all job titles for user {UserId}", userId);
 
         var user = await _validationHelper.ValidateUserAsync(userId);
+        var userCompanies = user.CompanyUsers.Select(cu => cu.CompanyId).ToList();
         return await repository.GetAll()
             .AsNoTracking()
-            .Where(j => j.CompanyId == user.CompanyId)
+            .Where(j => userCompanies.Contains(j.CompanyId))
             .Select(j => new JobTitleModel
             {
                 Id = j.Id,
@@ -154,7 +155,7 @@ internal sealed class JobTitleService(
 
         var user = await _validationHelper.ValidateUserAsync(userId);
 
-        var targetCompanyId = companyId ?? user.CompanyId;
+        var targetCompanyId = companyId ?? user.CompanyUsers.FirstOrDefault()?.CompanyId ?? Guid.Empty;
 
         _logger.LogDebug("Searching job titles for user {UserId} with term: {SearchTerm} and company: {CompanyId}",
             userId, searchTerm ?? "(none)", targetCompanyId.ToString() ?? "(none)");

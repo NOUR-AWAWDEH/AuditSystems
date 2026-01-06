@@ -3,6 +3,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportS
 using AuditSystem.Contract.Models.Observation;
 using AuditSystem.Contract.Models.Recommendation;
 using AuditSystem.Contract.Models.Reports.DriftReport;
+using AuditSystem.Contract.Models.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
@@ -26,7 +27,7 @@ public sealed class RecommendationsFetcher(
 
         foreach (var observation in observations)
         {
-            var result = await recommendationService.SearchByUserIdAsync(request.UserId, "", observation.Id, null);
+            var result = await recommendationService.SearchByUserIdAsync(request.UserId, "", observation.Id, new Page(1, 100));
             recommendations.AddRange(result.Items);
         }
 

@@ -140,8 +140,6 @@ public class RegistrationService(
             LastName = request.LastName,
             Email = request.Email,
             UserName = identityUser.UserName,
-            Role = request.RoleName,
-            CompanyId = request.CompanyId,
             JobTitleId = request.JobTitleId,
             SubDepartmentId = request.SubDepartmentId,
             IsActive = true,
@@ -149,6 +147,19 @@ public class RegistrationService(
         };
 
         _dbContext.AppUsers.Add(appUser);
+
+        var role = await ValidateAndGetRoleAsync(request.RoleName);
+        var companyUser = new CompanyUser
+        {
+            Id = Guid.NewGuid(),
+            CompanyId = request.CompanyId,
+            AppUserId = appUser.Id,
+            RoleId = role.Id,
+            IsActive = true,
+            CreatedByUserId = adminAppUserId
+        };
+
+        _dbContext.Set<CompanyUser>().Add(companyUser);
         await _dbContext.SaveChangesAsync();
     }
 

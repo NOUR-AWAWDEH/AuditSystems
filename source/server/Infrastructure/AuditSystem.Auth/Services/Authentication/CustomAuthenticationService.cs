@@ -69,7 +69,9 @@ public class CustomAuthenticationService(
         }
 
         // --- Start user session via UserSessionManager ---
-        var appUser = await _db.AppUsers.FirstOrDefaultAsync(au => au.IdentityUserId == user.Id);
+        var appUser = await _db.AppUsers
+            .Include(u => u.CompanyUsers)
+            .FirstOrDefaultAsync(au => au.IdentityUserId == user.Id);
         if (appUser != null)
         {
             await _userSessionManager.StartSessionAsync(appUser);
@@ -85,7 +87,7 @@ public class CustomAuthenticationService(
             JwtToken = jwtToken,
             RefreshToken = refreshToken,
             IsEmailVerified = appUser.IsActive,
-            CompanyId = appUser.CompanyId,
+            CompanyId = appUser.CompanyUsers.FirstOrDefault()?.CompanyId ?? Guid.Empty,
         }, "Login successful.");
     }
 
@@ -164,14 +166,16 @@ public class CustomAuthenticationService(
         var expiresAt = jwtToken?.ValidTo > DateTime.MinValue ? jwtToken.ValidTo : (DateTime?)null;
         var authenticatedAt = jwtToken?.ValidFrom > DateTime.MinValue ? jwtToken.ValidFrom : (DateTime?)null;
 
-        var appUser = await _db.AppUsers.FirstOrDefaultAsync(au => au.IdentityUserId == user.Id);
+        var appUser = await _db.AppUsers
+            .Include(u => u.CompanyUsers)
+            .FirstOrDefaultAsync(au => au.IdentityUserId == user.Id);
 
         return new AuthStatusResponseDto
         {
             Username = user.UserName,
             UserId = user.Id.ToString(),
             Email = user.Email,
-            CompanyId = appUser?.CompanyId.ToString(),
+            CompanyId = appUser?.CompanyUsers.FirstOrDefault()?.CompanyId.ToString() ?? Guid.Empty.ToString(),
             Roles = string.Join(", ", roles!),
             AuthenticationType = jwtToken?.Claims.FirstOrDefault(c => c.Type == "auth_type")?.Value ?? "Bearer",
             IsEmailVerified = user.EmailConfirmed,

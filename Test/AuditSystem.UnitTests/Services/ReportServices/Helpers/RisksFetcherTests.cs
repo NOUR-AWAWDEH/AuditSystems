@@ -37,14 +37,14 @@ public class RisksFetcherTests
             new RiskModel { Id = Guid.NewGuid(), ObjectiveId = request.ObjectiveId, RiskName = "Risk 1" }
         };
 
-        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, null))
-            .Returns(new PaginationResult<RiskModel> 
+        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, A<Page>._))
+            .Returns(Task.FromResult(new PaginationResult<RiskModel> 
             { 
                 Items = risks,
                 TotalCount = 1,
                 PageNumber = 1,
                 PageSize = 10
-            });
+            }));
 
         // Act
         var result = await _sut.FetchAsync(request);

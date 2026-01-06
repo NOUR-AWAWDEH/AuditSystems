@@ -79,7 +79,6 @@ internal sealed class AppUserService(
         appUser.LastName = user.LastName;
         appUser.Email = user.Email;
         appUser.UserName = user.UserName;
-        appUser.Role = user.Role;
         appUser.SubDepartmentId = user.SubDepartment?.Id;
         appUser.JobTitleId = user.JobTitle?.Id ?? appUser.JobTitleId;
         appUser.UpdatedAt = DateTime.UtcNow;
@@ -136,7 +135,7 @@ internal sealed class AppUserService(
                 u.FirstName,
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
-                u.Role,
+                u.CompanyUsers.FirstOrDefault() != null ? u.CompanyUsers.FirstOrDefault()!.Role.Name ?? string.Empty : string.Empty,
                 u.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = u.SubDepartment.Id,
@@ -167,6 +166,8 @@ internal sealed class AppUserService(
             .Include(u => u.IdentityUser)
             .Include(u => u.SubDepartment)
             .Include(u => u.JobTitle)
+            .Include(u => u.CompanyUsers)
+                .ThenInclude(cu => cu.Role)
             .FirstOrDefaultAsync(u => u.Id == id)
             ?? throw new KeyNotFoundException("User not found");
 
@@ -177,7 +178,7 @@ internal sealed class AppUserService(
             userWithRelations.FirstName,
             userWithRelations.LastName,
             userWithRelations.IdentityUser.Email ?? string.Empty,
-            userWithRelations.Role,
+            userWithRelations.CompanyUsers.FirstOrDefault()?.Role.Name ?? string.Empty,
             userWithRelations.SubDepartment == null ? null : new SubDepartmentModel
             {
                 Id = userWithRelations.SubDepartment.Id,
@@ -208,6 +209,8 @@ internal sealed class AppUserService(
             .Include(u => u.IdentityUser)
             .Include(u => u.SubDepartment)
             .Include(u => u.JobTitle)
+            .Include(u => u.CompanyUsers)
+                .ThenInclude(cu => cu.Role)
             .AsNoTracking()
             .ToListAsync();
 
@@ -221,7 +224,7 @@ internal sealed class AppUserService(
                 user.FirstName,
                 user.LastName,
                 user.IdentityUser.Email ?? string.Empty,
-                user.Role,
+                user.CompanyUsers.FirstOrDefault()?.Role.Name ?? string.Empty,
                 user.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = user.SubDepartment.Id,

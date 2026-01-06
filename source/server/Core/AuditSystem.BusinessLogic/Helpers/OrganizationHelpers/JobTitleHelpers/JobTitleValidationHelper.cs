@@ -33,6 +33,7 @@ public class JobTitleValidationHelper(
     public async Task<JobTitle> ValidateJobTitleOwnershipAsync(Guid jobTitleId, Guid userId)
     {
         var appUser = await _appUserRepository.Query()
+            .Include(u => u.CompanyUsers)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
 
@@ -45,7 +46,7 @@ public class JobTitleValidationHelper(
         if (jobTitle == null)
             throw new KeyNotFoundException(string.Format(JobTitleConstants.JobTitleNotFoundMessage, jobTitleId));
 
-        if (jobTitle.CompanyId != appUser.CompanyId)
+        if (!appUser.CompanyUsers.Any(cu => cu.CompanyId == jobTitle.CompanyId))
         {
             throw new UnauthorizedAccessException(string.Format(JobTitleConstants.UnauthorizedAccessMessage, userId, jobTitleId));
         }
@@ -81,6 +82,7 @@ public class JobTitleValidationHelper(
     public async Task ValidateJobTitleCreationAsync(Guid userId, Guid companyId)
     {
         var appUser = await _appUserRepository.Query()
+            .Include(u => u.CompanyUsers)
             .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
 
         if (appUser == null)
@@ -88,7 +90,7 @@ public class JobTitleValidationHelper(
             throw new UnauthorizedAccessException($"User with ID {userId} not found.");
         }
 
-        if (appUser.CompanyId != companyId)
+        if (!appUser.CompanyUsers.Any(cu => cu.CompanyId == companyId))
         {
             throw new UnauthorizedAccessException($"User {userId} is not authorized to create job titles for company {companyId}.");
         }
@@ -137,6 +139,7 @@ public class JobTitleValidationHelper(
     public async Task<AppUser> ValidateUserAsync(Guid userId)
     {
         var appUser = await _appUserRepository.Query()
+            .Include(u => u.CompanyUsers)
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
 

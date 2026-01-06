@@ -13,11 +13,11 @@ public class DriftReportModel
 {
     public Guid UserId { get; set; } = Guid.Empty;
     public CompanyModel? Company { get; set; }
-    public  LocationModel? Location { get; set; }
-    public  DepartmentModel? Department { get; set; }
-    public  SubDepartmentModel? SubDepartment { get; set; }
-    public  ObjectiveModel? Objective { get; set; }
-    public  AuditProgramModel? AuditProgram { get; set; }
+    public LocationModel? Location { get; set; }
+    public DepartmentModel? Department { get; set; }
+    public SubDepartmentModel? SubDepartment { get; set; }
+    public ObjectiveModel? Objective { get; set; }
+    public AuditProgramModel? AuditProgram { get; set; }
     public DateTime ActionDate { get; set; }
     public string? ActionPlan { get; set; } = string.Empty;
     public bool IsAgreed { get; set; } = false;

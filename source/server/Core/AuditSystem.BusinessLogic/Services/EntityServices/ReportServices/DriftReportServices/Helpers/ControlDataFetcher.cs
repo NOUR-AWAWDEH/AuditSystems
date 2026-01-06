@@ -23,20 +23,18 @@ public sealed class ControlDataFetcher(
     {
         logger.LogDebug("Fetching control data");
         
-        var objectiveTask = objectiveService.GetObjectiveByIdAsync(request.ObjectiveId, request.UserId);
-        var risks = risksFetcher.FetchAsync(request);
-        var auditProgramTask = auditProgramService.GetAuditProgramByIdAsync(request.AuditProgramId, request.UserId);
-        var observations = observationsFetcher.FetchAsync(request);
-
-        await Task.WhenAll(objectiveTask, risks, auditProgramTask, observations);
+        var objective = await objectiveService.GetObjectiveByIdAsync(request.ObjectiveId, request.UserId);
+        var risks = await risksFetcher.FetchAsync(request);
+        var auditProgram = await auditProgramService.GetAuditProgramByIdAsync(request.AuditProgramId, request.UserId);
+        var observations = await observationsFetcher.FetchAsync(request);
 
         logger.LogDebug("Fetching control data succeeded");
         
         return new ControlData(
-            objectiveTask.Result,
-            risks.Result,
-            auditProgramTask.Result,
-            observations.Result
+            objective,
+            risks,
+            auditProgram,
+            observations
         );
     }
 }

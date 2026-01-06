@@ -11,7 +11,7 @@
             <div class="w-full sm:min-w-64 sm:max-w-xs">
               <ExitControlSelector
                 :exit-controls="exitControls"
-                label="Select Exit Control (Adequate)"
+                label="Select Exit Control"
                 :selected-exit-control-id="internalSelectedExitControlId"
                 @update:selected-exit-control="(id) => (internalSelectedExitControlId = id)"
                 @exit-control-changed="(id) => (internalSelectedExitControlId = id)"

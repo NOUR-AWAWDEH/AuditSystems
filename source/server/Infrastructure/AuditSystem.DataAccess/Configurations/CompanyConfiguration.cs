@@ -12,10 +12,6 @@ namespace AuditSystem.DataAccess.Configurations
             builder.ToTable("Companies");
             builder.Property(c => c.Name).IsRequired().HasMaxLength(200);
 
-            builder.HasMany(c => c.Users)
-                   .WithOne(u => u.Company)
-                   .HasForeignKey(u => u.CompanyId)
-                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(c => c.Locations)
                    .WithOne(l => l.Company)
@@ -29,7 +25,7 @@ namespace AuditSystem.DataAccess.Configurations
                 {
                     Id = new Guid("d2719f8e-8b4f-4c0e-a6b8-123456789abc"),
                     Name = "FUTURE-LINKS",
-                    CreatedAt = new DateTime(2026, 1, 1, 1, 1, 1)
+                    CreatedAt = new DateTime(2026, 1, 1, 1, 1, 1, DateTimeKind.Utc)
                 }
             );
 

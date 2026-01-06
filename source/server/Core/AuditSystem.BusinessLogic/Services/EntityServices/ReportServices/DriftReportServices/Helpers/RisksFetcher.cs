@@ -2,6 +2,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportS
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Models.Reports.DriftReport;
 using AuditSystem.Contract.Models.Risks;
+using AuditSystem.Contract.Models.Pagination;
 using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
@@ -14,7 +15,7 @@ public class RisksFetcher(
     public async Task<IReadOnlyList<RiskModel>> FetchAsync(GenerateDriftReportRequest request)
     {
         var result = await riskService.SearchByUserIdAsync(
-                request.UserId, "", request.ObjectiveId, null);
+                request.UserId, "", request.ObjectiveId, new Page(1, 100));
 
             if (result?.Items == null)
             {

@@ -20,20 +20,18 @@ public sealed class OrganizationalDataFetcher(
     {
         logger.LogDebug("Fetching organizational data");
 
-        var companyTask = companyService.GetCompanyByIdAsync(request.CompanyId);
-        var locationTask = locationService.GetLocationByIdAsync(request.LocationId, request.UserId);
-        var departmentTask = departmentService.GetDepartmentByIdAsync(request.DepartmentId, request.UserId);
-        var subDepartmentTask = subDepartmentService.GetSubDepartmentByIdAsync(request.SubDepartmentId, request.UserId);
+        var company = await companyService.GetCompanyByIdAsync(request.CompanyId);
+        var location = await locationService.GetLocationByIdAsync(request.LocationId, request.UserId);
+        var department = await departmentService.GetDepartmentByIdAsync(request.DepartmentId, request.UserId);
+        var subDepartment = await subDepartmentService.GetSubDepartmentByIdAsync(request.SubDepartmentId, request.UserId);
 
-        await Task.WhenAll(companyTask, locationTask, departmentTask, subDepartmentTask);
-        
         logger.LogDebug("Organizational data fetched successfully");
         
         return new OrganizationalData(
-            companyTask.Result,
-            locationTask.Result,
-            departmentTask.Result,
-            subDepartmentTask.Result
+            company,
+            location,
+            department,
+            subDepartment
         );
     }
 }

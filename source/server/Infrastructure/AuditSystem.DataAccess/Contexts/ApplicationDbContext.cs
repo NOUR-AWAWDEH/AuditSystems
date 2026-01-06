@@ -59,6 +59,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // User
     // -------------------
     public virtual DbSet<AppUser> AppUsers { get; set; } = null!;
+    public virtual DbSet<CompanyUser> CompanyUsers { get; set; } = null!;
     public virtual DbSet<UserSessionInfo> UserSessions { get; set; } = null!;
 
     // -------------------

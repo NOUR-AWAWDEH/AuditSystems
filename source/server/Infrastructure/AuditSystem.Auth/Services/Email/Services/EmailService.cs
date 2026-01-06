@@ -1,5 +1,6 @@
 ﻿using AuditSystem.Auth.Services.Email.Abstractions;
 using AuditSystem.Auth.Services.Email.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace AuditSystem.Auth.Services.Email.Services;
 
@@ -7,13 +8,20 @@ public class EmailService : IEmailService
 {
     private readonly IEmailTemplateRenderer _renderer;
     private readonly IEmailSender _sender;
+    private readonly string _clientDomain;
 
     public EmailService(
         IEmailTemplateRenderer renderer,
-        IEmailSender sender)
+        IEmailSender sender,
+        IConfiguration configuration)
     {
         _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
         _sender = sender ?? throw new ArgumentNullException(nameof(sender));
+        if (configuration == null)
+            throw new ArgumentNullException(nameof(configuration));
+
+        var origins = configuration["CORS_ALLOWED_ORIGIN"]?.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        _clientDomain = origins?.FirstOrDefault() ?? "http://localhost:10000";
     }
 
     public async Task SendEmailAsync(EmailRequest request)
@@ -85,6 +93,32 @@ public class EmailService : IEmailService
             throw new ArgumentException("Email cannot be empty", nameof(email));
 
         var request = new PasswordChangedEmailRequest(email, "support@auditsystem.online");
+        await SendEmailAsync(request);
+    }
+
+    public async Task SendDriftReportNotificationToActionOwnerAsync(string actionOwnerEmail, string actionOwnerName, Guid driftReportId)
+    {
+        if (string.IsNullOrWhiteSpace(actionOwnerEmail))
+            throw new ArgumentException("Action owner email cannot be empty", nameof(actionOwnerEmail));
+
+        if (string.IsNullOrWhiteSpace(actionOwnerName))
+            throw new ArgumentException("Action owner name cannot be empty", nameof(actionOwnerName));
+
+        var placeholders = new Dictionary<string, PlaceholderValue>
+        {
+            { "ActionOwnerName", new PlaceholderValue { Value = actionOwnerName } },
+            { "DriftReportId", new PlaceholderValue { Value = driftReportId.ToString() } },
+            { "DriftReportLink", new PlaceholderValue { Value = $"{_clientDomain}/reports/drift/{driftReportId}" } }
+        };
+
+        var request = new EmailRequest
+        {
+            ToEmails = new List<string> { actionOwnerEmail },
+            Subject = "New Drift Report Notification",
+            TemplateName = "DriftReportNotification.html",
+            Placeholders = placeholders
+        };
+
         await SendEmailAsync(request);
     }
 }

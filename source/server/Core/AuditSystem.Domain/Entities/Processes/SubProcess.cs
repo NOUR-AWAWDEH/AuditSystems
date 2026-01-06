@@ -8,7 +8,7 @@ public class SubProcess : AuditableEntity<Guid>
     public required string Particular { get; set; }
     public required Guid AuditProcessId { get; set; }
 
-    // Navigation property
+    // Navigation properties
     public virtual AuditProcess AuditProcess { get; set; } = null!;
-    public virtual ICollection<RiskControlMatrix> RiskControlMatrices { get; set; } = new HashSet<RiskControlMatrix>();
+    public virtual ICollection<RiskControlMatrix> RiskControlMatrices { get; set; } = [];
 }

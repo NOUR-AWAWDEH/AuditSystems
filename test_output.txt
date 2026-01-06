@@ -1,0 +1,17 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AuditSystem.Domain -> /home/nour/Work/AuditSystems/source/server/Core/AuditSystem.Domain/bin/Debug/net9.0/AuditSystem.Domain.dll
+  AuditSystem.Contract -> /home/nour/Work/AuditSystems/source/server/Core/AuditSystem.Contract/bin/Debug/net9.0/AuditSystem.Contract.dll
+  AuditSystem.Application -> /home/nour/Work/AuditSystems/source/server/Core/AuditSystem.Application/bin/Debug/net9.0/AuditSystem.Application.dll
+  AuditSystem.DataAccess -> /home/nour/Work/AuditSystems/source/server/Infrastructure/AuditSystem.DataAccess/bin/Debug/net9.0/AuditSystem.DataAccess.dll
+  AuditSystem.Auth -> /home/nour/Work/AuditSystems/source/server/Infrastructure/AuditSystem.Auth/bin/Debug/net9.0/AuditSystem.Auth.dll
+  AuditSystem.BusinessLogic -> /home/nour/Work/AuditSystems/source/server/Core/AuditSystem.BusinessLogic/bin/Debug/net9.0/AuditSystem.BusinessLogic.dll
+  AuditSystem.Host -> /home/nour/Work/AuditSystems/source/server/Infrastructure/AuditSystem.Host/bin/Debug/net9.0/AuditSystem.Host.dll
+  AuditSystem.UnitTests -> /home/nour/Work/AuditSystems/Test/AuditSystem.UnitTests/bin/Debug/net9.0/AuditSystem.UnitTests.dll
+Test run for /home/nour/Work/AuditSystems/Test/AuditSystem.UnitTests/bin/Debug/net9.0/AuditSystem.UnitTests.dll (.NETCoreApp,Version=v9.0)
+VSTest version 17.12.0 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     5, Skipped:     0, Total:     5, Duration: 1 s - AuditSystem.UnitTests.dll (net9.0)

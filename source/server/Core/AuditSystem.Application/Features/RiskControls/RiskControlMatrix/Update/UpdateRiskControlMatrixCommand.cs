@@ -5,6 +5,6 @@ namespace AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Update
 
 public sealed record class UpdateRiskControlMatrixCommand(
     Guid Id,
-    Guid SubProcessId,
+    Guid AuditProcessId,
     string Description
 ) : UserAwareCommand<Result>;

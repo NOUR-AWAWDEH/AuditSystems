@@ -7,8 +7,8 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.Ris
 
 public interface IRiskControlMatrixSearch
 {
-    Expression<Func<RiskControlMatrix, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid subProcessId);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid subProcessId, Page page);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? subProcessId, Page page);
-    Task<PaginationResult<RiskControlMatrixModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid subProcessId, Page page, string cacheKey, string countCacheKey);
+    Expression<Func<RiskControlMatrix, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProcessId);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid auditProcessId, Page page);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? auditProcessId, Page page);
+    Task<PaginationResult<RiskControlMatrixModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page page, string cacheKey, string countCacheKey);
 }

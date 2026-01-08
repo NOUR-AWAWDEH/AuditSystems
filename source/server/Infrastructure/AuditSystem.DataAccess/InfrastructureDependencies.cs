@@ -93,7 +93,6 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Company>()
         .AddRepository<Guid, JobTitle>()
         //Processes
-        .AddRepository<Guid, SubProcess>()
         .AddRepository<Guid, AuditProcess>()
 
         //RiskControls

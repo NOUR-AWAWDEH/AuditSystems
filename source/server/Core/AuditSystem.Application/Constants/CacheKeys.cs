@@ -22,7 +22,6 @@ public static class CacheKeys
     public const string SubDepartment = "subdepartment";
 
     public const string AuditProcess = "auditprocess";
-    public const string SubProcess = "subprocess";
 
     public const string RiskControlMatrix = "riskcontrolmatrix";
     public const string Objective = "objective";

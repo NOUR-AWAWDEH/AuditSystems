@@ -6,7 +6,7 @@ namespace AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Search
 
 public sealed record SearchRiskControlMatrixQuery(
     string? SearchTerm,
-    Guid SubProcessId
+    Guid AuditProcessId
 ) : PaginationRequest<RiskControlMatrixModel>, IUserAwareRequest
 {
     public Guid UserId { get; set; }

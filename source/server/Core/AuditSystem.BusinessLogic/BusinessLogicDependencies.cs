@@ -11,7 +11,6 @@ using AuditSystem.BusinessLogic.Helpers.RecommendationHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
-using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.BusinessLogic.Helpers.UserHelpers.AppUserHelpers;
 using AuditSystem.BusinessLogic.Mappings;
@@ -46,7 +45,6 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.JobTitl
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RecommendationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
@@ -152,12 +150,6 @@ public static class BusinessLogicDependencies
             .AddScoped<IUnifiedCacheService<Guid, AuditProcess, AuditProcessModel>, AuditProcessService>()
             .AddScoped<IAuditProcessValidation, AuditProcessValidationHelper>()
             .AddScoped<IAuditProcessSearch, AuditProcessSearchHelper>()
-
-            // Sub Process
-            .AddScoped<ISubProcessService, SubProcessService>()
-            .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
-            .AddScoped<ISubProcessValidation, SubProcessValidationHelper>()
-            .AddScoped<ISubProcessSearch, SubProcessSearchHelper>()
 
             // Risk Control Matrix
             .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()

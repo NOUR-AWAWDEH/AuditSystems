@@ -32,9 +32,9 @@ public class AuditProcessConfiguration : IEntityTypeConfiguration<AuditProcess>
                  .OnDelete(DeleteBehavior.Restrict);
 
 
-              builder.HasMany(ap => ap.SubProcesses)
-                     .WithOne(sp => sp.AuditProcess)
-                     .HasForeignKey(sp => sp.AuditProcessId)
+              builder.HasMany(ap => ap.RiskControlMatrices)
+                     .WithOne(rcm => rcm.AuditProcess)
+                     .HasForeignKey(rcm => rcm.AuditProcessId)
                      .OnDelete(DeleteBehavior.Restrict);
 
               builder.HasIndex(ap => ap.SubDepartmentId);

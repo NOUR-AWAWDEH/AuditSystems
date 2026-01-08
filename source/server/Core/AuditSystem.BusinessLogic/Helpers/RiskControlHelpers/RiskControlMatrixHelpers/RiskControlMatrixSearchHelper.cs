@@ -22,11 +22,11 @@ public class RiskControlMatrixSearchHelper(
     private readonly ILogger<RiskControlMatrixSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<RiskControlMatrix, bool>> BuildUserSearchPredicate(
-        Guid userId, string? searchTerm, Guid subProcessId)
+        Guid userId, string? searchTerm, Guid auditProcessId)
     {
         return sp => sp.CreatedByUserId == userId &&
                 (string.IsNullOrEmpty(searchTerm) || sp.Description.Contains(searchTerm)) &&
-                sp.SubProcessId == subProcessId;
+                sp.AuditProcessId == auditProcessId;
     }
 
     // Original method for backward compatibility
@@ -36,42 +36,40 @@ public class RiskControlMatrixSearchHelper(
         return GetUserSearchCacheKeys(userId, searchTerm, null, page);
     }
 
-    // Method with required Guid subProcessId (not nullable) - matches interface
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid subProcessId, Page page)
+        Guid userId, string? searchTerm, Guid auditProcessId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subProcessIdStr = subProcessId.ToString();
+        var auditProcessIdStr = auditProcessId.ToString();
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, subProcessIdStr, page.Number, page.Size);
+            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, auditProcessIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, subProcessIdStr);
+            CacheKeys.RiskControlMatrix, userId, normalizedSearchTerm, auditProcessIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
-    // Updated method with nullable subProcessId support (for internal use)
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid? subProcessId, Page page)
+        Guid userId, string? searchTerm, Guid? auditProcessId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var subProcessIdStr = subProcessId?.ToString() ?? "all";
+        var auditProcessIdStr = auditProcessId?.ToString() ?? "all";
         
         var cacheKey = string.Format(CacheKeys.UserSearchCacheKey, 
-            CacheKeys.SubProcess, userId, normalizedSearchTerm, subProcessIdStr, page.Number, page.Size);
+            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProcessIdStr, page.Number, page.Size);
 
         var countCacheKey = string.Format(CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.SubProcess, userId, normalizedSearchTerm, subProcessIdStr);
+            CacheKeys.AuditProcess, userId, normalizedSearchTerm, auditProcessIdStr);
 
         return (cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<RiskControlMatrixModel>> GetUserSearchFromRepositoryAsync(
-    Guid userId, string? searchTerm, Guid subProcessId, Page page, string cacheKey, string countCacheKey)
+    Guid userId, string? searchTerm, Guid auditProcessId, Page page, string cacheKey, string countCacheKey)
     {
-        var predicate = BuildUserSearchPredicate(userId, searchTerm, subProcessId);
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, auditProcessId);
 
         var query = _repository.GetAll()
             .Where(predicate)
@@ -87,7 +85,7 @@ public class RiskControlMatrixSearchHelper(
             {
                 Id = rcm.Id,
                 Description = rcm.Description,
-                SubProcessId = rcm.SubProcessId,
+                AuditProcessId = rcm.AuditProcessId,
                 CreatedAt = rcm.CreatedAt,
                 UpdatedAt = rcm.UpdatedAt
             })

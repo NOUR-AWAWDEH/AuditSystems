@@ -19,7 +19,6 @@ public static class RiskControlMatrixConstants
     public const string UnauthorizedAccessMessage = "User {0} is not authorized to access risk control matrix {1}.";
     public const string UnauthorizedRiskControlMatrixCreateMessage = "User {0} is not authorized to create risk control matrix under SubDepartment {1}.";
     public const string RiskControlMatrixNotFoundMessage = "RiskControlMatrix with ID {0} not found.";
-    public const string SubProcessNotFoundMessage = "SubProcess with ID {0} not found.";
     public const string UnauthorizedRiskControlMatrixAccessMessage = "User {0} is not authorized to access risk control matrix {1}.";
     public const string UserIdEmptyMessage = "UserId cannot be empty";
     public const string RetrievedUserSearchResultsFromCacheMessage = "Retrieved user search results from cache";

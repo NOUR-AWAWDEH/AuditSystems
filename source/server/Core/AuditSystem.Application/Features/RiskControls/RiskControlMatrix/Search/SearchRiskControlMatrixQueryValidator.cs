@@ -14,11 +14,11 @@ public class SearchRiskControlMatrixQueryValidator : PaginationRequestValidator<
             .Must(BeAValidGuid)
             .WithMessage("User ID must be a valid GUID.");
         
-        RuleFor(x => x.SubProcessId)
+        RuleFor(x => x.AuditProcessId)
             .NotEmpty()
-            .WithMessage("SubProcess ID is required.")
+            .WithMessage("AuditProcess ID is required.")
             .Must(BeAValidGuid)
-            .WithMessage("SubProcess ID must be a valid GUID");
+            .WithMessage("AuditProcess ID must be a valid GUID");
 
         RuleFor(x => x.SearchTerm)
             .MaximumLength(200)

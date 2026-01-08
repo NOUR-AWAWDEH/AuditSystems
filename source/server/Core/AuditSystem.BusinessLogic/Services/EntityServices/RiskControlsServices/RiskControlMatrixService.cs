@@ -42,7 +42,7 @@ internal sealed class RiskControlMatrixService(
 
         _logger.LogDebug("Creating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
 
-        await _validationHelper.ValidateSubProcessOwnershipAsync(riskControlMatrixModel.SubProcessId, userId);
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(riskControlMatrixModel.AuditProcessId, userId);
 
         var entity = mapper.Map<RiskControlMatrix>(riskControlMatrixModel);
         entity.CreatedByUserId = userId;
@@ -85,13 +85,13 @@ internal sealed class RiskControlMatrixService(
         
         await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(riskControlMatrixId, userId);
         
-        // Get the risk control matrix first to retrieve the SubProcessId before deletion
+        // Get the risk control matrix first to retrieve the AuditProcessId before deletion
         var riskControlMatrix = await repository.GetByIdAsync(riskControlMatrixId);
-        Guid? subProcessId = riskControlMatrix?.SubProcessId;
+        Guid? auditProcessId = riskControlMatrix?.AuditProcessId;
 
         await repository.DeleteAsync(riskControlMatrixId);
         await ClearEntityCacheAsync(riskControlMatrixId);
-        await ClearUserRelatedCachesAsync(userId, RiskControlMatrixConstants.EntityName, subProcessId);
+        await ClearUserRelatedCachesAsync(userId, RiskControlMatrixConstants.EntityName, auditProcessId);
 
         _logger.LogInformation("Successfully deleted risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixId, userId);
     }
@@ -104,7 +104,7 @@ internal sealed class RiskControlMatrixService(
         _logger.LogDebug("Updating risk control matrix {RiskControlMatrixId} for user {UserId}", riskControlMatrixModel.Id, userId);
 
         var existingEntity = await _validationHelper.ValidateRiskControlMatrixOwnershipAsync(riskControlMatrixModel.Id, userId);
-        await _validationHelper.ValidateSubProcessOwnershipAsync(riskControlMatrixModel.SubProcessId, userId);
+        await _validationHelper.ValidateAuditProcessOwnershipAsync(riskControlMatrixModel.AuditProcessId, userId);
 
         mapper.Map(riskControlMatrixModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -128,7 +128,7 @@ internal sealed class RiskControlMatrixService(
             {
                 Id = rcm.Id,
                 Description = rcm.Description,
-                SubProcessId = rcm.SubProcessId,
+                AuditProcessId = rcm.AuditProcessId,
                 CreatedAt = rcm.CreatedAt,
                 UpdatedAt = rcm.UpdatedAt,
             })
@@ -136,15 +136,15 @@ internal sealed class RiskControlMatrixService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid subProcessId, Page? page)
+    public async Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page? page)
     {
         RiskControlMatrixValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        _logger.LogDebug("Searching risk control matrices for user {UserId} with term: {SearchTerm} and sub process: {SubProcessId}",
-                userId, searchTerm ?? "(none)", subProcessId.ToString() ?? "(none)");
+        _logger.LogDebug("Searching risk control matrices for user {UserId} with term: {SearchTerm} and audit process: {AuditProcessId}",
+                userId, searchTerm ?? "(none)", auditProcessId.ToString() ?? "(none)");
 
-        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, subProcessId, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, auditProcessId, page);
 
         var cachedResult = await GetFromCacheAsync<RiskControlMatrixModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
@@ -153,7 +153,7 @@ internal sealed class RiskControlMatrixService(
             return cachedResult;
         }
 
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, subProcessId, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, auditProcessId, page, cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<RiskControlMatrixModel>> SearchAsync(string? description, Page page)

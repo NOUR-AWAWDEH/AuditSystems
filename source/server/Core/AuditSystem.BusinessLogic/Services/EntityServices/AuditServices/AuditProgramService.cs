@@ -102,7 +102,6 @@ internal sealed class AuditProgramService(
             .Include(ap => ap.ExitControl)
                 .ThenInclude(ec => ec.Objective)
                 .ThenInclude(o => o.RiskControlMatrix)
-                .ThenInclude(rcm => rcm.SubProcess)
                 .ThenInclude(sp => sp.AuditProcess)
                 .ThenInclude(ap => ap.SubDepartment)
                 .ThenInclude(sd => sd.Department)
@@ -131,8 +130,6 @@ internal sealed class AuditProgramService(
         AuditProgramValidationHelper.ValidateUserId(userId);
 
         _logger.LogDebug("Retrieving all audit programs for user {UserId}", userId);
-
-
 
         return await repository.GetAll()
             .AsNoTracking()

@@ -36,7 +36,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // Process
     // -------------------
     public virtual DbSet<AuditProcess> AuditProcesses { get; set; } = null!;
-    public virtual DbSet<SubProcess> SubProcesses { get; set; } = null!;
 
     // -------------------
     // Risk Controls

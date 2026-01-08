@@ -1,5 +1,6 @@
 using AuditSystem.Domain.Entities.Common;
 using AuditSystem.Domain.Entities.Organization;
+using AuditSystem.Domain.Entities.RiskControls;
 
 namespace AuditSystem.Domain.Entities.Processes;
 
@@ -10,6 +11,6 @@ public class AuditProcess : AuditableEntity<Guid>
 
     // Navigation property
     public virtual SubDepartment SubDepartment { get; set; } = null!;
-    public virtual ICollection<AuditSystem.Domain.Entities.RiskControls.Objective> Objectives { get; set; } = [];
-    public virtual ICollection<SubProcess> SubProcesses { get; set; } = [];
+    public virtual ICollection<Objective> Objectives { get; set; } = [];
+    public virtual ICollection<RiskControlMatrix> RiskControlMatrices { get; set; } = [];
 }

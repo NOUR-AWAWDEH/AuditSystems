@@ -11,7 +11,7 @@ public interface IRiskControlMatrixService
     Task DeleteRiskControlMatrixAsync(Guid riskControlMatrixId, Guid userId);
     Task<RiskControlMatrixModel> GetRiskControlMatrixByIdAsync(Guid id, Guid userId);
     Task<IReadOnlyList<RiskControlMatrixModel>> GetRiskControlMatricesByUserIdAsync(Guid userId);
-    Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid SubProcessId, Page? page);
+    Task<PaginationResult<RiskControlMatrixModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid auditProcessId, Page? page);
 
     // The Exiting SearchAsync for admin/system use if needed
     Task<PaginationResult<RiskControlMatrixModel>> SearchAsync(string? description, Page page);

@@ -18,7 +18,7 @@ internal sealed class CreateRiskCommandHandler(
         var riskModel = mapper.Map<RiskModel>(request);
         var riskId = await riskService.CreateRiskAsync(riskModel, request.UserId);
 
-        logger.LogInformation("Risk with name {RiskName} has been created by user {UserId}.", request.RiskName, request.UserId);
+        logger.LogInformation("Risk with name {Factor} has been created by user {UserId}.", request.Factor, request.UserId);
         return Result<CreateRiskCommandResponse>.Created(new CreateRiskCommandResponse(riskId), "Risk created.");
     }
 }

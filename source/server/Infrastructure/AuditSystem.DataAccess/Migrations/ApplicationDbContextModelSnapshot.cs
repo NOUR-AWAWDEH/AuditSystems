@@ -688,26 +688,18 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Factor")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("Impact")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Factor")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Impact")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Guid>("ObservationId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("RiskName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -716,7 +708,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("Description");
+                    b.HasIndex("Impact");
 
                     b.HasIndex("ObservationId");
 

@@ -12,11 +12,11 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                 builder.HasKey(r => r.Id);
 
                 // Properties
-                builder.Property(r => r.Description)
+                builder.Property(r => r.Impact)
                         .IsRequired(true)
                         .HasMaxLength(500);
 
-                builder.Property(r => r.RiskName)
+                builder.Property(r => r.Factor)
                         .IsRequired(true)
                         .HasMaxLength(250);
 
@@ -30,6 +30,6 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
 
 
                 builder.HasIndex(r => r.ObservationId);
-                builder.HasIndex(r => r.Description);
+                builder.HasIndex(r => r.Impact);
         }
 }

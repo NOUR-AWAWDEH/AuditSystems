@@ -72,7 +72,7 @@ public class ControlDataFetcherTests
             {
                 Id = Guid.NewGuid(),
                 ObservationId = Guid.NewGuid(),
-                RiskName = "Test Risk"
+                Factor = "Test Risk"
             }
         };
 

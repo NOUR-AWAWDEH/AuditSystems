@@ -41,7 +41,7 @@ internal sealed class RiskService(
         ArgumentNullException.ThrowIfNull(riskModel, nameof(riskModel));
         RiskValidationHelper.ValidateUserId(userId);
 
-        _logger.LogInformation("Creating risk {RiskName} for user {UserId}", riskModel.RiskName, userId);
+        _logger.LogInformation("Creating risk {Factor} for user {UserId}", riskModel.Factor, userId);
 
         await _validationHelper.ValidateObservationOwnershipAsync(riskModel.ObservationId, userId);
 
@@ -129,7 +129,7 @@ internal sealed class RiskService(
             .Select(ap => new RiskModel
             {
                 Id = ap.Id,
-                RiskName = ap.RiskName,
+                Factor = ap.Factor,
                 ObservationId = ap.ObservationId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
@@ -161,7 +161,7 @@ internal sealed class RiskService(
     { 
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        _logger.LogDebug("Searching risks with name filter: {RiskName}", name ?? "(none)");
+        _logger.LogDebug("Searching risks with name filter: {Factor}", name ?? "(none)");
 
         var (cacheKey, countCacheKey) = GetSearchCacheKeys(name, page);
 

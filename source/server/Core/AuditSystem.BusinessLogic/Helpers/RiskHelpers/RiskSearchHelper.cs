@@ -25,7 +25,7 @@ public class RiskSearchHelper(
         Guid userId, string? searchTerm, Guid observationId)
     {
         return r => r.CreatedByUserId == userId &&
-                (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
+                (string.IsNullOrEmpty(searchTerm) || r.Impact.Contains(searchTerm)) &&
                 r.ObservationId == observationId;
     }
 
@@ -95,15 +95,15 @@ public class RiskSearchHelper(
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderBy( r => r.Description)
+            .OrderBy( r => r.Impact)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
             .Select(r => new RiskModel
             {
                 Id = r.Id,
-                Description = r.Description,
+                Impact = r.Impact,
                 ObservationId = r.ObservationId,
-                RiskName = r.RiskName,
+                Factor = r.Factor,
                 CreatedAt = r.CreatedAt,
                 UpdatedAt = r.UpdatedAt,
             })

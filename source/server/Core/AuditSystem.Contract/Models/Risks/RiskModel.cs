@@ -4,7 +4,7 @@ namespace AuditSystem.Contract.Models.Risks;
 
 public sealed class RiskModel : BaseModel<Guid>
 {
-    public required string RiskName { get; init; }
+    public required string Factor { get; init; }
     public required Guid ObservationId { get; init; }
-    public string Description { get; init; } = string.Empty;
+    public string Impact { get; init; } = string.Empty;
 }

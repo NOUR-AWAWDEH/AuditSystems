@@ -37,7 +37,7 @@ public class RisksFetcherTests
 
         var risks = new List<RiskModel>
         {
-            new RiskModel { Id = Guid.NewGuid(), ObservationId = observationId, RiskName = "Risk 1" }
+            new RiskModel { Id = Guid.NewGuid(), ObservationId = observationId, Factor = "Risk 1" }
         };
 
         A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", observationId, A<Page>._))
@@ -98,8 +98,8 @@ public class RisksFetcherTests
         var obs2 = Guid.NewGuid();
         var observationIds = new[] { obs1, obs2 };
 
-        var risks1 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs1, RiskName = "Risk 1" } };
-        var risks2 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs2, RiskName = "Risk 2" } };
+        var risks1 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs1, Factor = "Risk 1" } };
+        var risks2 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs2, Factor = "Risk 2" } };
 
         A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", obs1, A<Page>._))
             .Returns(Task.FromResult(new PaginationResult<RiskModel> 

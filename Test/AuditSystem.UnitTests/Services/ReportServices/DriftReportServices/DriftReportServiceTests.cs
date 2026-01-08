@@ -86,7 +86,7 @@ public class DriftReportServiceTests
 
         // Control data setup
         var objective = new ObjectiveModel { Id = request.ObjectiveId, Description = "Obj", RiskControlMatrixId = Guid.NewGuid() };
-        var risks = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = Guid.NewGuid(), RiskName = "Test Risk" } };
+        var risks = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = Guid.NewGuid(), Factor = "Test Risk" } };
         var auditProgram = new AuditProgramModel { Id = request.AuditProgramId, Description = "AP", ExitControlId = Guid.NewGuid() };
         var observations = new List<ObservationModel>
         {

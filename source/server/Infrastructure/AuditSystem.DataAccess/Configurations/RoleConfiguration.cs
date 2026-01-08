@@ -13,7 +13,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         // Use static GUIDs instead of dynamic ones
         builder.HasData(
             new Role { Id = new Guid("b94a0ed7-4f2a-46a5-a3a9-d2f4d6a4f5c3"), Name = Role.Admin, NormalizedName = Role.Admin.ToUpper() },
-            new Role { Id = new Guid("e6a0c0f7-8f9a-4661-b47d-c8a8a37c9d70"), Name = Role.ActionOwner, NormalizedName = Role.ActionOwner.ToUpper() }
+            new Role { Id = new Guid("e6a0c0f7-8f9a-4661-b47d-c8a8a37c9d70"), Name = Role.ProcessOwner, NormalizedName = Role.ProcessOwner.ToUpper() }
         );
     }
 }

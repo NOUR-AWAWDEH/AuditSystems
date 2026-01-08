@@ -86,7 +86,7 @@ public class CustomAuthenticationService(
         {
             JwtToken = jwtToken,
             RefreshToken = refreshToken,
-            IsEmailVerified = appUser.IsActive,
+            IsEmailVerified = appUser.IdentityUser.EmailConfirmed,
             CompanyId = appUser.CompanyUsers.FirstOrDefault()?.CompanyId ?? Guid.Empty,
         }, "Login successful.");
     }

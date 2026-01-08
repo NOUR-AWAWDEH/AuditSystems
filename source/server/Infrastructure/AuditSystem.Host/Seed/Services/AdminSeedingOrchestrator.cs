@@ -119,7 +119,7 @@ public class AdminSeedingOrchestrator(
     // -----------------------------
     private async Task EnsureRequiredRolesAsync()
     {
-        string[] roles = [Role.Admin, Role.ActionOwner];
+        string[] roles = [Role.Admin, Role.ProcessOwner];
 
         foreach (var roleName in roles)
             await EnsureRoleExistsAsync(roleName);
@@ -232,7 +232,6 @@ public class AdminSeedingOrchestrator(
             Email = config.Email,
             UserName = config.Username,
             JobTitleId = config.JobTitleId,
-            IsActive = true,
             SubDepartmentId = null,
             // Self-reference for the first admin user
             CreatedByUserId = identityUserId

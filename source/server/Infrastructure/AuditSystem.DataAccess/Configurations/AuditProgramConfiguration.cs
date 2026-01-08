@@ -1,6 +1,4 @@
 using AuditSystem.Domain.Entities.Audit;
-using AuditSystem.Domain.Entities.Observations;
-using AuditSystem.Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,7 +21,7 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
               builder.Property(ap => ap.ExitControlId)
                      .IsRequired();
 
-              builder.Property(ap => ap.ActionOwnerId)
+              builder.Property(ap => ap.ProcessOwnerId)
                      .IsRequired();
 
               builder.Property(ap => ap.ControlDesignId)
@@ -37,11 +35,6 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
                      .HasForeignKey(ap => ap.ExitControlId)
                      .OnDelete(DeleteBehavior.Restrict);
 
-              // ActionOwner (required) -> AppUser
-              builder.HasOne(ap => ap.ActionOwner)
-                     .WithMany(au => au.OwnedAuditPrograms)
-                     .HasForeignKey(ap => ap.ActionOwnerId)
-                     .OnDelete(DeleteBehavior.Restrict);
 
               // ControlDesign (optional)
               builder.HasOne(ap => ap.ControlDesign)
@@ -64,7 +57,7 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
 
               // Indexes
               builder.HasIndex(ap => ap.ExitControlId);
-              builder.HasIndex(ap => ap.ActionOwnerId);
+              builder.HasIndex(ap => ap.ProcessOwnerId);
               builder.HasIndex(ap => ap.ControlDesignId);
               builder.HasIndex(ap => ap.Description);
        }

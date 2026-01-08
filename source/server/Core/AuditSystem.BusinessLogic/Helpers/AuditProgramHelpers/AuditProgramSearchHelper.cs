@@ -7,11 +7,9 @@ using AuditSystem.Domain.Entities.Audit;
 using Microsoft.Extensions.Logging;
 using AuditSystem.Application.Constants;
 using Microsoft.EntityFrameworkCore;
-using AuditSystem.Application.Constants.Audit.AuditProgramConst;
 using AuditSystem.Contract.Models.Users;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Contract.Interfaces.Cache;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
@@ -137,28 +135,28 @@ public sealed class AuditProgramSearchHelper : IAuditProgramSearch
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
-                ActionOwnerId = ap.ActionOwnerId,
+                ProcessOwnerId = ap.ProcessOwnerId,
                 ControlDesignId = ap.ControlDesignId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
-                ActionOwner = ap.ActionOwner == null ? null : new UserModel(
-                    ap.ActionOwner.Id,
-                    ap.ActionOwner.IdentityUser.UserName ?? string.Empty,
-                    ap.ActionOwner.FirstName,
-                    ap.ActionOwner.LastName,
-                    ap.ActionOwner.IdentityUser.Email ?? string.Empty,
-                    Role.ActionOwner,
-                    ap.ActionOwner.SubDepartment == null ? null : new SubDepartmentModel
+                ProcessOwner = ap.ProcessOwner == null ? null : new UserModel(
+                    ap.ProcessOwner.Id,
+                    ap.ProcessOwner.IdentityUser.UserName ?? string.Empty,
+                    ap.ProcessOwner.FirstName,
+                    ap.ProcessOwner.LastName,
+                    ap.ProcessOwner.IdentityUser.Email ?? string.Empty,
+                    Role.ProcessOwner,
+                    ap.ProcessOwner.SubDepartment == null ? null : new SubDepartmentModel
                     {
-                        Id = ap.ActionOwner.SubDepartment.Id,
-                        Name = ap.ActionOwner.SubDepartment.Name,
-                        DepartmentId = ap.ActionOwner.SubDepartment.DepartmentId
+                        Id = ap.ProcessOwner.SubDepartment.Id,
+                        Name = ap.ProcessOwner.SubDepartment.Name,
+                        DepartmentId = ap.ProcessOwner.SubDepartment.DepartmentId
                     },
-                    ap.ActionOwner.JobTitle == null ? null : new JobTitleModel
+                    ap.ProcessOwner.JobTitle == null ? null : new JobTitleModel
                     {
-                        Id = ap.ActionOwner.JobTitle.Id,
-                        Name = ap.ActionOwner.JobTitle.Name,
-                        CompanyId = ap.ActionOwner.JobTitle.CompanyId
+                        Id = ap.ProcessOwner.JobTitle!.Id,
+                        Name = ap.ProcessOwner.JobTitle.Name,
+                        CompanyId = ap.ProcessOwner.JobTitle.CompanyId
                     }
                 )
             })

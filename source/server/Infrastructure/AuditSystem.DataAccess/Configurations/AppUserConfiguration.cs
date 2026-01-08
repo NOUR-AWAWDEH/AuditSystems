@@ -21,7 +21,6 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
               builder.Property(u => u.UserName).IsRequired();
               builder.Property(u => u.IdentityUserId).IsRequired();
               builder.Property(u => u.JobTitleId).IsRequired(false);
-              builder.Property(u => u.IsActive).IsRequired();
 
               // Optional
               builder.Property(u => u.SubDepartmentId).IsRequired(false);
@@ -31,11 +30,6 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                      .WithOne(iu => iu.AppUser)
                      .HasForeignKey<AppUser>(u => u.Id) // Using shared primary key
                      .OnDelete(DeleteBehavior.Restrict);
-
-              builder.HasMany(u => u.OwnedAuditPrograms)
-                     .WithOne(ap => ap.ActionOwner)
-                     .HasForeignKey(ap => ap.ActionOwnerId)
-                     .OnDelete(DeleteBehavior.Cascade);
 
               builder.HasMany(u => u.UserSessions)
                      .WithOne(usi => usi.AppUser)
@@ -63,6 +57,5 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
               builder.HasIndex(u => u.IdentityUserId).IsUnique();
               builder.HasIndex(u => u.JobTitleId);
               builder.HasIndex(u => u.SubDepartmentId);
-              builder.HasIndex(u => u.IsActive);
        }
 }

@@ -97,7 +97,7 @@ internal sealed class AuditProgramService(
 
         // If not in cache, load from database with PROPER includes
         var entity = await repository.GetAll()
-            .Include(ap => ap.ActionOwner)
+            .Include(ap => ap.ProcessOwner)
                 .ThenInclude(u => u.JobTitle)
             .Include(ap => ap.ExitControl)
                 .ThenInclude(ec => ec.Objective)
@@ -142,7 +142,7 @@ internal sealed class AuditProgramService(
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
-                ActionOwnerId = d.ActionOwnerId,
+                ProcessOwnerId = d.ProcessOwnerId,
                 ControlDesignId = d.ControlDesignId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
@@ -191,7 +191,7 @@ internal sealed class AuditProgramService(
             .ValidateAuditProgramOwnershipAsync(auditProgramModel.Id, userId);
 
         await _validationHelper.ValidateActionOwnerAssignmentAsync(
-            auditProgramModel.ActionOwnerId,
+            auditProgramModel.ProcessOwnerId,
             userId
         );
 

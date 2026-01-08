@@ -117,7 +117,7 @@ internal sealed class AppUserService(
         }
 
         // 2. Get all Identity Users in the "ActionOwner" role
-        var actionOwnerIdentityUsers = await userManager.GetUsersInRoleAsync(Role.ActionOwner);
+        var actionOwnerIdentityUsers = await userManager.GetUsersInRoleAsync(Role.ProcessOwner);
         var actionOwnerIdentityIds = actionOwnerIdentityUsers.Select(u => u.Id).ToList();
 
         if (actionOwnerIdentityIds.Count == 0)
@@ -150,7 +150,9 @@ internal sealed class AppUserService(
                 }))
             .ToListAsync();
 
-        appLogger.LogInformation("Retrieved {Count} ActionOwners created by {CreatorId}", userModels.Count, adminAppUser.Id);
+       appLogger.LogInformation("Retrieved {userModels.Count} ActionOwners created by {adminAppUser.Id}",userModels.Count,adminAppUser.Id);
+
+
         return userModels;
     }
 

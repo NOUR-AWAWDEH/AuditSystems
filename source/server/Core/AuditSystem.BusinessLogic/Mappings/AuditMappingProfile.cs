@@ -10,11 +10,11 @@ public sealed class AuditMappingProfile : Profile
     public AuditMappingProfile()
     {
         CreateMap<AuditProgram, AuditProgramModel>()
-            .ForMember(dest => dest.ActionOwner,
-                opt => opt.MapFrom(src => src.ActionOwner));
+            .ForMember(dest => dest.ProcessOwner,
+                opt => opt.MapFrom(src => src.ProcessOwner));
 
         CreateMap<AuditProgramModel, AuditProgram>()
-            .ForMember(dest => dest.ActionOwner, opt => opt.Ignore());
+            .ForMember(dest => dest.ProcessOwner, opt => opt.Ignore());
 
         CreateMap<CreateAuditProgramCommand, AuditProgramModel>();
         CreateMap<UpdateAuditProgramCommand, AuditProgramModel>();

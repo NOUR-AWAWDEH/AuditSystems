@@ -139,10 +139,9 @@ public class RegistrationService(
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            UserName = identityUser.UserName,
+            UserName = identityUser.UserName!,
             JobTitleId = request.JobTitleId,
             SubDepartmentId = request.SubDepartmentId,
-            IsActive = true,
             CreatedByUserId = adminAppUserId
         };
 

@@ -12,19 +12,30 @@ public class RisksFetcher(
     ILogger<RisksFetcher> logger
 ) : IRisksFetcher
 {
-    public async Task<IReadOnlyList<RiskModel>> FetchAsync(GenerateDriftReportRequest request)
+    public async Task<IReadOnlyList<RiskModel>> FetchAsync(GenerateDriftReportRequest request, IEnumerable<Guid> observationIds)
     {
-        var result = await riskService.SearchByUserIdAsync(
-                request.UserId, "", request.ObjectiveId, new Page(1, 100));
+        var allRisks = new List<RiskModel>();
 
-            if (result?.Items == null)
+        foreach (var observationId in observationIds)
+        {
+            var result = await riskService.SearchByUserIdAsync(
+                request.UserId, "", observationId, new Page(1, 100));
+
+            if (result?.Items != null)
             {
-                logger.LogWarning("No risks found or null result for audit program {AuditProgramId}", 
-                    request.AuditProgramId);
-                return [];
+                 allRisks.AddRange(result.Items);
             }
+        }
 
-            logger.LogDebug("Fetched {riskCount} risks", result.Items.Count);
-            return result.Items;
+        if (allRisks.Count == 0)
+        {
+            logger.LogWarning("No risks found for provided observations");
+        }
+        else 
+        {
+             logger.LogDebug("Fetched {riskCount} risks across {observationCount} observations", allRisks.Count, observationIds.Count());
+        }
+        
+        return allRisks;
     }
 }

@@ -24,9 +24,9 @@ public sealed class ControlDataFetcher(
         logger.LogDebug("Fetching control data");
         
         var objective = await objectiveService.GetObjectiveByIdAsync(request.ObjectiveId, request.UserId);
-        var risks = await risksFetcher.FetchAsync(request);
         var auditProgram = await auditProgramService.GetAuditProgramByIdAsync(request.AuditProgramId, request.UserId);
         var observations = await observationsFetcher.FetchAsync(request);
+        var risks = await risksFetcher.FetchAsync(request, observations.Select(o => o.Id));
 
         logger.LogDebug("Fetching control data succeeded");
         

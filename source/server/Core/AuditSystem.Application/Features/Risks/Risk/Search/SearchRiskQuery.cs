@@ -6,7 +6,7 @@ namespace AuditSystem.Application.Features.Risks.Risk.Search;
 
 public sealed record class SearchRiskQuery(
     string? SearchTerm,
-    Guid ObjectiveId
+    Guid ObservationId
 ) : PaginationRequest<RiskModel>, IUserAwareRequest
 { 
     public Guid UserId { get; set; } = Guid.Empty;

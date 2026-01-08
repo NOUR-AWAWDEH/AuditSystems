@@ -32,22 +32,25 @@ public class RisksFetcherTests
             ObjectiveId = Guid.NewGuid()
         };
 
+        var observationId = Guid.NewGuid();
+        var observationIds = new[] { observationId };
+
         var risks = new List<RiskModel>
         {
-            new RiskModel { Id = Guid.NewGuid(), ObjectiveId = request.ObjectiveId, RiskName = "Risk 1" }
+            new RiskModel { Id = Guid.NewGuid(), ObservationId = observationId, RiskName = "Risk 1" }
         };
 
-        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, A<Page>._))
+        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", observationId, A<Page>._))
             .Returns(Task.FromResult(new PaginationResult<RiskModel> 
             { 
                 Items = risks,
                 TotalCount = 1,
                 PageNumber = 1,
-                PageSize = 10
+                PageSize = 100
             }));
 
         // Act
-        var result = await _sut.FetchAsync(request);
+        var result = await _sut.FetchAsync(request, observationIds);
 
         // Assert
         result.Should().BeEquivalentTo(risks);
@@ -63,39 +66,65 @@ public class RisksFetcherTests
             ObjectiveId = Guid.NewGuid()
         };
 
-        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, null))
+        var observationId = Guid.NewGuid();
+        var observationIds = new[] { observationId };
+
+        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", observationId, A<Page>._))
             .Returns(new PaginationResult<RiskModel> 
             { 
                 Items = new List<RiskModel>(),
                 TotalCount = 0,
                 PageNumber = 1,
-                PageSize = 10
+                PageSize = 100
             });
 
         // Act
-        var result = await _sut.FetchAsync(request);
+        var result = await _sut.FetchAsync(request, observationIds);
 
         // Assert
         result.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task FetchAsync_ShouldReturnEmptyList_WhenResultIsNull()
+    public async Task FetchAsync_ShouldReturnCombinedRisks_WhenMultipleObservationsProvided()
     {
         // Arrange
         var request = new GenerateDriftReportRequest
         {
-            UserId = Guid.NewGuid(),
-            ObjectiveId = Guid.NewGuid()
+            UserId = Guid.NewGuid()
         };
 
-        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", request.ObjectiveId, null))
-            .Returns((PaginationResult<RiskModel>)null!);
+        var obs1 = Guid.NewGuid();
+        var obs2 = Guid.NewGuid();
+        var observationIds = new[] { obs1, obs2 };
+
+        var risks1 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs1, RiskName = "Risk 1" } };
+        var risks2 = new List<RiskModel> { new RiskModel { Id = Guid.NewGuid(), ObservationId = obs2, RiskName = "Risk 2" } };
+
+        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", obs1, A<Page>._))
+            .Returns(Task.FromResult(new PaginationResult<RiskModel> 
+            { 
+                Items = risks1,
+                TotalCount = 1,
+                PageNumber = 1,
+                PageSize = 100
+            }));
+
+        A.CallTo(() => _riskService.SearchByUserIdAsync(request.UserId, "", obs2, A<Page>._))
+            .Returns(Task.FromResult(new PaginationResult<RiskModel> 
+            { 
+                Items = risks2,
+                TotalCount = 1,
+                PageNumber = 1,
+                PageSize = 100
+            }));
 
         // Act
-        var result = await _sut.FetchAsync(request);
+        var result = await _sut.FetchAsync(request, observationIds);
 
         // Assert
-        result.Should().BeEmpty();
+        result.Should().HaveCount(2);
+        result.Should().ContainEquivalentOf(risks1[0]);
+        result.Should().ContainEquivalentOf(risks2[0]);
     }
 }

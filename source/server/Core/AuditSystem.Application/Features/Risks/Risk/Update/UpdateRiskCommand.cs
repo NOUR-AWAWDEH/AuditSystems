@@ -7,5 +7,5 @@ public sealed record class UpdateRiskCommand(
     Guid Id,
     string RiskName,
     string Description,
-    Guid ObjectiveId
+    Guid ObservationId
 ) : UserAwareCommand<Result>;

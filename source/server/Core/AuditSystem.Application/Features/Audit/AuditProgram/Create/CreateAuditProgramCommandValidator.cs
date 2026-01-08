@@ -20,12 +20,6 @@ public sealed class CreateAuditProgramCommandValidator : AbstractValidator<Creat
             .MaximumLength(500)
             .WithMessage("Audit Program Description must not exceed 500 characters.");
         
-        RuleFor(x => x.ActionOwnerId)
-            .NotEmpty()
-            .WithMessage("Action Owner Id is required.")
-            .Must(x => x != Guid.Empty)
-            .WithMessage("Action Owner Id must be a valid GUID.");
-
         RuleFor(x => x.ExitControlId)
             .NotEmpty()
             .WithMessage("Exit Control Id is required.")

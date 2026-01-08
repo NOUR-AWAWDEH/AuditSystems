@@ -11,7 +11,7 @@ public interface IRiskService
     Task<RiskModel> GetRiskByIdAsync(Guid id, Guid userId);
     Task<IReadOnlyList<RiskModel>> GetRisksByUserIdAsync(Guid userId);
 
-    Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid objectiveId, Page? page);
+    Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid observationId, Page? page);
     // The existing SearchAsync for admin/system use if needed
     Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page);
 }

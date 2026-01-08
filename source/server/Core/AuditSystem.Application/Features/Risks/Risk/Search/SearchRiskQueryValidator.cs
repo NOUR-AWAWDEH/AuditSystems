@@ -14,11 +14,11 @@ public class SearchRiskQueryValidator : PaginationRequestValidator<RiskModel, Se
             .Must(BeAValidGuid)
             .WithMessage("User ID must be a valid GUID.");
         
-        RuleFor(x => x.ObjectiveId)
+        RuleFor(x => x.ObservationId)
             .NotEmpty()
-            .WithMessage("Objective ID is required.")
+            .WithMessage("Observation ID is required.")
             .Must(BeAValidGuid)
-            .WithMessage("Objective ID must be a valid GUID.");
+            .WithMessage("Observation ID must be a valid GUID.");
 
     }
     

@@ -20,16 +20,16 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                         .IsRequired(true)
                         .HasMaxLength(250);
 
-                builder.Property(r => r.ObjectiveId)
+                builder.Property(r => r.ObservationId)
                         .IsRequired(true);
 
                 builder.HasOne(e => e.CreatedBy)
-           .WithMany()
-           .HasForeignKey(e => e.CreatedByUserId)
-           .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey(e => e.CreatedByUserId)
+                        .OnDelete(DeleteBehavior.Restrict);
 
 
-                builder.HasIndex(r => r.ObjectiveId);
+                builder.HasIndex(r => r.ObservationId);
                 builder.HasIndex(r => r.Description);
         }
 }

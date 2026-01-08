@@ -135,30 +135,9 @@ public sealed class AuditProgramSearchHelper : IAuditProgramSearch
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
-                ProcessOwnerId = ap.ProcessOwnerId,
                 ControlDesignId = ap.ControlDesignId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
-                ProcessOwner = ap.ProcessOwner == null ? null : new UserModel(
-                    ap.ProcessOwner.Id,
-                    ap.ProcessOwner.IdentityUser.UserName ?? string.Empty,
-                    ap.ProcessOwner.FirstName,
-                    ap.ProcessOwner.LastName,
-                    ap.ProcessOwner.IdentityUser.Email ?? string.Empty,
-                    Role.ProcessOwner,
-                    ap.ProcessOwner.SubDepartment == null ? null : new SubDepartmentModel
-                    {
-                        Id = ap.ProcessOwner.SubDepartment.Id,
-                        Name = ap.ProcessOwner.SubDepartment.Name,
-                        DepartmentId = ap.ProcessOwner.SubDepartment.DepartmentId
-                    },
-                    ap.ProcessOwner.JobTitle == null ? null : new JobTitleModel
-                    {
-                        Id = ap.ProcessOwner.JobTitle!.Id,
-                        Name = ap.ProcessOwner.JobTitle.Name,
-                        CompanyId = ap.ProcessOwner.JobTitle.CompanyId
-                    }
-                )
             })
             .ToListAsync();
 

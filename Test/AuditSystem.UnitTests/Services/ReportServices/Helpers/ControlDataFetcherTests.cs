@@ -71,7 +71,7 @@ public class ControlDataFetcherTests
             new RiskModel
             {
                 Id = Guid.NewGuid(),
-                ObjectiveId = objectiveId,
+                ObservationId = Guid.NewGuid(),
                 RiskName = "Test Risk"
             }
         };
@@ -81,7 +81,6 @@ public class ControlDataFetcherTests
             Id = auditProgramId,
             ExitControlId = Guid.NewGuid(),
             Description = "Test Audit Program",
-            ActionOwnerId = Guid.NewGuid()
         };
 
         var observations = new List<ObservationModel>
@@ -100,7 +99,7 @@ public class ControlDataFetcherTests
         A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
             .Returns(objective);
 
-        A.CallTo(() => _risksFetcher.FetchAsync(request))
+        A.CallTo(() => _risksFetcher.FetchAsync(request, A<IEnumerable<Guid>>._))
             .Returns(risks);
 
         A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))
@@ -120,7 +119,7 @@ public class ControlDataFetcherTests
         result.Observations.Should().BeEquivalentTo(observations);
 
         A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId)).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _risksFetcher.FetchAsync(request)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _risksFetcher.FetchAsync(request, A<IEnumerable<Guid>>._)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId)).MustHaveHappenedOnceExactly();
         A.CallTo(() => _observationsFetcher.FetchAsync(request)).MustHaveHappenedOnceExactly();
     }
@@ -152,14 +151,13 @@ public class ControlDataFetcherTests
             Id = auditProgramId,
             ExitControlId = Guid.NewGuid(),
             Description = "Empty audit",
-            ActionOwnerId = Guid.NewGuid()
         };
 
         // Fake the service calls
         A.CallTo(() => _objectiveService.GetObjectiveByIdAsync(objectiveId, userId))
             .Returns(objective);
 
-        A.CallTo(() => _risksFetcher.FetchAsync(request))
+        A.CallTo(() => _risksFetcher.FetchAsync(request, A<IEnumerable<Guid>>._))
             .Returns(new List<RiskModel>());
 
         A.CallTo(() => _auditProgramService.GetAuditProgramByIdAsync(auditProgramId, userId))

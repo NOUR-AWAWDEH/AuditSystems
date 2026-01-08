@@ -9,12 +9,10 @@ public class AuditProgram : AuditableEntity<Guid>
 {
     public required string Description { get; set; }
     public required Guid ExitControlId { get; set; }
-    public required Guid ProcessOwnerId { get; set; }
     public Guid? ControlDesignId { get; set; } = Guid.Empty;
     // Navigation properties
     public virtual ControlDesign? ControlDesign { get; set; } = null;
     public virtual ExitControl ExitControl { get; set; } = null!;
-    public virtual AppUser ProcessOwner { get; set; } = null!;
 
     public virtual ICollection<Observation> Observations { get; set; } = new HashSet<Observation>();
 }

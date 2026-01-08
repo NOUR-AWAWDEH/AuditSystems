@@ -6,5 +6,5 @@ namespace AuditSystem.Application.Features.Risks.Risk.Create;
 public sealed record class CreateRiskCommand(
     string RiskName,
     string Description,
-    Guid ObjectiveId
+    Guid ObservationId
 ) : UserAwareCommand<Result<CreateRiskCommandResponse>>;

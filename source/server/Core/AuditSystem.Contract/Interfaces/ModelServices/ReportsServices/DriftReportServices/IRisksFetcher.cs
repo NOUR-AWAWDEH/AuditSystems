@@ -5,5 +5,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftRep
 
 public interface IRisksFetcher
 {
-    Task<IReadOnlyList<RiskModel>> FetchAsync(GenerateDriftReportRequest request);
+    Task<IReadOnlyList<RiskModel>> FetchAsync(GenerateDriftReportRequest request, IEnumerable<Guid> observationIds);
 }

@@ -14,11 +14,11 @@ public sealed class CreateRiskValidator : AbstractValidator<CreateRiskCommand>
             .MaximumLength(500)
             .WithMessage("Description must not exceed 500 characters.");
 
-        RuleFor(x => x.ObjectiveId)
+        RuleFor(x => x.ObservationId)
             .NotEmpty()
-            .WithMessage("Objective ID is required.")
+            .WithMessage("Observation ID is required.")
             .Must(x => x != Guid.Empty)
-            .WithMessage("Objective ID is required.");
+            .WithMessage("Observation ID is required.");
 
         RuleFor(x => x.UserId)
             .NotEmpty()

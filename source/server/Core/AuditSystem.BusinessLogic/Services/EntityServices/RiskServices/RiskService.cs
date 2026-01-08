@@ -43,7 +43,7 @@ internal sealed class RiskService(
 
         _logger.LogInformation("Creating risk {RiskName} for user {UserId}", riskModel.RiskName, userId);
 
-        await _validationHelper.ValidateObjectiveOwnershipAsync(riskModel.ObjectiveId, userId);
+        await _validationHelper.ValidateObservationOwnershipAsync(riskModel.ObservationId, userId);
 
         var entity = mapper.Map<Risk>(riskModel);
         entity.CreatedByUserId = userId;
@@ -88,11 +88,11 @@ internal sealed class RiskService(
         await _validationHelper.ValidateRiskOwnershipAsync(riskId, userId);
     
         var risk = await repository.GetByIdAsync(riskId);
-        Guid? objectiveId = risk?.ObjectiveId;
+        Guid? observationId = risk?.ObservationId;
 
         await repository.DeleteAsync(riskId);
         await ClearEntityCacheAsync(riskId);
-        await ClearUserRelatedCachesAsync(userId, RiskConstants.EntityName, objectiveId);
+        await ClearUserRelatedCachesAsync(userId, RiskConstants.EntityName, observationId);
 
         _logger.LogInformation("Successfully deleted risk {RiskId} for user {UserId}", riskId, userId);
     }
@@ -106,7 +106,7 @@ internal sealed class RiskService(
     
         var existingEntity = await _validationHelper.ValidateRiskOwnershipAsync(riskModel.Id, userId);
         
-        await _validationHelper.ValidateObjectiveOwnershipAsync(riskModel.ObjectiveId, userId);
+        await _validationHelper.ValidateObservationOwnershipAsync(riskModel.ObservationId, userId);
         
         mapper.Map(riskModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;
@@ -130,7 +130,7 @@ internal sealed class RiskService(
             {
                 Id = ap.Id,
                 RiskName = ap.RiskName,
-                ObjectiveId = ap.ObjectiveId,
+                ObservationId = ap.ObservationId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
             })
@@ -138,15 +138,15 @@ internal sealed class RiskService(
             .ToListAsync();
     }
 
-    public async Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid objectiveId, Page? page)
+    public async Task<PaginationResult<RiskModel>> SearchByUserIdAsync(Guid userId, string? searchTerm, Guid observationId, Page? page)
     {
         RiskValidationHelper.ValidateUserId(userId);
         ArgumentNullException.ThrowIfNull(page, nameof(page));
 
-        _logger.LogDebug("Searching risks for user {UserId} with term: {SearchTerm} and objective: {ObjectiveId}",
-            userId, searchTerm ?? "(none)", objectiveId.ToString() ?? "(none)");
+        _logger.LogDebug("Searching risks for user {UserId} with term: {SearchTerm} and observation: {ObservationId}",
+            userId, searchTerm ?? "(none)", observationId.ToString());
 
-        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, objectiveId, page);
+        var (cacheKey, countCacheKey) = _searchHelper.GetUserSearchCacheKeys(userId, searchTerm, observationId, page);
 
         var cachedResult = await GetFromCacheAsync<RiskModel>(cacheKey, countCacheKey, page);
         if (cachedResult != null)
@@ -154,7 +154,7 @@ internal sealed class RiskService(
             _logger.LogDebug(RiskConstants.RetrievedUserSearchResultsFromCacheMessage);
             return cachedResult;
         }
-        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, objectiveId, page, cacheKey, countCacheKey);
+        return await _searchHelper.GetUserSearchFromRepositoryAsync(userId, searchTerm, observationId, page, cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<RiskModel>> SearchAsync(string? name, Page page) 

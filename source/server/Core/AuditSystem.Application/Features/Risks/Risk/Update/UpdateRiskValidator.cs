@@ -12,11 +12,11 @@ public sealed class UpdateRiskValidator : AbstractValidator<UpdateRiskCommand>
             .Must(BeAValidGuid)
             .WithMessage("Id must not be empty.");
         
-        RuleFor(x => x.ObjectiveId)
+        RuleFor(x => x.ObservationId)
             .NotEmpty()
-            .WithMessage("ObjectiveId is required.")
+            .WithMessage("ObservationId is required.")
             .Must(BeAValidGuid)
-            .WithMessage("ObjectiveId must not be empty.");
+            .WithMessage("ObservationId must not be empty.");
         
         RuleFor(x => x.RiskName)
             .NotEmpty()

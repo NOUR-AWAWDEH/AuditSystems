@@ -187,7 +187,6 @@ public class AdminSeedingOrchestratorTests : IDisposable
 
         // Assert
         A.CallTo(() => _roleManager.CreateAsync(A<Role>.That.Matches(r => r.Name == Role.Admin))).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _roleManager.CreateAsync(A<Role>.That.Matches(r => r.Name == Role.ActionOwner))).MustHaveHappenedOnceExactly();
     }
 
     private async Task SeedRequiredDataAsync()

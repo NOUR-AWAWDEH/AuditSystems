@@ -21,9 +21,6 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
               builder.Property(ap => ap.ExitControlId)
                      .IsRequired();
 
-              builder.Property(ap => ap.ProcessOwnerId)
-                     .IsRequired();
-
               builder.Property(ap => ap.ControlDesignId)
                      .IsRequired(false);
 
@@ -48,16 +45,13 @@ public class AuditProgramConfiguration : IEntityTypeConfiguration<AuditProgram>
                      .HasForeignKey(o => o.AuditProgramId)
                      .OnDelete(DeleteBehavior.Restrict);
 
-
               builder.HasOne(e => e.CreatedBy)
                  .WithMany()
                  .HasForeignKey(e => e.CreatedByUserId)
                  .OnDelete(DeleteBehavior.Restrict);
 
-
               // Indexes
               builder.HasIndex(ap => ap.ExitControlId);
-              builder.HasIndex(ap => ap.ProcessOwnerId);
               builder.HasIndex(ap => ap.ControlDesignId);
               builder.HasIndex(ap => ap.Description);
        }

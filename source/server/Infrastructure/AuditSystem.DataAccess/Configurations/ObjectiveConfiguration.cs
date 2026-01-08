@@ -34,12 +34,6 @@ public class ObjectiveConfiguration : IEntityTypeConfiguration<Objective>
                      .OnDelete(DeleteBehavior.Restrict)
                      .IsRequired(true);
 
-              builder.HasMany(rcm => rcm.Risks)
-                     .WithOne(r => r.Objective)
-                     .HasForeignKey(r => r.ObjectiveId)
-                     .OnDelete(DeleteBehavior.Restrict)
-                     .IsRequired(true);
-
               builder.HasOne(e => e.CreatedBy)
                      .WithMany()
                      .HasForeignKey(e => e.CreatedByUserId)

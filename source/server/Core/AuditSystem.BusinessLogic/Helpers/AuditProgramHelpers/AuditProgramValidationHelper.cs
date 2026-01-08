@@ -14,7 +14,6 @@ namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 public class AuditProgramValidationHelper(
     IRepository<Guid, AuditProgram> repository,
     IRepository<Guid, ExitControl> exitControlRepository,
-    IRepository<Guid, AppUser> userRepository,
     ILogger<AuditProgramValidationHelper> logger)
     : IAuditProgramValidation
 {
@@ -23,9 +22,6 @@ public class AuditProgramValidationHelper(
 
     private readonly IRepository<Guid, ExitControl> _exitControlRepository = exitControlRepository
         ?? throw new ArgumentNullException(nameof(exitControlRepository));
-
-    private readonly IRepository<Guid, AppUser> _userRepository = userRepository
-        ?? throw new ArgumentNullException(nameof(userRepository));
 
     private readonly ILogger<AuditProgramValidationHelper> _logger = logger
         ?? throw new ArgumentNullException(nameof(logger));
@@ -90,32 +86,5 @@ public class AuditProgramValidationHelper(
                     userId, exitControlId));
 
         return exitControl;
-    }
-
-    public async Task ValidateActionOwnerAssignmentAsync(Guid actionOwnerId, Guid userId)
-    {
-        if (actionOwnerId == Guid.Empty)
-            throw new ArgumentException(
-                "Action Owner ID is invalid.", nameof(actionOwnerId));
-
-        if (userId == Guid.Empty)
-            throw new ArgumentException(
-                "User ID is invalid.", nameof(userId));
-
-        var isValid = await _userRepository.GetAll()
-            .AsNoTracking()
-            .AnyAsync(u =>
-                u.Id == actionOwnerId &&
-                u.CreatedByUserId == userId);
-
-        if (!isValid)
-        {
-            _logger.LogWarning(
-                "Unauthorized ActionOwner assignment attempt. User {UserId} tried to assign {ActionOwnerId}",
-                userId, actionOwnerId);
-
-            throw new UnauthorizedAccessException(
-                "You are not allowed to assign this Action Owner.");
-        }
     }
 }

@@ -45,9 +45,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("ExitControlId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProcessOwnerId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -60,8 +57,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("Description");
 
                     b.HasIndex("ExitControlId");
-
-                    b.HasIndex("ProcessOwnerId");
 
                     b.ToTable("AuditPrograms", (string)null);
                 });
@@ -706,9 +701,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ObjectiveId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ObservationId")
                         .HasColumnType("uuid");
 
@@ -725,8 +717,6 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("Description");
-
-                    b.HasIndex("ObjectiveId");
 
                     b.HasIndex("ObservationId");
 
@@ -1134,19 +1124,11 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.Users.AppUser", "ProcessOwner")
-                        .WithMany()
-                        .HasForeignKey("ProcessOwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ControlDesign");
 
                     b.Navigation("CreatedBy");
 
                     b.Navigation("ExitControl");
-
-                    b.Navigation("ProcessOwner");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.Auth.RefreshToken", b =>
@@ -1392,12 +1374,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.Objective", "Objective")
-                        .WithMany("Risks")
-                        .HasForeignKey("ObjectiveId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AuditSystem.Domain.Entities.Observations.Observation", "Observation")
                         .WithMany("Risks")
                         .HasForeignKey("ObservationId")
@@ -1405,8 +1381,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Objective");
 
                     b.Navigation("Observation");
                 });
@@ -1612,8 +1586,6 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
                 {
                     b.Navigation("ExitControls");
-
-                    b.Navigation("Risks");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>

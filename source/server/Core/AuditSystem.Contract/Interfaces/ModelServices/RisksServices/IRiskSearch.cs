@@ -7,8 +7,8 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 
 public interface IRiskSearch
 {
-    Expression<Func<Risk, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid ObjectiveId);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid ObjectiveId, Page page);
-    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? ObjectiveId, Page page);
-    Task<PaginationResult<RiskModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid ObjectiveId, Page page, string cacheKey, string countCacheKey);
+    Expression<Func<Risk, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid observationId);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid observationId, Page page);
+    (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(Guid userId, string? searchTerm, Guid? observationId, Page page);
+    Task<PaginationResult<RiskModel>> GetUserSearchFromRepositoryAsync(Guid userId, string? searchTerm, Guid observationId, Page page, string cacheKey, string countCacheKey);
 }

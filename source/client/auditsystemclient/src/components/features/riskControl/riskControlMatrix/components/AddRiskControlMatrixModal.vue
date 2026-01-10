@@ -77,7 +77,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    subProcessId: {
+    auditProcessId: {
         type: [String, Number],
         default: null
     }
@@ -114,8 +114,8 @@ const resetForm = () => {
 };
 
 const handleSubmit = async () => {
-    if (!props.subProcessId) {
-        showNotification('sub process is required', 'error');
+    if (!props.auditProcessId) {
+        showNotification('audit process is required', 'error');
         return;
     }
 
@@ -126,7 +126,7 @@ const handleSubmit = async () => {
     try {
         const riskControlMatrixData = {
             description: formData.value.description.trim(),
-            subProcessId: props.subProcessId
+            auditProcessId: props.auditProcessId
         };
 
         const result = await createRiskControlMatrix(riskControlMatrixData);

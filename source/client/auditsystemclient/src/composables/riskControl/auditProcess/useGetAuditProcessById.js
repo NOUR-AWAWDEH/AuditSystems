@@ -7,8 +7,8 @@ export function useGetAuditProcessById() {
     const error = ref(null);
 
     const handleFetchSuccess = (response) => {
-        auditProcess.value = response.result;
-        return { success: true, data: response.result };
+        auditProcess.value = response.result?.auditProcessModel || response.result;
+        return { success: true, data: auditProcess.value };
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch process!') => {

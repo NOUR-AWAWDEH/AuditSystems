@@ -6,9 +6,9 @@
       >
         <ProcessIcon size="xxxl" custom-class="text-primary-shade" />
       </div>
-      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Sub Processes Available</h3>
+      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Audit Processes Available</h3>
       <p class="text-gray-base mb-6 text-sm leading-relaxed">
-        You need to create sub processes first before you can manage risk control matrices
+        You need to create audit processes first before you can manage risk control matrices
       </p>
       <div class="bg-white border border-tertiary-shade rounded-lg p-6">
         <div class="flex items-start space-x-3">
@@ -31,7 +31,7 @@
             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
               <li>Navigate to the Risk Control section</li>
-              <li>Create or select a sub process</li>
+              <li>Create or select an audit process</li>
               <li>Return here to manage risk control matrices</li>
             </ol>
           </div>

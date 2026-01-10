@@ -12,9 +12,9 @@ export const createRiskControlMatrixRepository = {
 
             const payload = {
                 description: riskControlMatrixData.description,
-                subProcessId: typeof riskControlMatrixData.subProcessId === 'object' 
-                    ? riskControlMatrixData.subProcessId.value || riskControlMatrixData.subProcessId.id
-                    : riskControlMatrixData.subProcessId
+                auditProcessId: typeof riskControlMatrixData.auditProcessId === 'object' 
+                    ? riskControlMatrixData.auditProcessId.value || riskControlMatrixData.auditProcessId.id
+                    : riskControlMatrixData.auditProcessId
             };
 
             const response = await api.post(

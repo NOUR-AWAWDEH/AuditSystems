@@ -1,11 +1,10 @@
 import { ref, onMounted, nextTick } from 'vue';
 
 export function useRiskControlMatrixLifecycle({
-    selectedSubProcessId,
+    selectedAuditProcessId,
     currentPage,
     pageSize,
     searchRiskControlMatrices,
-    subProcessesRef,
     searchQuery,
     getRiskControlMatricesByUserId,
     resetToDefaultView
@@ -14,7 +13,7 @@ export function useRiskControlMatrixLifecycle({
     const isInitializing = ref(false);
 
     const initializeData = async () => {
-        if (!selectedSubProcessId.value || isInitialized.value || isInitializing.value) {
+        if (!selectedAuditProcessId.value || isInitialized.value || isInitializing.value) {
             return;
         }
 
@@ -22,7 +21,7 @@ export function useRiskControlMatrixLifecycle({
             isInitializing.value = true;
             if (searchRiskControlMatrices) {
                 await searchRiskControlMatrices({
-                    subProcessId: selectedSubProcessId.value,
+                    auditProcessId: selectedAuditProcessId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });
@@ -38,17 +37,9 @@ export function useRiskControlMatrixLifecycle({
     onMounted(async () => {
         await nextTick();
 
-        if (selectedSubProcessId.value && !isInitialized.value && !isInitializing.value) {
-            if (subProcessesRef.value?.length > 0) {
-                const subProcessExists = subProcessesRef.value.some(
-                    subProcess => subProcess.id === selectedSubProcessId.value);
-                if (subProcessExists) {
-                    await initializeData();
-                } else {
-                    resetToDefaultView();
-                }
-            }
-        } else if (!selectedSubProcessId.value 
+        if (selectedAuditProcessId.value && !isInitialized.value && !isInitializing.value) {
+             await initializeData();
+        } else if (!selectedAuditProcessId.value 
             && !searchQuery.value.trim() 
             && getRiskControlMatricesByUserId) {
                 await getRiskControlMatricesByUserId();

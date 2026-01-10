@@ -8,14 +8,9 @@
           <RiskControlMatrixHeader />
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div class="w-full sm:min-w-64 sm:max-w-xs">
-              <SubProcessSelector
-                :sub-processes="subProcesses"
-                :selected-sub-process-id="internalSelectedSubProcessId"
-                @update:selected-sub-process="(id) => (internalSelectedSubProcessId = id)"
-                @sub-process-changed="(id) => (internalSelectedSubProcessId = id)"
-              />
-            </div>
+            <!-- <div class="w-full sm:min-w-64 sm:max-w-xs">
+              Audit Process: {{ currentAuditProcess?.particular || "Loading..." }}
+            </div> -->
             <div class="w-full sm:w-auto">
               <SearchFilter
                 :search="searchQuery"
@@ -27,9 +22,8 @@
           </div>
         </div>
 
-        <!-- Selected SubProcess Info -->
         <div
-          v-if="selectedSubProcessId"
+          v-if="auditProcessId"
           class="mb-6 p-3 sm:p-4 bg-linear-to-r from-primary-soft to-indigo-200 rounded-lg border border-primary-base"
         >
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -39,8 +33,8 @@
                 <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
                   <span>Showing Risk Control Matrices for:</span>
                   <span class="ml-1 font-semibold text-primary-shade">
-                    <span v-if="isSubProcessLoading">Loading sub process...</span>
-                    <span v-else>{{ currentSubProcess?.particular || "Loading..." }}</span>
+                    <span v-if="isAuditProcessLoading">Loading audit process...</span>
+                    <span v-else>{{ currentAuditProcess?.processName || "Loading..." }}</span>
                   </span>
                   <span v-if="searchQuery" class="ml-2 text-blue-600">
                     | Search: "{{ searchQuery }}"
@@ -60,7 +54,7 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="selectedSubProcessId" class="hidden lg:block rounded-lg border border-gray-200">
+        <div v-if="auditProcessId" class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="riskControlMatrices"
             :columns="enhancedColumns"
@@ -107,7 +101,7 @@
 
         <!-- Mobile Card View -->
         <ReusableMobileCardList
-          v-if="selectedSubProcessId"
+          v-if="auditProcessId"
           :items="riskControlMatrices"
           :showNumber="true"
           :isLoading="isLoading"
@@ -179,20 +173,15 @@
           </button>
         </div>
 
-        <!-- No SubProcess Selected -->
-        <div v-else-if="!selectedSubProcessId" class="text-center py-16">
+        <!-- No Audit Process Selected -->
+        <div v-else-if="!auditProcessId" class="text-center py-16">
           <ProcessIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
           <h3 class="text-xl font-semibold text-secondary-shade mb-4">
-            Please select a Sub Process to view risk control matrices
+            Please select an Audit Process to view risk control matrices
           </h3>
           <p class="text-gray-500 mb-6">
-            Choose a sub process from the dropdown above to get started
+            Choose an audit process from the list above to get started
           </p>
-          <div v-if="!subProcesses || subProcesses.length === 0">
-            <p class="text-sm text-gray-400">
-              Please add a sub process first to manage risk control matrices
-            </p>
-          </div>
         </div>
       </div>
     </div>
@@ -204,7 +193,6 @@ import { computed, ref, watch } from "vue";
 import ReusableTable from "@/components/common/ReusableTable.vue";
 import ReusableMobileCardList from "@/components/common/ReusableMobileCardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
-import SubProcessSelector from "@/components/features/riskControl/subProcess/components/SubProcessSelector.vue";
 import ProcessIcon from "@/components/common/icons/ProcessIcon.vue";
 import PlusIcon from "@/components/common/icons/PlusIcon.vue";
 import EditIcon from "@/components/common/icons/EditIcon.vue";
@@ -216,10 +204,7 @@ import RiskControlMatrixHeader from "./RiskControlMatrixHeader.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
-  subProcesses: {
-    type: Array,
-    default: () => [],
-  },
+
   riskControlMatrices: {
     type: Array,
     default: () => [],
@@ -228,19 +213,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  selectedSubProcessId: {
+  auditProcessId: { 
     type: [String, Number],
     default: null,
   },
-  selectedSubProcess: {
+  currentAuditProcess: {
     type: Object,
     default: () => null,
   },
-  currentSubProcess: {
-    type: Object,
-    default: () => null,
-  },
-  isSubProcessLoading: {
+  isAuditProcessLoading: {
     type: Boolean,
     default: false,
   },
@@ -248,7 +229,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  handleSubProcessChange: {
+  handleAuditProcessChange: {
     type: Function,
     default: () => {},
   },
@@ -262,18 +243,6 @@ const props = defineProps({
   },
 });
 
-const internalSelectedSubProcessId = ref(props.selectedSubProcessId);
-
-watch(
-  () => props.selectedSubProcessId,
-  (newVal) => {
-    internalSelectedSubProcessId.value = newVal;
-  }
-);
-
-watch(internalSelectedSubProcessId, (newVal) => {
-  props.handleSubProcessChange(newVal);
-});
 
 const emit = defineEmits([
   "add-risk-control-matrix",
@@ -304,7 +273,7 @@ const noDataMessage = computed(() => {
   if (props.searchQuery) {
     return `No risk control matrices found for "${props.searchQuery}".`;
   }
-  return "No risk control matrices found for this sub process.";
+  return "No risk control matrices found for this audit process.";
 });
 </script>
 

@@ -24,17 +24,32 @@
                 <!-- Progress Bar (shown when uploading) -->
                 <div v-if="isUploading" class="mb-4">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-medium text-gray-700">Uploading...</span>
+                        <span class="text-sm font-medium text-gray-700">
+                            {{ isScanning ? 'Checking security...' : 'Uploading...' }}
+                        </span>
                         <span class="text-sm text-gray-500">{{ uploadProgress }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
                         <div 
-                            class="bg-primary-base h-2 rounded-full transition-all duration-300 ease-out"
+                            class="h-2 rounded-full transition-all duration-300 ease-out"
+                            :class="[
+                                isScanning ? 'bg-indigo-600 animate-pulse' : 'bg-primary-base',
+                                uploadProgress === 100 ? 'bg-green-500' : ''
+                            ]"
                             :style="{ width: uploadProgress + '%' }"
                         ></div>
                     </div>
-                    <div v-if="uploadProgress === 100" class="text-center mt-2">
-                        <span class="text-sm text-green-600 font-medium">✓ Upload completed successfully!</span>
+                    <div v-if="uploadProgress === 100 && !isScanning" class="text-center mt-2">
+                        <span class="text-sm text-green-600 font-medium flex items-center justify-center">
+                           <span class="mr-1">✓</span> Scan complete. Saving...
+                        </span>
+                    </div>
+                    <div v-if="isScanning" class="text-center mt-2 flex items-center justify-center text-indigo-600">
+                        <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm font-semibold italic">Scanning for malware...</span>
                     </div>
                 </div>
                 
@@ -94,13 +109,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 import BaseInput from '@/components/base/BaseInput.vue';
-import { validateFileType } from '../utils/fileUtils.js';
+import { validateFileType, validateFileSize, validateFileName } from '../utils/fileUtils.js';
 
-defineProps({
+const props = defineProps({
   isUploading: {
+    type: Boolean,
+    default: false
+  },
+  isScanning: {
     type: Boolean,
     default: false
   },
@@ -120,6 +139,7 @@ const errorMessage = ref('');
 
 // Define allowed file types based on your backend
 const allowedTypes = ['pdf', 'docx', 'doc', 'docm', 'dotx', 'dotm', 'rtf','xlsx', 'xls', 'xlsm', 'xltx', 'xltm','pptx', 'ppt', 'ppsm', 'ppsx', 'potx', 'potm'];
+const MAX_FILE_SIZE_MB = 200; // Match backend limit
 
 const toggleUploadForm = () => {
     showUploadForm.value = !showUploadForm.value;
@@ -141,6 +161,11 @@ function validateFile(file) {
   
   if (!validateFileType(file, allowedTypes)) {
     errorMessage.value = `Invalid file type. Allowed types: ${allowedTypes.join(', ')}`;
+    return false;
+  }
+
+  if (!validateFileSize(file, MAX_FILE_SIZE_MB)) {
+    errorMessage.value = `File too large. Maximum size allowed is ${MAX_FILE_SIZE_MB}MB.`;
     return false;
   }
   
@@ -191,15 +216,27 @@ function handleUpload() {
     ? `${customFileName.value.trim()}${fileExtension}`
     : selectedFile.value.name;
 
+  // Security: Validate the final filename
+  const nameValidation = validateFileName(finalFileName);
+  if (!nameValidation.isValid) {
+    errorMessage.value = nameValidation.error;
+    return;
+  }
+
   emit('upload', {
     file: selectedFile.value,
     fileName: finalFileName
   });
-
-  // Reset form
-  resetForm();
-  showUploadForm.value = false;
 }
+
+// Watch for upload completion to reset the form automatically
+watch(() => props.isUploading, (newVal, oldVal) => {
+  // When uploading turns from true to false and there is no error, it means success
+  if (oldVal === true && newVal === false && !errorMessage.value) {
+    showUploadForm.value = false;
+    resetForm();
+  }
+});
 </script>
 
 <style scoped>

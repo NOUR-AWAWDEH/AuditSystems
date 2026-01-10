@@ -8,6 +8,7 @@ export function useUploadSupportingDoc() {
 
   const uploadStatus = ref(null);
   const isUploading = ref(false);
+  const isScanning = ref(false);
   const uploadProgress = ref(0);
   const error = ref(null);
   const { authStatus, checkAuthStatus } = useAuthStatus();
@@ -15,6 +16,7 @@ export function useUploadSupportingDoc() {
 
   const uploadSupportingDocument = async ({ file, fileName }) => {
     isUploading.value = true;
+    isScanning.value = false;
     uploadProgress.value = 0;
     error.value = null;
     uploadStatus.value = null;
@@ -47,20 +49,34 @@ export function useUploadSupportingDoc() {
 
       uploadProgress.value = 50;
 
-      const response = await uploadSupportingDocRepository.uploadSupportingDoc({
-
+      // Start the actual network request
+      const responsePromise = uploadSupportingDocRepository.uploadSupportingDoc({
         file,
         userId,
         fileName,
         token
       });
 
+      // Simulation of progress while waiting for network/scanning
+      uploadProgress.value = 70;
+      
+      const response = await responsePromise;
+
       uploadProgress.value = 90;
+      isScanning.value = true; // Enter scanning simulation phase
+      
+      // Deliberate delay to show the "Scanning for malware" phase
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       if (response && response.success) {
+        isScanning.value = false;
         uploadProgress.value = 100;
         uploadStatus.value = { success: true, message: 'Document uploaded successfully', result: response.result };
-        showNotification(`"${fileName}" uploaded successfully!`, 'success', 3000);
+        showNotification(`"${fileName}" uploaded and scanned successfully!`, 'success', 3000);
+        
+        // Show the 100% success state for a moment before closing/resetting
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
         return response;
       } else {
         const errorMessage = response?.message || response?.errors?.[0]?.message || 'Upload failed';
@@ -77,6 +93,7 @@ export function useUploadSupportingDoc() {
       return { success: false, message: errorMessage };
     } finally {
       isUploading.value = false;
+      isScanning.value = false;
       uploadProgress.value = 0;
     }
   };
@@ -86,11 +103,13 @@ export function useUploadSupportingDoc() {
     error.value = null;
     uploadProgress.value = 0;
     isUploading.value = false;
+    isScanning.value = false;
   };
 
   return {
     uploadStatus,
     isUploading,
+    isScanning,
     uploadProgress,
     error,
     uploadSupportingDocument,

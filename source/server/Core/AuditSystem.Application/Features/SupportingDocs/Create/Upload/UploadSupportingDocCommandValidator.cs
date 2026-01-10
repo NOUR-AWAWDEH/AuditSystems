@@ -7,7 +7,7 @@ public sealed class UploadSupportingDocCommandValidator : AbstractValidator<Uplo
     public UploadSupportingDocCommandValidator()
     {
         RuleFor(x => x.File).NotNull().WithMessage("File is required.");
-        RuleFor(x => x.File.Length).GreaterThan(0).WithMessage("File cannot be empty.");
+        RuleFor(x => x.File.Length).GreaterThan(0).When(x => x.File != null).WithMessage("File cannot be empty.");
         RuleFor(x => x.FileName).NotEmpty().MaximumLength(255);
         RuleFor(x => x.UserId).NotEqual(Guid.Empty).WithMessage("User Id is required");
     }

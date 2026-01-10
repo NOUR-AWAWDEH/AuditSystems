@@ -3,6 +3,7 @@
   <FileUploadDialog
     v-if="uploadDialogOpen"
     :is-uploading="isUploading"
+    :is-scanning="isScanning"
     :upload-progress="uploadProgress"
     @close="closeUploadDialog"
     @upload="handleFileUpload"
@@ -19,7 +20,7 @@ import FileUploadDialog from "./FileUploadDialog.vue";
 
 const emit = defineEmits(['document-uploaded', 'documents-refreshed']);
 
-const { uploadSupportingDocument, isUploading, uploadProgress, error: uploadError } = useUploadSupportingDoc();
+const { uploadSupportingDocument, isUploading, isScanning, uploadProgress, error: uploadError } = useUploadSupportingDoc();
 const { fetchDocumentsByUserId } = useGetSupportingDocsByUserId();
 const { authStatus } = useAuthStatus();
 const { showNotification, hideNotification } = useNotification();
@@ -49,7 +50,6 @@ async function handleFileUpload({ file, fileName }) {
           emit('documents-refreshed', documentsResponse.result);
         }
       }
-      showNotification("Document uploaded successfully", "success");
     } else {
       showNotification(result.message || uploadError.value || "Upload failed", "error");
     }

@@ -9,7 +9,10 @@ using AuditSystem.Auth.Services.Email.Services.Smtp;
 using AuditSystem.Auth.Services.Password.PasswordToken;
 using AuditSystem.Auth.Services.Password.ResetPassword;
 using AuditSystem.Auth.Services.Registration;
+using AuditSystem.Auth.Services.Security;
+using AuditSystem.Contract.Interfaces.Security;
 using DotNetEnv;
+using nClam;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -119,6 +122,29 @@ namespace AuditSystem.Auth
             services.AddScoped<IEmailSender, SmtpEmailSender>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IAccountService, AccountService>();
+
+            // Malware Scanning
+            services.Configure<ClamAvSettings>(options =>
+            {
+                options.Host = Environment.GetEnvironmentVariable("CLAMAV_HOST") ?? "localhost";
+                options.Port = int.TryParse(Environment.GetEnvironmentVariable("CLAMAV_PORT"), out int port) ? port : 3310;
+                options.Enabled = bool.TryParse(Environment.GetEnvironmentVariable("CLAMAV_ENABLED"), out bool enabled) && enabled;
+            });
+
+            if (bool.TryParse(Environment.GetEnvironmentVariable("CLAMAV_ENABLED"), out bool scannerEnabled) && scannerEnabled)
+            {
+                services.AddScoped<IClamClient>(sp => 
+                {
+                    var host = Environment.GetEnvironmentVariable("CLAMAV_HOST") ?? "localhost";
+                    var port = int.TryParse(Environment.GetEnvironmentVariable("CLAMAV_PORT"), out int p) ? p : 3310;
+                    return new ClamClient(host, port);
+                });
+                services.AddScoped<IMalwareScanner, ClamAvScanner>();
+            }
+            else
+            {
+                services.AddScoped<IMalwareScanner, NullMalwareScanner>();
+            }
 
             _ = services.Configure<SmtpSettings>(options =>
             {

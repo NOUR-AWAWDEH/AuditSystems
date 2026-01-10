@@ -118,6 +118,14 @@
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>
+
+                <button
+                  @click.stop="$emit('add-risks', item)"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                >
+                  <AddIcon size="sm" custom-class="mr-1" />
+                  Add Risks
+                </button>
               </div>
             </template>
           </ReusableTable>
@@ -220,6 +228,14 @@
               >
                 <DeleteIcon size="sm" class="mr-1" /> Delete
               </button>
+
+              <button
+                @click.stop="$emit('add-risks', item)"
+                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
+              >
+                <AddIcon size="sm" class="mr-1" /> Add Risks
+              </button>
+
               <button
                 @click.stop="$emit('recommendation-add', item)"
                 class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
@@ -369,7 +385,8 @@ const emit = defineEmits([
   "add-observation",
   "edit-observation",
   "delete-observation",
-  "observation-selected"
+  "observation-selected",
+  "add-risks"
 ]);
 
 // Observation selection state

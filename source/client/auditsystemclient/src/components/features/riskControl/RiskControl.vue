@@ -95,14 +95,6 @@
           />
         </div>
 
-        <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
-          <RiskVue
-            :objectives="objectives"
-            :selected-objective-id="selectedObjectiveId"
-            @risk-deleted="handleRiskDeleted"
-          />
-        </div>
-
         <!-- Exit Controls -->
         <div v-if="activeTab === 'exitcontrols'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
           <ExitControlVue
@@ -140,6 +132,15 @@
             @observation-deleted="handleObservationDeleted"
           />
         </div>
+
+        <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
+          <RiskVue
+            :objectives="objectives"
+            :selected-objective-id="selectedObjectiveId"
+            @risk-deleted="handleRiskDeleted"
+          />
+        </div>
+
         <!-- Recommendations -->
         <div
           v-if="activeTab === 'recommendations'"
@@ -212,11 +213,11 @@ const tabs = ref([
   { id: "processes", name: "Processes" },
   { id: "matrix", name: "Risk Control Matrix" },
   { id: "objectives", name: "Objectives" },
-  { id: "risks", name: "Risks" },
   { id: "exitcontrols", name: "Exit Controls" },
   { id: "controldesigns", name: "Control Design" },
   { id: "auditprograms", name: "Audit Programs" },
   { id: "observations", name: "Observations" },
+  { id: "risks", name: "Risks" },
   { id: "recommendations", name: "Recommendations" },
 ]);
 

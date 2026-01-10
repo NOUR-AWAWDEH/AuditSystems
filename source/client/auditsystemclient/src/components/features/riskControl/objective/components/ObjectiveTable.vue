@@ -101,14 +101,6 @@
                   <DeleteIcon size="sm" custom-class="mr-1" />
                   Delete
                 </button>
-
-                <button
-                  @click.stop="$emit('add-risks', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <AddIcon size="sm" custom-class="mr-1" />
-                  Add Risks
-                </button>
               </div>
             </template>
           </ReusableTable>
@@ -170,13 +162,6 @@
               >
                 <DeleteIcon size="sm" class="mr-1" /> Delete
               </button>
-
-              <button
-                @click.stop="$emit('add-risks', item)"
-                class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-all duration-200"
-              >
-                <AddIcon size="sm" class="mr-1" /> Add Risks
-              </button>
             </div>
           </template>
         </ReusableMobileCardList>
@@ -228,7 +213,6 @@ import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
-import AddIcon from "@/components/common/icons/AddIcon.vue";
 import ObjectiveHeader from "./ObjectiveHeader.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 
@@ -302,8 +286,7 @@ const emit = defineEmits([
   "add-objective",
   "edit-objective",
   "delete-objective",
-  "objective-selected",
-  "add-risks",
+  "objective-selected"
 ]);
 
 // Handle objective selection from table row or button

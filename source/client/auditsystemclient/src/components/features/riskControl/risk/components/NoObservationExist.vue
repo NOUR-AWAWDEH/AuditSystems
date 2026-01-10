@@ -4,11 +4,11 @@
       <div
         class="bg-linear-to-br from-primary-soft to-primary-tint rounded-full w-32 h-32 mx-auto mb-8 flex items-center justify-center shadow-lg border-2 border-dashed border-primary-base"
       >
-        <ObjectiveIcon size="xxxl" custom-class="text-primary-shade" />
+        <ObservationIcon size="xxxl" custom-class="text-primary-shade" />
       </div>
-      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Objectives Available</h3>
+      <h3 class="text-2xl font-bold text-secondary-shade mb-4">No Observations Available</h3>
       <p class="text-gray-base mb-6 text-sm leading-relaxed">
-        You need to create objectives first before you can manage risks
+        You need to create observations first before you can manage risks
       </p>
       <div class="bg-white border border-tertiary-shade rounded-lg p-6">
         <div class="flex items-start space-x-3">
@@ -31,7 +31,7 @@
             <h4 class="text-sm font-medium text-tertiary-shade mb-2">Getting Started</h4>
             <ol class="text-sm text-gray-base space-y-1 list-decimal list-inside">
               <li>Navigate to the Risk Control section</li>
-              <li>Create or select an objective</li>
+              <li>Create or select an observation</li>
               <li>Return here to manage risks</li>
             </ol>
           </div>
@@ -42,5 +42,5 @@
 </template>
 
 <script setup>
-import ObjectiveIcon from "@/components/common/icons/ObjectiveIcon.vue";
+import ObservationIcon from "@/components/common/icons/ObservationIcon.vue";
 </script>

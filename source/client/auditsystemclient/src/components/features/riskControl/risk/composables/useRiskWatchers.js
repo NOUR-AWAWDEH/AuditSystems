@@ -90,7 +90,7 @@ export function useRiskWatchers({
             if (searchRisks) {
                 await searchRisks({
                     searchTerm: trimmed,
-                    objectiveId: selectedObjectiveId.value,
+                    observationId: selectedObjectiveId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value
                 });
@@ -104,7 +104,7 @@ export function useRiskWatchers({
                 if (searchRisks) {
                     await searchRisks({
                         searchTerm: '',
-                        objectiveId: selectedObjectiveId.value,
+                        observationId: selectedObjectiveId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value
                     });
@@ -139,7 +139,7 @@ export function useRiskWatchers({
         if (searchRisks) {
             await searchRisks({
                 searchTerm: searchQuery.value || '',
-                objectiveId: newObjectiveId,
+                observationId: newObjectiveId,
                 page: currentPage.value,
                 pageSize: pageSize.value
             });

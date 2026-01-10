@@ -56,7 +56,7 @@ export function useRiskLifecycle({
             isInitializing.value = true;
             if (searchRisks) {
                 await searchRisks({
-                    objectiveId: selectedObjectiveId.value,
+                    observationId: selectedObjectiveId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value,
                 });

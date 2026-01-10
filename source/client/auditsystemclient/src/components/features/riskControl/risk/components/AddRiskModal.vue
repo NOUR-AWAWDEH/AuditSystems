@@ -104,7 +104,7 @@ import { useNotification } from "@/composables/notification/useNotification";
 
 const props = defineProps({
   isVisible: { type: Boolean, default: false },
-  objectiveId: { type: [String, Number], default: null },
+  observationId: { type: [String, Number], default: null },
 });
 
 const emit = defineEmits(["close", "risk-added"]);
@@ -155,8 +155,8 @@ const validateForm = () => {
 };
 
 const handleSubmit = async () => {
-  if (!props.objectiveId) {
-    showNotification("Objective is required", "error");
+  if (!props.observationId) {
+    showNotification("Observation is required", "error");
     return;
   }
 
@@ -167,7 +167,7 @@ const handleSubmit = async () => {
       riskName: formData.value.riskName.trim(),
       description: formData.value.description.trim(),
 
-      objectiveId: props.objectiveId,
+      observationId: props.observationId,
     };
 
     const result = await createRisk(riskData);

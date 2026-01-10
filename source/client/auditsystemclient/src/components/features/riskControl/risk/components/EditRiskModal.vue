@@ -154,8 +154,8 @@ const handleSubmit = async () => {
     showNotification("Risk is required", "error");
     return;
   }
-  if (!props.risk.objectiveId) {
-    showNotification("Objective is requerd", "error");
+  if (!props.risk.observationId) {
+    showNotification("Observation is required", "error");
   }
 
   if (!validateForm()) return;
@@ -165,7 +165,7 @@ const handleSubmit = async () => {
       id: props.risk.id,
       riskName: formData.value.riskName.trim(),
       description: formData.value.description.trim(),
-      objectiveId: props.risk.objectiveId,
+      observationId: props.risk.observationId,
 
       createdAt: props.risk.createdAt,
     };

@@ -24,7 +24,7 @@ export function useUpdateRiskById() {
     if (!riskData.id) return "Risk ID is required";
     if (!riskData.riskName?.trim()) return "Risk name is required";
     if (!riskData.description?.trim()) return "Risk description is required";
-    if (!riskData.objectiveId) return "Objective ID is required";
+    if (!riskData.observationId) return "Observation ID is required";
 
     return null;
   };

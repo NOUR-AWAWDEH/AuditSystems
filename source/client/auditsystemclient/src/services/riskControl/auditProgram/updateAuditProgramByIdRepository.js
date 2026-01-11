@@ -15,7 +15,6 @@ export const updateAuditProgramByIdRepository = {
                 id: auditProgramData.id,
                 description: auditProgramData.description,
                 exitControlId: auditProgramData.exitControlId,
-                actionOwnerId: auditProgramData.actionOwnerId,
                 controlDesignId: auditProgramData.controlDesignId ?? null,
             };
 

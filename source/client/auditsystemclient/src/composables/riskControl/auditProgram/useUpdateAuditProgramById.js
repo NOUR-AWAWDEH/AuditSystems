@@ -38,10 +38,6 @@ export function useUpdateAuditProgramById() {
             return 'Exit Control ID is required';
         }
 
-        if (!auditProgramData.actionOwnerId) {
-            return 'Action Owner ID is required';
-        }
-
         return null;
     };
 

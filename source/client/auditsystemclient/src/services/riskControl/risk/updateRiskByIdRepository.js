@@ -13,8 +13,8 @@ export const updateRiskByIdRepository = {
 
       const payload = {
         id: riskData.id,
-        riskName: riskData.riskName,
-        description: riskData.description,
+        factor: riskData.factor,
+        impact: riskData.impact,
         observationId:
           riskData.observationId && typeof riskData.observationId === "object"
             ? riskData.observationId.value || riskData.observationId.id

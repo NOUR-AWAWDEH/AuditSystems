@@ -6,28 +6,28 @@ import { watch, nextTick } from 'vue';
  * or switching between objectives.
  *
  * @param {Object} params - Reactive references and actions for managing risks.
- * @param {Ref<Array>} params.objectivesRef - List of available objectives (risk control matrices).
- * @param {Ref<Object|null>} params.selectedObjective - The currently selected objective object.
- * @param {Ref<string|null>} params.selectedObjectiveId - ID of the selected objective.
+ * @param {Ref<Array>} params.observationsRef - List of available observations (risk control matrices).
+ * @param {Ref<Object|null>} params.selectedObservation - The currently selected observation object.
+ * @param {Ref<string|null>} params.selectedObservationId - ID of the selected observation.
  * @param {Ref<string>} params.searchQuery - Current search term for filtering risks.
  * @param {Ref<number>} params.currentPage - Current pagination page number.
  * @param {Ref<number>} params.pageSize - Number of items per page.
  * @param {Ref<boolean>} params.isInitialized - Flag indicating whether data has been initialized.
  * @param {Ref<boolean>} params.isInitializing - Flag indicating if initialization is in progress.
  *
- * @param {Function} params.searchRisks - Function to search risks by term/objective/page.
+ * @param {Function} params.searchRisks - Function to search risks by term/observation/page.
  * @param {Function} params.clearSearch - Function to clear search results.
  * @param {Function} params.getRisksByUserId - Function to load all risks for the user.
  * @param {Ref<Array>} params.allRisks - Reactive list of all risks (mutable).
- * @param {Function} params.clearObjective - Function to reset selected objective.
- * @param {Function} params.getObjectiveById - Function to fetch a specific objective by ID.
- * @param {Function} params.initializeData - Function to initialize data when an objective is valid.
- * @param {Function} params.resetToDefaultView - Function to reset view when objective is invalid.
+ * @param {Function} params.clearObservation - Function to reset selected observation.
+ * @param {Function} params.getObservationById - Function to fetch a specific observation by ID.
+ * @param {Function} params.initializeData - Function to initialize data when an observation is valid.
+ * @param {Function} params.resetToDefaultView - Function to reset view when observation is invalid.
  *
  * Behavior:
- * - Watches `selectedObjective`:
- *   → Initializes data if a valid objective is chosen and not already initialized.
- *   → Resets to default view if the objective no longer exists.
+ * - Watches `selectedObservation`:
+ *   → Initializes data if a valid observation is chosen and not already initialized.
+ *   → Resets to default view if the observation no longer exists.
  *
  * - Watches `searchQuery`:
  *   → Performs a filtered search when query has text.
@@ -35,16 +35,16 @@ import { watch, nextTick } from 'vue';
  *     • Reloads current objective risks if one is selected.
  *     • Loads all risks if no objective is selected.
  *
- * - Watches `selectedObjectiveId`:
+ * - Watches `selectedObservationId`:
  *   → Clears search and resets risks list.
- *   → Clears objective if none is selected.
- *   → Fetches objective by ID when selected.
- *   → Refreshes risks based on new objective and current search query.
+ *   → Clears observation if none is selected.
+ *   → Fetches observation by ID when selected.
+ *   → Refreshes risks based on new observation and current search query.
  */
 export function useRiskWatchers({
-    objectivesRef,
-    selectedObjective,
-    selectedObjectiveId,
+    observationsRef,
+    selectedObservation,
+    selectedObservationId,
     searchQuery,
     currentPage,
     pageSize,
@@ -54,24 +54,24 @@ export function useRiskWatchers({
     clearSearch,
     getRisksByUserId,
     allRisks,
-    clearObjective,
-    getObjectiveById,
+    clearObservation,
+    getObservationById,
     initializeData,
     resetToDefaultView
 }) {
-    // Watch for changes in the selected objective object
+    // Watch for changes in the selected observation object
     watch(
-        selectedObjective,
-        async (newObjective) => {
-            if (!newObjective || isInitialized.value || isInitializing.value) {
+        selectedObservation,
+        async (newObservation) => {
+            if (!newObservation || isInitialized.value || isInitializing.value) {
                 return;
             }
 
-            const objectiveExists = objectivesRef.value.some(
-                matrix => matrix.id === selectedObjectiveId.value
+            const observationExists = observationsRef.value.some(
+                matrix => matrix.id === selectedObservationId.value
             );
 
-            if (objectiveExists) {
+            if (observationExists) {
                 await nextTick();
                 await initializeData();
             } else {
@@ -90,7 +90,7 @@ export function useRiskWatchers({
             if (searchRisks) {
                 await searchRisks({
                     searchTerm: trimmed,
-                    observationId: selectedObjectiveId.value,
+                    observationId: selectedObservationId.value,
                     page: currentPage.value,
                     pageSize: pageSize.value
                 });
@@ -99,30 +99,30 @@ export function useRiskWatchers({
             // Clear results when search is empty
             if (clearSearch) clearSearch();
 
-            if (selectedObjectiveId.value) {
-                // Reload risks for the selected objective
+            if (selectedObservationId.value) {
+                // Reload risks for the selected observation
                 if (searchRisks) {
                     await searchRisks({
                         searchTerm: '',
-                        observationId: selectedObjectiveId.value,
+                        observationId: selectedObservationId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value
                     });
                 }
             } else if (getRisksByUserId) {
-                // Load all risks if no objective is selected
+                // Load all risks if no observation is selected
                 await getRisksByUserId();
             }
         }
     });
 
-    // Watch for changes in the selected objective ID
-    watch(selectedObjectiveId, async (newObjectiveId) => {
+    // Watch for changes in the selected observation ID
+    watch(selectedObservationId, async (newObservationId) => {
         if (clearSearch) clearSearch();
         if (allRisks?.value !== undefined) allRisks.value = [];
 
-        if (!newObjectiveId) {
-            if (clearObjective) clearObjective();
+        if (!newObservationId) {
+            if (clearObservation) clearObservation();
 
             if (!searchQuery.value.trim() && getRisksByUserId) {
                 await getRisksByUserId();
@@ -131,15 +131,15 @@ export function useRiskWatchers({
         }
 
         try {
-            await getObjectiveById(newObjectiveId);
+            await getObservationById(newObservationId);
         } catch (error) {
-            console.error('[Objective] Error fetching objective:', error);
+            console.error('[Observation] Error fetching observation:', error);
         }
 
         if (searchRisks) {
             await searchRisks({
                 searchTerm: searchQuery.value || '',
-                observationId: newObjectiveId,
+                observationId: newObservationId,
                 page: currentPage.value,
                 pageSize: pageSize.value
             });

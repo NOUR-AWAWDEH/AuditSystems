@@ -104,25 +104,16 @@
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{ enhancedColumns[0].label }}
+                  Description
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
-                  {{ item.title }}
-                </div>
-              </div>
-
-              <div class="border-b border-gray-100 pb-3">
-                <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{ enhancedColumns[1].label }}
-                </div>
-                <div class="text-gray-700 text-sm leading-snug wrap-break-word">
                   {{ item.description }}
                 </div>
               </div>
 
               <div>
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  {{ enhancedColumns[2].label }}
+                  Created Date
                 </div>
                 <div class="text-gray-400 text-xs font-medium">
                   {{ formatDateSimple(item.createdAt) }}
@@ -259,7 +250,6 @@ watch(internalSelectedObservationId, (newVal) => {
 defineEmits(["add-recommendation", "edit-recommendation", "delete-recommendation"]);
 
 const recommendationColumns = [
-  { key: "title", label: "Title" },
   { key: "description", label: "Description" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];

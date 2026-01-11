@@ -47,6 +47,10 @@ export function useUpdateObservationById() {
             return 'AuditProgram ID is required';
         }
 
+        if (!observationData.classification) {
+            return 'Observation classification is required';
+        }
+
         return null;
     };
     

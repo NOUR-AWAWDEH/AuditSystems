@@ -89,7 +89,7 @@ export function useRiskModals(risks, emit) {
       }
 
       emit("risk-updated", updatedRisk);
-      showNotification(`Risk "${updatedRisk.riskName}" has been updated successfully!`, "success");
+      showNotification(`Risk for Factor "${updatedRisk.factor}" has been updated successfully!`, "success");
       handleCloseEditRiskModal();
     } catch (error) {
       console.error("Error in handleRiskUpdated:", error);
@@ -100,7 +100,7 @@ export function useRiskModals(risks, emit) {
   const handleDeleteRisk = (risk) => {
     itemToDelete.value = risk;
     deleteDialogTitle.value = "Delete Risk";
-    deleteDialogMessage.value = `Are you sure you want to delete the risk "${risk.riskName}"?`;
+    deleteDialogMessage.value = `Are you sure you want to delete the risk for Factor "${risk.factor}"?`;
     showDeleteDialog.value = true;
   };
 
@@ -115,7 +115,7 @@ export function useRiskModals(risks, emit) {
         risks.value.splice(index, 1);
       }
 
-      showNotification(`Risk "${deletedRisk.riskName}" has been deleted successfully!`, "success");
+      showNotification(`Risk for Factor "${deletedRisk.factor}" has been deleted successfully!`, "success");
 
       localStorage.removeItem("riskControlSelectedRiskId");
 

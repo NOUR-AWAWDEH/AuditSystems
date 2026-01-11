@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuditSystem.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260111073025_Init")]
+    [Migration("20260111103519_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -463,11 +463,6 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<Guid>("ObservationId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

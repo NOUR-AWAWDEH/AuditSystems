@@ -5,7 +5,7 @@
       <div class="p-3 sm:p-4 md:p-6">
         <!-- Header -->
         <div class="flex flex-col gap-4 mb-6">
-          <SubProcessHeader />
+          <ObservationHeader />
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <div class="w-full sm:min-w-64 sm:max-w-xs">
@@ -59,10 +59,9 @@
           </div>
         </div>
 
-        <!-- Desktop Table -->
         <div
           v-if="selectedAuditProgramId"
-          class="hidden lg:block rounded-lg border border-gray-200"
+          class="hidden 2xl:block rounded-lg border border-gray-200"
         >
           <ReusableTable
             :items="enrichedObservations"
@@ -120,6 +119,14 @@
                 </button>
 
                 <button
+                  @click.stop="$emit('recommendation-add', item)"
+                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+                >
+                  <AddIcon size="sm" custom-class="mr-1" />
+                  Add Recommendations
+                </button>
+
+                <button
                   @click.stop="$emit('add-risks', item)"
                   class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
                 >
@@ -138,7 +145,7 @@
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
-          class="lg:hidden"
+          class="2xl:hidden"
         >
           <template #card-content="{ item }">
             <div class="space-y-4">
@@ -185,10 +192,10 @@
 
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Note
+                  Classification
                 </div>
                 <div class="text-gray-700 text-sm leading-snug wrap-break-word">
-                  {{ item.note || 'N/A' }}
+                  {{ item.classification || 'N/A' }}
                 </div>
               </div>
 
@@ -283,7 +290,7 @@ import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import CheckIcon from "@/components/common/icons/CheckIcon.vue";
 import SelectIcon from "@/components/common/icons/SelectIcon.vue";
 import AddIcon from "@/components/common/icons/AddIcon.vue";
-import SubProcessHeader from "./ObservationHeader.vue";
+import ObservationHeader from "./ObservationHeader.vue";
 import NoAuditProgramSelected from "./NoAuditProgramSelected.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 import { useSearchRates } from "@/composables/common/rate/useSearchRates";
@@ -386,7 +393,8 @@ const emit = defineEmits([
   "edit-observation",
   "delete-observation",
   "observation-selected",
-  "add-risks"
+  "add-risks",
+  "recommendation-add"
 ]);
 
 // Observation selection state
@@ -403,7 +411,7 @@ const observationColumns = [
   { key: "background", label: "Background" },
   { key: "isActive", label: "Is Active" },
   { key: "rate", label: "Rate" },
-  { key: "note", label: "Note" },
+  { key: "classification", label: "Classification" },
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
 

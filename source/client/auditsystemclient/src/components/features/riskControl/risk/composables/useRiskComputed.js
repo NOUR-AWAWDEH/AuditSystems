@@ -15,8 +15,8 @@
  *
  * Returns:
  * - `risks` → Computed array of risks to display in the UI.
- *   - Uses `searchResults` if a search query or selected objective exists.
- *   - Falls back to `allRisks` if no query or objective is selected.
+ *   - Uses `searchResults` if a search query or selected observation exists.
+ *   - Falls back to `allRisks` if no query or observation is selected.
  *   - Always returns a safe array (never null/undefined).
  *
  * - `isLoading` → Computed boolean indicating if any risk-related data is currently loading.
@@ -33,7 +33,7 @@ import { computed } from 'vue';
 
 export function useRiskComputed({
     searchQuery,
-    selectedObjectiveId,
+    selectedObservationId,
     searchResults,
     allRisks,
     isSearching,
@@ -41,7 +41,7 @@ export function useRiskComputed({
     isInitializing
 }) {
     const risks = computed(() => {
-        if ((searchQuery?.value?.trim()) || selectedObjectiveId?.value) {
+        if ((searchQuery?.value?.trim()) || selectedObservationId?.value) {
             return searchResults?.value || [];
         }
         return allRisks?.value || [];

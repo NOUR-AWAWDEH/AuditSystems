@@ -91,7 +91,6 @@
             v-model:selectedObjectiveId="selectedObjectiveId"
             @objective-selected="handleObjectiveSelected"
             @objective-deleted="handleObjectiveDeleted"
-            @add-risks="handleAddRisks"
           />
         </div>
 
@@ -130,14 +129,17 @@
             :selected-audit-program-id="selectedAuditProgramId"
             @observation-selected="handleObservationSelected"
             @observation-deleted="handleObservationDeleted"
+            @add-risks="handleAddRisks"
+            @recommendation-add="handleRecommendationAdd"
           />
         </div>
 
         <div v-if="activeTab === 'risks'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
           <RiskVue
-            :objectives="objectives"
-            :selected-objective-id="selectedObjectiveId"
+            :observations="observations"
+            :selected-observation-id="selectedObservationId"
             @risk-deleted="handleRiskDeleted"
+            @add-risks="handleAddRisks"
           />
         </div>
 
@@ -302,7 +304,7 @@ const setActiveTab = async (tabId) => {
         await getRiskControlMatricesByUserId();
         break;
       case "risks":
-        await getObjectivesByUserId();
+        await getObservationsByUserId();
         break;
       case "exitcontrols":
         await getObjectivesByUserId();
@@ -369,10 +371,14 @@ const handleObservationSelected = async (id) => {
   setActiveTab("recommendations");
 };
 
-// Add Risk - Navigate to risks tab with selected objective
-const handleAddRisks = (objectiveId) => {
-  selectedObjectiveId.value = objectiveId;
+const handleAddRisks = (observationId) => {
+  selectedObservationId.value = observationId;
   setActiveTab("risks");
+};
+
+const handleRecommendationAdd = (observationId) => {
+  selectedObservationId.value = observationId;
+  setActiveTab("recommendations");
 };
 
 // Deleted
@@ -399,7 +405,7 @@ const handleObjectiveDeleted = async (deletedId) => {
 };
 
 const handleRiskDeleted = async () => {
-  await getObjectivesByUserId();
+  await getObservationsByUserId();
 };
 
 const handleExitControlDeleted = async (deletedId) => {

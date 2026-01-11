@@ -13,7 +13,6 @@ export const updateRecommendationByIdRepository = {
 
       const payload = {
         id: recommendationData.id,
-        title: recommendationData.title,
         description: recommendationData.description,
         observationId:
           recommendationData.observationId && typeof recommendationData.observationId === "object"

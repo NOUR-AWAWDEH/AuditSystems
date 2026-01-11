@@ -27,7 +27,6 @@
             @edit-objective="handleEditObjective"
             @delete-objective="handleDeleteObjective"
             @objective-selected="handleObjectiveSelected"
-            @add-risks="handleAddRisks"
         />
 
         <!-- Show big RiskControlMatrix icon when no Risk Control Matrix  exist -->
@@ -149,11 +148,6 @@ const handleObjectiveSelected = (objectiveId) => {
     emit('objective-selected', objectiveId);
 };
 
-const handleAddRisks = (objective) => {
-    internalSelectedObjectiveId.value = objective.id;
-    emit('objective-selected', objective.id);
-    emit('add-risks', objective.id);
-};
 
 defineExpose({
     objectives,

@@ -22,8 +22,8 @@ export function useUpdateRiskById() {
 
   const validateUpdateRisk = (riskData) => {
     if (!riskData.id) return "Risk ID is required";
-    if (!riskData.riskName?.trim()) return "Risk name is required";
-    if (!riskData.description?.trim()) return "Risk description is required";
+    if (!riskData.factor?.trim()) return "Risk factor is required";
+    if (!riskData.impact?.trim()) return "Risk impact is required";
     if (!riskData.observationId) return "Observation ID is required";
 
     return null;

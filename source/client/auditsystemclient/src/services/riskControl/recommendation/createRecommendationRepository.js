@@ -11,7 +11,6 @@ export const createRecommendationRepository = {
       const token = authService.getLocalToken();
 
       const payload = {
-        title: recommendationData.title,
         description: recommendationData.description,
         observationId:
           recommendationData.observationId && typeof recommendationData.observationId === "object"

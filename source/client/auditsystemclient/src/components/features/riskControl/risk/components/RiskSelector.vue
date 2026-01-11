@@ -6,7 +6,7 @@
     label="Select Risk"
     placeholder="Choose an Risk"
     value-key="id"
-    label-key="riskName"
+    label-key="factor"
     :error="riskError"
     @update:modelValue="handleRiskChange"
   />

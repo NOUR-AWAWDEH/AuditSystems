@@ -26,39 +26,39 @@
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Risk Name Field -->
+              <!-- Risk Factor Field -->
               <div>
-                <label for="risk-name" class="block text-sm font-medium text-gray-700">
-                  Risk Name *
+                <label for="risk-factor" class="block text-sm font-medium text-gray-700">
+                  Risk Factor *
                 </label>
                 <BaseInput
-                  id="risk-name"
-                  v-model="formData.riskName"
-                  placeholder="Enter Risk Name"
+                  id="risk-factor"
+                  v-model="formData.factor"
+                  placeholder="Enter Risk Factor"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${
-                    errors.riskName ? 'border-error' : 'border-gray-tint'
+                    errors.factor ? 'border-error' : 'border-gray-tint'
                   } focus:ring-primary-base`"
                 />
-                <p v-if="errors.riskName" class="text-error text-sm mt-1">
-                  {{ errors.riskName }}
+                <p v-if="errors.factor" class="text-error text-sm mt-1">
+                  {{ errors.factor }}
                 </p>
               </div>
 
-              <!-- Risk Description -->
+              <!-- Risk Impact -->
               <div>
-                <label for="risk-description" class="block text-sm font-medium text-gray-700">
-                  Risk Description *
+                <label for="risk-impact" class="block text-sm font-medium text-gray-700">
+                  Risk Impact *
                 </label>
                 <BaseInput
-                  id="risk-description"
-                  v-model="formData.description"
-                  placeholder="Enter Risk Description"
+                  id="risk-impact"
+                  v-model="formData.impact"
+                  placeholder="Enter Risk Impact"
                   :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${
-                    errors.description ? 'border-error' : 'border-gray-tint'
+                    errors.impact ? 'border-error' : 'border-gray-tint'
                   } focus:ring-primary-base`"
                 />
-                <p v-if="errors.description" class="text-error text-sm mt-1">
-                  {{ errors.description }}
+                <p v-if="errors.impact" class="text-error text-sm mt-1">
+                  {{ errors.impact }}
                 </p>
               </div>
 
@@ -80,7 +80,7 @@
 
                 <button
                   type="submit"
-                  :disabled="!formData.riskName.trim() || isCreating"
+                  :disabled="!formData.factor.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   <span v-if="isCreating">Adding...</span>
@@ -113,13 +113,13 @@ const { showNotification } = useNotification();
 const { isCreating, error, createRisk, resetState } = useCreateRisk();
 
 const formData = ref({
-  riskName: "",
-  description: "",
+  factor: "",
+  impact: "",
 });
 
 const errors = ref({
-  riskName: "",
-  description: "",
+  factor: "",
+  impact: "",
 });
 
 watch(
@@ -132,22 +132,22 @@ watch(
 );
 
 const resetForm = () => {
-  formData.value = { riskName: "", description: "" };
+  formData.value = { factor: "", impact: "" };
 
-  errors.value = { riskName: "", description: "" };
+  errors.value = { factor: "", impact: "" };
   resetState();
 };
 
 const validateForm = () => {
-  errors.value = { riskName: "", description: "" };
+  errors.value = { factor: "", impact: "" };
   let isValid = true;
 
-  if (!formData.value.riskName.trim()) {
-    errors.value.riskName = "Risk name is required";
+  if (!formData.value.factor.trim()) {
+    errors.value.factor = "Risk factor is required";
     isValid = false;
   }
-  if (!formData.value.description.trim()) {
-    errors.value.description = "Risk description is required";
+  if (!formData.value.impact.trim()) {
+    errors.value.impact = "Risk impact is required";
     isValid = false;
   }
 
@@ -164,8 +164,8 @@ const handleSubmit = async () => {
 
   try {
     const riskData = {
-      riskName: formData.value.riskName.trim(),
-      description: formData.value.description.trim(),
+      factor: formData.value.factor.trim(),
+      impact: formData.value.impact.trim(),
 
       observationId: props.observationId,
     };
@@ -179,7 +179,7 @@ const handleSubmit = async () => {
         createdAt: new Date().toISOString(),
       };
 
-      showNotification(`Risk "${newRisk.riskName}" has been added successfully!`, "success");
+      showNotification(`Risk for Factor "${newRisk.factor}" has been added successfully!`, "success");
       emit("risk-added", newRisk);
       emit("close");
     } else {

@@ -51,7 +51,7 @@ export function useRecommendationModals(recommendations, emit) {
       }
 
       emit("recommendation-updated", updatedRecommendation);
-      showNotification(`Recommendation "${updatedRecommendation.title}" has been updated successfully!`, "success");
+      showNotification(`Recommendation updated successfully!`, "success");
       handleCloseEditRecommendationModal();
     } catch (error) {
       console.error("Error in handleRecommendationUpdated:", error);
@@ -62,7 +62,7 @@ export function useRecommendationModals(recommendations, emit) {
   const handleDeleteRecommendation = (recommendation) => {
     itemToDelete.value = recommendation;
     deleteDialogTitle.value = "Delete Recommendation";
-    deleteDialogMessage.value = `Are you sure you want to delete the recommendation "${recommendation.title}"?`;
+    deleteDialogMessage.value = `Are you sure you want to delete the recommendation "${recommendation.description}"?`;
     showDeleteDialog.value = true;
   };
 
@@ -77,7 +77,7 @@ export function useRecommendationModals(recommendations, emit) {
         recommendations.value.splice(index, 1);
       }
 
-      showNotification(`Recommendation "${deletedRecommendation.title}" has been deleted successfully!`, "success");
+      showNotification(`Recommendation deleted successfully!`, "success");
 
       localStorage.removeItem("recommendationControlSelectedRecommendationId");
 

@@ -92,19 +92,19 @@
                                 <p v-if="errors.rateId" class="text-error text-sm mt-1">{{ errors.rateId }}</p>
                             </div>
 
-                            <!--  Observation Note Field -->
+                            <!--  Observation Classification Field -->
                             <div>
-                                 <label for="observation-note" class="block text-sm font-medium text-gray-700 mb-3">
-                                    Observation Note
+                                 <label for="observation-classification" class="block text-sm font-medium text-gray-700 mb-3">
+                                    Observation Classification *
                                 </label>
                                 <BaseInput
-                                    id="observation-note"
-                                    v-model="formData.note"
-                                    label="Observation Note"
-                                    placeholder="Enter Observation Note"
-                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.note ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
+                                    id="observation-classification"
+                                    v-model="formData.classification"
+                                    label="Observation Classification"
+                                    placeholder="Enter Observation Classification"
+                                    :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${errors.classification ? 'border-error' : 'border-gray-tint'} focus:ring-primary-base`"
                                 />
-                                <p v-if="errors.note" class="text-error text-sm mt-1">{{ errors.note }}</p>
+                                <p v-if="errors.classification" class="text-error text-sm mt-1">{{ errors.classification }}</p>
                             </div>
 
 
@@ -171,7 +171,7 @@ const formData = ref({
     background: '',
     isActive: '',
     rateId: '',
-    note: ''
+    classification: ''
 });
 
 const errors = ref({
@@ -179,7 +179,7 @@ const errors = ref({
     background: '',
     isActive: '',
     rateId: '',
-    note: ''
+    classification: ''
 });
 
 // Computed property to check if form is valid
@@ -187,7 +187,8 @@ const isFormValid = computed(() => {
     return formData.value.highlight.trim() &&
            formData.value.background.trim() &&
            (formData.value.isActive === 'true' || formData.value.isActive === 'false' || formData.value.isActive === true || formData.value.isActive === false) &&
-           formData.value.rateId;
+           formData.value.rateId &&
+           formData.value.classification.trim();
 });
 
 const handleRateChange = (value) => {
@@ -220,14 +221,14 @@ const resetForm = () => {
         background: '',
         isActive: '',
         rateId: '',
-        note: ''
+        classification: ''
     };
     errors.value = {
         highlight: '',
         background: '',
         isActive: '',
         rateId: '',
-        note: ''
+        classification: ''
     };
 
     resetState();
@@ -239,7 +240,7 @@ const validateForm = () => {
         background: '',
         isActive: '',
         rateId: '',
-        note: ''
+        classification: ''
     };
 
     let isValid = true;
@@ -258,6 +259,10 @@ const validateForm = () => {
     }
     if (!formData.value.rateId) {
         errors.value.rateId = 'Observation rate is required';
+        isValid = false;
+    }
+    if (!formData.value.classification.trim()) {
+        errors.value.classification = 'Observation classification is required';
         isValid = false;
     }
 
@@ -280,7 +285,7 @@ const handleSubmit = async () => {
             background: formData.value.background.trim(),
             isActive: formData.value.isActive === 'true' || formData.value.isActive === true,
             rateId: String(formData.value.rateId),
-            note: formData.value.note ? formData.value.note.trim() : null,
+            classification: formData.value.classification.trim(),
             auditProgramId: String(props.auditProgramId)
         };
 

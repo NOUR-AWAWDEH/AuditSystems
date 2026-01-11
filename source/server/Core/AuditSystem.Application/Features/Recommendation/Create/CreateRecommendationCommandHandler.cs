@@ -18,7 +18,7 @@ internal sealed class CreateRecommendationCommandHandler(
         var recommendationModel = mapper.Map<RecommendationModel>(request);
         var recommendationId = await recommendationService.CreateRecommendationAsync(recommendationModel, request.UserId);
         
-        logger.LogInformation("Recommendation with Title {RecommendationTitle} has been created by user with id: {UserId}", request.Title, request.UserId);
+        logger.LogInformation("Recommendation has been created by user with id: {UserId}", request.UserId);
         return Result<CreateRecommendationCommandResponse>.Created(new(recommendationId), "Recommendation has been created.");
     }
 }

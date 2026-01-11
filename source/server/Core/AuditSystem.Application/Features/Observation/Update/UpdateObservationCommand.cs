@@ -8,7 +8,7 @@ public sealed record UpdateObservationCommand(
     string Highlight,
     string Background,
     bool IsActive,
-    string? Note,
+    string Classification,
     Guid AuditProgramId,
     Guid RateId
 ) : UserAwareCommand<Result>;

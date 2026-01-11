@@ -10,7 +10,6 @@ public class Observation : AuditableEntity<Guid>
     public required string Highlight { get; set; }
     public required string Background { get; set; }
     public required bool IsActive { get; set; }
-    public string Note { get; set; } = string.Empty;
     public required Guid AuditProgramId { get; set; }
     public required Guid RateId { get; set; }
     public string Classification { get; set; } = null!;

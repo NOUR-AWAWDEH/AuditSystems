@@ -162,7 +162,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("Classification")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -177,10 +178,6 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("RateId")
                         .HasColumnType("uuid");

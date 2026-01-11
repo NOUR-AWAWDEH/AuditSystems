@@ -81,7 +81,7 @@ public class ObservationSearchHelper(
                 Background = ap.Background,
                 Highlight = ap.Highlight,
                 IsActive =  ap.IsActive,
-                Note = ap.Note,
+                Classification = ap.Classification,
                 AuditProgramId = ap.AuditProgramId,
                 RateId =  ap.RateId,
                 CreatedAt = ap.CreatedAt,

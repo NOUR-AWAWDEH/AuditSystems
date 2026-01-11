@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuditSystem.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108195026_RemoveProcessOwnerFromAuditProgram")]
-    partial class RemoveProcessOwnerFromAuditProgram
+    [Migration("20260111073025_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,7 +165,8 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<string>("Classification")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -180,10 +181,6 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
 
                     b.Property<Guid>("RateId")
                         .HasColumnType("uuid");
@@ -691,29 +688,18 @@ namespace AuditSystem.DataAccess.Migrations
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Factor")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<string>("Impact")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Factor")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Impact")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ObjectiveId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("ObservationId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("RiskName")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -722,9 +708,7 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("Description");
-
-                    b.HasIndex("ObjectiveId");
+                    b.HasIndex("Impact");
 
                     b.HasIndex("ObservationId");
 
@@ -1382,12 +1366,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AuditSystem.Domain.Entities.RiskControls.Objective", "Objective")
-                        .WithMany("Risks")
-                        .HasForeignKey("ObjectiveId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("AuditSystem.Domain.Entities.Observations.Observation", "Observation")
                         .WithMany("Risks")
                         .HasForeignKey("ObservationId")
@@ -1395,8 +1373,6 @@ namespace AuditSystem.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Objective");
 
                     b.Navigation("Observation");
                 });
@@ -1602,8 +1578,6 @@ namespace AuditSystem.DataAccess.Migrations
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.Objective", b =>
                 {
                     b.Navigation("ExitControls");
-
-                    b.Navigation("Risks");
                 });
 
             modelBuilder.Entity("AuditSystem.Domain.Entities.RiskControls.RiskControlMatrix", b =>

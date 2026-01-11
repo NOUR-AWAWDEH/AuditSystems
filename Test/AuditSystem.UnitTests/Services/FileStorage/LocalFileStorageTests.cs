@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Ardalis.Result;
+using System.IO.Compression;
 
 namespace AuditSystem.UnitTests.Services.FileStorage;
 
@@ -595,28 +596,47 @@ public class LocalFileStorageTests : IDisposable
 
     #region Helper Methods
 
+    private static bool IsOpenXml(string ext) =>
+        ext.EndsWith("x") || ext.EndsWith("m");
+
     private static IFormFile CreateMockFile(string fileName, string content, bool includeMagic = true)
     {
         var ext = Path.GetExtension(fileName).ToLowerInvariant();
-        var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+        byte[] bytes;
 
-        if (includeMagic)
+        if (IsOpenXml(ext))
         {
-            byte[] magicBytes = ext switch
+            using var ms = new MemoryStream();
+            using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, true))
             {
-                ".pdf" => [0x25, 0x50, 0x44, 0x46],
-                ".docx" or ".xlsx" or ".pptx" or ".docm" or ".xlsm" or ".ppsm" or ".dotx" or ".xltx" or ".potx" => [0x50, 0x4B, 0x03, 0x04],
-                ".doc" or ".xls" or ".ppt" => [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1],
-                ".rtf" => [0x7B, 0x5C, 0x72, 0x74, 0x66, 0x31],
-                _ => []
-            };
+                zip.CreateEntry("[Content_Types].xml");
+                if (ext.Contains(".doc")) zip.CreateEntry("word/document.xml");
+                else if (ext.Contains(".xls")) zip.CreateEntry("xl/workbook.xml");
+                else if (ext.Contains(".ppt")) zip.CreateEntry("ppt/presentation.xml");
+            }
+            bytes = ms.ToArray();
+        }
+        else
+        {
+            bytes = System.Text.Encoding.UTF8.GetBytes(content);
 
-            if (magicBytes.Length > 0)
+            if (includeMagic)
             {
-                var newBytes = new byte[magicBytes.Length + bytes.Length];
-                Buffer.BlockCopy(magicBytes, 0, newBytes, 0, magicBytes.Length);
-                Buffer.BlockCopy(bytes, 0, newBytes, magicBytes.Length, bytes.Length);
-                bytes = newBytes;
+                byte[] magicBytes = ext switch
+                {
+                    ".pdf" => [0x25, 0x50, 0x44, 0x46],
+                    ".doc" or ".xls" or ".ppt" => [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1],
+                    ".rtf" => [0x7B, 0x5C, 0x72, 0x74, 0x66, 0x31],
+                    _ => []
+                };
+
+                if (magicBytes.Length > 0)
+                {
+                    var newBytes = new byte[magicBytes.Length + bytes.Length];
+                    Buffer.BlockCopy(magicBytes, 0, newBytes, 0, magicBytes.Length);
+                    Buffer.BlockCopy(bytes, 0, newBytes, magicBytes.Length, bytes.Length);
+                    bytes = newBytes;
+                }
             }
         }
 

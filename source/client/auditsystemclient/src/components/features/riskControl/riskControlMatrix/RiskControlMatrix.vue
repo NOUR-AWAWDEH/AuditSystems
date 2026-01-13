@@ -4,32 +4,30 @@
         <!-- Add RiskControlMatrix Modal -->
         <AddRiskControlMatrixModal
             :is-visible="showAddRiskControlMatrixModal"
-            :sub-process-id="internalSelectedSubProcessId"
+            :audit-process-id="internalAuditProcessId"
             @close="handleCloseAddRiskControlMatrixModal"
             @risk-control-matrix-added="handleRiskControlMatrixAdded"
         />
 
-        <!-- Show RiskControlMatrixTable only when sub processes exist -->
+        <!-- Show RiskControlMatrixTable only when audit processes exist -->
         <RiskControlMatrixTable
-            v-if="props.subProcesses && props.subProcesses.length > 0"
-            :sub-processes="props.subProcesses"
+            v-if="props.auditProcessId"
+            :audit-process-id="internalAuditProcessId"
             :risk-control-matrices="riskControlMatrices"
             :is-loading="isLoading"
-            :selected-sub-process-id="internalSelectedSubProcessId"
-            :selected-sub-process="selectedSubProcess"
-            :current-sub-process="currentSubProcess"
-            :is-sub-process-loading="isSubProcessLoading"
             :search-query="searchQuery"
-            :handle-sub-process-change="handleRiskControlMatrixChange"
+            :handle-audit-process-change="handleRiskControlMatrixChange"
             :handle-search="handleSearch"
+            :current-audit-process="auditProcess"
+            :is-audit-process-loading="isAuditProcessLoading"
             @add-risk-control-matrix="handleAddRiskControlMatrix"
             @edit-risk-control-matrix="handleEditRiskControlMatrix"
             @delete-risk-control-matrix="handleDeleteRiskControlMatrix"
             @risk-control-matrix-selected="handleRiskControlMatrixSelected"
         />
 
-        <!-- Show big process icon when no sub processes exist -->
-         <NoSubProcessExist v-else/>
+        <!-- Show big process icon when no audit process selected -->
+         <NoAuditProcessExist v-else/>
 
         <!-- Edit RiskControlMatrix Modal -->
         <EditRiskControlMatrixModal
@@ -55,21 +53,18 @@
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { watch, toRef } from 'vue';
 import ConfirmDialog from '@/components/base/ConfirmDialog.vue';
 import RiskControlMatrixTable from './components/RiskControlMatrixTable.vue';
 import AddRiskControlMatrixModal from './components/AddRiskControlMatrixModal.vue';
 import EditRiskControlMatrixModal from './components/EditRiskControlMatrixModal.vue';
 import { useRiskControlMatrixTable } from './composables/useRiskControlMatrixTable';
 import { useRiskControlMatrixModals } from './composables/useRiskControlMatrixModals';
-import NoSubProcessExist from './components/NoSubProcessExist.vue';
+import { useGetAuditProcessById } from '@/composables/riskControl/auditProcess/useGetAuditProcessById';
+import NoAuditProcessExist from './components/NoAuditProcessExist.vue';
 
 const props = defineProps({
-    subProcesses: {
-        type: Array,
-        default: () => [],
-    },
-    selectedSubProcessId: {
+    auditProcessId: {
         type: [String, Number],
         default: null
     },
@@ -87,25 +82,25 @@ const emit = defineEmits([
 const {
     riskControlMatrices,
     isLoading,
-    selectedSubProcessId: internalSelectedSubProcessId,
-    selectedSubProcess,
-    currentSubProcess,
-    isSubProcessLoading,
+    selectedAuditProcessId: internalAuditProcessId,
     searchQuery,
     handleRiskControlMatrixChange,
     handleSearch,
     resetToDefaultView,
-} = useRiskControlMatrixTable(props.subProcesses);
+} = useRiskControlMatrixTable(toRef(props, "auditProcessId"));
+
+const { auditProcess, isLoading: isAuditProcessLoading, getAuditProcessById, clearAuditProcess } = useGetAuditProcessById();
+
+watch(internalAuditProcessId, async (newVal) => {
+    if (newVal) {
+        await getAuditProcessById(newVal);
+    } else {
+        clearAuditProcess();
+    }
+}, { immediate: true });
 
 
 // Watch for prop changes and update internal state
-watch(() => props.selectedSubProcessId, (newSubProcessId) => {
-        if (newSubProcessId !== internalSelectedSubProcessId.value) {
-            handleRiskControlMatrixChange(newSubProcessId);
-        }
-    },
-    { immediate: true }
-);
 
 
 // Use modal composable for dialog management
@@ -135,7 +130,6 @@ const handleRiskControlMatrixSelected = (riskControlMatrixId) => {
 
 defineExpose({
     riskControlMatrices,
-    selectedSubProcessId: internalSelectedSubProcessId,
     resetToDefaultView
 });
 

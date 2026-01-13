@@ -12,24 +12,24 @@ public class RiskConfiguration : IEntityTypeConfiguration<Risk>
                 builder.HasKey(r => r.Id);
 
                 // Properties
-                builder.Property(r => r.Description)
+                builder.Property(r => r.Impact)
                         .IsRequired(true)
                         .HasMaxLength(500);
 
-                builder.Property(r => r.RiskName)
+                builder.Property(r => r.Factor)
                         .IsRequired(true)
                         .HasMaxLength(250);
 
-                builder.Property(r => r.ObjectiveId)
+                builder.Property(r => r.ObservationId)
                         .IsRequired(true);
 
                 builder.HasOne(e => e.CreatedBy)
-           .WithMany()
-           .HasForeignKey(e => e.CreatedByUserId)
-           .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey(e => e.CreatedByUserId)
+                        .OnDelete(DeleteBehavior.Restrict);
 
 
-                builder.HasIndex(r => r.ObjectiveId);
-                builder.HasIndex(r => r.Description);
+                builder.HasIndex(r => r.ObservationId);
+                builder.HasIndex(r => r.Impact);
         }
 }

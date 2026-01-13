@@ -11,12 +11,12 @@ export const createRiskRepository = {
       const token = authService.getLocalToken();
 
       const payload = {
-        riskName: riskData.riskName,
-        description: riskData.description,
-        objectiveId:
-          riskData.objectiveId && typeof riskData.objectiveId === "object"
-            ? riskData.objectiveId.value || riskData.objectiveId.id
-            : riskData.objectiveId,
+        factor: riskData.factor,
+        impact: riskData.impact,
+        observationId:
+          riskData.observationId && typeof riskData.observationId === "object"
+            ? riskData.observationId.value || riskData.observationId.id
+            : riskData.observationId,
       };
 
       const response = await api.post(`${RISK_API_ENDPOINT}${CREATE_RISK_API_ENDPOINT}`, payload, {

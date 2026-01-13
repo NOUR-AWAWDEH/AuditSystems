@@ -4,31 +4,31 @@
     <!-- Add Risk Modal -->
     <AddRiskModal
       :is-visible="showAddRiskModal"
-      :objective-id="internalSelectedObjectiveId"
+      :observation-id="internalSelectedObservationId"
       @close="handleCloseAddRiskModal"
       @risk-added="handleRiskAdded"
     />
 
-    <!-- Show RiskTable only when objectives exist -->
+    <!-- Show RiskTable only when observations exist -->
     <RiskTable
-      v-if="props.objectives && props.objectives.length > 0"
-      :objectives="props.objectives"
+      v-if="props.observations && props.observations.length > 0"
+      :observations="props.observations"
       :risks="risks"
       :is-loading="isLoading"
-      :selected-objective-id="internalSelectedObjectiveId"
-      :selected-objective="selectedObjective"
-      :current-objective="currentObjective"
-      :is-objective-loading="isObjectiveLoading"
+      :selected-observation-id="internalSelectedObservationId"
+      :selected-observation="selectedObservation"
+      :current-observation="currentObservation"
+      :is-observation-loading="isObservationLoading"
       :search-query="searchQuery"
-      :handle-objective-change="handleRiskChange"
+      :handle-observation-change="handleRiskChange"
       :handle-search="handleSearch"
       @add-risk="handleAddRisk"
       @edit-risk="handleEditRisk"
       @delete-risk="handleDeleteRisk"
     />
 
-    <!-- Show big Objective icon when no objectives exist -->
-    <NoObjectiveExist v-else />
+    <!-- Show big Observation icon when no observations exist -->
+    <NoObservationExist v-else />
 
     <!-- Edit Risk Modal -->
     <EditRiskModal
@@ -44,7 +44,7 @@
       v-model="showDeleteDialog"
       :title="deleteDialogTitle"
       :message="deleteDialogMessage"
-      :highlight-text="itemToDelete?.riskName || ''"
+      :highlight-text="itemToDelete?.factor || ''"
       :confirm-text="'Delete'"
       :cancel-text="'Cancel'"
       @confirm="confirmDelete"
@@ -61,14 +61,14 @@ import AddRiskModal from "./components/AddRiskModal.vue";
 import EditRiskModal from "./components/EditRiskModal.vue";
 import { useRiskTable } from "./composables/useRiskTable";
 import { useRiskModals } from "./composables/useRiskModals";
-import NoObjectiveExist from "./components/NoObjectiveExist.vue";
+import NoObservationExist from "./components/NoObservationExist.vue";
 
 const props = defineProps({
-  objectives: {
+  observations: {
     type: Array,
     default: () => [],
   },
-  selectedObjectiveId: {
+  selectedObservationId: {
     type: [String, Number],
     default: null,
   },
@@ -81,22 +81,22 @@ const emit = defineEmits(["risk-added", "risk-updated", "risk-deleted"]);
 const {
   risks,
   isLoading,
-  selectedObjectiveId: internalSelectedObjectiveId,
-  selectedObjective,
-  currentObjective,
-  isObjectiveLoading,
+  selectedObservationId: internalSelectedObservationId,
+  selectedObservation,
+  currentObservation,
+  isObservationLoading,
   searchQuery,
   handleRiskChange,
   handleSearch,
   resetToDefaultView,
-} = useRiskTable(props.objectives);
+} = useRiskTable(props.observations);
 
 // Watch for prop changes and update internal state
 watch(
-  () => props.selectedObjectiveId,
-  (newObjectiveId) => {
-    if (newObjectiveId !== internalSelectedObjectiveId.value) {
-      handleRiskChange(newObjectiveId);
+  () => props.selectedObservationId,
+  (newObservationId) => {
+    if (newObservationId !== internalSelectedObservationId.value) {
+      handleRiskChange(newObservationId);
     }
   },
   { immediate: true }
@@ -124,7 +124,7 @@ const {
 
 defineExpose({
   risks,
-  selectedObjectiveId: internalSelectedObjectiveId,
+  selectedObservationId: internalSelectedObservationId,
   resetToDefaultView,
 });
 </script>

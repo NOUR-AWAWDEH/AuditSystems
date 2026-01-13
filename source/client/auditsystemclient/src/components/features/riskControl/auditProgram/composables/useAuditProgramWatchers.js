@@ -90,7 +90,7 @@ export function useAuditProgramWatchers({
             }
         }
         
-        if (!newExitControlId) {
+        if (newExitControlId) {
             try {
                 await getExitControlById(newExitControlId);
             } catch (error) {

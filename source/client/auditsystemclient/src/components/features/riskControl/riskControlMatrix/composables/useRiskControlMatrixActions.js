@@ -2,23 +2,23 @@ export function useRiskControlMatrixActions({
     searchRiskControlMatrices,
     getRiskControlMatricesByUserId,
     clearSearch,
-    clearSubProcess,
+    clearAuditProcess,
     allRiskControlMatrices,
     searchQuery,
-    selectedSubProcessId,
+    selectedAuditProcessId,
     currentPage,
     pageSize
 }) {
 
     const refreshData = async () => {
         try {
-            const hasSearchOrFilter = searchQuery.value.trim() || selectedSubProcessId.value;
+            const hasSearchOrFilter = searchQuery.value.trim() || selectedAuditProcessId.value;
 
             if (hasSearchOrFilter) {
                 if (searchRiskControlMatrices) {
                     await searchRiskControlMatrices({
                         searchTerm: searchQuery.value || '',
-                        subProcessId: selectedSubProcessId.value,
+                        auditProcessId: selectedAuditProcessId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -42,7 +42,7 @@ export function useRiskControlMatrixActions({
         }
     };
 
-    const handleRiskControlMatrixChange = async (newSubProcessId) => {
+    const handleRiskControlMatrixChange = async (newAuditProcessId) => {
         try {
             if (clearSearch) {
                 clearSearch();
@@ -52,7 +52,7 @@ export function useRiskControlMatrixActions({
                 allRiskControlMatrices.value = [];
             }
 
-            selectedSubProcessId.value = newSubProcessId;
+            selectedAuditProcessId.value = newAuditProcessId;
         } catch (error) {
             console.error('Error handling risk control matrix change:', error);
         }
@@ -60,7 +60,7 @@ export function useRiskControlMatrixActions({
 
     const resetToDefaultView = () => {
         try {
-            selectedSubProcessId.value = null;
+            selectedAuditProcessId.value = null;
             searchQuery.value = '';
             currentPage.value = 1;
 
@@ -72,8 +72,8 @@ export function useRiskControlMatrixActions({
                 allRiskControlMatrices.value = [];
             }
 
-            if (clearSubProcess) {
-                clearSubProcess();
+            if (clearAuditProcess) {
+                clearAuditProcess();
             }
         } catch (error) {
             console.error('Error resetting to default view:', error);

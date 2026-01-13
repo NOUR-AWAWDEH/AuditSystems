@@ -6,13 +6,13 @@ const RISK_BASE_ENDPOINT = '/api/Risk';
 const SEARCH_RISKS_BY_USER_ID_ENDPOINT = '/search-risks-by-user-id';
 
 export const searchRisksByUserIdRepository = {
-    async searchRisksByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, objectiveId = '') {
+    async searchRisksByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, observationId = '') {
         try {
             const token = authService.getLocalToken();
             const searchTermParam = searchTerm?.trim() || '';
             const params = {
                 searchTerm: searchTermParam,
-                objectiveId: objectiveId,
+                observationId: observationId,
                 pageNumber: pageNumber,
                 pageSize: pageSize
             };

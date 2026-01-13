@@ -77,7 +77,6 @@ public class RecommendationSearchHelper(
             .Select(ap => new RecommendationModel
             {
                 Id = ap.Id,
-                Title = ap.Title,
                 Description = ap.Description,
                 ObservationId = ap.ObservationId,
                 CreatedAt = ap.CreatedAt,

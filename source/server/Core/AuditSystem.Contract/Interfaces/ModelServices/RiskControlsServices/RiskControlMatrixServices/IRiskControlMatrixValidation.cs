@@ -6,5 +6,5 @@ namespace AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.Ris
 public interface IRiskControlMatrixValidation
 {
     Task<RiskControlMatrix> ValidateRiskControlMatrixOwnershipAsync(Guid riskControlMatrixId, Guid userId);
-    Task<SubProcess> ValidateSubProcessOwnershipAsync(Guid subProcessId, Guid userId);
+    Task<AuditProcess> ValidateAuditProcessOwnershipAsync(Guid auditProcessId, Guid userId);
 }

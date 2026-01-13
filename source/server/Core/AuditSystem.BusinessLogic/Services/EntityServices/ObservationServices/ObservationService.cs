@@ -114,7 +114,7 @@ internal sealed class ObservationService(
                 Highlight = d.Highlight,
                 Background = d.Background,
                 IsActive = d.IsActive,
-                Note = d.Note,
+                Classification = d.Classification,
                 AuditProgramId = d.AuditProgramId,
                 RateId = d.RateId,
                 CreatedAt = d.CreatedAt,

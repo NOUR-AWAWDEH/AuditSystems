@@ -1,9 +1,9 @@
-using AuditSystem.Application.Constants.RiskControls.ObjectiveConst;
+using AuditSystem.Application.Constants.ObservationConst;
 using AuditSystem.Application.Constants.Risks.RiskConst;
 using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
 using AuditSystem.Contract.Interfaces.Repositories;
-using AuditSystem.Domain.Entities.RiskControls;
+using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Risks;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +11,11 @@ namespace AuditSystem.BusinessLogic.Helpers.RiskHelpers;
 
 public class RiskValidationHelper(
     IRepository<Guid, Risk> repository,
-    IRepository<Guid, Objective> objectiveRepository) 
+    IRepository<Guid, Observation> observationRepository) 
     : IRiskValidation
 {
     private readonly IRepository<Guid, Risk> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    private readonly IRepository<Guid, Objective> _objectiveRepository = objectiveRepository ?? throw new ArgumentNullException(nameof(objectiveRepository));
+    private readonly IRepository<Guid, Observation> _observationRepository = observationRepository ?? throw new ArgumentNullException(nameof(observationRepository));
 
     public static void ValidateUserId(Guid userId) 
     {
@@ -35,24 +35,24 @@ public class RiskValidationHelper(
         );
     }
 
-    public async Task<Objective> ValidateObjectiveOwnershipAsync(Guid objectiveId, Guid userId)
+    public async Task<Observation> ValidateObservationOwnershipAsync(Guid observationId, Guid userId)
     {
-        var objective = await _objectiveRepository.GetByIdAsync(objectiveId)
+        var observation = await _observationRepository.GetByIdAsync(observationId)
             ?? throw new ArgumentException(
-                ObjectiveConstants.ObjectiveNotFoundMessage, nameof(objectiveId)
+                $"Observation with ID {observationId} not found.", nameof(observationId)
             );
         
-        var ownerId = await _objectiveRepository.Query()
+        var ownerId = await _observationRepository.Query()
             .AsNoTracking()
-            .Where(o => o.Id == objectiveId)
-            .Select(ObjectiveConstants.ObjectiveOwnerIdSelector)
+            .Where(o => o.Id == observationId)
+            .Select(ObservationConstants.ObservationOwnerIdSelector)
             .FirstOrDefaultAsync();
         
         if (ownerId == Guid.Empty || ownerId != userId)
             throw new ArgumentException(
-                string.Format(ObjectiveConstants.UnauthorizedAccessMessage, userId, objectiveId)
+                string.Format(ObservationConstants.UnauthorizedAuditProgramAccessMessage, userId, observationId)
             );
         
-        return objective;
+        return observation;
     }
 }

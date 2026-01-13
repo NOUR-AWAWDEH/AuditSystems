@@ -14,9 +14,9 @@ export const updateRiskControlMatrixByIdRepository = {
             const payload = {
                 id: riskControlMatrixData.id,
                 description: riskControlMatrixData.description,
-                subProcessId:  (riskControlMatrixData.subProcessId && typeof riskControlMatrixData.subProcessId === 'object')
-                    ? riskControlMatrixData.subProcessId.value || riskControlMatrixData.subProcessId.id
-                    : riskControlMatrixData.subProcessId,
+                auditProcessId:  (riskControlMatrixData.auditProcessId && typeof riskControlMatrixData.auditProcessId === 'object')
+                    ? riskControlMatrixData.auditProcessId.value || riskControlMatrixData.auditProcessId.id
+                    : riskControlMatrixData.auditProcessId,
             };
 
             const response = await api.put(

@@ -6,6 +6,5 @@ namespace AuditSystem.Application.Features.Recommendation.Update;
 public sealed record UpdateRecommendationCommand(
     Guid Id,
     string Description,
-    string Title,
     Guid ObservationId
 ) : UserAwareCommand<Result>;

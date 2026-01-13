@@ -14,9 +14,6 @@ public class RecommendationConfiguration : IEntityTypeConfiguration<Recommendati
             .IsRequired(true)
             .HasMaxLength(500);
         
-        builder.Property(x => x.Title)
-            .IsRequired(true)
-            .HasMaxLength(100);
 
         builder.Property(x => x.ObservationId)
             .IsRequired(true);

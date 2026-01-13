@@ -37,7 +37,7 @@ public class UploadSupportingDocCommandHandler(
             var response = new UploadSupportingDocCommandResponse(docId.Value);
             return Result.Success(response, "File uploaded successfully");
         }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+        catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))
         {
             _logger.LogError(ex, "Duplicate DriveFileId violation");
             return Result.Error("Document storage conflict. Please try again.");
@@ -47,5 +47,10 @@ public class UploadSupportingDocCommandHandler(
             _logger.LogError(ex, "Error uploading file");
             return Result.Error("Upload failed");
         }
+    }
+
+    protected virtual bool IsDuplicateKeyException(DbUpdateException ex)
+    {
+        return ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627);
     }
 }

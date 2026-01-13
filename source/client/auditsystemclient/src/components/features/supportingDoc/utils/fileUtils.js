@@ -35,3 +35,32 @@ export function validateFileSize(file, maxSizeInMB = 10) {
   const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
   return file.size <= maxSizeInBytes;
 }
+
+/**
+ * Validates file name for security issues
+ * @param {string} fileName - The file name to validate
+ * @returns {object} - { isValid: boolean, error: string|null }
+ */
+export function validateFileName(fileName) {
+  if (!fileName || fileName.trim() === '') {
+    return { isValid: false, error: 'File name cannot be empty' };
+  }
+
+  // Check for path traversal attempts
+  if (fileName.includes('..') || fileName.includes('/') || fileName.includes('\\')) {
+    return { isValid: false, error: 'File name contains invalid path characters' };
+  }
+
+  // Check for dangerous characters
+  const dangerousChars = /[<>:"|?*\x00-\x1f]/;
+  if (dangerousChars.test(fileName)) {
+    return { isValid: false, error: 'File name contains invalid characters' };
+  }
+
+  // Check length
+  if (fileName.length > 255) {
+    return { isValid: false, error: 'File name is too long (max 255 characters)' };
+  }
+
+  return { isValid: true, error: null };
+}

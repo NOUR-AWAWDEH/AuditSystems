@@ -50,15 +50,6 @@
                 </p>
               </div>
 
-              <!-- Action Owner Selector -->
-              <div>
-                <ActionOwnersSelector
-                  :action-owners="actionOwners"
-                  :selected-action-owner-id="formData.actionOwnerId"
-                  :action-owner-error="errors.actionOwnerId"
-                  @update:selectedActionOwner="handleActionOwnerChange"
-                />
-              </div>
 
               <!--Error Display -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -78,7 +69,7 @@
 
                 <button
                   type="submit"
-                  :disabled="!formData.description.trim() || !formData.actionOwnerId || isCreating"
+                  :disabled="!formData.description.trim() || isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   <span v-if="isCreating">Adding...</span>
@@ -93,13 +84,11 @@
   </Teleport>
 </template>
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch} from "vue";
 import BaseInput from "@/components/base/BaseInput.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
-import ActionOwnersSelector from "./ActionOwnersSelector.vue";
 import { useCreateAuditProgram } from "@/composables/riskControl/auditProgram/useCreateAuditProgram.js";
 import { useNotification } from "@/composables/notification/useNotification";
-import { useGetActionOwnersByAdminId } from "@/composables/userManagement/users/useGetActionOwnersByAdminId";
 
 const props = defineProps({
   isVisible: {
@@ -120,21 +109,15 @@ const emit = defineEmits(["close", "audit-program-added"]);
 
 const { showNotification } = useNotification();
 const { isCreating, error, createAuditProgram, resetState } = useCreateAuditProgram();
-const { actionOwners, getActionOwnersByAdminId } = useGetActionOwnersByAdminId();
 
 const formData = ref({
   description: "",
-  actionOwnerId: "",
 });
 
 const errors = ref({
   description: "",
-  actionOwnerId: "",
 });
 
-onMounted(async () => {
-  await getActionOwnersByAdminId();
-});
 
 watch(
   () => props.isVisible,
@@ -148,20 +131,14 @@ watch(
 const resetForm = () => {
   formData.value = {
     description: "",
-    actionOwnerId: "",
   };
   errors.value = {
     description: "",
-    actionOwnerId: "",
   };
 
   resetState();
 };
 
-const handleActionOwnerChange = (value) => {
-  formData.value.actionOwnerId = value;
-  errors.value.actionOwnerId = "";
-};
 
 const handleSubmit = async () => {
   if (!props.exitControlId) {
@@ -178,31 +155,14 @@ const handleSubmit = async () => {
       description: formData.value.description.trim(),
       exitControlId: props.exitControlId,
       controlDesignId: props.controlDesignId,
-      actionOwnerId: formData.value.actionOwnerId,
     };
 
     const result = await createAuditProgram(auditProgramData);
     if (result?.success) {
-      // Find the selected action owner from the list
-      const selectedActionOwner = actionOwners.value.find(
-        (owner) => owner.id === formData.value.actionOwnerId
-      );
-
       const newAuditProgram = {
         id: result.data.auditProgramId,
         ...auditProgramData,
         createdAt: new Date().toISOString(),
-        // Include the full actionOwner object so it displays in the table
-        actionOwner: selectedActionOwner
-          ? {
-              id: selectedActionOwner.id,
-              firstName: selectedActionOwner.firstName,
-              lastName: selectedActionOwner.lastName,
-              email: selectedActionOwner.email,
-              jobTitle: selectedActionOwner.jobTitle,
-              subDepartment: selectedActionOwner.subDepartment,
-            }
-          : null,
       };
 
       showNotification(
@@ -223,7 +183,6 @@ const handleSubmit = async () => {
 const validateForm = () => {
   errors.value = {
     description: "",
-    actionOwnerId: "",
   };
 
   let isValid = true;
@@ -233,10 +192,6 @@ const validateForm = () => {
     isValid = false;
   }
 
-  if (!formData.value.actionOwnerId) {
-    errors.value.actionOwnerId = "Action Owner is required";
-    isValid = false;
-  }
 
   return isValid;
 };

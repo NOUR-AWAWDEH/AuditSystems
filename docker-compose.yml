@@ -39,11 +39,28 @@ services:
       ADMIN_INITIAL_USERNAME: nour
       ADMIN_INITIAL_COMPANY_ID: d2719f8e-8b4f-4c0e-a6b8-123456789abc
       ADMIN_INITIAL_JOBTITLE_ID: 11111111-1111-1111-1111-111111111111
+
+      CLAMAV_ENABLED: "true"
+      CLAMAV_HOST: auditsystem.clamav
+      CLAMAV_PORT: 3310
     volumes:
       - ./uploads:/app/uploads
-      
+
     depends_on:
       - auditsystem.db
+      - auditsystem.clamav
+
+  auditsystem.clamav:
+    image: clamav/clamav:latest
+    container_name: auditsystem.clamav
+    restart: unless-stopped
+    environment:
+      - CLAMD_CONF_MaxScanSize=250M
+      - CLAMD_CONF_MaxFileSize=200M
+      - CLAMD_CONF_MaxRecursion=10
+      - CLAMD_CONF_StreamMaxLength=200M
+    ports:
+      - "3310:3310"
 
   auditsystem.db:
     image: postgres:16

@@ -5,10 +5,10 @@ namespace AuditSystem.Domain.Entities.RiskControls;
 
 public class RiskControlMatrix : AuditableEntity<Guid>
 {
-    public required Guid SubProcessId { get; set; }
+    public required Guid AuditProcessId { get; set; }
     public string Description { get; set; } = string.Empty;
     
     // Navigation properties
-    public virtual SubProcess SubProcess { get; set; } = null!;
+    public virtual AuditProcess AuditProcess { get; set; } = null!;
     public virtual ICollection<Objective> Objectives { get; set; } = null!;
 }

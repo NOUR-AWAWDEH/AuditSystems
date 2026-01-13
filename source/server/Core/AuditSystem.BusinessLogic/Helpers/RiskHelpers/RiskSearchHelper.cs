@@ -22,33 +22,25 @@ public class RiskSearchHelper(
     private readonly ILogger<RiskSearchHelper> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public Expression<Func<Risk, bool>> BuildUserSearchPredicate(
-        Guid userId, string? searchTerm, Guid objectiveId)
+        Guid userId, string? searchTerm, Guid observationId)
     {
         return r => r.CreatedByUserId == userId &&
-                (string.IsNullOrEmpty(searchTerm) || r.Description.Contains(searchTerm)) &&
-                r.ObjectiveId == objectiveId;
+                (string.IsNullOrEmpty(searchTerm) || r.Impact.Contains(searchTerm)) &&
+                r.ObservationId == observationId;
     }
 
-    // Original method for backward compatibility
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Page page)
-    {
-        return GetUserSearchCacheKeys(userId, searchTerm, null, page);
-    }
-
-    // Method with required Guid objectiveId - matches interface
-    public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid objectiveId, Page page)
+        Guid userId, string? searchTerm, Guid observationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var objectiveIdStr = objectiveId == Guid.Empty ? "all" : objectiveId.ToString();
+        var observationIdStr = observationId == Guid.Empty ? "all" : observationId.ToString();
 
         var cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey,
             CacheKeys.Risk,
             userId,
             normalizedSearchTerm,
-            objectiveIdStr,
+            observationIdStr,
             page.Number,
             page.Size
         );
@@ -58,44 +50,43 @@ public class RiskSearchHelper(
             CacheKeys.Risk,
             userId,
             normalizedSearchTerm,
-            objectiveIdStr
+            observationIdStr
         );
 
         return (cacheKey, countCacheKey);
     }
 
-    // Updated method with nullable objectiveId support (for internal use)
     public (string cacheKey, string countCacheKey) GetUserSearchCacheKeys(
-        Guid userId, string? searchTerm, Guid? objectiveId, Page page)
+        Guid userId, string? searchTerm, Guid? observationId, Page page)
     {
         var normalizedSearchTerm = searchTerm?.Trim().ToLowerInvariant() ?? "all";
-        var objectiveIdStr = objectiveId?.ToString() ?? "all";
+        var observationIdStr = observationId?.ToString() ?? "all";
         
         var cacheKey = string.Format(
             CacheKeys.UserSearchCacheKey, 
-            CacheKeys.Objective,
+            CacheKeys.Risk,
             userId,
             normalizedSearchTerm,
-            objectiveIdStr,
+            observationIdStr,
             page.Number,
             page.Size
         );
 
         var countCacheKey = string.Format(
             CacheKeys.UserSearchCountCacheKey, 
-            CacheKeys.Objective,
+            CacheKeys.Risk,
             userId,
             normalizedSearchTerm,
-            objectiveIdStr
+            observationIdStr
         );
 
         return (cacheKey, countCacheKey);
     }
 
     public async Task<PaginationResult<RiskModel>> GetUserSearchFromRepositoryAsync(
-        Guid userId, string? searchTerm, Guid objectiveId, Page page, string cacheKey, string countCacheKey)
+        Guid userId, string? searchTerm, Guid observationId, Page page, string cacheKey, string countCacheKey)
     {
-        var predicate = BuildUserSearchPredicate(userId, searchTerm, objectiveId);
+        var predicate = BuildUserSearchPredicate(userId, searchTerm, observationId);
 
         var query = _repository.GetAll()
             .Where(predicate)
@@ -104,15 +95,15 @@ public class RiskSearchHelper(
         var totalCount = await query.CountAsync();
 
         var items = await query
-            .OrderBy( r => r.Description)
+            .OrderBy( r => r.Impact)
             .Skip((page.Number - 1) * page.Size)
             .Take(page.Size)
             .Select(r => new RiskModel
             {
                 Id = r.Id,
-                Description = r.Description,
-                ObjectiveId = r.ObjectiveId,
-                RiskName = r.RiskName,
+                Impact = r.Impact,
+                ObservationId = r.ObservationId,
+                Factor = r.Factor,
                 CreatedAt = r.CreatedAt,
                 UpdatedAt = r.UpdatedAt,
             })

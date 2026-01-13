@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
@@ -24,6 +25,7 @@
     <ProjectReference Include="..\..\source\server\Core\AuditSystem.Application\AuditSystem.Application.csproj" />
     <ProjectReference Include="..\..\source\server\Core\AuditSystem.BusinessLogic\AuditSystem.BusinessLogic.csproj" />
     <ProjectReference Include="..\..\source\server\Infrastructure\AuditSystem.Auth\AuditSystem.Auth.csproj" />
+    <ProjectReference Include="..\..\source\server\Infrastructure\AuditSystem.Host\AuditSystem.Host.csproj" />
   </ItemGroup>
 
 </Project>

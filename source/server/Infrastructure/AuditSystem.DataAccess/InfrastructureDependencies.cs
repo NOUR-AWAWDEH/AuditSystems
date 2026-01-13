@@ -10,6 +10,7 @@ using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Recommendations;
+using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
@@ -92,7 +93,6 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Company>()
         .AddRepository<Guid, JobTitle>()
         //Processes
-        .AddRepository<Guid, SubProcess>()
         .AddRepository<Guid, AuditProcess>()
 
         //RiskControls
@@ -105,6 +105,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Observation>()
         .AddRepository<Guid, Recommendation>()
 
+        .AddRepository<Guid, DriftReport>()
         //SupportingDocs
         .AddRepository<Guid, SupportingDoc>()
         //Auth

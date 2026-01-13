@@ -1,4 +1,4 @@
-using AuditSystem.Application.Constants.Processes.SubProcessConst;
+using AuditSystem.Application.Constants.Processes.AuditProcessConst;
 using AuditSystem.Application.Constants.RiskControls.RiskControlMatrixConst;
 using AuditSystem.BusinessLogic.Utilities;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
@@ -11,11 +11,11 @@ namespace AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrix
 
 public class RiskControlMatrixValidationHelper(
     IRepository<Guid, RiskControlMatrix> repository,
-    IRepository<Guid, SubProcess> subProcessRepository) 
+    IRepository<Guid, AuditProcess> auditProcessRepository) 
     : IRiskControlMatrixValidation
 {
     private readonly IRepository<Guid, RiskControlMatrix> _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-    private readonly IRepository<Guid, SubProcess> _subProcessRepository = subProcessRepository ?? throw new ArgumentNullException(nameof(subProcessRepository));
+    private readonly IRepository<Guid, AuditProcess> _auditProcessRepository = auditProcessRepository ?? throw new ArgumentNullException(nameof(auditProcessRepository));
     
     public static void ValidateUserId(Guid userId) 
     {
@@ -35,22 +35,22 @@ public class RiskControlMatrixValidationHelper(
         );
     }
 
-    public async Task<SubProcess> ValidateSubProcessOwnershipAsync(Guid subProcessId, Guid userId)
+    public async Task<AuditProcess> ValidateAuditProcessOwnershipAsync(Guid auditProcessId, Guid userId)
     {
-       var subProcess = await _subProcessRepository.GetByIdAsync(subProcessId)
-            ?? throw new ArgumentException(SubProcessConstants.SubProcessNotFoundMessage, nameof(subProcessId));
+       var auditProcess = await _auditProcessRepository.GetByIdAsync(auditProcessId)
+            ?? throw new ArgumentException(string.Format(AuditProcessConstants.AuditProcessNotFoundMessage, auditProcessId), nameof(auditProcessId));
 
-        var ownerId = await _subProcessRepository.Query()
+        var ownerId = await _auditProcessRepository.Query()
             .AsNoTracking()
-            .Where(sp => sp.Id == subProcessId)
-            .Select(SubProcessConstants.SubProcessOwnerIdSelector)
+            .Where(ap => ap.Id == auditProcessId)
+            .Select(AuditProcessConstants.AuditProcessOwnerIdSelector)
             .FirstOrDefaultAsync();
       
         if (ownerId == Guid.Empty || ownerId != userId)
             throw new ArgumentException(
-                string.Format(SubProcessConstants.UnauthorizedSubProcessAccessMessage, userId, subProcessId)
+                string.Format(AuditProcessConstants.UnauthorizedAccessMessage, userId, auditProcessId)
             );
         
-        return subProcess;
+        return auditProcess;
     }
 }

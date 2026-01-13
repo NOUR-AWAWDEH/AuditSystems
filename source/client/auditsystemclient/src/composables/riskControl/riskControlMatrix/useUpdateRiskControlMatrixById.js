@@ -34,8 +34,8 @@ export function useUpdateRiskControlMatrixById() {
             return 'Risk Control Matrix description is required';
         }
 
-        if (!riskControlMatrixData.subProcessId) {
-            return 'SubProcess ID is required';
+        if (!riskControlMatrixData.auditProcessId) {
+            return 'Audit Process ID is required';
         }
 
         return null;

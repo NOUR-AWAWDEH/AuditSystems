@@ -5,6 +5,7 @@ using AuditSystem.Domain.Entities.Observations;
 using AuditSystem.Domain.Entities.Organization;
 using AuditSystem.Domain.Entities.Processes;
 using AuditSystem.Domain.Entities.Recommendations;
+using AuditSystem.Domain.Entities.Reports;
 using AuditSystem.Domain.Entities.RiskControls;
 using AuditSystem.Domain.Entities.Risks;
 using AuditSystem.Domain.Entities.SupportingDocs;
@@ -35,7 +36,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // Process
     // -------------------
     public virtual DbSet<AuditProcess> AuditProcesses { get; set; } = null!;
-    public virtual DbSet<SubProcess> SubProcesses { get; set; } = null!;
 
     // -------------------
     // Risk Controls
@@ -58,8 +58,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     // User
     // -------------------
     public virtual DbSet<AppUser> AppUsers { get; set; } = null!;
+    public virtual DbSet<CompanyUser> CompanyUsers { get; set; } = null!;
     public virtual DbSet<UserSessionInfo> UserSessions { get; set; } = null!;
 
+    // -------------------
+    // Reports
+    // -------------------
+    public virtual DbSet<DriftReport> DriftReports { get; set; } = null!;
 
     // -------------------
     // Auth

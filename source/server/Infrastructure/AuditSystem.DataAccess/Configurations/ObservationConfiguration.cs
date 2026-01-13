@@ -23,9 +23,9 @@ public class ObservationConfiguration : IEntityTypeConfiguration<Observation>
         builder.Property(x => x.IsActive)
             .IsRequired(true);
 
-        builder.Property(x => x.Note)
-            .HasMaxLength(500)
-            .IsRequired(false);
+        builder.Property(x => x.Classification)
+            .HasMaxLength(100)
+            .IsRequired(true);
 
         builder.HasOne(x => x.Rate)
             .WithMany(x => x.Observations)
@@ -33,6 +33,11 @@ public class ObservationConfiguration : IEntityTypeConfiguration<Observation>
             .IsRequired(true);
 
         builder.HasMany(x => x.Recommendations)
+            .WithOne(x => x.Observation)
+            .HasForeignKey(x => x.ObservationId)
+            .IsRequired(true);
+
+        builder.HasMany(x => x.Risks)
             .WithOne(x => x.Observation)
             .HasForeignKey(x => x.ObservationId)
             .IsRequired(true);

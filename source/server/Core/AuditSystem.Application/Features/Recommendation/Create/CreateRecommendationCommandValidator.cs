@@ -20,13 +20,6 @@ public sealed class CreateRecommendationCommandValidator : AbstractValidator<Cre
             .MaximumLength(500)
             .WithMessage("Recommendation Description must not exceed 500 characters.");
 
-        RuleFor(x => x.Title)
-            .NotEmpty()
-            .WithMessage("Title is required.")
-            .MinimumLength(2)
-            .WithMessage("Title must be at least 2 characters long.")
-            .MaximumLength(100)
-            .WithMessage("Title must not exceed 100 characters.");
         
         RuleFor(x => x.ObservationId)
             .NotEmpty()

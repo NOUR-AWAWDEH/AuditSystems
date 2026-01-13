@@ -6,13 +6,13 @@ const RISK_CONTROL_MATRIX_BASE_ENDPOINT = '/api/RiskControlMatrix';
 const SEARCH_RISK_CONTROL_MATRICES_BY_USER_ID_ENDPOINT = '/search-risk-control-matrices-by-user-id';
 
 export const searchRiskControlMatricesByUserIdRepository = {
-    async searchRiskControlMatricesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, subProcessId = '') {
+    async searchRiskControlMatricesByUserId(searchTerm = '', pageNumber = 1, pageSize = 10, auditProcessId = '') {
         try {
             const token = authService.getLocalToken();
 
             const params = {
                 searchTerm: searchTerm,
-                subProcessId: subProcessId,
+                auditProcessId: auditProcessId,
                 page: pageNumber,
                 pageSize: pageSize
             };

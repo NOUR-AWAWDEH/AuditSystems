@@ -1,9 +1,7 @@
 import { watch, nextTick } from 'vue';
 
 export function useRiskControlMatrixWatchers({
-    subProcessesRef,
-    selectedSubProcess,
-    selectedSubProcessId,
+    selectedAuditProcessId,
     searchQuery,
     currentPage,
     pageSize,
@@ -13,25 +11,11 @@ export function useRiskControlMatrixWatchers({
     clearSearch,
     getRiskControlMatricesByUserId,
     allRiskControlMatrices,
-    clearSubProcess,
-    getSubProcessById,
+    clearAuditProcess,
     initializeData,
     resetToDefaultView
 }) {
-    // Watch Sub Process
-    watch(subProcessesRef, async (newSubProcesses) => {
-        if (!newSubProcesses?.length || !selectedSubProcess.value || isInitialized.value || isInitializing.value) {
-            return;
-        }
-
-        const subProcessExists = newSubProcesses.some(sub => sub.id === selectedSubProcessId.value);
-        if (subProcessExists) {
-            await nextTick();
-            await initializeData();
-        } else {
-            resetToDefaultView();
-        }
-    }, { immediate: true });
+    // Watch Sub Process - Removed
 
     // Watch search query
     watch(searchQuery, async (search) => {
@@ -40,7 +24,7 @@ export function useRiskControlMatrixWatchers({
                 if (searchRiskControlMatrices) {
                     await searchRiskControlMatrices({
                         searchTerm: search,
-                        subProcessId: selectedSubProcessId.value,
+                        auditProcessId: selectedAuditProcessId.value,
                         page: currentPage.value,
                         pageSize: pageSize.value,
                     });
@@ -51,19 +35,19 @@ export function useRiskControlMatrixWatchers({
                     clearSearch();
                 }
                 
-                // Reload sub processes based on current state
-                if (selectedSubProcessId.value) {
-                    // If a sub process is selected, reload sub processes for that sub process
+                // Reload based on current state
+                if (selectedAuditProcessId.value) {
+                    // If an audit process is selected, reload 
                     if (searchRiskControlMatrices) {
                         await searchRiskControlMatrices({
                             searchTerm: '',
-                            subProcessId: selectedSubProcessId.value,
+                            auditProcessId: selectedAuditProcessId.value,
                             page: currentPage.value,
                             pageSize: pageSize.value,
                         });
                     }
                 } else {
-                    // If no sub process is selected, load all sub processes
+                    // If no process is selected, load all
                     if (getRiskControlMatricesByUserId) {
                         await getRiskControlMatricesByUserId();
                     }
@@ -71,8 +55,8 @@ export function useRiskControlMatrixWatchers({
             }
     });
 
-    // Watch selected sub process
-    watch(selectedSubProcessId, async (newSubProcessId) => {
+    // Watch selected audit process
+    watch(selectedAuditProcessId, async (newAuditProcessId) => {
         if (clearSearch) {
             clearSearch();
         }
@@ -81,31 +65,25 @@ export function useRiskControlMatrixWatchers({
             allRiskControlMatrices.value = [];
         }
 
-        if (!newSubProcessId) {
-            if (clearSubProcess) {
-                clearSubProcess();
+        if (!newAuditProcessId) {
+            if (clearAuditProcess) {
+                clearAuditProcess();
             }
         }
         
-        if (newSubProcessId) {
-            try {
-                await getSubProcessById(newSubProcessId);
-            } catch (error) {
-                console.error('[SubProcess] Error fetching sub process:', error);
-            }
-        }
+        // Remove getSubProcessById logic as we don't need to fetch extra process details separately usually, or if we do, it should be getAuditProcessById
 
-        if (!newSubProcessId) {
+        if (!newAuditProcessId) {
             if (!searchQuery.value.trim() && getRiskControlMatricesByUserId) {
                 getRiskControlMatricesByUserId();
             }
             return;
         }
 
-        if (newSubProcessId) {
+        if (newAuditProcessId) {
             await searchRiskControlMatrices({
                 searchTerm: searchQuery.value || '',
-                subProcessId: newSubProcessId,
+                auditProcessId: newAuditProcessId,
                 page: currentPage.value,
                 pageSize: pageSize.value,
             });

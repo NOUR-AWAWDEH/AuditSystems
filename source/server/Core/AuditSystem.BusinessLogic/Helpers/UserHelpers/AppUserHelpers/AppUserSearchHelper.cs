@@ -63,6 +63,8 @@ public class AppUserSearchHelper(
             .Include(u => u.IdentityUser)
             .Include(u => u.SubDepartment)
             .Include(u => u.JobTitle)
+            .Include(u => u.CompanyUsers)
+                .ThenInclude(cu => cu.Role)
             .Where(predicate)
             .AsNoTracking();
 
@@ -79,7 +81,7 @@ public class AppUserSearchHelper(
                 u.FirstName,
                 u.LastName,
                 u.IdentityUser.Email ?? string.Empty,
-                u.Role,
+                u.CompanyUsers.FirstOrDefault() != null ? u.CompanyUsers.FirstOrDefault()!.Role.Name ?? string.Empty : string.Empty,
                 u.SubDepartment == null ? null : new SubDepartmentModel
                 {
                     Id = u.SubDepartment.Id,

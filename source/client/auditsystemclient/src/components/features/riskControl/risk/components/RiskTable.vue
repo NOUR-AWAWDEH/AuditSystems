@@ -9,11 +9,11 @@
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <div class="w-full sm:min-w-64 sm:max-w-xs">
-              <ObjectiveSelector
-                :objectives="objectives"
-                :selected-objective-id="internalSelectedObjectiveId"
-                @update:selected-objective="(id) => (internalSelectedObjectiveId = id)"
-                @objective-changed="(id) => (internalSelectedObjectiveId = id)"
+              <ObservationSelector
+                :observations="observations"
+                :selected-observation-id="internalSelectedObservationId"
+                @update:selected-observation="(id) => (internalSelectedObservationId = id)"
+                @observation-changed="(id) => (internalSelectedObservationId = id)"
               />
             </div>
             <div class="w-full sm:w-auto">
@@ -29,18 +29,18 @@
 
         <!-- Selected Objective Info -->
         <div
-          v-if="selectedObjectiveId"
+          v-if="selectedObservationId"
           class="mb-6 p-3 sm:p-4 bg-linear-to-r from-primary-soft to-indigo-200 rounded-lg border border-primary-base"
         >
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex items-start sm:items-center gap-2 flex-1 min-w-0">
-              <ObjectiveIcon size="lg" custom-class="text-blue-600" />
+              <ObservationIcon size="lg" custom-class="text-blue-600" />
               <div class="flex-1 min-w-0">
                 <p class="text-xs sm:text-sm text-gray-700 wrap-break-word">
-                  <span>Showing Risks for objective:</span>
+                  <span>Showing Risks for observation:</span>
                   <span class="ml-1 font-semibold text-primary-shade">
-                    <span v-if="isObjectiveLoading">Loading objective...</span>
-                    <span v-else>{{ currentObjective?.description || "Loading..." }}</span>
+                    <span v-if="isObservationLoading">Loading observation...</span>
+                    <span v-else>{{ currentObservation?.highlight || "Loading..." }}</span>
                   </span>
                   <span v-if="searchQuery" class="ml-2 text-blue-600">
                     | Search: "{{ searchQuery }}"
@@ -60,7 +60,7 @@
         </div>
 
         <!-- Desktop Table -->
-        <div v-if="selectedObjectiveId" class="hidden lg:block rounded-lg border border-gray-200">
+        <div v-if="selectedObservationId" class="hidden lg:block rounded-lg border border-gray-200">
           <ReusableTable
             :items="enhancedRisks"
             :columns="enhancedColumns"
@@ -93,7 +93,7 @@
 
         <!-- Mobile Card View -->
         <ReusableMobileCardList
-          v-if="selectedObjectiveId"
+          v-if="selectedObservationId"
           :items="enhancedRisks"
           :showNumber="true"
           :isLoading="isLoading"
@@ -104,19 +104,19 @@
             <div class="space-y-4">
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Name
+                  Factor
                 </div>
                 <div class="text-gray-900 font-bold text-base leading-snug wrap-break-word">
-                  {{ item.riskName }}
+                  {{ item.factor }}
                 </div>
               </div>
 
               <div class="border-b border-gray-100 pb-3">
                 <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                  Description
+                  Impact
                 </div>
                 <div class="text-gray-700 text-sm leading-snug wrap-break-word">
-                  {{ item.description }}
+                  {{ item.impact }}
                 </div>
               </div>
 
@@ -164,17 +164,17 @@
           </button>
         </div>
 
-        <!-- No Objective Selected -->
-        <div v-else-if="!selectedObjectiveId" class="text-center py-16">
-          <ObjectiveIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
+        <!-- No Observation Selected -->
+        <div v-else-if="!selectedObservationId" class="text-center py-16">
+          <ObservationIcon size="xxxl" custom-class="text-secondary-base mx-auto mb-6" />
           <h3 class="text-xl font-semibold text-secondary-shade mb-4">
-            Please select an Objective to view risks
+            Please select an Observation to view risks
           </h3>
           <p class="text-gray-500 mb-6">
-            Choose an objective from the dropdown above to get started
+            Choose an observation from the dropdown above to get started
           </p>
-          <div v-if="!objectives || objectives.length === 0">
-            <p class="text-sm text-gray-400">Please add an objective first to manage risks</p>
+          <div v-if="!observations || observations.length === 0">
+            <p class="text-sm text-gray-400">Please add an observation first to manage risks</p>
           </div>
         </div>
       </div>
@@ -192,12 +192,12 @@ import EditIcon from "@/components/common/icons/EditIcon.vue";
 import DeleteIcon from "@/components/common/icons/DeleteIcon.vue";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 import RiskHeader from "./RiskHeader.vue";
-import ObjectiveSelector from "../../objective/components/ObjectiveSelector.vue";
-import ObjectiveIcon from "@/components/common/icons/ObjectiveIcon.vue";
+import ObservationSelector from "../../observation/components/ObservationSelector.vue";
+import ObservationIcon from "@/components/common/icons/ObservationIcon.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
-  objectives: {
+  observations: {
     type: Array,
     default: () => [],
   },
@@ -209,19 +209,19 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  selectedObjectiveId: {
+  selectedObservationId: {
     type: [String, Number],
     default: null,
   },
-  selectedObjective: {
+  selectedObservation: {
     type: Object,
     default: () => null,
   },
-  currentObjective: {
+  currentObservation: {
     type: Object,
     default: () => null,
   },
-  isObjectiveLoading: {
+  isObservationLoading: {
     type: Boolean,
     default: false,
   },
@@ -229,7 +229,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
-  handleObjectiveChange: {
+  handleObservationChange: {
     type: Function,
     default: () => {},
   },
@@ -243,24 +243,24 @@ const props = defineProps({
   },
 });
 
-const internalSelectedObjectiveId = ref(props.selectedObjectiveId);
+const internalSelectedObservationId = ref(props.selectedObservationId);
 
 watch(
-  () => props.selectedObjectiveId,
+  () => props.selectedObservationId,
   (newVal) => {
-    internalSelectedObjectiveId.value = newVal;
+    internalSelectedObservationId.value = newVal;
   }
 );
 
-watch(internalSelectedObjectiveId, (newVal) => {
-  props.handleObjectiveChange(newVal);
+watch(internalSelectedObservationId, (newVal) => {
+  props.handleObservationChange(newVal);
 });
 
 defineEmits(["add-risk", "edit-risk", "delete-risk"]);
 
 const riskColumns = [
-  { key: "riskName", label: "Name" },
-  { key: "description", label: "Description" },
+  { key: "factor", label: "Factor" },
+  { key: "impact", label: "Impact" },
 
   { key: "createdAt", label: "Created Date", type: "date" },
 ];
@@ -281,7 +281,7 @@ const noDataMessage = computed(() => {
   if (props.searchQuery) {
     return `No Risks found for "${props.searchQuery}".`;
   }
-  return "No Risks found for this Objective.";
+  return "No Risks found for this Observation.";
 });
 </script>
 

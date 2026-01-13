@@ -22,7 +22,7 @@ internal sealed class SearchRiskQueryHandler(
         var searchResult = await riskService.SearchByUserIdAsync(
             request.UserId, 
             request.SearchTerm, 
-            request.ObjectiveId, 
+            request.ObservationId, 
             page);
 
         logger.LogInformation(

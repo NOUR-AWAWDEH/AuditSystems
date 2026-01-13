@@ -7,11 +7,9 @@ using AuditSystem.Domain.Entities.Audit;
 using Microsoft.Extensions.Logging;
 using AuditSystem.Application.Constants;
 using Microsoft.EntityFrameworkCore;
-using AuditSystem.Application.Constants.Audit.AuditProgramConst;
 using AuditSystem.Contract.Models.Users;
 using AuditSystem.Contract.Models.Organization;
 using AuditSystem.Domain.Entities.Users;
-using AuditSystem.Contract.Interfaces.Cache;
 
 namespace AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 
@@ -137,30 +135,9 @@ public sealed class AuditProgramSearchHelper : IAuditProgramSearch
                 Id = ap.Id,
                 Description = ap.Description,
                 ExitControlId = ap.ExitControlId,
-                ActionOwnerId = ap.ActionOwnerId,
                 ControlDesignId = ap.ControlDesignId,
                 CreatedAt = ap.CreatedAt,
                 UpdatedAt = ap.UpdatedAt,
-                ActionOwner = ap.ActionOwner == null ? null : new UserModel(
-                    ap.ActionOwner.Id,
-                    ap.ActionOwner.IdentityUser.UserName ?? string.Empty,
-                    ap.ActionOwner.FirstName,
-                    ap.ActionOwner.LastName,
-                    ap.ActionOwner.IdentityUser.Email ?? string.Empty,
-                    Role.ActionOwner,
-                    ap.ActionOwner.SubDepartment == null ? null : new SubDepartmentModel
-                    {
-                        Id = ap.ActionOwner.SubDepartment.Id,
-                        Name = ap.ActionOwner.SubDepartment.Name,
-                        DepartmentId = ap.ActionOwner.SubDepartment.DepartmentId
-                    },
-                    ap.ActionOwner.JobTitle == null ? null : new JobTitleModel
-                    {
-                        Id = ap.ActionOwner.JobTitle.Id,
-                        Name = ap.ActionOwner.JobTitle.Name,
-                        CompanyId = ap.ActionOwner.JobTitle.CompanyId
-                    }
-                )
             })
             .ToListAsync();
 

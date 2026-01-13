@@ -1,5 +1,6 @@
 using AuditSystem.Application.Constants;
 using AuditSystem.Application.Constants.Risks.ControlDesignConst;
+using AuditSystem.Application.Constants.Risks.ExitControlConst;
 using AuditSystem.BusinessLogic.Helpers.ControlDesignHelpers;
 using AuditSystem.BusinessLogic.Services.CacheServices;
 using AuditSystem.Contract.Interfaces.Cache;
@@ -21,7 +22,8 @@ internal sealed class ControlDesignService(
     ICacheService cacheService,
     ILogger<ControlDesignService> _logger,
     IControlDesignValidation validationHelper,
-    IControlDesignSearch searchHelper) :
+    IControlDesignSearch searchHelper,
+    IRepository<Guid, ExitControl> exitControlRepository) :
     UnifiedCacheService<Guid, ControlDesign, ControlDesignModel>(
         repository,
         mapper,
@@ -35,6 +37,7 @@ internal sealed class ControlDesignService(
 {
     private readonly IControlDesignValidation _validationHelper = validationHelper;
     private readonly IControlDesignSearch _searchHelper = searchHelper;
+    private readonly IRepository<Guid, ExitControl> _exitControlRepositoryRepository = exitControlRepository;
 
     public async Task<Guid> CreateControlDesignAsync(ControlDesignModel controlDesignModel, Guid userId)
     {
@@ -43,7 +46,8 @@ internal sealed class ControlDesignService(
 
         _logger.LogInformation("Creating  control design {ControlDesignDescription} for user {UserId}", controlDesignModel.Description, userId);
 
-        await _validationHelper.ValidateExitControlOwnershipAsync(controlDesignModel.ExitControlId, userId);
+
+        var exitControl = await _validationHelper.ValidateExitControlOwnershipAsync(controlDesignModel.ExitControlId, userId);
 
         var entity = mapper.Map<ControlDesign>(controlDesignModel);
         entity.CreatedByUserId = userId;
@@ -54,6 +58,14 @@ internal sealed class ControlDesignService(
 
         _logger.LogInformation("Successfully created  control design {ControlDesignId} for user {UserId}", createdEntity.Id, userId);
 
+        exitControl.Inadequate = false;
+        await _exitControlRepositoryRepository.UpdateAsync(exitControl);
+
+        var cacheKey = string.Format(CacheKeys.CacheKey, CacheKeys.ExitControl, exitControl.Id, "en");
+        await cacheService.SetAsync(cacheKey, exitControl, tags: ExitControlConstants.ExitControlTags, expiration: CacheExpirations.MediumTerm);
+
+        var exitControlId = createdEntity.ExitControlId;
+        
         return createdEntity.Id;
     }
 

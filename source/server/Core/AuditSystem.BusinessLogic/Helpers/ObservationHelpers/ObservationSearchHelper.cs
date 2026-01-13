@@ -23,6 +23,7 @@ public class ObservationSearchHelper(
     public Expression<Func<Observation, bool>> BuildUserSearchPredicate(Guid userId, string? searchTerm, Guid auditProgramId)
     {
         return ap => ap.CreatedByUserId == userId &&
+                ap.AuditProgramId == auditProgramId &&
                 (string.IsNullOrEmpty(searchTerm) || ap.Highlight.Contains(searchTerm));
     }
 
@@ -81,7 +82,7 @@ public class ObservationSearchHelper(
                 Background = ap.Background,
                 Highlight = ap.Highlight,
                 IsActive =  ap.IsActive,
-                Note = ap.Note,
+                Classification = ap.Classification,
                 AuditProgramId = ap.AuditProgramId,
                 RateId =  ap.RateId,
                 CreatedAt = ap.CreatedAt,

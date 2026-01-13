@@ -26,23 +26,6 @@
           <!-- Content -->
           <div class="p-4">
             <form @submit.prevent="handleSubmit" class="space-y-4">
-              <!-- Recommendation Title Field -->
-              <div>
-                <label for="recommendation-title" class="block text-sm font-medium text-gray-700">
-                  Title *
-                </label>
-                <BaseInput
-                  id="recommendation-title"
-                  v-model="formData.title"
-                  placeholder="Enter Recommendation Title"
-                  :input-class="`w-full px-4 py-2 text-secondary-shade border rounded-md focus:outline-none focus:ring-2 ${
-                    errors.title ? 'border-error' : 'border-gray-tint'
-                  } focus:ring-primary-base`"
-                />
-                <p v-if="errors.title" class="text-error text-sm mt-1">
-                  {{ errors.title }}
-                </p>
-              </div>
 
               <!-- Recommendation Description -->
               <div>
@@ -80,7 +63,7 @@
 
                 <button
                   type="submit"
-                  :disabled="!formData.title.trim() || isCreating"
+                  :disabled="isCreating"
                   class="px-4 py-2 text-sm font-medium text-white bg-primary-base border border-transparent rounded-md hover:bg-primary-shade focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-base disabled:opacity-50"
                 >
                   <span v-if="isCreating">Adding...</span>
@@ -113,12 +96,10 @@ const { showNotification } = useNotification();
 const { isCreating, error, createRecommendation, resetState } = useCreateRecommendation();
 
 const formData = ref({
-  title: "",
   description: "",
 });
 
 const errors = ref({
-  title: "",
   description: "",
 });
 
@@ -132,20 +113,14 @@ watch(
 );
 
 const resetForm = () => {
-  formData.value = { title: "", description: "" };
-
-  errors.value = { title: "", description: "" };
+  formData.value = { description: "" };
+  errors.value = { description: "" };
   resetState();
 };
 
 const validateForm = () => {
-  errors.value = { title: "", description: "" };
   let isValid = true;
-
-  if (!formData.value.title.trim()) {
-    errors.value.title = "Recommendation Title is required";
-    isValid = false;
-  }
+  errors.value = { description: "" };
   if (!formData.value.description.trim()) {
     errors.value.description = "Recommendation description is required";
     isValid = false;
@@ -164,7 +139,6 @@ const handleSubmit = async () => {
 
   try {
     const recommendationData = {
-      title: formData.value.title.trim(),
       description: formData.value.description.trim(),
 
       observationId: props.observationId,
@@ -179,7 +153,7 @@ const handleSubmit = async () => {
         createdAt: new Date().toISOString(),
       };
 
-      showNotification(`Recommendation "${newRecommendation.title}" has been added successfully!`, "success");
+      showNotification(`Recommendation has been added successfully!`, "success");
       emit("recommendation-added", newRecommendation);
       emit("close");
     } else {

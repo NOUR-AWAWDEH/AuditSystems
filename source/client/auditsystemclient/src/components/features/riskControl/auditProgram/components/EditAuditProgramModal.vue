@@ -50,15 +50,6 @@
                 </p>
               </div>
 
-              <!-- Action Owner Selector -->
-              <div>
-                <ActionOwnersSelector
-                  :action-owners="actionOwners"
-                  :selected-action-owner-id="formData.actionOwnerId"
-                  :action-owner-error="errors.actionOwnerId"
-                  @update:selectedActionOwner="handleActionOwnerChange"
-                />
-              </div>
 
               <!-- Error Display -->
               <div v-if="error" class="p-3 bg-soft-error border border-error rounded-md">
@@ -95,11 +86,9 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import BaseInput from "@/components/base/BaseInput.vue";
-import ActionOwnersSelector from "./ActionOwnersSelector.vue";
 import { useUpdateAuditProgramById } from "@/composables/riskControl/auditProgram/useUpdateAuditProgramById";
 import { useNotification } from "@/composables/notification/useNotification";
 import { useAuthStatus } from "@/composables/auth/useAuthStatus";
-import { useGetActionOwnersByAdminId } from "@/composables/userManagement/users/useGetActionOwnersByAdminId";
 import CloseIcon from "@/components/common/icons/CloseIcon.vue";
 
 const props = defineProps({
@@ -117,36 +106,28 @@ const emit = defineEmits(["close", "audit-program-updated"]);
 const { showNotification } = useNotification();
 const { isUpdating, error, updateAuditProgram, resetState } = useUpdateAuditProgramById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
-const { actionOwners, getActionOwnersByAdminId } = useGetActionOwnersByAdminId();
 
 const formData = ref({
   description: "",
-  actionOwnerId: "",
 });
 
 const errors = ref({
   description: "",
-  actionOwnerId: "",
 });
 
 watch([() => props.isVisible, () => props.auditProgram], async ([newVisible, newAuditProgram]) => {
   if (newVisible && newAuditProgram) {
     resetForm();
     populateForm();
-    if (actionOwners.value.length === 0) {
-      await getActionOwnersByAdminId();
-    }
   }
 });
 
 const resetForm = () => {
   formData.value = {
     description: "",
-    actionOwnerId: "",
   };
   errors.value = {
     description: "",
-    actionOwnerId: "",
   };
 
   resetState();
@@ -156,21 +137,15 @@ const populateForm = () => {
   if (props.auditProgram) {
     formData.value = {
       description: props.auditProgram.description || "",
-      actionOwnerId: props.auditProgram.actionOwnerId || "",
     };
   }
 };
 
-const handleActionOwnerChange = (value) => {
-  formData.value.actionOwnerId = value;
-  errors.value.actionOwnerId = "";
-};
 
 onMounted(async () => {
   if (!authStatus.value) {
     await checkAuthStatus();
   }
-  await getActionOwnersByAdminId();
 });
 
 const handleSubmit = async () => {
@@ -197,7 +172,6 @@ const handleSubmit = async () => {
       exitControlId: props.auditProgram?.exitControlId,
       controlDesignId: props.auditProgram?.controlDesignId ?? null,
       description: formData.value.description.trim(),
-      actionOwnerId: formData.value.actionOwnerId,
       createdAt: props.auditProgram?.createdAt,
       updatedAt: new Date().toISOString(),
     };
@@ -205,22 +179,10 @@ const handleSubmit = async () => {
     const result = await updateAuditProgram(auditProgramData);
 
     if (result?.success) {
-      const selectedActionOwner = actionOwners.value.find(
-        (owner) => owner.id === formData.value.actionOwnerId
-      );
-
       const updatedAuditProgramData = {
         ...props.auditProgram,
         ...auditProgramData,
         ...result.data,
-        actionOwner: selectedActionOwner
-          ? {
-              id: selectedActionOwner.id,
-              firstName: selectedActionOwner.firstName,
-              lastName: selectedActionOwner.lastName,
-              email: selectedActionOwner.email,
-            }
-          : props.auditProgram.actionOwner,
       };
 
       showNotification(
@@ -247,7 +209,6 @@ const handleSubmit = async () => {
 const validateForm = () => {
   errors.value = {
     description: "",
-    actionOwnerId: "",
   };
 
   let isValid = true;
@@ -257,10 +218,6 @@ const validateForm = () => {
     isValid = false;
   }
 
-  if (!formData.value.actionOwnerId) {
-    errors.value.actionOwnerId = "Action Owner is required";
-    isValid = false;
-  }
 
   return isValid;
 };

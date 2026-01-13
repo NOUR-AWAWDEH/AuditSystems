@@ -60,7 +60,6 @@
 import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useUpdateRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useUpdateRiskControlMatrixById';
-import { useNotification } from '@/composables/notification/useNotification';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 
@@ -77,7 +76,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'risk-control-matrix-updated']);
 
-const { showNotification } = useNotification();
 const { isUpdating, error, updateRiskControlMatrix, resetState } = useUpdateRiskControlMatrixById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
 
@@ -146,7 +144,7 @@ const handleSubmit = async () => {
     const riskControlMatrixData = {
       id: props.riskControlMatrix?.id,
       description: formData.value.description.trim(),
-      subProcessId: props.riskControlMatrix?.subProcessId
+      auditProcessId: props.riskControlMatrix?.auditProcessId
     };
 
     const result = await updateRiskControlMatrix(riskControlMatrixData);
@@ -157,17 +155,16 @@ const handleSubmit = async () => {
         ...result.data
       };
       
-      showNotification(`Risk Control Matrix "${updatedRiskControlMatrixData.description}" has been updated successfully!`, 'success');
       emit('risk-control-matrix-updated', updatedRiskControlMatrixData);
       emit('close');
     } else {
       const errorMessage = result?.message || error.value || 'Failed to update risk control matrix. Please try again.';
-      showNotification(errorMessage, 'error');
+      console.error('Update failed:', errorMessage);
     }
   } catch (err) {
     console.error('Error in handleSubmit:', err);
     const errorMessage = err.response?.data?.message || err.message || 'Failed to update risk control matrix. Please try again.';
-    showNotification(errorMessage, 'error');
+    console.error('Update error:', errorMessage);
   }
 };
 

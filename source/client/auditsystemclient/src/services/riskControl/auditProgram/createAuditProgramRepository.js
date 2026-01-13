@@ -13,9 +13,8 @@ export const createAuditProgramRepository = {
             const payload = {
                 description: AuditProgramData.description,
                 exitControlId: AuditProgramData.exitControlId,
-                actionOwnerId: AuditProgramData.actionOwnerId,
                 controlDesignId: AuditProgramData.controlDesignId ?? null,
-            }
+            };
 
             const response = await api.post(
                 `${AUDIT_PROGRAM_API_ENDPOINT}${CREATE_AUDIT_PROGRAM_API_ENDPOINT}`,

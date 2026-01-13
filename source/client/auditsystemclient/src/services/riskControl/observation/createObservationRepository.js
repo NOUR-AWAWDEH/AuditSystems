@@ -16,7 +16,7 @@ export const createObservationRepository = {
                 isActive: observationData.isActive,
                 auditProgramId: observationData.auditProgramId,
                 rateId: observationData.rateId,
-                ...( observationData.note ? { note: observationData.note } : {} )
+                classification: observationData.classification
             };
 
             const response = await api.post(

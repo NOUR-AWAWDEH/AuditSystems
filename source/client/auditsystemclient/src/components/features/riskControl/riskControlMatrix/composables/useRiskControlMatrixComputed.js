@@ -2,7 +2,7 @@ import { computed } from 'vue';
 
 export function useRiskControlMatrixComputed({
     searchQuery,
-    selectedSubProcessId,
+    selectedAuditProcessId,
     searchResults,
     allRiskControlMatrices,
     isSearching,
@@ -16,7 +16,7 @@ export function useRiskControlMatrixComputed({
                 : [];
         }
         
-        if (selectedSubProcessId?.value) {
+        if (selectedAuditProcessId?.value) {
             return (searchResults && searchResults.value)
                 ? searchResults.value
                 : [];

@@ -11,7 +11,6 @@ using AuditSystem.BusinessLogic.Helpers.RecommendationHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.ObjectiveHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskControlHelpers.RiskControlMatrixHelpers;
 using AuditSystem.BusinessLogic.Helpers.RiskHelpers;
-using AuditSystem.BusinessLogic.Helpers.SubProcessHelpers;
 using AuditSystem.BusinessLogic.Helpers.SupportingDocsHelpers;
 using AuditSystem.BusinessLogic.Helpers.UserHelpers.AppUserHelpers;
 using AuditSystem.BusinessLogic.Mappings;
@@ -23,6 +22,8 @@ using AuditSystem.BusinessLogic.Services.EntityServices.ObservationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.OrganizationServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.ProcessesServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RecommendationServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices;
+using AuditSystem.BusinessLogic.Services.EntityServices.ReportServices.DriftReportServices.Helpers;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskControlsServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.RiskServices;
 using AuditSystem.BusinessLogic.Services.EntityServices.SupportingDocsServices;
@@ -44,8 +45,8 @@ using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.JobTitl
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.SubDepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.AuditProcessServices;
-using AuditSystem.Contract.Interfaces.ModelServices.ProcessServices.SubProcessServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RecommendationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.ReportsServices.DriftReportServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.ObjectiveServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RiskControlsServices.RiskControlMatrixServices;
 using AuditSystem.Contract.Interfaces.ModelServices.RisksServices;
@@ -150,12 +151,6 @@ public static class BusinessLogicDependencies
             .AddScoped<IAuditProcessValidation, AuditProcessValidationHelper>()
             .AddScoped<IAuditProcessSearch, AuditProcessSearchHelper>()
 
-            // Sub Process
-            .AddScoped<ISubProcessService, SubProcessService>()
-            .AddScoped<IUnifiedCacheService<Guid, SubProcess, SubProcessModel>, SubProcessService>()
-            .AddScoped<ISubProcessValidation, SubProcessValidationHelper>()
-            .AddScoped<ISubProcessSearch, SubProcessSearchHelper>()
-
             // Risk Control Matrix
             .AddScoped<IRiskControlMatrixService, RiskControlMatrixService>()
             .AddScoped<IUnifiedCacheService<Guid, RiskControlMatrix, RiskControlMatrixModel>, RiskControlMatrixService>()
@@ -207,6 +202,15 @@ public static class BusinessLogicDependencies
             // File Path Builder
             .AddSingleton<IFilePathBuilder, FilePathBuilder>()
 
+            // report
+            .AddScoped<IDriftReportService, DriftReportService>()
+            .AddScoped<IOrganizationalDataFetcher, OrganizationalDataFetcher>()
+            .AddScoped<IControlDataFetcher, ControlDataFetcher>()
+            .AddScoped<IRisksFetcher, RisksFetcher>()
+            .AddScoped<IObservationsFetcher, ObservationsFetcher>()
+            .AddScoped<IRecommendationsFetcher, RecommendationsFetcher>()
+
+            
             // Url
             .AddSingleton<ISignedUrlService, SignedUrlService>()
             .AddScoped<IURLService, URLService>()

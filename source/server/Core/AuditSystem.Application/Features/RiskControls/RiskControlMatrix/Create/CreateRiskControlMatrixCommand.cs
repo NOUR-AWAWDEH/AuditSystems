@@ -5,5 +5,5 @@ namespace AuditSystem.Application.Features.RiskControls.RiskControlMatrix.Create
 
 public sealed record class CreateRiskControlMatrixCommand(
     string Description,
-    Guid SubProcessId
+    Guid AuditProcessId
 ) : UserAwareCommand<Result<CreateRiskControlMatrixCommandResponse>>;

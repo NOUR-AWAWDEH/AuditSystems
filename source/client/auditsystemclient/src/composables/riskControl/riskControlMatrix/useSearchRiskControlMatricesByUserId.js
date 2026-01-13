@@ -9,7 +9,7 @@ export function useSearchRiskControlMatricesByUserId() {
     const currentPage = ref(1);
     const pageSize = ref(10);
     const searchTerm = ref('');
-    const subProcessId = ref(null);
+    const auditProcessId = ref(null);
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.items || [];
@@ -44,13 +44,13 @@ export function useSearchRiskControlMatricesByUserId() {
 
             const params = {
                 searchTerm: searchParams.searchTerm || searchTerm.value,
-                subProcessId: searchParams.subProcessId || subProcessId.value,
+                auditProcessId: searchParams.auditProcessId || auditProcessId.value,
                 page: searchParams.page || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
             }
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
-            if (searchParams.subProcessId !== undefined) subProcessId.value = searchParams.subProcessId;
+            if (searchParams.auditProcessId !== undefined) auditProcessId.value = searchParams.auditProcessId;
             if (searchParams.page !== undefined) currentPage.value = searchParams.page;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
@@ -58,7 +58,7 @@ export function useSearchRiskControlMatricesByUserId() {
                 params.searchTerm,
                 params.page,
                 params.pageSize,
-                params.subProcessId
+                params.auditProcessId
             );
 
 
@@ -79,7 +79,7 @@ export function useSearchRiskControlMatricesByUserId() {
     const clearSearch = () => {
         searchResults.value = [];
         searchTerm.value = '';
-        subProcessId.value = null;
+        auditProcessId.value = null;
         currentPage.value = 1;
         error.value = null;
         totalCount.value = 0;
@@ -93,7 +93,7 @@ export function useSearchRiskControlMatricesByUserId() {
         totalCount.value = 0;
         currentPage.value = 1;
         searchTerm.value = '';
-        subProcessId.value = null;
+        auditProcessId.value = null;
     };
 
     return {

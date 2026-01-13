@@ -9,7 +9,7 @@ export function useSearchRisksByUserId() {
     const currentPage = ref(1);
     const pageSize = ref(10);
     const searchTerm = ref('');
-    const objectiveId = ref(null);
+    const observationId = ref(null);
 
     const handleSearchSuccess = (response) => {
         const items = response.result?.items || [];
@@ -45,7 +45,7 @@ export function useSearchRisksByUserId() {
 
             const params = {
                 searchTerm: (searchParams.searchTerm || searchTerm.value || '').trim(),
-                objectiveId: searchParams.objectiveId || objectiveId.value,
+                observationId: searchParams.observationId || observationId.value,
                 pageNumber: searchParams.pageNumber || currentPage.value,
                 pageSize: searchParams.pageSize || pageSize.value,
             };
@@ -53,7 +53,7 @@ export function useSearchRisksByUserId() {
 
 
             if (searchParams.searchTerm !== undefined) searchTerm.value = searchParams.searchTerm;
-            if (searchParams.objectiveId !== undefined) objectiveId.value = searchParams.objectiveId;
+            if (searchParams.observationId !== undefined) observationId.value = searchParams.observationId;
             if (searchParams.pageNumber !== undefined) currentPage.value = searchParams.pageNumber;
             if (searchParams.pageSize !== undefined) pageSize.value = searchParams.pageSize;
 
@@ -61,7 +61,7 @@ export function useSearchRisksByUserId() {
                 params.searchTerm,
                 params.pageNumber,
                 params.pageSize,
-                params.objectiveId
+                params.observationId
             );
 
 
@@ -82,7 +82,7 @@ export function useSearchRisksByUserId() {
     const clearSearch = () => {
         searchResults.value = [];
         searchTerm.value = '';
-        objectiveId.value = null;
+        observationId.value = null;
         currentPage.value = 1;
         error.value = null;
         totalCount.value = 0;
@@ -96,7 +96,7 @@ export function useSearchRisksByUserId() {
         totalCount.value = 0;
         currentPage.value = 1;
         searchTerm.value = '';
-        objectiveId.value = null;
+        observationId.value = null;
     };
 
     return {
@@ -107,7 +107,7 @@ export function useSearchRisksByUserId() {
         currentPage,
         pageSize,
         searchTerm,
-        objectiveId,
+        observationId,
         searchRisks,
         clearSearch,
         resetState

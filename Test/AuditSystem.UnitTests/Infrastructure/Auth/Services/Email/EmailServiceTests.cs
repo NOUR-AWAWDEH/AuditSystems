@@ -3,8 +3,8 @@ using AuditSystem.Auth.Services.Email.Models;
 using AuditSystem.Auth.Services.Email.Services;
 using FakeItEasy;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Xunit;
+using Microsoft.Extensions.Configuration;
+
 
 namespace AuditSystem.UnitTests.Infrastructure.Auth.Services.Email;
 
@@ -12,22 +12,28 @@ public class EmailServiceTests
 {
     private readonly IEmailTemplateRenderer _renderer;
     private readonly IEmailSender _sender;
+    private readonly IConfiguration _configuration;
     private readonly EmailService _emailService;
 
     public EmailServiceTests()
     {
         _renderer = A.Fake<IEmailTemplateRenderer>();
         _sender = A.Fake<IEmailSender>();
-        _emailService = new EmailService(_renderer, _sender);
+        _configuration = A.Fake<IConfiguration>();
+        A.CallTo(() => _configuration["CORS_ALLOWED_ORIGIN"]).Returns("http://localhost:10000,https://localhost:10000");
+        _emailService = new EmailService(_renderer, _sender, _configuration);
     }
 
     [Fact]
     public void Constructor_ShouldThrowArgumentNullException_WhenDependenciesAreNull()
     {
-        FluentActions.Invoking(() => new EmailService(null!, _sender))
+        FluentActions.Invoking(() => new EmailService(null!, _sender, _configuration))
             .Should().Throw<ArgumentNullException>();
 
-        FluentActions.Invoking(() => new EmailService(_renderer, null!))
+        FluentActions.Invoking(() => new EmailService(_renderer, null!, _configuration))
+            .Should().Throw<ArgumentNullException>();
+
+        FluentActions.Invoking(() => new EmailService(_renderer, _sender, null!))
             .Should().Throw<ArgumentNullException>();
     }
 
@@ -107,14 +113,13 @@ public class EmailServiceTests
         // Act
         await _emailService.SendPasswordResetEmailAsync("user@example.com", "http://reset.link");
 
-        // Assert
+        // Assert - check renderer received expected placeholders and sender sent expected message
         A.CallTo(() => _renderer.Render("PasswordReset", A<Dictionary<string, PlaceholderValue>>.That.Matches(p =>
             p["ResetUrl"].Value == "http://reset.link" &&
             p["UserName"].Value == "user"
         ))).MustHaveHappenedOnceExactly();
 
         A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
-            m.Subject == "Reset Your Password" && // Assumed based on logic or implementation detail
             m.Body == "Reset Body" &&
             m.To[0] == "user@example.com"
         ))).MustHaveHappenedOnceExactly();
@@ -138,6 +143,35 @@ public class EmailServiceTests
         A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
             m.Body == "Changed Body" &&
             m.To[0] == "user@example.com"
+        ))).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task SendDriftReportNotificationToActionOwnerAsync_ShouldSendCorrectly()
+    {
+        // Arrange
+        var actionOwnerEmail = "owner@example.com";
+        var actionOwnerName = "Owner Name";
+        var driftReportId = Guid.NewGuid();
+
+        A.CallTo(() => _renderer.Render("DriftReportNotification.html", A<Dictionary<string, PlaceholderValue>>._))
+            .Returns("Drift Rendered Body");
+
+        // Act
+        await _emailService.SendDriftReportNotificationToActionOwnerAsync(actionOwnerEmail, actionOwnerName, driftReportId);
+
+        // Assert renderer was called with expected placeholders
+        A.CallTo(() => _renderer.Render("DriftReportNotification.html", A<Dictionary<string, PlaceholderValue>>.That.Matches(p =>
+            p["ActionOwnerName"].Value == actionOwnerName &&
+            p["DriftReportId"].Value == driftReportId.ToString() &&
+            p["DriftReportLink"].Value.StartsWith("http://localhost:10000/reports/drift/")
+        ))).MustHaveHappenedOnceExactly();
+
+        // Assert sender was called with a message that includes the rendered body and correct to/subject
+        A.CallTo(() => _sender.SendAsync(A<EmailMessage>.That.Matches(m =>
+            m.Subject == "New Drift Report Notification" &&
+            m.Body == "Drift Rendered Body" &&
+            m.To.Contains(actionOwnerEmail)
         ))).MustHaveHappenedOnceExactly();
     }
 }

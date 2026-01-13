@@ -12,11 +12,11 @@ public sealed class UpdateRiskControlMatrixValidator : AbstractValidator<UpdateR
             .Must(BeAValidGuid)
             .WithMessage("Id must be a valid Guid.");
 
-        RuleFor(x => x.SubProcessId)
+        RuleFor(x => x.AuditProcessId)
             .NotEmpty()
-            .WithMessage("SubProcessId is required.")
+            .WithMessage("AuditProcessId is required.")
             .Must(BeAValidGuid)
-            .WithMessage("SubProcessId must be a valid Guid.");
+            .WithMessage("AuditProcessId must be a valid Guid.");
 
         RuleFor(x => x.Description)
             .MaximumLength(500)

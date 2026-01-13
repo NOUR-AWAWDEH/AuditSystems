@@ -97,12 +97,9 @@ internal sealed class AuditProgramService(
 
         // If not in cache, load from database with PROPER includes
         var entity = await repository.GetAll()
-            .Include(ap => ap.ActionOwner)
-                .ThenInclude(u => u.JobTitle)
             .Include(ap => ap.ExitControl)
                 .ThenInclude(ec => ec.Objective)
                 .ThenInclude(o => o.RiskControlMatrix)
-                .ThenInclude(rcm => rcm.SubProcess)
                 .ThenInclude(sp => sp.AuditProcess)
                 .ThenInclude(ap => ap.SubDepartment)
                 .ThenInclude(sd => sd.Department)
@@ -132,8 +129,6 @@ internal sealed class AuditProgramService(
 
         _logger.LogDebug("Retrieving all audit programs for user {UserId}", userId);
 
-
-
         return await repository.GetAll()
             .AsNoTracking()
             .Where(AuditProgramConstants.AuditProgramOwnerPredicate(userId))
@@ -142,7 +137,6 @@ internal sealed class AuditProgramService(
                 Id = d.Id,
                 Description = d.Description,
                 ExitControlId = d.ExitControlId,
-                ActionOwnerId = d.ActionOwnerId,
                 ControlDesignId = d.ControlDesignId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
@@ -189,11 +183,6 @@ internal sealed class AuditProgramService(
 
         var existingEntity = await _validationHelper
             .ValidateAuditProgramOwnershipAsync(auditProgramModel.Id, userId);
-
-        await _validationHelper.ValidateActionOwnerAssignmentAsync(
-            auditProgramModel.ActionOwnerId,
-            userId
-        );
 
         mapper.Map(auditProgramModel, existingEntity);
         existingEntity.UpdatedAt = DateTime.UtcNow;

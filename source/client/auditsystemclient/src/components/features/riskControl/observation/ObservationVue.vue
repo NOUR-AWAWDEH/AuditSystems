@@ -26,6 +26,8 @@
       @edit-observation="handleEditObservation"
       @delete-observation="handleDeleteObservation"
       @observation-selected="handleObservationSelected"
+      @add-risks="handleAddRisks"
+      @recommendation-add="handleRecommendationAdd"
     />
 
     <!-- No Observations Message -->
@@ -84,6 +86,8 @@ const emit = defineEmits([
   "observation-added",
   "observation-updated",
   "observation-deleted",
+  "add-risks",
+  "recommendation-add",
   "update:selectedObservationId",
 ]);
 
@@ -141,6 +145,16 @@ const {
 const handleObservationSelected = (observationId) => {
   internalSelectedObservationId.value = observationId;
   emit("observation-selected", observationId);
+};
+
+const handleAddRisks = (observation) => {
+  internalSelectedObservationId.value = observation.id;
+  emit("add-risks", observation.id);
+};
+
+const handleRecommendationAdd = (observation) => {
+  internalSelectedObservationId.value = observation.id;
+  emit("recommendation-add", observation.id);
 };
 
 defineExpose({

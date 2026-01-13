@@ -5,7 +5,7 @@ namespace AuditSystem.Application.Features.Risks.Risk.Update;
 
 public sealed record class UpdateRiskCommand(
     Guid Id,
-    string RiskName,
-    string Description,
-    Guid ObjectiveId
+    string Factor,
+    string Impact,
+    Guid ObservationId
 ) : UserAwareCommand<Result>;

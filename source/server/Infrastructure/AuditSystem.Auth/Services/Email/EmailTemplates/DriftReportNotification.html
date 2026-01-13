@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drift Report Notification</title>
+    <style>
+        body {
+            font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+            background-color: #edf2f7;
+            margin: 0;
+            padding: 20px;
+            color: #495057;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #339af0;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #495057;
+        }
+        .instructions {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #495057;
+        }
+        .report-container {
+            background: #d0ebff;
+            border: 2px dashed #339af0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .report-link {
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background-color: #1c7ed6;
+            padding: 12px 30px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .report-link:hover {
+            background-color: #339af0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #495057;
+            border-top: 1px solid #d5dae3;
+        }
+        .footer a {
+            color: #339af0;
+            text-decoration: none;
+        }
+        .highlight {
+            color: #1c7ed6;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">Drift Report Notification</div>
+        <div class="content">
+            <div class="greeting">
+                Hello <span class="highlight">{{ActionOwnerName}}</span>,
+            </div>
+            <div class="instructions">
+                You have a new <strong>Drift Report</strong> assigned to you. Please review it at your earliest convenience.
+            </div>
+            <div class="report-container">
+                <div><strong>Report ID:</strong> {{DriftReportId}}</div>
+                <a class="report-link" target="_blank" rel="noopener noreferrer" href="{{DriftReportLink}}">View Drift Report</a>
+            </div>
+            <div class="instructions">
+                If you have any questions, please contact your AuditSystem administrator.
+            </div>
+        </div>
+        <div class="footer">
+            <strong>AuditSystem Team</strong><br>
+            © 2025 AuditSystem. All rights reserved.<br>
+            <a href="mailto:support@auditsystem.online">Contact Support</a>
+        </div>
+    </div>
+</body>
+</html>

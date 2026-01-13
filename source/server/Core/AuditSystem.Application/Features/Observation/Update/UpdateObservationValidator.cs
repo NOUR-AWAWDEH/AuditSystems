@@ -39,9 +39,11 @@ public sealed class UpdateObservationValidator : AbstractValidator<UpdateObserva
             .NotNull()
             .WithMessage("IsActive is required.");
         
-        RuleFor(x => x.Note)
-            .MaximumLength(500)
-            .WithMessage("Note must not exceed 500 characters.");
+        RuleFor(x => x.Classification)
+            .NotEmpty()
+            .WithMessage("Classification is required.")
+            .MaximumLength(100)
+            .WithMessage("Classification must not exceed 100 characters.");
             
         RuleFor(x => x.AuditProgramId)
             .NotEmpty()

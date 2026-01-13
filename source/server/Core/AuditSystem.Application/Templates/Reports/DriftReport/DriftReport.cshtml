@@ -1,0 +1,216 @@
+@model AuditSystem.Contract.Models.Reports.DriftReport.DriftReportModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Drift Audit Report</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            color: #222;
+            margin: 40px;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 24px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 6px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            text-align: left;
+        }
+
+        .meta-table td {
+            border: none;
+            padding: 4px 0;
+        }
+
+        .section {
+            margin-top: 30px;
+        }
+
+        .empty {
+            font-style: italic;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <h1>Drift Audit Report</h1>
+
+    <table class="meta-table">
+        <tr>
+            <td><strong>Company:</strong></td>
+            <td>@Model.Company?.Name ?? "—"</td>
+        </tr>
+        <tr>
+            <td><strong>Location:</strong></td>
+            <td>@Model.Location?.Name ?? "—"</td>
+        </tr>
+        <tr>
+            <td><strong>Department:</strong></td>
+            <td>@Model.Department?.Name ?? "—"</td>
+        </tr>
+        <tr>
+            <td><strong>Sub-Department:</strong></td>
+            <td>@Model.SubDepartment?.Name ?? "—"</td>
+        </tr>
+        <tr>
+            <td><strong>Objective:</strong></td>
+            <td>@Model.Objective?.Name ?? "—"</td>
+        </tr>
+        <tr>
+            <td><strong>Audit Program:</strong></td>
+            <td>@Model.AuditProgram?.Name ?? "—"</td>
+        </tr>
+    </table>
+
+    <!-- ================= RISKS ================= -->
+
+    <div class="section">
+        <h2>Risks</h2>
+
+        @if (!Model.Risks.Items.Any())
+        {
+            <div class="empty">No risks found.</div>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Risk Name</th>
+                        <th>Description</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var index = 1;
+                        foreach (var risk in Model.Risks.Items)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@risk.Name</td>
+                                <td>@risk.Description</td>
+                            </tr>;
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- ================= OBSERVATIONS ================= -->
+
+    <div class="section">
+        <h2>Observations</h2>
+
+        @if (!Model.Observations.Items.Any())
+        {
+            <div class="empty">No observations found.</div>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th></th>
+                        <th>Description</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var index = 1;
+                        foreach (var obs in Model.Observations.Items)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@obs.Description</td>
+                                <td>@obs.Impact</td>
+                                <td>@obs.Status</td>
+                            </tr>;
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- ================= RECOMMENDATIONS ================= -->
+
+    <div class="section">
+        <h2>Recommendations</h2>
+
+        @if (!Model.Recommendations.Any())
+        {
+            <div class="empty">No recommendations found.</div>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        var index = 1;
+                        foreach (var rec in Model.Recommendations)
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@rec.Title</td>
+                                <td>@rec.Description</td>
+                                <td>@rec.CreatedAt?.ToString("yyyy-MM-dd") ?? "—"</td>
+                            </tr>;
+                            index++;
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</body>
+</html>

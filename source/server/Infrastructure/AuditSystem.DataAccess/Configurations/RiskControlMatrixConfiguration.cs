@@ -15,7 +15,7 @@ public class RiskControlMatrixConfiguration : IEntityTypeConfiguration<RiskContr
         builder.HasKey(d => d.Id);
 
         // Properties
-        builder.Property(d => d.SubProcessId)
+        builder.Property(d => d.AuditProcessId)
             .IsRequired(true);
 
         builder.Property(d => d.Description)
@@ -23,9 +23,9 @@ public class RiskControlMatrixConfiguration : IEntityTypeConfiguration<RiskContr
             .IsRequired(true);
 
         // Relationships
-        builder.HasOne(d => d.SubProcess)
-            .WithMany(sp => sp.RiskControlMatrices)
-            .HasForeignKey(d => d.SubProcessId)
+        builder.HasOne(d => d.AuditProcess)
+            .WithMany(ap => ap.RiskControlMatrices)
+            .HasForeignKey(d => d.AuditProcessId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(d => d.Objectives)
@@ -40,7 +40,7 @@ public class RiskControlMatrixConfiguration : IEntityTypeConfiguration<RiskContr
 
 
         // Indexes for performance
-        builder.HasIndex(d => d.SubProcessId);
+        builder.HasIndex(d => d.AuditProcessId);
         builder.HasIndex(d => d.Description);
         
     }

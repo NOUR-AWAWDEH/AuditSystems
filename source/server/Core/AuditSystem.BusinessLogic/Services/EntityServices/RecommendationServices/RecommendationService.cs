@@ -45,7 +45,7 @@ internal sealed class RecommendationService(
         ArgumentNullException.ThrowIfNull(recommendationModel, nameof(recommendationModel));
         RecommendationValidationHelper.ValidateUserId(userId);
         
-        _logger.LogInformation("Creating recommendation {Title} for user {UserId}", recommendationModel.Title, userId);
+        _logger.LogInformation("Creating recommendation for user {UserId}", userId);
 
         await _validationHelper.ValidateObservationOwnershipAsync(recommendationModel.ObservationId, userId);
 
@@ -117,7 +117,6 @@ internal sealed class RecommendationService(
             {
                 Id = d.Id,
                 Description = d.Description,
-                Title = d.Title,
                 ObservationId = d.ObservationId,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,

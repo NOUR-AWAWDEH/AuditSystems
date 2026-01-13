@@ -61,6 +61,7 @@ import { ref, watch, onMounted } from 'vue';
 import BaseInput from '@/components/base/BaseInput.vue';
 import { useUpdateRiskControlMatrixById } from '@/composables/riskControl/riskControlMatrix/useUpdateRiskControlMatrixById';
 import { useAuthStatus } from '@/composables/auth/useAuthStatus';
+import { useNotification } from '@/composables/notification/useNotification';
 import CloseIcon from '@/components/common/icons/CloseIcon.vue';
 
 const props = defineProps({
@@ -78,6 +79,7 @@ const emit = defineEmits(['close', 'risk-control-matrix-updated']);
 
 const { isUpdating, error, updateRiskControlMatrix, resetState } = useUpdateRiskControlMatrixById();
 const { authStatus, checkAuthStatus } = useAuthStatus();
+const { showNotification } = useNotification();
 
 const formData = ref({
   description: ''

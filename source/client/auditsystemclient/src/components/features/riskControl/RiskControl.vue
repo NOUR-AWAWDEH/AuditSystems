@@ -200,7 +200,7 @@ const selectedObservationId = ref(localStorage.getItem("riskControlSelectedObser
 
 // Composables
 const { getSubDepartmentsByUserId, subDepartments } = useGetSubDepartmentsByUserId();
-const { getAuditProcessesByUserId, auditProcesses } = useGetAuditProcessesByUserId();
+const { getAuditProcessesByUserId } = useGetAuditProcessesByUserId();
 const { getRiskControlMatricesByUserId, riskControlMatrices } = useGetRiskControlMatricesByUserId();
 const { getObjectivesByUserId, objectives } = useGetObjectivesByUserId();
 const { getExitControlsByUserId, exitControls } = useGetExitControlsByUserId();

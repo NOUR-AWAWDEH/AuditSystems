@@ -2,7 +2,7 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const COMPANY_BSE_ENDPOINT = '/api/company';
+const COMPANY_BASE_ENDPOINT = '/api/company';
 const CREATE_COMPANY_ENDPOINT = '/create-company';
 
 export const createCompanyRepository = {
@@ -15,7 +15,7 @@ export const createCompanyRepository = {
             };
 
             const response = await api.post(
-                `${COMPANY_BSE_ENDPOINT}${CREATE_COMPANY_ENDPOINT}`,
+                `${COMPANY_BASE_ENDPOINT}${CREATE_COMPANY_ENDPOINT}`,
                 payload, {
 
                 headers: {
@@ -25,14 +25,16 @@ export const createCompanyRepository = {
             });
 
             if (response.status === 201 || response?.success !== false) {
-                return ApiResponseT.ok(response.data.result, response.successMessage || 'Department created successfully');
+                return ApiResponseT.ok(response.data.result, response.successMessage || 'Company created successfully');
             }
 
             const errors = Array.isArray(response?.errors)
                 ? response.errors
                 : [{ message: response?.data?.successMessage || 'Creation failed' }];
             return ApiResponseT.badRequest(errors, response?.data?.successMessage);
+       
         } catch (error) {
+            
             if (error.response?.status === 401) {
                 return ApiResponseT.unauthorized(
                     [{ message: 'Authentication required. Please log in again.' }],
@@ -47,7 +49,7 @@ export const createCompanyRepository = {
             }
 
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while creating department.' }],
+                [{ message: error.message || 'An unexpected error occurred while creating company.' }],
                 'Server error'
             );
         }

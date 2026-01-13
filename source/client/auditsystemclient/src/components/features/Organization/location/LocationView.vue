@@ -4,21 +4,27 @@
     <!-- Add Location Form -->
     <AddLocationForm
       :is-visible="showAddLocationModal"
-      :company-id="companyId"
+      :company-id="internalSelectedCompanyId"
       @close="handleCloseAddLocationModal"
       @location-added="handleLocationAdded"
     />
 
     <!-- Location Table with integrated selection -->
     <LocationTable
+      v-if="props.companies && props.companies.length > 0"
+      :companies="props.companies"
       :locations="locations"
       :is-loading="isLoading"
+      :selected-company-id="internalSelectedCompanyId"
       :search-query="searchQuery"
       :handle-search="handleSearch"
       @edit-location="handleEditLocation"
       @delete-location="handleDeleteLocation"
       @location-selected="handleLocationSelected"
     />
+
+    <!-- Show NoCompanyExist when no companies -->
+    <NoCompanyExist v-else />
 
     <!-- Edit Location Modal -->
     <EditLocationModal
@@ -50,9 +56,25 @@ import EditLocationModal from "./components/EditLocationModal.vue";
 import ConfirmDialog from "@/components/base/ConfirmDialog.vue";
 import { useLocationTable } from "./composables/useLocationTable";
 import { useLocationActions } from "./composables/useLocationActions";
-import { useAuthStatus } from "@/composables/auth/useAuthStatus";
+import { ref, watch } from "vue";
+import NoCompanyExist from "@/components/features/Organization/company/components/NoCompanyExist.vue";
 
-const {companyId } = useAuthStatus();
+const props = defineProps({
+  companies: {
+    type: Array,
+    default: () => [],
+  },
+  selectedCompanyId: {
+    type: [String, Number],
+    default: null,
+  },
+});
+
+const internalSelectedCompanyId = ref(props.selectedCompanyId);
+
+watch(() => props.selectedCompanyId, (newId) => {
+  internalSelectedCompanyId.value = newId;
+});
 
 const emit = defineEmits([
   "location-selected",

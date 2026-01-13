@@ -7,7 +7,6 @@ export function useRiskControlMatrixLifecycle({
     searchRiskControlMatrices,
     searchQuery,
     getRiskControlMatricesByUserId,
-    resetToDefaultView
 }) {
     const isInitialized = ref(false);
     const isInitializing = ref(false);

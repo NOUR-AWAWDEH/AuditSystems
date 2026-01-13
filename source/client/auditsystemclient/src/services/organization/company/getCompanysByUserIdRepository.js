@@ -2,16 +2,16 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const DEPARTMENT_BSE_ENDPOINT = '/api/department';
-const GET_DEPARTMENT_BY_USER_ID_ENDPOINT = '/get-departments-by-user-id';
+const COMPANY_BASE_ENDPOINT = '/api/company';
+const SEARCH_COMPANY_ENDPOINT = '/search-company';
 
-export const getDepartmentByUserIdRepository = {
-    async getDepartmentByUserId() {
+export const getCompanyByUserIdRepository = {
+    async getCompanyByUserId() {
         try {
             const token = authService.getLocalToken();
 
             const response = await api.get(
-                `${DEPARTMENT_BSE_ENDPOINT}${GET_DEPARTMENT_BY_USER_ID_ENDPOINT}`, {
+                `${COMPANY_BASE_ENDPOINT}${SEARCH_COMPANY_ENDPOINT}`, {
 
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -20,12 +20,15 @@ export const getDepartmentByUserIdRepository = {
             });
 
             if (response.data?.success && response.data?.result) {
-                return ApiResponseT.ok(response.data.result, response.data.successMessage || 'Department retrieved successfully.');
+                // If it's returning a pagination response, we extract items
+                const result = response.data.result;
+                const companies = result.items || result.Items || result.companys || result.companies || result;
+                return ApiResponseT.ok(companies, response.data.successMessage || 'Company retrieved successfully.');
             }
 
             return ApiResponseT.badRequest(
-                response.data?.errors || [{ message: 'Failed to retrieve department.' }],
-                response.data?.successMessage || 'Failed to retrieve department.'
+                response.data?.errors || [{ message: 'Failed to retrieve company.' }],
+                response.data?.successMessage || 'Failed to retrieve company.'
             );
             
         } catch (error) {
@@ -49,7 +52,7 @@ export const getDepartmentByUserIdRepository = {
             }
 
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while retrieving department.' }],
+                [{ message: error.message || 'An unexpected error occurred while retrieving company.' }],
                 'Server error'
             );
         }

@@ -11,10 +11,10 @@ export const searchRiskControlMatricesByUserIdRepository = {
             const token = authService.getLocalToken();
 
             const params = {
-                searchTerm: searchTerm,
-                auditProcessId: auditProcessId,
-                page: pageNumber,
-                pageSize: pageSize
+                SearchTerm: searchTerm,
+                AuditProcessId: auditProcessId,
+                PageNumber: pageNumber,
+                PageSize: pageSize
             };
 
             const response = await api.get(
@@ -31,11 +31,13 @@ export const searchRiskControlMatricesByUserIdRepository = {
             const { data, status } = response;
 
             if (status === 200 && data?.success) {
-                const result = data.result;
+                const result = data.result || data.Result;
+                const items = result?.items || result?.Items || [];
+                const totalCount = result?.totalCount || result?.TotalCount || 0;
 
-                if (result?.items && typeof result.totalCount === 'number') {
+                if (Array.isArray(items)) {
                     return ApiResponseT.ok(
-                        result,
+                        { items, totalCount },
                         data.successMessage || 'Risk Control Matrices fetched successfully.'
                     );
                 }

@@ -2,12 +2,12 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
-const DEPARTMENT_BASE_ENDPOINT = '/api/department';
-const SEARCH_DEPARTMENT_BY_USER_ID_ENDPOINT = '/search-department-by-user-id';
+const COMPANY_BASE_ENDPOINT = '/api/company';
+const SEARCH_COMPANY_BY_USER_ID_ENDPOINT = '/search-company';
 
-export const searchDepartmentsByUserIdRepository = {
+export const searchCompanysByUserIdRepository = {
 
-    async searchDepartmentsByUserId(searchParams = {}) {
+    async searchCompanysByUserId(searchParams = {}) {
         try {
             const token = authService.getLocalToken();
 
@@ -15,29 +15,12 @@ export const searchDepartmentsByUserIdRepository = {
                 throw new Error('Authentication token not found');
             }
 
-            const queryParams = new URLSearchParams();
-
-            if (searchParams.searchTerm) {
-                queryParams.append('searchTerm', searchParams.searchTerm);
-            }
-
-            if (searchParams.locationId) {
-                queryParams.append('locationId', searchParams.locationId);
-            }
-
-            if (searchParams.page) {
-                queryParams.append('page', searchParams.page);
-            }
-
-            if (searchParams.pageSize) {
-                queryParams.append('pageSize', searchParams.pageSize);
-            }
-
-
-            const queryString = queryParams.toString();
-            const url = `${DEPARTMENT_BASE_ENDPOINT}${SEARCH_DEPARTMENT_BY_USER_ID_ENDPOINT}${queryString ? `?${queryString}` : ''}`;
-            
-            const response = await api.get(url, {
+            const response = await api.get(`${COMPANY_BASE_ENDPOINT}${SEARCH_COMPANY_BY_USER_ID_ENDPOINT}`, {
+                params: {
+                    SearchTerm: searchParams.searchTerm,
+                    PageNumber: searchParams.page,
+                    PageSize: searchParams.pageSize
+                },
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -49,17 +32,17 @@ export const searchDepartmentsByUserIdRepository = {
             if (status === 200 && data?.success) {
                 return ApiResponseT.ok(
                     data.result, 
-                    data.successMessage || 'Departments retrieved successfully.'
+                    data.successMessage || 'Companies retrieved successfully.'
                 );
             }
 
             return ApiResponseT.badRequest(
-                data?.errors || [{ message: 'Failed to retrieve departments.' }],
-                data?.message || 'Failed to retrieve departments.'
+                data?.errors || [{ message: 'Failed to retrieve companies.' }],
+                data?.message || 'Failed to retrieve companies.'
             );
 
         } catch (error) {
-            console.error("Error searching department:", error);
+            console.error("Error searching company:", error);
             
             const responseData = error.response?.data;
             

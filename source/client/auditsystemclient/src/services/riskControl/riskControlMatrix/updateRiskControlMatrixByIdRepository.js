@@ -12,9 +12,9 @@ export const updateRiskControlMatrixByIdRepository = {
             const token = authService.getLocalToken();
 
             const payload = {
-                id: riskControlMatrixData.id,
-                description: riskControlMatrixData.description,
-                auditProcessId:  (riskControlMatrixData.auditProcessId && typeof riskControlMatrixData.auditProcessId === 'object')
+                Id: riskControlMatrixData.id,
+                Description: riskControlMatrixData.description,
+                AuditProcessId: (riskControlMatrixData.auditProcessId && typeof riskControlMatrixData.auditProcessId === 'object')
                     ? riskControlMatrixData.auditProcessId.value || riskControlMatrixData.auditProcessId.id
                     : riskControlMatrixData.auditProcessId,
             };

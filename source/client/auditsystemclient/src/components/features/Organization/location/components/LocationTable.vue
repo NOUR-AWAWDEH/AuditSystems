@@ -6,7 +6,10 @@
       <div class="p-3 sm:p-4 md:p-6">
         <!-- Header with Title and Filters -->
         <div class="flex flex-col gap-4 mb-6">
-          <LocationHeader />
+          <LocationHeader
+            :companies="props.companies"
+            :selected-company-id="props.selectedCompanyId"
+          />
 
           <div class="flex flex-col sm:flex-row sm:items-end gap-3">
             <SearchFilters
@@ -156,6 +159,8 @@ import LocationHeader from "./LocationHeader.vue";
 import { formatDateSimple } from "@/utils/dateUtils";
 
 const props = defineProps({
+  companies: Array,
+  selectedCompanyId: [String, Number],
   locations: Array,
   isLoading: Boolean,
   searchQuery: String,

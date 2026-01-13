@@ -2,18 +2,18 @@ import api from "@/services/api/api";
 import { ApiResponseT } from "@/utils/ApiResponse";
 import authService from '@/services/auth/authRepos/authService';
 
-const DEPARTMENT_BSE_ENDPOINT = '/api/department';
-const DELETE_DEPARTMENT_ENDPOINT = '/delete-department-by-id';
+const COMPANY_BASE_ENDPOINT = '/api/company';
+const DELETE_COMPANY_ENDPOINT = '/delete-company';
 
-export const deleteDepartmentByIdRepository = {
-    async deleteDepartmentById(departmentId) {
+export const deleteCompanyByIdRepository = {
+    async deleteCompanyById(companyId) {
         try {
             const token = authService.getLocalToken();
 
             const response = await api.delete(
-                `${DEPARTMENT_BSE_ENDPOINT}${DELETE_DEPARTMENT_ENDPOINT}`, {
+                `${COMPANY_BASE_ENDPOINT}${DELETE_COMPANY_ENDPOINT}`, {
 
-                data: { id: departmentId },
+                data: { id: companyId },
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -21,7 +21,7 @@ export const deleteDepartmentByIdRepository = {
             });
 
             if (response.status === 204 || response?.success !== false) {
-                return ApiResponseT.ok(null, 'Department deleted successfully');
+                return ApiResponseT.ok(null, 'Company deleted successfully');
             }
 
             const errors = Array.isArray(response.errors)
@@ -47,13 +47,13 @@ export const deleteDepartmentByIdRepository = {
 
             if (error.response?.status === 404) {
                 return ApiResponseT.notFound(
-                    [{ message: 'Department not found' }], 'Department not found'
+                    [{ message: 'Company not found' }], 'Company not found'
                 );
             }
 
             // Handle other server errors
             const responseData = error.response?.data;
-            const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting department.';
+            const serverMessage = responseData?.message || responseData?.title || error.message || 'An unexpected error occurred while deleting company.';
             
             return ApiResponseT.serverError(
                 [{ message: serverMessage }],

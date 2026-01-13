@@ -12,7 +12,7 @@ export const deleteRiskControlMatrixByIdRepository = {
 
             const response = await api.delete(
                 `${RISK_CONTROL_MATRIX_API_ENDPOINT}${DELETE_RISK_CONTROL_MATRIX_API_ENDPOINT}`, {
-                    data: { id: riskControlMatrixId },
+                    data: { Id: riskControlMatrixId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',

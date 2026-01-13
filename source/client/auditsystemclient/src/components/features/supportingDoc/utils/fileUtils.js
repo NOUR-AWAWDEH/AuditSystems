@@ -52,6 +52,7 @@ export function validateFileName(fileName) {
   }
 
   // Check for dangerous characters
+  // eslint-disable-next-line no-control-regex
   const dangerousChars = /[<>:"|?*\x00-\x1f]/;
   if (dangerousChars.test(fileName)) {
     return { isValid: false, error: 'File name contains invalid characters' };

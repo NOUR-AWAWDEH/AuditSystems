@@ -21,10 +21,11 @@ export const getRiskControlMatricesByUserIdRepository = {
             );
 
             const { data, status } = response;
-            responseData = data;
             
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result?.riskControlMatrixModels, data?.successMessage || 'Risk Control Matrices retrieved successfully');
+                const result = data.result || data.Result;
+                const models = result?.riskControlMatrixModels || result?.RiskControlMatrixModels || result?.items || result?.Items || result;
+                return ApiResponseT.ok(models, data.successMessage || 'Risk Control Matrices retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

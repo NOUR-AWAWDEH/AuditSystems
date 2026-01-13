@@ -59,85 +59,6 @@
           </div>
         </div>
 
-        <div
-          v-if="selectedAuditProgramId"
-          class="hidden 2xl:block rounded-lg border border-gray-200"
-        >
-          <ReusableTable
-            :items="enrichedObservations"
-            :columns="enhancedColumns"
-            :is-loading="isLoading"
-            :actions="[]"
-            :no-data-message="noDataMessage"
-            class="observation-table min-w-full"
-          >
-            <!-- Custom cell for IsActive -->
-            <template #cell-isActive="{ item }">
-              <span :class="item.isActive ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'">
-                {{ item.isActive ? 'Yes' : 'No' }}
-              </span>
-            </template>
-
-            <!-- Custom cell for Rate -->
-            <template #cell-rate="{ item }">
-              <span v-if="item.rate && item.rate.level" :class="getRateColorClasses(item.rate.level)">
-                {{ item.rate.level }}
-              </span>
-              <span v-else class="text-gray-400 italic">Not assigned</span>
-            </template>
-
-            <template #cell-actions="{ item }">
-              <div class="flex flex-col items-start justify-start xl:flex-row gap-2 min-w-max">
-                <button
-                  @click.stop="handleSelectObservation(item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                  :class="{ 'bg-green-200': selectedObservationId === item.id }"
-                >
-                  <CheckIcon
-                    v-if="selectedObservationId === item.id"
-                    size="md"
-                    custom-class="mr-1"
-                  />
-                  <SelectIcon v-else size="md" custom-class="mr-1" />
-                  {{ selectedObservationId === item.id ? "Selected" : "Select" }}
-                </button>
-
-                <button
-                  @click.stop="$emit('edit-observation', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <EditIcon size="sm" custom-class="mr-1" />
-                  Edit
-                </button>
-
-                <button
-                  @click.stop="$emit('delete-observation', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <DeleteIcon size="sm" custom-class="mr-1" />
-                  Delete
-                </button>
-
-                <button
-                  @click.stop="$emit('recommendation-add', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <AddIcon size="sm" custom-class="mr-1" />
-                  Add Recommendations
-                </button>
-
-                <button
-                  @click.stop="$emit('add-risks', item)"
-                  class="inline-flex items-center min-w-22 px-2 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
-                >
-                  <AddIcon size="sm" custom-class="mr-1" />
-                  Add Risks
-                </button>
-              </div>
-            </template>
-          </ReusableTable>
-        </div>
-
         <!-- Mobile Card View -->
         <ReusableMobileCardList
           v-if="selectedAuditProgramId"
@@ -145,7 +66,6 @@
           :showNumber="true"
           :isLoading="isLoading"
           :noDataMessage="noDataMessage"
-          class="2xl:hidden"
         >
           <template #card-content="{ item }">
             <div class="space-y-4">

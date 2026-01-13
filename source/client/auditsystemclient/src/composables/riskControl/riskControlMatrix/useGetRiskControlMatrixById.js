@@ -7,8 +7,9 @@ export function useGetRiskControlMatrixById() {
     const error = ref(null);
 
     const handleFetchSuccess = (response) => {
-        riskControlMatrix.value = response.result;
-        return { success: true, data: response.result };
+        const matrix = response.result || response.data || {};
+        riskControlMatrix.value = matrix.riskControlMatrixModel || matrix.RiskControlMatrixModel || matrix;
+        return { success: true, data: riskControlMatrix.value };
     };
 
     const handleFetchFailure = (response, defaultErrorMessage = 'Failed to fetch risk control matrix!') => {

@@ -2,11 +2,11 @@ import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 import api from '@/services/api/api';
 
-const DEPARTMENT_BASE_ENDPOINT = '/api/department';
-const UPDATE_DEPARTMENT_BY_ID_ENDPOINT = '/update-department';
+const COMPANY_BASE_ENDPOINT = '/api/company';
+const UPDATE_COMPANY_BY_ID_ENDPOINT = '/update-company';
 
-export const updateDepartmentByIdRepository = {
-    async updateDepartmentById(departmentData) {
+export const updateCompanyByIdRepository = {
+    async updateCompanyById(companyData) {
         try {
             const token = authService.getLocalToken();
 
@@ -15,15 +15,12 @@ export const updateDepartmentByIdRepository = {
             }
 
             const payload = {
-                id: departmentData.id,
-                name: departmentData.name,
-                locationId: typeof departmentData.locationId === 'object' 
-                    ? departmentData.locationId.value || departmentData.locationId.id || departmentData.locationId
-                    : departmentData.locationId
+                id: companyData.id,
+                name: companyData.name
             };
 
             const response = await api.put(
-                `${DEPARTMENT_BASE_ENDPOINT}${UPDATE_DEPARTMENT_BY_ID_ENDPOINT}`,
+                `${COMPANY_BASE_ENDPOINT}${UPDATE_COMPANY_BY_ID_ENDPOINT}`,
                 payload, 
                 {
                     headers: {
@@ -34,7 +31,7 @@ export const updateDepartmentByIdRepository = {
             );
 
             if (response.status === 200 || response?.success !== false) {
-              return ApiResponseT.ok(null, response?.data?.successMessage || 'Department updated successfully');
+              return ApiResponseT.ok(null, response?.data?.successMessage || 'Company updated successfully');
             }
 
           const errors = Array.isArray(response?.errors)
@@ -60,13 +57,13 @@ export const updateDepartmentByIdRepository = {
       
       if (error.response?.status === 404) {
         return ApiResponseT.notFound(
-          [{ message: 'Department not found' }],
-          'Department not found'
+          [{ message: 'Company not found' }],
+          'Company not found'
         );
       }
       
       return ApiResponseT.serverError(
-        [{ message: error.message || 'An unexpected error occurred while updating department.' }],
+        [{ message: error.message || 'An unexpected error occurred while updating company.' }],
         'Server error'
       );
     }

@@ -1,19 +1,15 @@
-import { watch, nextTick } from 'vue';
+import { watch } from 'vue';
 
 export function useRiskControlMatrixWatchers({
     selectedAuditProcessId,
     searchQuery,
     currentPage,
     pageSize,
-    isInitialized,
-    isInitializing,
     searchRiskControlMatrices,
     clearSearch,
     getRiskControlMatricesByUserId,
     allRiskControlMatrices,
     clearAuditProcess,
-    initializeData,
-    resetToDefaultView
 }) {
     // Watch Sub Process - Removed
 

@@ -64,10 +64,19 @@
       </div>
 
       <div v-else>
+        <!-- Companies -->
+        <div v-if="activeTab === 'companies'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
+          <CompanyView
+            @company-selected="handleCompanySelected"
+            @company-deleted="handleCompanyDeleted"
+          />
+        </div>
+
         <!-- Locations -->
         <div v-if="activeTab === 'locations'" class="p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-auto">
           <LocationView
-            :locations="locations"
+            :companies="companies"
+            :selected-company-id="selectedCompanyId"
             @location-selected="handleLocationSelected"
             @location-deleted="handleLocationDeleted"
           />
@@ -102,9 +111,11 @@ import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import OrganizationHeader from "./components/OrganizationHeader.vue";
+import CompanyView from "./company/CompanyView.vue";
 import LocationView from "./location/LocationView.vue";
 import DepartmentView from "./department/DepartmentView.vue";
 import SubDepartmentView from "./subdepartment/SubDepartmentView.vue";
+import { useGetCompanysByUserId } from "@/composables/organization/company/useGetCompanysByUserId";
 import { useGetLocationById } from "@/composables/organization/location/useGetLocationById";
 import { useGetDepartmentsByUserId } from "@/composables/organization/department/useGetDepartmentsByUserId";
 import { useGetDepartmentById } from "@/composables/organization/department/useGetDepartmentById";
@@ -114,11 +125,13 @@ import { useGetLocationsByUserId } from "@/composables/organization/location/use
 const route = useRoute();
 const router = useRouter();
 
-const activeTab = ref("locations");
+const activeTab = ref("companies");
+const selectedCompanyId = ref(localStorage.getItem("organizationSelectedCompanyId") || null);
 const selectedLocationId = ref(localStorage.getItem("organizationSelectedLocationId") || null);
 const selectedDepartmentId = ref(localStorage.getItem("organizationSelectedDepartmentId") || null);
 const selectedSubDepartmentId = ref(localStorage.getItem("organizationSelectedSubDepartmentId") || null);
 
+const { getCompanysByUserId, companies } = useGetCompanysByUserId();
 const { getLocationsByUserId, locations } = useGetLocationsByUserId();
 const { getLocationById } = useGetLocationById();
 const { getDepartmentsByUserId, departments } = useGetDepartmentsByUserId();
@@ -129,19 +142,24 @@ const isLoading = ref(false);
 const errorMessage = ref(null);
 
 const tabs = ref([
+  { id: "companies", name: "Companies" },
   { id: "locations", name: "Locations" },
   { id: "departments", name: "Departments" },
   { id: "subdepartments", name: "Sub-Departments" },
 ]);
 
 const storageKeys = {
-  locations: "organizationSelectedLocationId",
-  departments: "organizationSelectedDepartmentId",
-  subdepartments: "organizationSelectedSubDepartmentId"
-}
+  company: "organizationSelectedCompanyId",
+  location: "organizationSelectedLocationId",
+  department: "organizationSelectedDepartmentId",
+  subDepartment: "organizationSelectedSubDepartmentId",
+};
 
 const setSelectedId = (key, value) => {
   switch (key) {
+    case "company":
+      selectedCompanyId.value = value;
+      break;
     case "location":
       selectedLocationId.value = value;
       break;
@@ -161,8 +179,14 @@ const setSelectedId = (key, value) => {
   if (value) {
     localStorage.setItem(storageKey, value);
   } else {
-    localStorage.removeItem(storageKey)
+    localStorage.removeItem(storageKey);
   }
+};
+
+const handleCompanySelected = async (id) => {
+  setSelectedId("company", id);
+  await getCompanysByUserId();
+  activeTab.value = "locations";
 };
 
 const handleLocationSelected = async (id) => {
@@ -183,6 +207,20 @@ const handleSubDepartmentSelected = async (id) => {
 
 
 // Handle Deleted SelectedId
+
+const handleCompanyDeleted = (deletedId) => {
+  if (selectedCompanyId.value === deletedId) {
+    setSelectedId("company", null);
+    setSelectedId("location", null);
+    setSelectedId("department", null);
+    setSelectedId("subDepartment", null);
+    selectedCompanyId.value = null;
+  }
+
+  if (Array.isArray(companies.value)) {
+    companies.value = companies.value.filter((comp) => comp.id !== deletedId);
+  }
+};
 
 const handleLocationDeleted = (deletedId) => {
   if (selectedLocationId.value === deletedId) {
@@ -224,13 +262,18 @@ const setActiveTab = async (tabId) => {
 
   try {
     switch (tabId) {
+      case "companies":
+        if (!companies.value || companies.value.length === 0) {
+          await getCompanysByUserId();
+        }
+        break;
       case "locations":
-        if(!locations.value || locations.value.length === 0) {
+        if (!locations.value || locations.value.length === 0) {
           await getLocationsByUserId();
         }
         break;
       case "departments":
-        if (!locations.value || locations.value.length === 0) { 
+        if (!locations.value || locations.value.length === 0) {
           await getLocationsByUserId();
         }
         break;
@@ -247,7 +290,12 @@ const setActiveTab = async (tabId) => {
 };
 
 const handleRouteQueries = async () => {
-  const { locationId, departmentId, subDepartmentId } = route.query;
+  const { companyId, locationId, departmentId, subDepartmentId } = route.query;
+  if (companyId) {
+    selectedCompanyId.value = companyId;
+    // Assuming useGetCompanyById exists or similar
+    // await getCompanyById(companyId); 
+  }
   if (locationId) {
     selectedLocationId.value = locationId;
     await getLocationById(locationId);
@@ -260,7 +308,7 @@ const handleRouteQueries = async () => {
     selectedSubDepartmentId.value = subDepartmentId;
     await getSubDepartmentById(subDepartmentId);
   }
-  if (locationId || departmentId || subDepartmentId) {
+  if (companyId || locationId || departmentId || subDepartmentId) {
     await router.replace({ path: "/organization" });
   }
 };

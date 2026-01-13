@@ -12,15 +12,16 @@ export function useSearchRiskControlMatricesByUserId() {
     const auditProcessId = ref(null);
 
     const handleSearchSuccess = (response) => {
-        const items = response.result?.items || [];
-        const extractedTotalCount = response.result?.totalCount || 0;
+        const result = response.result || response.data || {};
+        const items = result.items || result.Items || [];
+        const extractedTotalCount = result.totalCount || result.TotalCount || 0;
 
         const isValidArray = Array.isArray(items);
 
         searchResults.value = isValidArray ? items : [];
         totalCount.value = extractedTotalCount;
 
-        return { success: true, data: response.result };
+        return { success: true, data: result };
     };
 
     const handleSearchFailure = (response, defaultErrorMessage = 'Failed to search risk control matrices') => {

@@ -5,7 +5,7 @@ import { useRiskControlMatrixWatchers } from './useRiskControlMatrixWatchers';
 import { useRiskControlMatrixLifecycle } from './useRiskControlMatrixLifecycle';
 import { useRiskControlMatrixComputed } from './useRiskControlMatrixComputed';
 
-import { ref } from 'vue';
+
 
 export function useRiskControlMatrixTable(selectedAuditProcessId) {
 

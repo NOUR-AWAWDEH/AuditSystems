@@ -2,17 +2,17 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const DEPARTMENT_BASE_ENDPOINT = '/api/department';
-const GET_DEPARTMENT_BY_ID_ENDPOINT = '/get-department-by-id';
+const COMPANY_BASE_ENDPOINT = '/api/company';
+const GET_COMPANY_BY_ID_ENDPOINT = '/get-company';
 
-export const getDepartmentByIdRepository = {
-    async getDepartmentById(departmentId) {
+export const getCompanyByIdRepository = {
+    async getCompanyById(companyId) {
         try {
             const token = authService.getLocalToken();
 
             const response = await api.get(
-                `${DEPARTMENT_BASE_ENDPOINT}${GET_DEPARTMENT_BY_ID_ENDPOINT}`, {
-                params: { id: departmentId },
+                `${COMPANY_BASE_ENDPOINT}${GET_COMPANY_BY_ID_ENDPOINT}`, {
+                params: { id: companyId },
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -25,17 +25,17 @@ export const getDepartmentByIdRepository = {
             if (status === 200 && data?.success && data?.result) {
                 return ApiResponseT.ok(
                     data.result, 
-                    data.successMessage || 'Department retrieved successfully.'
+                    data.successMessage || 'Company retrieved successfully.'
                 );
             }
 
             return ApiResponseT.badRequest(
-                data?.errors || [{ message: data?.message || 'Failed to retrieve department.' }],
-                data?.message || 'Failed to retrieve department.'
+                data?.errors || [{ message: data?.message || 'Failed to retrieve company.' }],
+                data?.message || 'Failed to retrieve company.'
             );
 
         } catch (error) {
-            console.error('Error fetching department:', error);
+            console.error('Error fetching company:', error);
             
             const responseData = error.response?.data;
 
@@ -57,13 +57,13 @@ export const getDepartmentByIdRepository = {
 
             if (error.response?.status === 404) {
                 return ApiResponseT.notFound(
-                    [{ message: 'Department not found.' }],
-                    'Department not found.'
+                    [{ message: 'Company not found.' }],
+                    'Company not found.'
                 );
             }
             
             return ApiResponseT.serverError(
-                [{ message: error.message || 'An unexpected error occurred while retrieving department.' }],
+                [{ message: error.message || 'An unexpected error occurred while retrieving company.' }],
                 'Server error'
             );
         }

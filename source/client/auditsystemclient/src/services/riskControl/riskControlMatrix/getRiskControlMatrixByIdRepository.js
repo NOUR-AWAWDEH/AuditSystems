@@ -2,18 +2,17 @@ import api from '@/services/api/api';
 import { ApiResponseT } from '@/utils/ApiResponse';
 import authService from '@/services/auth/authRepos/authService';
 
-const RISK_CONTROL_MATRIX_API_ENDPOINT = '/api/RiskControlMatrix';
-const RISK_CONTROL_MATRIX_API_ENDPOINT_ID = '/get-risk-control-matrix-by-id';
+const RISK_CONTROL_MATRIX_BASE_ENDPOINT = '/api/RiskControlMatrix';
+const GET_BY_ID_ENDPOINT = '/get-risk-control-matrix-by-id';
 
 export const getRiskControlMatrixByIdRepository = {
     async getRiskControlMatrixById(riskControlMatrixId) {
-        let responseData = null;
         try {
             const token = authService.getLocalToken();
 
             const response = await api.get(
-                `${RISK_CONTROL_MATRIX_API_ENDPOINT}${RISK_CONTROL_MATRIX_API_ENDPOINT_ID}`, {
-                    params: { id: riskControlMatrixId },
+                `${RISK_CONTROL_MATRIX_BASE_ENDPOINT}${GET_BY_ID_ENDPOINT}`, {
+                    params: { Id: riskControlMatrixId },
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -21,10 +20,11 @@ export const getRiskControlMatrixByIdRepository = {
                 });
 
             const { data, status } = response;
-            responseData = data;
 
             if (status === 200 && data?.success !== false) {
-                return ApiResponseT.ok(data?.result, data?.successMessage || 'Risk Control Matrix retrieved successfully');
+                const result = data.result || data.Result;
+                const matrixModel = result?.riskControlMatrixModel || result?.RiskControlMatrixModel || result;
+                return ApiResponseT.ok(matrixModel, data.successMessage || 'Risk Control Matrix retrieved successfully');
             }
 
             const errors = Array.isArray(data?.errors)

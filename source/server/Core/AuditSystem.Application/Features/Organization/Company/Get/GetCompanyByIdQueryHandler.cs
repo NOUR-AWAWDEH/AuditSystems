@@ -1,16 +1,16 @@
 using Ardalis.Result;
-using MediatR;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using MediatR;
 
 namespace AuditSystem.Application.Features.Organization.Company.Get;
 
 internal sealed class GetCompanyByIdQueryHandler(
-    ICompanyService companyService) : 
+    ICompanyService companyService) :
     IRequestHandler<GetCompanyByIdQuery, Result<GetCompanyByIdQueryResponse>>
 {
     public async Task<Result<GetCompanyByIdQueryResponse>> Handle(GetCompanyByIdQuery request, CancellationToken cancellationToken)
     {
-        var result = await companyService.GetCompanyByIdAsync(request.Id);
+        var result = await companyService.GetCompanyByIdAsync(request.Id, request.UserId);
         if (result == null)
         {
             return Result.NotFound();

@@ -20,6 +20,7 @@ public interface IRepository<TId, TEntity>
     Task UpdateAsync(TEntity entity, Expression<Func<TEntity, object?>>[]? ignoreProperties = null);
     Task DeleteAsync(TId id);
     ValueTask DeleteRangeAsync(ICollection<TEntity> entities);
+    Task DeleteWhereAsync(Expression<Func<TEntity, bool>> predicate);
     IQueryable<TEntity> GetAll();
     Task<ICollection<TResponse>> GetByQueryAsync<TResponse>(IQueryable<TResponse> query);
     Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);

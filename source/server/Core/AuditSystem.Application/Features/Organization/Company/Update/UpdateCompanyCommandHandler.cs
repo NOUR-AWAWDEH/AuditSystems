@@ -16,9 +16,9 @@ internal sealed class UpdateCompanyCommandHandler(
     public async Task<Result> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
     {
         var companyModel = mapper.Map<CompanyModel>(request);
-        await companyService.UpdateCompanyAsync(companyModel);
-        
-        logger.LogInformation("Company updated successfully");
+        await companyService.UpdateCompanyAsync(companyModel, request.UserId);
+
+        logger.LogInformation("Company updated successfully by User {UserId}", request.UserId);
         return Result.SuccessWithMessage("Company updated successfully");
     }
 }

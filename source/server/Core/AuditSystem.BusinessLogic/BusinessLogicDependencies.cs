@@ -3,6 +3,7 @@ using AuditSystem.BusinessLogic.Helpers.AuditProgramHelpers;
 using AuditSystem.BusinessLogic.Helpers.ControlDesignHelpers;
 using AuditSystem.BusinessLogic.Helpers.ExitControlHelpers;
 using AuditSystem.BusinessLogic.Helpers.ObservationHelpers;
+using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.CompanyHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.DepartmentHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.JobTitleHelpers;
 using AuditSystem.BusinessLogic.Helpers.OrganizationHelpers.LocationHelpers;
@@ -40,6 +41,7 @@ using AuditSystem.Contract.Interfaces.ModelServices.AuditServices.AuditProgramSe
 using AuditSystem.Contract.Interfaces.ModelServices.CommonServices;
 using AuditSystem.Contract.Interfaces.ModelServices.ObservationServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.CompanyServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.DepartmentServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.JobTitleServices;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices.LocationServices;
@@ -120,6 +122,8 @@ public static class BusinessLogicDependencies
             //Company
             .AddScoped<ICompanyService, CompanyService>()
             .AddScoped<IUnifiedCacheService<Guid, Company, CompanyModel>, CompanyService>()
+            .AddScoped<ICompanyValidation, CompanyValidationHelper>()
+            .AddScoped<ICompanySearch, CompanySearchHelper>()
 
             // JobTitle
             .AddScoped<IJobTitleService, JobTitleService>()
@@ -210,7 +214,7 @@ public static class BusinessLogicDependencies
             .AddScoped<IObservationsFetcher, ObservationsFetcher>()
             .AddScoped<IRecommendationsFetcher, RecommendationsFetcher>()
 
-            
+
             // Url
             .AddSingleton<ISignedUrlService, SignedUrlService>()
             .AddScoped<IURLService, URLService>()

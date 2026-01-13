@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuditSystem.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260111103519_Init")]
+    [Migration("20260113072413_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -906,6 +906,9 @@ namespace AuditSystem.DataAccess.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("CompanyId", "AppUserId")
+                        .IsUnique();
 
                     b.ToTable("CompanyUsers", (string)null);
                 });

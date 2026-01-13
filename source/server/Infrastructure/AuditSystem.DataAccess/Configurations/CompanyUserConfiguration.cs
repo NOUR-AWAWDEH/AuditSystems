@@ -11,6 +11,11 @@ public class CompanyUserConfiguration : IEntityTypeConfiguration<CompanyUser>
         builder.ToTable("CompanyUsers");
 
         builder.HasKey(cu => cu.Id);
+        builder.Property(cu => cu.CompanyId).IsRequired();
+        builder.Property(cu => cu.AppUserId).IsRequired();
+        builder.Property(cu => cu.RoleId).IsRequired();
+        builder.Property(cu => cu.CreatedByUserId).IsRequired();
+
 
         builder.HasOne(cu => cu.Company)
                .WithMany(c => c.CompanyUsers)
@@ -21,6 +26,7 @@ public class CompanyUserConfiguration : IEntityTypeConfiguration<CompanyUser>
                .WithMany(u => u.CompanyUsers)
                .HasForeignKey(cu => cu.AppUserId)
                .OnDelete(DeleteBehavior.Restrict);
+               
 
         builder.HasOne(cu => cu.Role)
                .WithMany()
@@ -35,5 +41,8 @@ public class CompanyUserConfiguration : IEntityTypeConfiguration<CompanyUser>
                .WithMany()
                .HasForeignKey(cu => cu.CreatedByUserId)
                .OnDelete(DeleteBehavior.Restrict);
+
+       builder.HasIndex(cu => new { cu.CompanyId, cu.AppUserId }).IsUnique();
+       builder.HasIndex(cu => cu.CompanyId);
     }
 }

@@ -20,7 +20,7 @@ public sealed class OrganizationalDataFetcher(
     {
         logger.LogDebug("Fetching organizational data");
 
-        var company = await companyService.GetCompanyByIdAsync(request.CompanyId);
+        var company = await companyService.GetCompanyByIdAsync(request.CompanyId, request.UserId);
         var location = await locationService.GetLocationByIdAsync(request.LocationId, request.UserId);
         var department = await departmentService.GetDepartmentByIdAsync(request.DepartmentId, request.UserId);
         var subDepartment = await subDepartmentService.GetSubDepartmentByIdAsync(request.SubDepartmentId, request.UserId);

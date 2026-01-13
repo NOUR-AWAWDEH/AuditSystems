@@ -16,7 +16,7 @@ internal sealed class CreateCompanyCommandHandler(
     public async Task<Result<CreateCompanyCommandResponse>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
         var companyModel = mapper.Map<CompanyModel>(request);
-        var companyId = await companyService.CreateCompanyAsync(companyModel);
+        var companyId = await companyService.CreateCompanyAsync(companyModel, request.UserId);
         logger.LogInformation("Company with Name {CompanyName} has been created.", request.Name);
 
         return Result<CreateCompanyCommandResponse>.Created(new CreateCompanyCommandResponse(companyId), "Company created.");

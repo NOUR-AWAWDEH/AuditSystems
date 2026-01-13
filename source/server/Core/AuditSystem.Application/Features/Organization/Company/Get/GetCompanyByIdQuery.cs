@@ -1,6 +1,7 @@
-using MediatR;
 using Ardalis.Result;
+using AuditSystem.Application.Base;
+using MediatR;
 
 namespace AuditSystem.Application.Features.Organization.Company.Get;
 
-public sealed record class GetCompanyByIdQuery(Guid Id) : IRequest<Result<GetCompanyByIdQueryResponse>>;
+public sealed record class GetCompanyByIdQuery(Guid Id) : UserAwareQuery<Result<GetCompanyByIdQueryResponse>>;

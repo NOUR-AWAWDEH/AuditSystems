@@ -13,7 +13,7 @@ internal sealed class SearchCompanyQueryHandler(ICompanyService companyService)
     public async Task<Result<PaginationRequestResponse<CompanyModel>>> Handle(SearchCompanyQuery request, CancellationToken cancellationToken)
     {
         var page = new Page(request.PageNumber, request.PageSize);
-        var searchResult = await companyService.SearchAsync(request.SearchTerm, page);
+        var searchResult = await companyService.SearchByUserIdAsync(request.UserId, request.SearchTerm, page);
         var response = new PaginationRequestResponse<CompanyModel>(searchResult.Items, searchResult.TotalCount);
         return Result.Success(response);
     }

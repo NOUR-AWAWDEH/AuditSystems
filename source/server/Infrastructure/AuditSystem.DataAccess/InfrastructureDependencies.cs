@@ -91,6 +91,7 @@ public static class InfrastructureDependencies
         .AddRepository<Guid, Location>()
         .AddRepository<Guid, Department>()
         .AddRepository<Guid, Company>()
+        .AddRepository<Guid, CompanyUser>()
         .AddRepository<Guid, JobTitle>()
         //Processes
         .AddRepository<Guid, AuditProcess>()

@@ -905,6 +905,12 @@ namespace AuditSystem.DataAccess.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CompanyUsers_CompanyId_AppUserId",
+                table: "CompanyUsers",
+                columns: new[] { "CompanyId", "AppUserId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompanyUsers_CreatedByUserId",
                 table: "CompanyUsers",
                 column: "CreatedByUserId");

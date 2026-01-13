@@ -36,11 +36,6 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         await context.SaveChangesAsync();
     }
 
-    public async Task<TEntity?> GetByIdAsync(TId id)
-    {
-        return await _entities.FindAsync(id);
-    }
-
     public async Task<TEntity?> GetByIdAsync(TId id, Expression<Func<TEntity, object?>>[]? include = null)
     {
         IQueryable<TEntity> query = _entities.AsQueryable();
@@ -55,6 +50,14 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         
         return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
     }
+
+    public async Task<TEntity?> GetByIdAsync(TId id)
+    {
+        return await _entities
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id.Equals(id));
+    }
+
 
     // Generic method for cross-entity queries
     public async Task<TOtherEntity?> GetByIdAsync<TOtherEntity>(object id) where TOtherEntity : class
@@ -94,18 +97,36 @@ internal sealed class EntityRepository<TId, TEntity>(ApplicationDbContext contex
         context.Entry(entity).State = EntityState.Detached;
     }
 
-    public async Task DeleteAsync(TId id)
+   public async Task DeleteAsync(TId id)
     {
-        var entity = await GetByIdAsync(id);
-        if (entity != null)
-        {
-            _entities.Remove(entity);
-            await context.SaveChangesAsync();
-        }
+        var entity = await _entities
+            .FirstOrDefaultAsync(e => e.Id.Equals(id));
+
+        if (entity is null)
+            return;
+
+        _entities.Remove(entity);
+        await context.SaveChangesAsync();
     }
+
 
     public async ValueTask DeleteRangeAsync(ICollection<TEntity> entities)
     {
+        _entities.RemoveRange(entities);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteWhereAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        var entities = await _entities
+            .Where(predicate)
+            .ToListAsync();
+
+        if (entities.Count == 0)
+            return;
+
         _entities.RemoveRange(entities);
         await context.SaveChangesAsync();
     }

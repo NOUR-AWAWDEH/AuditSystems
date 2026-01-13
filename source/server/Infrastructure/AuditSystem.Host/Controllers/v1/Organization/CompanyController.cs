@@ -5,6 +5,7 @@ using AuditSystem.Application.Features.Organization.Company.Delete;
 using AuditSystem.Application.Features.Organization.Company.Get;
 using AuditSystem.Application.Features.Organization.Company.Search;
 using AuditSystem.Application.Features.Organization.Company.Update;
+using AuditSystem.BusinessLogic.Attributes;
 using AuditSystem.Contract.Common;
 using AuditSystem.Contract.Models.Organization;
 using MediatR;
@@ -17,6 +18,7 @@ namespace AuditSystem.Host.Controllers.v1.Organization;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[AutoInjectUserId]
 public sealed class CompanyController(IMediator mediator) : ApiControllerBase(mediator)
 {
     //Create Company

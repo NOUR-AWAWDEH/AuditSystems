@@ -1,27 +1,27 @@
-﻿using Microsoft.Extensions.Logging;
-using MediatR;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using AuditSystem.Contract.Interfaces.ModelServices.OrganizationServices;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace AuditSystem.Application.Features.Organization.Company.Delete;
 
 internal sealed class DeleteCompanyCommandHandler(
     ICompanyService companyService,
-    ILogger<DeleteCompanyCommandHandler> logger) : 
+    ILogger<DeleteCompanyCommandHandler> logger) :
     IRequestHandler<DeleteCompanyCommand, Result>
 {
     public async Task<Result> Handle(DeleteCompanyCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            await companyService.DeleteCompanyAsync(request.Id);
-            logger.LogInformation("Deleting company with ID {Id}", request.Id);
+            await companyService.DeleteCompanyAsync(request.Id, request.UserId);
+            logger.LogInformation("Deleting company with ID {Id} by User {UserId}", request.Id, request.UserId);
             return Result.SuccessWithMessage("Company deleted.");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error deleting company with ID {Id}", request.Id);
             return Result.Error(ex.Message);
-        } 
+        }
     }
 }

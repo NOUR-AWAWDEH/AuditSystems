@@ -904,6 +904,9 @@ namespace AuditSystem.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("CompanyId", "AppUserId")
+                        .IsUnique();
+
                     b.ToTable("CompanyUsers", (string)null);
                 });
 

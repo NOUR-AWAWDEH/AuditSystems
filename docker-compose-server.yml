@@ -103,6 +103,7 @@ services:
       - auditsystem-internal-network
 
   auditsystem.client:
+    image: local/node-security/auditsystems-auditsystem.client-1:24.22.1-20261024
     build:
       context: ./source/client/auditsystemclient
       dockerfile: Dockerfile
